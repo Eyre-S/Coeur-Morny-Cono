@@ -11,6 +11,7 @@ import static cc.sukazyo.cono.morny.Logger.logger;
 public class MornyCoeur {
 	
 	private static TelegramBot account;
+	public static final String USERNAME = "morny_cono_annie_bot";
 	
 	public static void main (String[] args) {
 		
@@ -20,7 +21,7 @@ public class MornyCoeur {
 		logger.info("args key:\n  " + args[0]);
 		
 		try { account = login(args[0]); }
-		catch (Exception e) { logger.error("Cannot login to bot/api."); System.exit(-1); }
+		catch (Exception e) { logger.error("Cannot login to bot/api. :\n  " + e.getMessage()); System.exit(-1); }
 		
 		logger.info("Bot login succeed.");
 		
@@ -37,7 +38,10 @@ public class MornyCoeur {
 		for (int i = 1; i < 4; i++) {
 			if (i != 1) logger.info("retrying...");
 			try {
-				logger.info("Succeed login to @" + account.execute(new GetMe()).user().username());
+				String username = account.execute(new GetMe()).user().username();
+				if (!USERNAME.equals(username))
+					throw new RuntimeException("Required the bot @"+USERNAME + " but @"+username + "logged in!");
+				logger.info("Succeed login to @" + username);
 				return account;
 			} catch (Exception e) {
 				e.printStackTrace(System.out);

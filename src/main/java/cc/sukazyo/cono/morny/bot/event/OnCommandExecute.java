@@ -22,13 +22,17 @@ public class OnCommandExecute extends EventListener {
 		}
 		switch (event.message().text()) {
 			case "/o":
+			case "/o@" + MornyCoeur.USERNAME:
 				onCommandOnExec(event);
 				break;
 			case "/hi":
+			case "/hi@" + MornyCoeur.USERNAME:
 			case "/hello":
+			case "/hello@" + MornyCoeur.USERNAME:
 				onCommandHelloExec(event);
 				break;
 			case "/exit":
+			case "/exit@" + MornyCoeur.USERNAME:
 				onCommandExitExec(event);
 				break;
 			default:
