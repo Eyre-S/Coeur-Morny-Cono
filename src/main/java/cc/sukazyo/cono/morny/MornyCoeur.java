@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny;
 
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
-import cc.sukazyo.cono.morny.data.MornyHello;
+import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -18,6 +18,8 @@ public class MornyCoeur {
 		logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
 		logger.info("System Starting");
 		
+		configureSafeExit();
+		
 		logger.info("args key:\n  " + args[0]);
 		
 		try { account = login(args[0]); }
@@ -25,11 +27,21 @@ public class MornyCoeur {
 		
 		logger.info("Bot login succeed.");
 		
+		TrackerDataManager.init();
 		EventListeners.registerAllListeners();
 		account.setUpdatesListener(OnUpdate::onNormalUpdate);
 		
 		logger.info("System start complete");
 		
+	}
+	
+	private static void exitCleanup () {
+		TrackerDataManager.DAEMON.interrupt();
+		TrackerDataManager.trackingLock.lock();
+	}
+	
+	private static void configureSafeExit () {
+		Runtime.getRuntime().addShutdownHook(new Thread(MornyCoeur::exitCleanup));
 	}
 	
 	public static TelegramBot login (String key) {
