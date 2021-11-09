@@ -30,6 +30,7 @@ public class TrackerDataManager {
 			long lastWaitTimestamp = System.currentTimeMillis();
 			boolean postProcess = false;
 			do {
+				lastWaitTimestamp += 10 * 60 * 1000;
 				long sleeping = lastWaitTimestamp - System.currentTimeMillis();
 				if (sleeping > 0) {
 					try { Thread.sleep(sleeping); } catch (InterruptedException e) { interrupt(); }
@@ -41,7 +42,6 @@ public class TrackerDataManager {
 					postProcess = true;
 					logger.warn("last tracker write in this processor!");
 				}
-				lastWaitTimestamp += 10 * 60 * 1000;
 				if (record.size() != 0) {
 					logger.info("start writing tracker data.");
 					save(reset());
@@ -78,6 +78,14 @@ public class TrackerDataManager {
 	
 	private static void save (HashMap<Long, HashMap<Long, TreeSet<Long>>> record) {
 		
+		{
+			if (!record.containsKey(0L)) record.put(0L, new HashMap<>());
+			HashMap<Long, TreeSet<Long>> chatUsers = record.get(0L);
+			if (!chatUsers.containsKey(0L)) chatUsers.put(0L, new TreeSet<>());
+			TreeSet<Long> userRecords = chatUsers.get(0L);
+			userRecords.add(System.currentTimeMillis());
+		}
+		
 		record.forEach((chat, chatUsers) -> chatUsers.forEach((user, userRecords) -> {
 			
 			long dayCurrent = -1;
@@ -103,6 +111,7 @@ public class TrackerDataManager {
 					e.printStackTrace(System.out);
 				}
 			}
+			
 		}));
 		
 	}
