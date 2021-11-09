@@ -1,3 +1,12 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+	}
+}
+
 plugins {
 	id 'java'
 }
@@ -20,4 +29,27 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc) {
+	options.encoding = 'UTF-8'
+	options.docEncoding = 'UTF-8'
+	options.charSet = 'UTF-8'
+}
+
+tasks.test {
+	useJUnitPlatform()
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+shadowJar {
+	mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
+	archiveBaseName.set("Morny_Coeur")
+	archiveVersion.set(version)
 }
