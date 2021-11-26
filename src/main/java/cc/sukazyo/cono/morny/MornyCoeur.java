@@ -15,7 +15,10 @@ public class MornyCoeur {
 	
 	public static void main (String[] args) {
 		
-		logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
+		if (!(args.length > 1 && "--no-hello".equals(args[1])))
+			logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
+		if (args.length > 1 && "--only-hello".equals(args[1]))
+			return;
 		logger.info("System Starting");
 		
 		configureSafeExit();
