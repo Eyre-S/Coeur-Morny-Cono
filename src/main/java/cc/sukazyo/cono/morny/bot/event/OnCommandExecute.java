@@ -1,9 +1,12 @@
 package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
+import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import static cc.sukazyo.cono.morny.Logger.logger;
@@ -34,6 +37,10 @@ public class OnCommandExecute extends EventListener {
 			case "/exit":
 			case "/exit@" + MornyCoeur.USERNAME:
 				onCommandExitExec(event);
+				break;
+			case "/version":
+			case "/version@" + MornyCoeur.USERNAME:
+				onCommandVersionExec(event);
 				break;
 			default:
 				return false;
@@ -74,6 +81,20 @@ public class OnCommandExecute extends EventListener {
 			);
 			logger.info("403 exited tag from user @" + event.message().from().username());
 		}
+	}
+	
+	private void onCommandVersionExec (Update event) {
+		MornyCoeur.getAccount().execute(new SendMessage(
+				event.message().chat().id(),
+				String.format(
+						"version:\n" +
+						"\t<code>%s</code>\n" +
+						"core md5_hash:\n" +
+						"\t<code>%s</code>",
+						MornySystem.VERSION,
+						MornySystem.getJarMd5()
+				)
+		).parseMode(ParseMode.HTML));
 	}
 	
 }

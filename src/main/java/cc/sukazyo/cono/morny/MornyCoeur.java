@@ -52,7 +52,7 @@ public class MornyCoeur {
 			try {
 				String username = account.execute(new GetMe()).user().username();
 				if (!USERNAME.equals(username))
-					throw new RuntimeException("Required the bot @"+USERNAME + " but @"+username + "logged in!");
+					throw new RuntimeException("Required the bot @"+USERNAME + " but @"+username + " logged in!");
 				logger.info("Succeed login to @" + username);
 				return account;
 			} catch (Exception e) {

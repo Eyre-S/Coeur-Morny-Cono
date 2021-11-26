@@ -1,18 +1,15 @@
-buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
-	}
-}
-
 plugins {
 	id 'java'
+	id 'maven-publish'
+	id 'application'
+	id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group 'cc.sukazyo'
-version '0.2.0'
+version '0.3.0'
+project.ext.archiveBaseName = 'Coeur_Morny_Cono'
+project.ext.artifactId = 'morny-coeur'
+mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
 
 repositories {
 	mavenCentral()
@@ -29,6 +26,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+java {
+	withSourcesJar()
 }
 
 tasks.withType(JavaCompile) {
@@ -49,7 +50,38 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'application'
 
 shadowJar {
-	mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
-	archiveBaseName.set("Morny_Coeur")
-	archiveVersion.set(version)
+	archiveBaseName.set("${project.ext.archiveBaseName}")
+	archiveVersion.set("${project.version}")
+	archiveClassifier.set("fat")
+}
+
+shadowJar {
+	archiveBaseName.set("${project.ext.archiveBaseName}")
+	archiveVersion.set("${project.version}")
+	archiveClassifier.set("fat")
+}
+
+publishing {
+	repositories{
+		maven {
+			name 'builds'
+			url = "file://" + new File("./build/publishing").getAbsolutePath()
+		}
+		maven {
+			name '-ws-'
+			url publishMvnRepoUrl
+			credentials {
+				username publishMvnRepoUsername
+				password publishMvnRepoPassword
+			}
+		}
+	}
+	publications {
+		main (MavenPublication) {
+			from components.java
+			groupId = project.group
+			artifactId = project.ext.artifactId
+			version = project.version
+		}
+	}
 }
