@@ -4,6 +4,8 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
+import cc.sukazyo.cono.morny.util.StringUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -23,7 +25,13 @@ public class OnCommandExecute extends EventListener {
 		if (event.message().text() == null) {
 			return false;
 		}
-		switch (event.message().text()) {
+		String[] command = StringUtils.formatCommand(event.message().text());
+		if (command.length == 0) return false;
+		switch (command[0]) {
+			case "/user":
+			case "/user@" + MornyCoeur.USERNAME:
+				GetUsernameAndId.exec(command, event);
+				break;
 			case "/o":
 			case "/o@" + MornyCoeur.USERNAME:
 				onCommandOnExec(event);
@@ -94,7 +102,7 @@ public class OnCommandExecute extends EventListener {
 						MornySystem.VERSION,
 						MornySystem.getJarMd5()
 				)
-		).parseMode(ParseMode.HTML));
+		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
 }
