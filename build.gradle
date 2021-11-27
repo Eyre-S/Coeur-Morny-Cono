@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.3.2'
+version '0.3.3'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'

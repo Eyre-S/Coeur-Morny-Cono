@@ -49,4 +49,14 @@ public class StringUtils {
 		
 	}
 	
+	public static String connectStringArray (String[] array, String connector, int startIndex, int stopIndex) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = startIndex; i < stopIndex; i++) {
+			builder.append(array[i]);
+			builder.append(connector);
+		}
+		builder.append(array[stopIndex]);
+		return builder.toString();
+	}
+	
 }
