@@ -6,6 +6,8 @@ import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
+import javax.annotation.Nonnull;
+
 import static cc.sukazyo.cono.morny.Logger.logger;
 
 public class MornyCoeur {
@@ -13,7 +15,7 @@ public class MornyCoeur {
 	private static TelegramBot account;
 	public static final String USERNAME = "morny_cono_annie_bot";
 	
-	public static void main (String[] args) {
+	public static void main (@Nonnull String[] args) {
 		
 		if (!(args.length > 1 && "--no-hello".equals(args[1])))
 			logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
@@ -47,13 +49,14 @@ public class MornyCoeur {
 		Runtime.getRuntime().addShutdownHook(new Thread(MornyCoeur::exitCleanup));
 	}
 	
-	public static TelegramBot login (String key) {
-		TelegramBot account = new TelegramBot(key);
+	@Nonnull
+	public static TelegramBot login (@Nonnull String key) {
+		final TelegramBot account = new TelegramBot(key);
 		logger.info("Trying to login...");
 		for (int i = 1; i < 4; i++) {
 			if (i != 1) logger.info("retrying...");
 			try {
-				String username = account.execute(new GetMe()).user().username();
+				final String username = account.execute(new GetMe()).user().username();
 				if (!USERNAME.equals(username))
 					throw new RuntimeException("Required the bot @"+USERNAME + " but @"+username + " logged in!");
 				logger.info("Succeed login to @" + username);

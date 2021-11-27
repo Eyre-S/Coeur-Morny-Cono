@@ -8,9 +8,11 @@ import com.pengrad.telegrambot.request.GetChatMember;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
+import javax.annotation.Nonnull;
+
 public class GetUsernameAndId {
 	
-	public static void exec (String[] command, Update event) {
+	public static void exec (@Nonnull String[] command, @Nonnull Update event) {
 		
 		if (command.length > 2) { MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
@@ -42,7 +44,7 @@ public class GetUsernameAndId {
 			return;
 		}
 		
-		GetChatMemberResponse response = MornyCoeur.getAccount().execute(
+		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
 		
@@ -54,9 +56,9 @@ public class GetUsernameAndId {
 			return;
 		}
 		
-		User user = response.chatMember().user();
+		final User user = response.chatMember().user();
 		
-		StringBuilder userInformation = new StringBuilder();
+		final StringBuilder userInformation = new StringBuilder();
 		userInformation.append(String.format(
 						"userid :\n" +
 						"- <code>%d</code>\n" +

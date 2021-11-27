@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.api;
 
 import com.pengrad.telegrambot.model.Update;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,7 @@ public class EventListenerManager {
 		
 		private final Function<EventListener, Boolean> exec;
 		
-		public EventPublisher(Update update, Function<EventListener, Boolean> exec) {
+		public EventPublisher(@Nonnull Update update, @Nonnull Function<EventListener, Boolean> exec) {
 			this.setName("EVT"+update.updateId());
 			this.exec = exec;
 		}
@@ -36,59 +37,59 @@ public class EventListenerManager {
 		
 	}
 	
-	public static void addListener (EventListener... listeners) {
+	public static void addListener (@Nonnull EventListener... listeners) {
 		EventListenerManager.listeners.addAll(Arrays.asList(listeners));
 	}
 	
-	public static void publishMessageEvent (Update update) {
+	public static void publishMessageEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onMessage(update)).start();
 	}
 	
-	public static void publishEditedMessageEvent (Update update) {
+	public static void publishEditedMessageEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onEditedMessage(update)).start();
 	}
 	
-	public static void publishChannelPostEvent (Update update) {
+	public static void publishChannelPostEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onChannelPost(update)).start();
 	}
 	
-	public static void publishEditedChannelPostEvent (Update update) {
+	public static void publishEditedChannelPostEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onEditedChannelPost(update)).start();
 	}
 	
-	public static void publishInlineQueryEvent (Update update) {
+	public static void publishInlineQueryEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onInlineQuery(update)).start();
 	}
 	
-	public static void publishChosenInlineResultEvent (Update update) {
+	public static void publishChosenInlineResultEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onChosenInlineResult(update)).start();
 	}
 	
-	public static void publishCallbackQueryEvent (Update update) {
+	public static void publishCallbackQueryEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onCallbackQuery(update)).start();
 	}
 	
-	public static void publishShippingQueryEvent (Update update) {
+	public static void publishShippingQueryEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onShippingQuery(update)).start();
 	}
 	
-	public static void publishPreCheckoutQueryEvent (Update update) {
+	public static void publishPreCheckoutQueryEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onPreCheckoutQuery(update)).start();
 	}
 	
-	public static void publishPollEvent (Update update) {
+	public static void publishPollEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onPoll(update)).start();
 	}
 	
-	public static void publishPollAnswerEvent (Update update) {
+	public static void publishPollAnswerEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onPollAnswer(update)).start();
 	}
 	
-	public static void publishMyChatMemberUpdatedEvent (Update update) {
+	public static void publishMyChatMemberUpdatedEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onMyChatMemberUpdated(update)).start();
 	}
 	
-	public static void publishChatMemberUpdatedEvent (Update update) {
+	public static void publishChatMemberUpdatedEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onChatMemberUpdated(update)).start();
 	}
 	

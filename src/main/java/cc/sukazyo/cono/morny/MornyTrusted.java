@@ -8,7 +8,7 @@ public class MornyTrusted {
 	public static final long TRUSTED_CHAT_ID = -1001541451710L;
 	
 	public static boolean isTrusted (long userId) {
-		ChatMember chatMember = MornyCoeur.getAccount().execute(new GetChatMember(TRUSTED_CHAT_ID, userId)).chatMember();
+		final ChatMember chatMember = MornyCoeur.getAccount().execute(new GetChatMember(TRUSTED_CHAT_ID, userId)).chatMember();
 		return (
 				chatMember != null && (
 						chatMember.status() == ChatMember.Status.administrator ||

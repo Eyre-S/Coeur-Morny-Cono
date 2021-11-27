@@ -11,6 +11,8 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
+import javax.annotation.Nonnull;
+
 import static cc.sukazyo.cono.morny.Logger.logger;
 
 public class OnCommandExecute extends EventListener {
@@ -21,11 +23,11 @@ public class OnCommandExecute extends EventListener {
 	private static final String EXIT_403_STICKER_ID = "CAACAgEAAxkBAAMqYYYa_7hpXH6hMOYMX4Nh8AVYd74AAnQnAAJ4_MYFRdmmsQKLDZgiBA";
 	
 	@Override
-	public boolean onMessage (Update event) {
+	public boolean onMessage (@Nonnull Update event) {
 		if (event.message().text() == null) {
 			return false;
 		}
-		String[] command = StringUtils.formatCommand(event.message().text());
+		final String[] command = StringUtils.formatCommand(event.message().text());
 		if (command.length == 0) return false;
 		switch (command[0]) {
 			case "/user":
@@ -56,7 +58,7 @@ public class OnCommandExecute extends EventListener {
 		return true;
 	}
 	
-	private void onCommandOnExec (Update event) {
+	private void onCommandOnExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendSticker(
 				event.message().chat().id(),
 				ONLINE_STATUS_RETURN_STICKER_ID
@@ -64,7 +66,7 @@ public class OnCommandExecute extends EventListener {
 		);
 	}
 	
-	private void onCommandHelloExec (Update event) {
+	private void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendSticker(
 				event.message().chat().id(),
 						HELLO_STICKER_ID
@@ -72,7 +74,7 @@ public class OnCommandExecute extends EventListener {
 		);
 	}
 	
-	private void onCommandExitExec (Update event) {
+	private void onCommandExitExec (@Nonnull Update event) {
 		if (MornyTrusted.isTrusted(event.message().from().id())) {
 			MornyCoeur.getAccount().execute(new SendSticker(
 							event.message().chat().id(),
@@ -91,7 +93,7 @@ public class OnCommandExecute extends EventListener {
 		}
 	}
 	
-	private void onCommandVersionExec (Update event) {
+	private void onCommandVersionExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
 				String.format(
