@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.3.4'
+version '0.3.4.1'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
@@ -27,11 +27,13 @@ dependencies {
 	
 }
 
-compileJava.doFirst {
+task updateVersionCode {
 	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
 		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'MornySystem.java')
 	}
 }
+
+compileJava.dependsOn updateVersionCode
 
 test {
 	useJUnitPlatform()
