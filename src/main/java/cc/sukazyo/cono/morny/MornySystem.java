@@ -14,7 +14,7 @@ public class MornySystem {
 	 * 程序的语义化版本号<br>
 	 * 会由 gradle 任务 {@code updateVersionCode} 更新
 	 */
-	public static final String VERSION = "0.3.4.1";
+	public static final String VERSION = GradleProjectConfigures.VERSION;
 	
 	/**
 	 * 获取程序 jar 文件的 md5-hash 值<br>

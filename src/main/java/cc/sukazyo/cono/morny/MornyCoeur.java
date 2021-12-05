@@ -34,11 +34,23 @@ public class MornyCoeur {
 	 * - 第一个参数({@code args[0]})必序传递，值为 telegram-bot 的 api-token<br>
 	 * - 第二个参数可选 {@code --no-hello} 和 {@code --only-hello}，
 	 * 前者表示不输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}，
-	 * 后者表示只输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}而不运行程序逻辑
+	 * 后者表示只输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}而不运行程序逻辑<br>
+	 * <br>
+	 * 或者，在第一个参数处使用 {@code --version} 来输出当前程序的版本信息
 	 *
 	 * @param args 程序命令行参数
 	 */
 	public static void main (@Nonnull String[] args) {
+		
+		if ("--version".equals(args[0])) {
+			logger.info(String.format("""
+					Morny Cono Version
+					- version : %s
+					- md5hash : %s
+					""", MornySystem.VERSION, MornySystem.getJarMd5()
+			));
+			return;
+		}
 		
 		if (!(args.length > 1 && "--no-hello".equals(args[1])))
 			logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
