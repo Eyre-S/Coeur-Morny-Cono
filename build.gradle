@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.3.4.2'
+version '0.3.4.3'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
@@ -29,6 +29,9 @@ dependencies {
 
 task updateVersionCode {
 	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
+		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
+	}
+	ant.replaceregexp(match:'COMPILE_TIMESTAMP = [0-9]+L;', replace:"COMPILE_TIMESTAMP = ${System.currentTimeMillis()}L;", flags:'g', byline:true) {
 		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
 	}
 }

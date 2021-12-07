@@ -8,6 +8,12 @@ import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
 import static cc.sukazyo.cono.morny.Logger.logger;
 
 /**
@@ -45,9 +51,19 @@ public class MornyCoeur {
 		if ("--version".equals(args[0])) {
 			logger.info(String.format("""
 					Morny Cono Version
-					- version : %s
-					- md5hash : %s
-					""", MornySystem.VERSION, MornySystem.getJarMd5()
+					- version :
+					    %s
+					- md5hash :
+					    %s
+					- co.time :
+					    %d
+					    %s [UTC]""",
+					MornySystem.VERSION,
+					MornySystem.getJarMd5(),
+					GradleProjectConfigures.COMPILE_TIMESTAMP,
+					DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS").format(LocalDateTime.ofInstant(
+							Instant.ofEpochMilli(GradleProjectConfigures.COMPILE_TIMESTAMP),
+							ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
 			));
 			return;
 		}
