@@ -5,8 +5,8 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
-import cc.sukazyo.cono.morny.util.StringUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -32,37 +32,33 @@ public class OnCommandExecute extends EventListener {
 	@Override
 	public boolean onMessage (@Nonnull Update event) {
 		if (event.message().text() == null) {
-			return false;
+			return false; // 检测到无消息文本，忽略掉命令处理
 		}
-		final String[] command = StringUtils.formatCommand(event.message().text());
-		if (command.length == 0) return false;
-		switch (command[0]) {
+		final InputCommand command = new InputCommand(event.message().text());
+		if (command.getTarget() != null && !MornyCoeur.username.equals(command.getTarget())) {
+			return true; // 检测到命令并非针对 morny，退出整个事件处理链
+		}
+		switch (command.getCommand()) {
 			case "/user":
-			case "/user@" + MornyCoeur.USERNAME:
-				GetUsernameAndId.exec(command, event);
+				GetUsernameAndId.exec(command.getArgs(), event);
 				break;
 			case "/o":
-			case "/o@" + MornyCoeur.USERNAME:
 				onCommandOnExec(event);
 				break;
 			case "/hi":
-			case "/hi@" + MornyCoeur.USERNAME:
 			case "/hello":
-			case "/hello@" + MornyCoeur.USERNAME:
 				onCommandHelloExec(event);
 				break;
 			case "/exit":
-			case "/exit@" + MornyCoeur.USERNAME:
 				onCommandExitExec(event);
 				break;
 			case "/version":
-			case "/version@" + MornyCoeur.USERNAME:
 				onCommandVersionExec(event);
 				break;
 			default:
-				return false;
+				return false; // 无法解析的命令，转交事件链后代处理
 		}
-		return true;
+		return true; // 命令执行成功，标记事件为已处理，退出事件链
 	}
 	
 	private void onCommandOnExec (@Nonnull Update event) {

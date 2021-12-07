@@ -30,7 +30,7 @@ public class MornyCoeur {
 	 * <br>
 	 * 出于技术限制，这个字段目前是写死的
 	 */
-	public static final String USERNAME = "morny_cono_annie_bot";
+	public static String username;
 	
 	/**
 	 * 程序入口<br>
@@ -77,6 +77,10 @@ public class MornyCoeur {
 		configureSafeExit();
 		
 		logger.info("args key:\n  " + args[0]);
+		if (args.length > 2) {
+			username = args[2];
+			logger.info("login as:\n  " + args[2]);
+		}
 		
 		try { account = login(args[0]); }
 		catch (Exception e) { logger.error("Cannot login to bot/api. :\n  " + e.getMessage()); System.exit(-1); }
@@ -111,7 +115,7 @@ public class MornyCoeur {
 	 * <br>
 	 * 会反复尝试三次进行登录。如果登录失败，则会直接抛出 RuntimeException 结束处理。
 	 * 会通过 GetMe 动作验证是否连接上了 telegram api 服务器，
-	 * 同时也要求登录获得的 username 和 {@link #USERNAME} 声明值相等
+	 * 同时也要求登录获得的 username 和 {@link #username} 声明值相等
 	 *
 	 * @param key bot 的 api-token
 	 * @return 成功登录后的 {@link TelegramBot} 对象
@@ -124,8 +128,9 @@ public class MornyCoeur {
 			if (i != 1) logger.info("retrying...");
 			try {
 				final String username = account.execute(new GetMe()).user().username();
-				if (!USERNAME.equals(username))
-					throw new RuntimeException("Required the bot @"+USERNAME + " but @"+username + " logged in!");
+				if (username != null && !MornyCoeur.username.equals(username))
+					throw new RuntimeException("Required the bot @" + MornyCoeur.username + " but @" + username + " logged in!");
+				else MornyCoeur.username = username;
 				logger.info("Succeed login to @" + username);
 				return account;
 			} catch (Exception e) {
