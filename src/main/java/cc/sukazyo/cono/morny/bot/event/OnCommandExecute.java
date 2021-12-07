@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.bot.event;
 
+import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.MornyTrusted;
@@ -12,6 +13,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import static cc.sukazyo.cono.morny.Logger.logger;
 
@@ -96,13 +103,20 @@ public class OnCommandExecute extends EventListener {
 	private void onCommandVersionExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
-				String.format(
-						"version:\n" +
-						"\t<code>%s</code>\n" +
-						"core md5_hash:\n" +
-						"\t<code>%s</code>",
+				String.format("""
+						version:
+						<code>  </code><code>%s</code>
+						core md5_hash:
+						<code>  </code><code>%s</code>
+						compile timestamp:
+						<code>  </code><code>%d</code>
+						<code>  </code><code>%s [UTC]</code>""",
 						MornySystem.VERSION,
-						MornySystem.getJarMd5()
+						MornySystem.getJarMd5(),
+						GradleProjectConfigures.COMPILE_TIMESTAMP,
+						DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS").format(LocalDateTime.ofInstant(
+								Instant.ofEpochMilli(GradleProjectConfigures.COMPILE_TIMESTAMP),
+								ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
