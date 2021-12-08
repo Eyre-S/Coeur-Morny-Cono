@@ -7,12 +7,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import javax.annotation.Nullable;
 
 import static cc.sukazyo.cono.morny.Logger.logger;
 
@@ -28,61 +23,45 @@ public class MornyCoeur {
 	/**
 	 * morny 的 bot 账户的用户名<br>
 	 * <br>
-	 * 出于技术限制，这个字段目前是写死的
+	 * 这个字段将会在登陆成功后赋值为登录到的 bot 的 username。
+	 * 它应该是和 {@link #account} 的 username 同步的<br>
+	 * <br>
+	 * 如果在登陆之前就定义了此字段，则登陆代码会验证登陆的 bot 的 username
+	 * 是否与定义的 username 符合。如果不符合则会报错。
 	 */
-	public static String username;
+	private static String username;
+	/**
+	 * morny 的事件忽略前缀时间<br>
+	 * <br>
+	 * {@link cc.sukazyo.cono.morny.bot.event.OnUpdateTimestampOffsetLock}
+	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
+	 */
+	public static long latestEventTimestamp;
 	
 	/**
-	 * 程序入口<br>
-	 * <br>
-	 * 会从命令行参数取得初始化数据并初始化程序和bot<br>
-	 * <br>
-	 * - 第一个参数({@code args[0]})必序传递，值为 telegram-bot 的 api-token<br>
-	 * - 第二个参数可选 {@code --no-hello} 和 {@code --only-hello}，
-	 * 前者表示不输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}，
-	 * 后者表示只输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}而不运行程序逻辑<br>
-	 * <br>
-	 * 或者，在第一个参数处使用 {@code --version} 来输出当前程序的版本信息
+	 * bot 启动入口，执行 bot 初始化
 	 *
-	 * @param args 程序命令行参数
+	 * @param botKey bot 的 telegram bot api token
+	 * @param botUsername bot 的 username 限定。如果为 null 则表示不限定，
+	 *                    如果指定，则登录时会检查所登陆的 bot 的用户名是否与此相等
+	 * @param latestEventTimestamp 事件处理器会处理事件的最早时间戳 ——
+	 *                             只有限定的 message 事件会受此影响。
+	 *                             单位为毫秒
 	 */
-	public static void main (@Nonnull String[] args) {
+	public static void main (@Nonnull String botKey, @Nullable String botUsername, long latestEventTimestamp) {
 		
-		if ("--version".equals(args[0])) {
-			logger.info(String.format("""
-					Morny Cono Version
-					- version :
-					    %s
-					- md5hash :
-					    %s
-					- co.time :
-					    %d
-					    %s [UTC]""",
-					MornySystem.VERSION,
-					MornySystem.getJarMd5(),
-					GradleProjectConfigures.COMPILE_TIMESTAMP,
-					DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS").format(LocalDateTime.ofInstant(
-							Instant.ofEpochMilli(GradleProjectConfigures.COMPILE_TIMESTAMP),
-							ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
-			));
-			return;
-		}
+		MornyCoeur.latestEventTimestamp = latestEventTimestamp;
 		
-		if (!(args.length > 1 && "--no-hello".equals(args[1])))
-			logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
-		if (args.length > 1 && "--only-hello".equals(args[1]))
-			return;
 		logger.info("System Starting");
 		
 		configureSafeExit();
 		
-		logger.info("args key:\n  " + args[0]);
-		if (args.length > 2) {
-			username = args[2];
-			logger.info("login as:\n  " + args[2]);
+		logger.info("args key:\n  " + botKey);
+		if (botUsername != null) {
+			logger.info("login as:\n  " + botUsername);
 		}
 		
-		try { account = login(args[0]); }
+		try { account = login(botKey); }
 		catch (Exception e) { logger.error("Cannot login to bot/api. :\n  " + e.getMessage()); System.exit(-1); }
 		
 		logger.info("Bot login succeed.");
@@ -128,7 +107,7 @@ public class MornyCoeur {
 			if (i != 1) logger.info("retrying...");
 			try {
 				final String username = account.execute(new GetMe()).user().username();
-				if (username != null && !MornyCoeur.username.equals(username))
+				if (MornyCoeur.username != null && !MornyCoeur.username.equals(username))
 					throw new RuntimeException("Required the bot @" + MornyCoeur.username + " but @" + username + " logged in!");
 				else MornyCoeur.username = username;
 				logger.info("Succeed login to @" + username);
@@ -148,6 +127,15 @@ public class MornyCoeur {
 	 */
 	public static TelegramBot getAccount () {
 		return account;
+	}
+	
+	/**
+	 * 获取登录 bot 的 username
+	 *
+	 * @return {@link #username MornyCoeur.username}
+	 */
+	public static String getUsername () {
+		return username;
 	}
 	
 }
