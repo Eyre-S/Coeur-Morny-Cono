@@ -13,13 +13,6 @@ import static cc.sukazyo.cono.morny.Logger.logger;
  * 程序启动入口<br>
  * <br>
  * 会处理程序传入的参数和选项等数据，并执行对应的启动方式<br>
- * <br>
- * - 第一个参数({@code args[0]})必序传递，值为 telegram-bot 的 api-token<br>
- * - 第二个参数可选 {@code --no-hello} 和 {@code --only-hello}，
- * 前者表示不输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}，
- * 后者表示只输出{@link MornyHello#MORNY_PREVIEW_IMAGE_ASCII 欢迎标语}而不运行程序逻辑<br>
- * <br>
- * 或者，在第一个参数处使用 {@code --version} 来输出当前程序的版本信息
  *
  * @since 0.4.0.0
  */

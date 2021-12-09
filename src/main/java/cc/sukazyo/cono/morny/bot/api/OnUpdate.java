@@ -49,6 +49,9 @@ public class OnUpdate {
 			if (update.chatMember() != null) {
 				EventListenerManager.publishChatMemberUpdatedEvent(update);
 			}
+			if (update.chatJoinRequest() != null) {
+				EventListenerManager.publishChatJoinRequestEvent(update);
+			}
 		}
 		return UpdatesListener.CONFIRMED_UPDATES_ALL;
 	}

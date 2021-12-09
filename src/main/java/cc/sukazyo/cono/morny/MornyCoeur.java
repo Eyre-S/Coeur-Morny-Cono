@@ -13,7 +13,6 @@ import static cc.sukazyo.cono.morny.Logger.logger;
 
 /**
  * Morny Cono 核心<br>
- * <br>
  * - 的程序化入口类，保管着 morny 的核心属性<br>
  */
 public class MornyCoeur {

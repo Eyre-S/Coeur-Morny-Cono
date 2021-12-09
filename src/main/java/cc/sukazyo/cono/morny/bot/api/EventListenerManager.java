@@ -93,4 +93,8 @@ public class EventListenerManager {
 		new EventPublisher(update, x -> x.onChatMemberUpdated(update)).start();
 	}
 	
+	public static void publishChatJoinRequestEvent (@Nonnull Update update) {
+		new EventPublisher(update, x -> x.onChatJoinRequest(update)).start();
+	}
+	
 }

@@ -59,4 +59,8 @@ public abstract class EventListener {
 		return false;
 	}
 	
+	public boolean onChatJoinRequest (@Nonnull Update update) {
+		return false;
+	}
+	
 }
