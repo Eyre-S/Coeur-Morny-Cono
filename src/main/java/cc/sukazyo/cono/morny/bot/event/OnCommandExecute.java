@@ -20,7 +20,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class OnCommandExecute extends EventListener {
 	
@@ -101,12 +101,12 @@ public class OnCommandExecute extends EventListener {
 				event.message().chat().id(),
 				String.format("""
 						version:
-						<code>  </code><code>%s</code>
+						- <code>%s</code>
 						core md5_hash:
-						<code>  </code><code>%s</code>
+						- <code>%s</code>
 						compile timestamp:
-						<code>  </code><code>%d</code>
-						<code>  </code><code>%s [UTC]</code>""",
+						- <code>%d</code>
+						- <code>%s [UTC]</code>""",
 						MornySystem.VERSION,
 						MornySystem.getJarMd5(),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,

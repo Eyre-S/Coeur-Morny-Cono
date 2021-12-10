@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.request.GetMe;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
  * Morny Cono 核心<br>

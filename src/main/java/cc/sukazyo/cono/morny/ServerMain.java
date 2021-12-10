@@ -7,7 +7,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
  * 程序启动入口<br>

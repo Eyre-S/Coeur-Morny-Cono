@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class EventListenerManager {
 	

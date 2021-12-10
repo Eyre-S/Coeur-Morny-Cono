@@ -14,11 +14,14 @@ mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
 
 repositories {
 	mavenCentral()
+	maven { name '-ws'; url 'https://mvn.sukazyo.cc' }
 }
 
 dependencies {
 	
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
+	
+	api "cc.sukazyo:messiva:${libMessivaVersion}"
 	
 	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"
 	

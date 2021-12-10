@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class TrackerDataManager {
 	
