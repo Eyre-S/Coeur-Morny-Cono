@@ -37,14 +37,17 @@ public class InputCommand {
 		return new InputCommand(cx.length == 1 ? null : cx[1], cx[0], args);
 	}
 	
+	@Nullable
 	public String getTarget () {
 		return target;
 	}
 	
+	@Nonnull
 	public String getCommand () {
 		return command;
 	}
 	
+	@Nonnull
 	public String[] getArgs () {
 		return args;
 	}
@@ -54,6 +57,7 @@ public class InputCommand {
 	}
 	
 	@Override
+	@Nonnull
 	public String toString() {
 		return String.format("{{%s}@{%s}#{%s}}", command, target, Arrays.toString(args));
 	}

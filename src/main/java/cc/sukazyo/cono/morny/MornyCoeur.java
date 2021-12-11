@@ -36,6 +36,11 @@ public class MornyCoeur {
 	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
 	 */
 	public static long latestEventTimestamp;
+	/**
+	 * morny 主程序启动时间<br>
+	 * 用于统计数据
+	 */
+	public static final long coeurStartTimestamp = System.currentTimeMillis();
 	
 	/**
 	 * bot 启动入口，执行 bot 初始化

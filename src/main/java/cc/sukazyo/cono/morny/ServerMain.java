@@ -1,11 +1,8 @@
 package cc.sukazyo.cono.morny;
 
+import cc.sukazyo.cono.morny.util.CommonFormatUtils;
+
 import javax.annotation.Nonnull;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
@@ -113,9 +110,7 @@ public class ServerMain {
 					MornySystem.VERSION,
 					MornySystem.getJarMd5(),
 					GradleProjectConfigures.COMPILE_TIMESTAMP,
-					DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS").format(LocalDateTime.ofInstant(
-							Instant.ofEpochMilli(GradleProjectConfigures.COMPILE_TIMESTAMP),
-							ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
+					CommonFormatUtils.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
 			));
 			return;
 			
