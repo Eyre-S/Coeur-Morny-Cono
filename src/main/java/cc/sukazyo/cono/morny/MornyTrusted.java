@@ -15,6 +15,12 @@ public class MornyTrusted {
 	public static final long TRUSTED_CHAT_ID = -1001541451710L;
 	
 	/**
+	 * morny 的主人<br>
+	 * 这项值的对象总是会被认为是可信任的
+	 */
+	public static final long MASTER = 793274677L;
+	
+	/**
 	 * 用于检查一个 telegram-user 是否受信任<br>
 	 * <br>
 	 * 用户需要受信任才能执行一些对程序甚至是宿主环境而言危险的操作，例如关闭程序<br>
@@ -25,6 +31,7 @@ public class MornyTrusted {
 	 * @return 所传递的用户id对应的用户是否受信任
 	 */
 	public static boolean isTrusted (long userId) {
+		if (userId == MASTER) return true;
 		final ChatMember chatMember = MornyCoeur.getAccount().execute(new GetChatMember(TRUSTED_CHAT_ID, userId)).chatMember();
 		return (
 				chatMember != null && (

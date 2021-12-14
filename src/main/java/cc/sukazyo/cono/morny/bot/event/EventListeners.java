@@ -9,6 +9,7 @@ public class EventListeners {
 	public static final OnUserSlashAction USER_SLASH_ACTION = new OnUserSlashAction();
 	public static final OnUpdateTimestampOffsetLock UPDATE_TIMESTAMP_OFFSET_LOCK = new OnUpdateTimestampOffsetLock();
 	public static final OnInlineQuery INLINE_QUERY = new OnInlineQuery();
+	public static final OnCallMe CALL_ME = new OnCallMe();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
@@ -16,7 +17,8 @@ public class EventListeners {
 				UPDATE_TIMESTAMP_OFFSET_LOCK,
 				COMMANDS_LISTENER,
 				USER_SLASH_ACTION,
-				INLINE_QUERY
+				INLINE_QUERY,
+				CALL_ME
 		);
 	}
 	
