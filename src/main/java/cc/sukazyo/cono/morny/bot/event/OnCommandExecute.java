@@ -6,7 +6,9 @@ import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.bot.api.InputCommand;
+import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
+import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.CommonFormatUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -18,12 +20,6 @@ import javax.annotation.Nonnull;
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class OnCommandExecute extends EventListener {
-	
-	private static final String ONLINE_STATUS_RETURN_STICKER_ID = "CAACAgEAAx0CW-CvvgAC5eBhhhODGRuu0pxKLwoQ3yMsowjviAACcycAAnj8xgVVU666si1utiIE";
-	private static final String HELLO_STICKER_ID = "CAACAgEAAxkBAAMnYYYWKNXO4ibo9dlsmDctHhhV6fIAAqooAAJ4_MYFJJhrHS74xUAiBA";
-	private static final String EXIT_STICKER_ID = "CAACAgEAAxkBAAMoYYYWt8UjvP0N405SAyvg2SQZmokAAkMiAAJ4_MYFw6yZLu06b-MiBA";
-	private static final String EXIT_403_STICKER_ID = "CAACAgEAAxkBAAMqYYYa_7hpXH6hMOYMX4Nh8AVYd74AAnQnAAJ4_MYFRdmmsQKLDZgiBA";
-	private static final String NON_COMMAND_QUESTION_STICKER_ID = "CAACAgEAAx0CSQh32gABA966YbRJpbmi2lCHINBDuo1DknSTsbsAAqUoAAJ4_MYFUa8SIaZriAojBA";
 	
 	@Override
 	public boolean onMessage (@Nonnull Update event) {
@@ -37,6 +33,9 @@ public class OnCommandExecute extends EventListener {
 		switch (command.getCommand()) {
 			case "/user":
 				GetUsernameAndId.exec(command.getArgs(), event);
+				break;
+			case "/event_hack":
+				EventHack.exec(event, command);
 				break;
 			case "/o":
 				onCommandOnExec(event);
@@ -65,7 +64,7 @@ public class OnCommandExecute extends EventListener {
 		else { // 无法解析的显式命令格式，报错找不到命令
 			MornyCoeur.getAccount().execute(new SendSticker(
 							event.message().chat().id(),
-							NON_COMMAND_QUESTION_STICKER_ID
+							TelegramStickers.ID_404
 					).replyToMessageId(event.message().messageId())
 			);
 			return true;
@@ -75,15 +74,15 @@ public class OnCommandExecute extends EventListener {
 	private void onCommandOnExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendSticker(
 				event.message().chat().id(),
-				ONLINE_STATUS_RETURN_STICKER_ID
+				TelegramStickers.ID_ONLINE_STATUS_RETURN
 				).replyToMessageId(event.message().messageId())
 		);
 	}
 	
 	private void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendSticker(
-				event.message().chat().id(),
-						HELLO_STICKER_ID
+						event.message().chat().id(),
+						TelegramStickers.ID_HELLO
 				).replyToMessageId(event.message().messageId())
 		);
 	}
@@ -92,7 +91,7 @@ public class OnCommandExecute extends EventListener {
 		if (MornyTrusted.isTrusted(event.message().from().id())) {
 			MornyCoeur.getAccount().execute(new SendSticker(
 							event.message().chat().id(),
-							EXIT_STICKER_ID
+							TelegramStickers.ID_EXIT
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("Morny exited by user @" + event.message().from().username());
@@ -100,7 +99,7 @@ public class OnCommandExecute extends EventListener {
 		} else {
 			MornyCoeur.getAccount().execute(new SendSticker(
 							event.message().chat().id(),
-							EXIT_403_STICKER_ID
+							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("403 exited tag from user @" + event.message().from().username());
@@ -126,6 +125,9 @@ public class OnCommandExecute extends EventListener {
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
+	/**
+	 * @since 0.4.1.2
+	 */
 	private void onCommandRuntimeExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
@@ -137,7 +139,7 @@ public class OnCommandExecute extends EventListener {
 								java runtime:
 								- <code>%s</code>
 								- <code>%s</code>
-								memory:
+								vm memory:
 								- <code>%d</code> / <code>%d</code> MB
 								morny version:
 								- <code>%s</code>

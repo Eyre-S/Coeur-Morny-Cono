@@ -11,6 +11,9 @@ import com.pengrad.telegrambot.request.AnswerInlineQuery;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * telegram inlineQuery 功能的处理类，
+ * 也是一个 InlineQueryManager（还没做）
+ *
  * @since 0.4.1.3
  */
 public class OnInlineQuery extends EventListener {
