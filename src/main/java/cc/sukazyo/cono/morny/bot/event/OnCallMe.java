@@ -101,6 +101,9 @@ public class OnCallMe extends EventListener {
 	 * <u>known issue</u><ul>
 	 *     <li>无法处理与转发带有媒体的消息</li>
 	 * </ul>
+	 * <br>
+	 * 现在你可以通过这个 bot 来呼叫主人（sukazyo）任何事情了 ——
+	 * <s>但是直接私聊sukazyo不好吗</s>
 	 *
 	 * @param event 执行呼叫的tg事件
 	 * @since 0.4.2.2
