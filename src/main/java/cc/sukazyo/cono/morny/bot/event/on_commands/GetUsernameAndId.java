@@ -19,7 +19,7 @@ public class GetUsernameAndId {
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
 		
-		long userId = 0;
+		long userId = event.message().from().id();
 		
 		if ( event.message().replyToMessage()!= null) {
 			userId = event.message().replyToMessage().from().id();
@@ -34,14 +34,6 @@ public class GetUsernameAndId {
 				).replyToMessageId(event.message().messageId()));
 				return;
 			}
-		}
-		
-		if (userId == 0) {
-			MornyCoeur.getAccount().execute(new SendMessage(
-					event.message().chat().id(),
-					"[Unavailable] no userid given."
-			).replyToMessageId(event.message().messageId()));
-			return;
 		}
 		
 		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
