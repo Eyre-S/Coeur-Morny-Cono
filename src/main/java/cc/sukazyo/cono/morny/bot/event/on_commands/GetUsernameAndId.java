@@ -54,11 +54,20 @@ public class GetUsernameAndId {
 		userInformation.append(String.format(
 				"""
 				userid :
-				- <code>%d</code>
-				username :
-				- <code>%s</code>""",
-				userId, user.username()
+				- <code>%d</code>""",
+				userId
 		));
+		if (user.username() == null) {
+			userInformation.append("\nusername : <u>null</u>");
+		} else {
+			userInformation.append(String.format(
+					"""
+					
+					username :
+					- <code>%s</code>""",
+					user.username()
+			));
+		}
 		if (user.firstName() == null) {
 			userInformation.append("\nfirstname : <u>null</u>");
 		} else {
