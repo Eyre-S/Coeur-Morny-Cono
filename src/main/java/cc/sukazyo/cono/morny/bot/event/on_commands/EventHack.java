@@ -36,7 +36,7 @@ public class EventHack {
 		
 		switch (x_mode) {
 			case "any":
-				if (MornyTrusted.isTrusted(event.message().from().id())) {
+				if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 					OnEventHackHandle.registerHack(
 							event.message().messageId(),
 							event.message().from().id(),

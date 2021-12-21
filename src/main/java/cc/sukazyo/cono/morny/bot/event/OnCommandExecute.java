@@ -3,7 +3,6 @@ package cc.sukazyo.cono.morny.bot.event;
 import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
-import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
@@ -88,7 +87,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandExitExec (@Nonnull Update event) {
-		if (MornyTrusted.isTrusted(event.message().from().id())) {
+		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 			MornyCoeur.getAccount().execute(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_EXIT

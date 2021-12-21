@@ -59,7 +59,7 @@ public class ServerMain {
 	 * <s>但实际上这并不影响现在的使用，选项赋值目前仍属于测试功能</s><br>
 	 * <b>但请勿混用</b>，这将使两个赋值出现混淆并<b>产生不可知的结果</b>
 	 *
-	 * @see MornyCoeur#main(String, String, long)
+	 * @see MornyCoeur#main(String, String, long, long, long)
 	 * @since 0.4.0.0
 	 * @param args 参数组
 	 */
@@ -68,6 +68,8 @@ public class ServerMain {
 		String key = null;
 		String username = null;
 		boolean outdatedBlock = false;
+		long master = 793274677L;
+		long trustedChat = -1001541451710L;
 		
 		for (int i = 0; i < args.length; i++) {
 			
@@ -98,6 +100,16 @@ public class ServerMain {
 					case "--username" -> {
 						i++;
 						username = args[i];
+						continue;
+					}
+					case "--master" -> {
+						i++;
+						master = Long.parseLong(args[i]);
+						continue;
+					}
+					case "--trusted-chat" -> {
+						i++;
+						trustedChat = Long.parseLong(args[i]);
 						continue;
 					}
 				}
@@ -143,7 +155,7 @@ public class ServerMain {
 		if (welcomeEchoMode) return;
 		
 		assert key != null;
-		MornyCoeur.main(key, username, outdatedBlock?System.currentTimeMillis():0);
+		MornyCoeur.main(key, username, master, trustedChat, outdatedBlock?System.currentTimeMillis():0);
 		
 	}
 	

@@ -23,7 +23,7 @@ public class OnCallMe extends EventListener {
 	 * 跟随 {@link MornyTrusted#MASTER} 的值
 	 * @since 0.4.2.1
 	 */
-	private static final long ME = MornyTrusted.MASTER;
+	private static final long ME = MornyCoeur.trustedInstance().MASTER;
 	
 	/**
 	 * 监听私聊 bot 的消息进行呼叫关键字匹配。

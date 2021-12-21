@@ -17,30 +17,41 @@ import javax.annotation.Nonnull;
  *     <li>{@link EventListener#onChannelPost(Update) 收到频道消息}</li>
  *     <li>{@link EventListener#onEditedChannelPost(Update) 频道消息被更新}</li>
  * </ul>
+ * @see #isOutdated 时间判断
  */
 public class OnUpdateTimestampOffsetLock extends EventListener {
 	
+	/**
+	 * 检查传入时间是否在要求时间之前（即"过期"）.
+	 * @param timestamp 传入时间，秒级
+	 * @return 如果传入时间在要求时间<u>之前</u>，返回true，反之false
+	 * @since 0.4.2.7
+	 */
+	public boolean isOutdated(long timestamp) {
+		return timestamp < MornyCoeur.getLatestEventTimestamp()/1000;
+	}
+	
 	@Override
 	public boolean onMessage (@NotNull Update update) {
-		return update.message().date() < MornyCoeur.latestEventTimestamp/1000;
+		return isOutdated(update.message().date());
 	}
 	
 	/** @since 0.4.2.6 */
 	@Override
 	public boolean onEditedMessage (@Nonnull Update update) {
-		return update.editedMessage().editDate() < MornyCoeur.latestEventTimestamp/1000;
+		return isOutdated(update.editedMessage().editDate());
 	}
 	
 	/** @since 0.4.2.6 */
 	@Override
 	public boolean onChannelPost (@Nonnull Update update) {
-		return update.channelPost().date() < MornyCoeur.latestEventTimestamp/1000;
+		return isOutdated(update.channelPost().date());
 	}
 	
 	/** @since 0.4.2.6 */
 	@Override
 	public boolean onEditedChannelPost (@Nonnull Update update) {
-		return update.editedChannelPost().editDate() < MornyCoeur.latestEventTimestamp/1000;
+		return isOutdated(update.editedChannelPost().editDate());
 	}
 	
 }
