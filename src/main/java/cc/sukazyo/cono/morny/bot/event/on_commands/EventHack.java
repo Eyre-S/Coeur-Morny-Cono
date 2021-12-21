@@ -42,8 +42,7 @@ public class EventHack {
 							event.message().from().id(),
 							event.message().chat().id(),
 							OnEventHackHandle.HackType.ANY
-					);
-					isOk = true;
+					);isOk = true;
 				}
 				break;
 			case "group":
@@ -52,8 +51,7 @@ public class EventHack {
 						event.message().from().id(),
 						event.message().chat().id(),
 						OnEventHackHandle.HackType.GROUP
-				);
-				isOk = true;
+				);isOk = true;
 				break;
 			default:
 				OnEventHackHandle.registerHack(
@@ -61,8 +59,7 @@ public class EventHack {
 						event.message().from().id(),
 						event.message().chat().id(),
 						OnEventHackHandle.HackType.USER
-				);
-				isOk = true;
+				);isOk = true;
 				break;
 		}
 		
