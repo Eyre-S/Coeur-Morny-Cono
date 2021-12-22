@@ -145,8 +145,10 @@ public class OnCommandExecute extends EventListener {
 								- <code>%s</code>
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]
-								continuous
+								continuous:
 								- <code>%s</code>
+								- [<code>%d</code>]
+								- <code>%s [UTC]</code>
 								- [<code>%d</code>]""",
 						// system
 						System.getProperty("os.name"),
@@ -165,7 +167,9 @@ public class OnCommandExecute extends EventListener {
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
 						// continuous
 						CommonFormatUtils.formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp),
-						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp
+						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
+						CommonFormatUtils.formatDate(MornyCoeur.coeurStartTimestamp, 0),
+						MornyCoeur.coeurStartTimestamp
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
