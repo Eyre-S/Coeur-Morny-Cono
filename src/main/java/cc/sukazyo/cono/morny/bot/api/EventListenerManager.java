@@ -25,9 +25,13 @@ public class EventListenerManager {
 		@Override
 		public void run () {
 			for (EventListener x : listeners) {
-				if (exec.apply(x)) return;
+				try {
+					if (exec.apply(x)) return;
+				} catch (Exception e) {
+					logger.error("Event Error!");
+					e.printStackTrace(System.out);
+				}
 			}
-			logger.info("event exited undone");
 		}
 		
 	}
