@@ -7,23 +7,26 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.4.0.1'
+version VERSION
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
 
 repositories {
 	mavenCentral()
+	maven { name '-ws'; url 'https://mvn.sukazyo.cc' }
 }
 
 dependencies {
 	
-	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:4.5.0"
+	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
 	
-	implementation 'com.github.pengrad:java-telegram-bot-api:5.4.0'
+	api "cc.sukazyo:messiva:${libMessivaVersion}"
 	
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"
+	
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${libJunitVersion}"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${libJunitVersion}"
 	
 }
 

@@ -9,7 +9,7 @@ public class OnUpdateTimestampOffsetLock extends EventListener {
 	
 	@Override
 	public boolean onMessage (@NotNull Update update) {
-		return update.message().date() < MornyCoeur.latestEventTimestamp*1000;
+		return update.message().date() < MornyCoeur.latestEventTimestamp/1000;
 	}
 	
 }

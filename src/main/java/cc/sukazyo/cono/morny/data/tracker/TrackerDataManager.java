@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class TrackerDataManager {
 	
@@ -40,7 +40,7 @@ public class TrackerDataManager {
 				}
 				if (interrupted()) {
 					postProcess = true;
-					logger.warn("last tracker write in this processor!");
+					logger.info("CALLED TO EXIT! writing cache.");
 				}
 				if (record.size() != 0) {
 					logger.info("start writing tracker data.");

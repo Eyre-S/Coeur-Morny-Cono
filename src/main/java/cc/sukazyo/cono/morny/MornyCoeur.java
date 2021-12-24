@@ -9,11 +9,10 @@ import com.pengrad.telegrambot.request.GetMe;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
  * Morny Cono 核心<br>
- * <br>
  * - 的程序化入口类，保管着 morny 的核心属性<br>
  */
 public class MornyCoeur {
@@ -37,6 +36,11 @@ public class MornyCoeur {
 	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
 	 */
 	public static long latestEventTimestamp;
+	/**
+	 * morny 主程序启动时间<br>
+	 * 用于统计数据
+	 */
+	public static final long coeurStartTimestamp = System.currentTimeMillis();
 	
 	/**
 	 * bot 启动入口，执行 bot 初始化

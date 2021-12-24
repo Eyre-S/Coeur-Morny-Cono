@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static cc.sukazyo.cono.morny.Logger.logger;
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class EventListenerManager {
 	
@@ -91,6 +91,10 @@ public class EventListenerManager {
 	
 	public static void publishChatMemberUpdatedEvent (@Nonnull Update update) {
 		new EventPublisher(update, x -> x.onChatMemberUpdated(update)).start();
+	}
+	
+	public static void publishChatJoinRequestEvent (@Nonnull Update update) {
+		new EventPublisher(update, x -> x.onChatJoinRequest(update)).start();
 	}
 	
 }
