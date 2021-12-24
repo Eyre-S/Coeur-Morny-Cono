@@ -8,11 +8,13 @@ import com.pengrad.telegrambot.request.GetChatMember;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
+import javax.annotation.Nonnull;
+
 public class GetUsernameAndId {
 	
-	public static void exec (String[] command, Update event) {
+	public static void exec (@Nonnull String[] args, @Nonnull Update event) {
 		
-		if (command.length > 2) { MornyCoeur.getAccount().execute(new SendMessage(
+		if (args.length > 1) { MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
@@ -22,9 +24,9 @@ public class GetUsernameAndId {
 		if ( event.message().replyToMessage()!= null) {
 			userId = event.message().replyToMessage().from().id();
 		}
-		if (command.length > 1) {
+		if (args.length > 0) {
 			try {
-				userId = Long.parseLong(command[1]);
+				userId = Long.parseLong(args[0]);
 			} catch (NumberFormatException e) {
 				MornyCoeur.getAccount().execute(new SendMessage(
 						event.message().chat().id(),
@@ -42,7 +44,7 @@ public class GetUsernameAndId {
 			return;
 		}
 		
-		GetChatMemberResponse response = MornyCoeur.getAccount().execute(
+		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
 		
@@ -54,22 +56,25 @@ public class GetUsernameAndId {
 			return;
 		}
 		
-		User user = response.chatMember().user();
+		final User user = response.chatMember().user();
 		
-		StringBuilder userInformation = new StringBuilder();
+		final StringBuilder userInformation = new StringBuilder();
 		userInformation.append(String.format(
-						"userid :\n" +
-						"- <code>%d</code>\n" +
-						"username :\n" +
-						"- <code>%s</code>",
-						userId, user.username()
+				"""
+				userid :
+				- <code>%d</code>
+				username :
+				- <code>%s</code>""",
+				userId, user.username()
 		));
 		if (user.firstName() == null) {
 			userInformation.append("\nfirstname : <u>null</u>");
 		} else {
 			userInformation.append(String.format(
-					"\nfirstname :\n" +
-					"- <code>%s</code>",
+					"""
+					
+					firstname :
+					- <code>%s</code>""",
 					user.firstName()
 			));
 		}
@@ -77,15 +82,19 @@ public class GetUsernameAndId {
 			userInformation.append("\nlastname : <u>null</u>");
 		} else {
 			userInformation.append(String.format(
-					"\nlastname :\n" +
-					"- <code>%s</code>",
+					"""
+					
+					lastname :
+					- <code>%s</code>""",
 					user.lastName()
 			));
 		}
 		if (user.languageCode() != null) {
 			userInformation.append(String.format(
-					"\nlanguage-code :\n" +
-					"- <code>%s</code>",
+					"""
+					
+					language-code :
+					- <code>%s</code>""",
 					user.languageCode()
 			));
 		}

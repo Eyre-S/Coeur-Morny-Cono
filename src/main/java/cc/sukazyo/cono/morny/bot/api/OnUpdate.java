@@ -3,11 +3,12 @@ package cc.sukazyo.cono.morny.bot.api;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class OnUpdate {
 	
-	public static int onNormalUpdate (List<Update> updates) {
+	public static int onNormalUpdate (@Nonnull List<Update> updates) {
 		for (Update update : updates) {
 			if (update.message() != null) {
 				EventListenerManager.publishMessageEvent(update);

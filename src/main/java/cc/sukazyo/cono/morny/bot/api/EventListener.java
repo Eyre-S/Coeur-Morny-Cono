@@ -2,58 +2,60 @@ package cc.sukazyo.cono.morny.bot.api;
 
 import com.pengrad.telegrambot.model.Update;
 
+import javax.annotation.Nonnull;
+
 @SuppressWarnings("unused")
 public abstract class EventListener {
 	
-	public boolean onMessage (Update update) {
+	public boolean onMessage (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onEditedMessage (Update update) {
+	public boolean onEditedMessage (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onChannelPost (Update update) {
+	public boolean onChannelPost (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onEditedChannelPost (Update update) {
+	public boolean onEditedChannelPost (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onInlineQuery (Update update) {
+	public boolean onInlineQuery (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onChosenInlineResult (Update update) {
+	public boolean onChosenInlineResult (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onCallbackQuery (Update update) {
+	public boolean onCallbackQuery (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onShippingQuery (Update update) {
+	public boolean onShippingQuery (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onPreCheckoutQuery (Update update) {
+	public boolean onPreCheckoutQuery (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onPoll (Update update) {
+	public boolean onPoll (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onPollAnswer (Update update) {
+	public boolean onPollAnswer (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onMyChatMemberUpdated (Update update) {
+	public boolean onMyChatMemberUpdated (@Nonnull Update update) {
 		return false;
 	}
 	
-	public boolean onChatMemberUpdated (Update update) {
+	public boolean onChatMemberUpdated (@Nonnull Update update) {
 		return false;
 	}
 	

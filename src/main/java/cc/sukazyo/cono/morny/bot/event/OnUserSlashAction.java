@@ -8,11 +8,13 @@ import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 
+import javax.annotation.Nonnull;
+
 public class OnUserSlashAction extends EventListener {
 	
 	@Override
-	public boolean onMessage (Update event) {
-		String text = event.message().text();
+	public boolean onMessage (@Nonnull Update event) {
+		final String text = event.message().text();
 		if (text == null) return false;
 		
 		if (text.startsWith("/")) {
@@ -31,12 +33,12 @@ public class OnUserSlashAction extends EventListener {
 				prefixLength = 2;
 			}
 			
-			String[] action = StringUtils.formatCommand(text.substring(prefixLength));
-			String verb = action[0];
-			boolean hasObject = action.length != 1;
-			String object = StringUtils.connectStringArray(action, " ", 1, action.length-1);
-			User origin = event.message().from();
-			User target = (event.message().replyToMessage() == null ? (
+			final String[] action = StringUtils.formatCommand(text.substring(prefixLength));
+			final String verb = action[0];
+			final boolean hasObject = action.length != 1;
+			final String object = StringUtils.connectStringArray(action, " ", 1, action.length-1);
+			final User origin = event.message().from();
+			final User target = (event.message().replyToMessage() == null ? (
 					origin
 			): (
 					event.message().replyToMessage().from()

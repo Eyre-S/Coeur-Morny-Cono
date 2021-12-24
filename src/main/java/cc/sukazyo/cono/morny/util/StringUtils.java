@@ -1,22 +1,26 @@
 package cc.sukazyo.cono.morny.util;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class StringUtils {
 	
+	@Nonnull
 	public static String repeatChar (char c, int i) {
-		char[] chars = new char[i];
+		final char[] chars = new char[i];
 		Arrays.fill(chars, c);
 		return new String(chars);
 	}
 	
-	public static String[] formatCommand (String com) {
+	@Nonnull
+	public static String[] formatCommand (@Nonnull String com) {
 		
-		ArrayList<String> arr = new ArrayList<>();
+		final ArrayList<String> arr = new ArrayList<>();
 		
-		StringBuilder tmp = new StringBuilder();
-		char[] coma = com.toCharArray();
+		final StringBuilder tmp = new StringBuilder();
+		final char[] coma = com.toCharArray();
 		for (int i = 0; i < coma.length; i++) {
 			if (coma[i] == ' ') {
 				if (!tmp.toString().equals("")) { arr.add(tmp.toString()); }
@@ -43,14 +47,17 @@ public class StringUtils {
 		if (!tmp.toString().equals("")) { arr.add(tmp.toString()); }
 		tmp.setLength(0);
 		
-		String[] out = new String[arr.size()];
+		final String[] out = new String[arr.size()];
 		arr.toArray(out);
 		return out;
 		
 	}
 	
-	public static String connectStringArray (String[] array, String connector, int startIndex, int stopIndex) {
-		StringBuilder builder = new StringBuilder();
+	@Nonnull
+	public static String connectStringArray (
+			@Nonnull String[] array, @Nonnull String connector, @Nonnegative int startIndex, @Nonnegative int stopIndex
+	) {
+		final StringBuilder builder = new StringBuilder();
 		for (int i = startIndex; i < stopIndex; i++) {
 			builder.append(array[i]);
 			builder.append(connector);

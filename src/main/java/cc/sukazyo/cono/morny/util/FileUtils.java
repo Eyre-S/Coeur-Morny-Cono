@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.util;
 
-import java.io.File;
+import javax.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -9,19 +9,19 @@ import java.security.NoSuchAlgorithmException;
 
 public class FileUtils {
 	
-	public static String getMD5Three (String path) {
-		BigInteger bi;
+	@Nonnull
+	public static String getMD5Three (@Nonnull String path) {
+		final BigInteger bi;
 		try {
-			byte[] buffer = new byte[8192];
+			final byte[] buffer = new byte[8192];
 			int len;
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			File f = new File(path);
-			FileInputStream fis = new FileInputStream(f);
+			final MessageDigest md = MessageDigest.getInstance("MD5");
+			final FileInputStream fis = new FileInputStream(path);
 			while ((len = fis.read(buffer)) != -1) {
 				md.update(buffer, 0, len);
 			}
 			fis.close();
-			byte[] b = md.digest();
+			final byte[] b = md.digest();
 			bi = new BigInteger(1, b);
 		} catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace(System.out);

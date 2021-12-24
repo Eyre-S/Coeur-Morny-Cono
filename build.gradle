@@ -1,12 +1,13 @@
 plugins {
 	id 'java'
+	id 'java-library'
 	id 'maven-publish'
 	id 'application'
 	id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group 'cc.sukazyo'
-version '0.3.3'
+version '0.3.4.4'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
@@ -17,25 +18,37 @@ repositories {
 
 dependencies {
 	
-	implementation 'com.github.pengrad:java-telegram-bot-api:5.3.0'
+	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:4.5.0"
 	
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+	implementation 'com.github.pengrad:java-telegram-bot-api:5.4.0'
+	
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 	
 }
 
-compileJava.doFirst {
+task updateVersionCode {
 	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'MornySystem.java')
+		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
+	}
+	ant.replaceregexp(match:'COMPILE_TIMESTAMP = [0-9]+L;', replace:"COMPILE_TIMESTAMP = ${System.currentTimeMillis()}L;", flags:'g', byline:true) {
+		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
 	}
 }
+
+compileJava.dependsOn updateVersionCode
 
 test {
 	useJUnitPlatform()
 }
 
 java {
+	
+	sourceCompatibility JavaVersion.VERSION_17
+	targetCompatibility JavaVersion.VERSION_17
+	
 	withSourcesJar()
+	
 }
 
 tasks.withType(JavaCompile) {

@@ -5,10 +5,12 @@ import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 
+import javax.annotation.Nonnull;
+
 public class OnActivityRecord extends EventListener {
 	
 	@Override
-	public boolean onMessage (Update update) {
+	public boolean onMessage (@Nonnull Update update) {
 		if (
 				update.message().chat().type() == Chat.Type.supergroup ||
 				update.message().chat().type() == Chat.Type.group
