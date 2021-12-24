@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny;
 
-import cc.sukazyo.cono.morny.bot.OnUpdate;
+import cc.sukazyo.cono.morny.bot.api.OnUpdate;
+import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -20,6 +21,7 @@ public class MornyCoeur {
 		
 		logger.info("Bot login succeed.");
 		
+		EventListeners.registerAllListeners();
 		account.setUpdatesListener(OnUpdate::onNormalUpdate);
 		
 		logger.info("System start complete");
