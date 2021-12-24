@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.3.0'
+version '0.3.3'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
 mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
@@ -22,6 +22,12 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 	
+}
+
+compileJava.doFirst {
+	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
+		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'MornySystem.java')
+	}
 }
 
 test {
@@ -44,15 +50,6 @@ tasks.withType(Javadoc) {
 
 tasks.test {
 	useJUnitPlatform()
-}
-
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'application'
-
-shadowJar {
-	archiveBaseName.set("${project.ext.archiveBaseName}")
-	archiveVersion.set("${project.version}")
-	archiveClassifier.set("fat")
 }
 
 shadowJar {
