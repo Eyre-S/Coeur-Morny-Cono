@@ -7,10 +7,10 @@ plugins {
 }
 
 group 'cc.sukazyo'
-version '0.3.4.4'
+version '0.4.0.1'
 project.ext.archiveBaseName = 'Coeur_Morny_Cono'
 project.ext.artifactId = 'morny-coeur'
-mainClassName = 'cc.sukazyo.cono.morny.MornyCoeur'
+mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
 
 repositories {
 	mavenCentral()

@@ -35,7 +35,7 @@ public class OnCommandExecute extends EventListener {
 			return false; // 检测到无消息文本，忽略掉命令处理
 		}
 		final InputCommand command = new InputCommand(event.message().text());
-		if (command.getTarget() != null && !MornyCoeur.username.equals(command.getTarget())) {
+		if (command.getTarget() != null && !MornyCoeur.getUsername().equals(command.getTarget())) {
 			return true; // 检测到命令并非针对 morny，退出整个事件处理链
 		}
 		switch (command.getCommand()) {
