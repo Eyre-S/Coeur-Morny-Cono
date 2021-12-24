@@ -7,6 +7,7 @@ import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
+import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.CommonFormatUtils;
 import com.pengrad.telegrambot.model.Update;
@@ -51,6 +52,9 @@ public class OnCommandExecute extends EventListener {
 				break;
 			case "/runtime":
 				onCommandRuntimeExec(event);
+				break;
+			case "/jrrp":
+				onCommandJrrpExec(event);
 				break;
 			default:
 				return nonCommandExecutable(event, command);
@@ -170,6 +174,19 @@ public class OnCommandExecute extends EventListener {
 						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
 						CommonFormatUtils.formatDate(MornyCoeur.coeurStartTimestamp, 0),
 						MornyCoeur.coeurStartTimestamp
+				)
+		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+	}
+	
+	private void onCommandJrrpExec (Update event) {
+		final double jrrp = MornyJrrp.getJrrpFromTelegramUser(event.message().from(), System.currentTimeMillis());
+		final String endChar = jrrp>70 ? "!" : jrrp>30 ? ";" : "...";
+		MornyCoeur.getAccount().execute(new SendMessage(
+				event.message().chat().id(),
+				String.format(
+						"<a href='tg://user?id=%d'>%s</a> 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
+						event.message().from().id(), event.message().from().firstName(),
+						jrrp, endChar
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}

@@ -10,7 +10,8 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.ForwardMessage;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * 通过 bot 呼叫主人的事件监听管理类
@@ -34,7 +35,7 @@ public class OnCallMe extends EventListener {
 	 *         如果匹配到呼叫，则返回{@code true}，反之返回{@code false}
 	 */
 	@Override
-	public boolean onMessage (@NotNull Update update) {
+	public boolean onMessage (@Nonnull Update update) {
 		if (update.message().text() == null)
 			return false;
 		if (update.message().chat().type() != Chat.Type.Private)
