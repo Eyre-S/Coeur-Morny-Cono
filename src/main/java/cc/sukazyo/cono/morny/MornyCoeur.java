@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny;
 
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
+import cc.sukazyo.cono.morny.data.MornyHello;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -13,11 +14,13 @@ public class MornyCoeur {
 	
 	public static void main (String[] args) {
 		
+		logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
 		logger.info("System Starting");
 		
-		logger.info("args key: " + args[0]);
+		logger.info("args key:\n  " + args[0]);
 		
-		account = login(args[0]);
+		try { account = login(args[0]); }
+		catch (Exception e) { logger.error("Cannot login to bot/api."); System.exit(-1); }
 		
 		logger.info("Bot login succeed.");
 		
@@ -38,7 +41,7 @@ public class MornyCoeur {
 				return account;
 			} catch (Exception e) {
 				e.printStackTrace(System.out);
-				logger.info("login failed.");
+				logger.error("login failed.");
 			}
 		}
 		throw new RuntimeException("Login failed..");

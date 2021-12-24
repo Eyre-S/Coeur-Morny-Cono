@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny;
 
+import cc.sukazyo.cono.morny.util.StringUtils;
+
 public class Logger {
 	
 	public static final Logger logger = new Logger();
@@ -16,15 +18,15 @@ public class Logger {
 		System.out.println(formatMessage(message, "WARN"));
 	}
 	
+	public void error (String message) {
+		System.out.println(formatMessage(message, "ERRO"));
+	}
+	
 	private String formatMessage (String message, String level) {
-		String levelStr = "\n["+level+"]";
-		return String.format(
-				"[%d][%s][%s]%s",
-				System.currentTimeMillis(),
-				Thread.currentThread().getName(),
-				level,
-				message.replaceAll("\\n", levelStr)
-		);
+		String prompt = String.format("[%s][%s]", System.currentTimeMillis(), Thread.currentThread().getName());
+		String levelStr = String.format("[%s]", level);
+		String newline = "\n" + StringUtils.repeatChar('\'', prompt.length()) + levelStr;
+		return prompt + levelStr + message.replaceAll("\\n", newline);
 	}
 	
 }
