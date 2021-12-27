@@ -12,7 +12,18 @@ public class MornyTrusted {
 	 * 群聊id，其指向的群聊指示了哪个群的成员是受信任的
 	 * @see #isTrusted(long) 受信检查
 	 */
-	public static final long TRUSTED_CHAT_ID = -1001541451710L;
+	public final Long TRUSTED_CHAT_ID;
+	
+	/**
+	 * morny 的主人<br>
+	 * 这项值的对象总是会被认为是可信任的
+	 */
+	public final long MASTER;
+	
+	public MornyTrusted (long master, long trustedChatId) {
+		this.TRUSTED_CHAT_ID = trustedChatId;
+		this.MASTER = master;
+	}
 	
 	/**
 	 * 用于检查一个 telegram-user 是否受信任<br>
@@ -24,7 +35,8 @@ public class MornyTrusted {
 	 * @param userId 需要检查的用户的id
 	 * @return 所传递的用户id对应的用户是否受信任
 	 */
-	public static boolean isTrusted (long userId) {
+	public boolean isTrusted (long userId) {
+		if (userId == MASTER) return true;
 		final ChatMember chatMember = MornyCoeur.getAccount().execute(new GetChatMember(TRUSTED_CHAT_ID, userId)).chatMember();
 		return (
 				chatMember != null && (

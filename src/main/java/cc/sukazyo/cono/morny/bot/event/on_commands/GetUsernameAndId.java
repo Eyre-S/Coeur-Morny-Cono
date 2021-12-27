@@ -10,6 +10,8 @@ import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+
 public class GetUsernameAndId {
 	
 	public static void exec (@Nonnull String[] args, @Nonnull Update event) {
@@ -19,7 +21,7 @@ public class GetUsernameAndId {
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
 		
-		long userId = 0;
+		long userId = event.message().from().id();
 		
 		if ( event.message().replyToMessage()!= null) {
 			userId = event.message().replyToMessage().from().id();
@@ -34,14 +36,6 @@ public class GetUsernameAndId {
 				).replyToMessageId(event.message().messageId()));
 				return;
 			}
-		}
-		
-		if (userId == 0) {
-			MornyCoeur.getAccount().execute(new SendMessage(
-					event.message().chat().id(),
-					"[Unavailable] no userid given."
-			).replyToMessageId(event.message().messageId()));
-			return;
 		}
 		
 		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
@@ -62,11 +56,20 @@ public class GetUsernameAndId {
 		userInformation.append(String.format(
 				"""
 				userid :
-				- <code>%d</code>
-				username :
-				- <code>%s</code>""",
-				userId, user.username()
+				- <code>%d</code>""",
+				userId
 		));
+		if (user.username() == null) {
+			userInformation.append("\nusername : <u>null</u>");
+		} else {
+			userInformation.append(String.format(
+					"""
+					
+					username :
+					- <code>%s</code>""",
+					escapeHtmlTelegram(user.username())
+			));
+		}
 		if (user.firstName() == null) {
 			userInformation.append("\nfirstname : <u>null</u>");
 		} else {
@@ -75,7 +78,7 @@ public class GetUsernameAndId {
 					
 					firstname :
 					- <code>%s</code>""",
-					user.firstName()
+					escapeHtmlTelegram(user.firstName())
 			));
 		}
 		if (user.lastName() == null) {
@@ -86,7 +89,7 @@ public class GetUsernameAndId {
 					
 					lastname :
 					- <code>%s</code>""",
-					user.lastName()
+					escapeHtmlTelegram(user.lastName())
 			));
 		}
 		if (user.languageCode() != null) {
@@ -95,7 +98,7 @@ public class GetUsernameAndId {
 					
 					language-code :
 					- <code>%s</code>""",
-					user.languageCode()
+					escapeHtmlTelegram(user.languageCode())
 			));
 		}
 		

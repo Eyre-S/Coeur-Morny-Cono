@@ -8,9 +8,13 @@ import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
 import com.pengrad.telegrambot.model.request.InputTextMessageContent;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.AnswerInlineQuery;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 /**
+ * telegram inlineQuery 功能的处理类，
+ * 也是一个 InlineQueryManager（还没做）
+ *
  * @since 0.4.1.3
  */
 public class OnInlineQuery extends EventListener {
@@ -19,7 +23,7 @@ public class OnInlineQuery extends EventListener {
 	 * @since 0.4.1.3
 	 */
 	@Override
-	public boolean onInlineQuery (@NotNull Update update) {
+	public boolean onInlineQuery (@Nonnull Update update) {
 		MornyCoeur.getAccount().execute(new AnswerInlineQuery(update.inlineQuery().id(), new InlineQueryResultArticle[]{
 				new InlineQueryResultArticle(
 						EncryptUtils.encryptByMD5(update.inlineQuery().query()),

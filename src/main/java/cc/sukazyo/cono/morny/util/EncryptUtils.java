@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.util;
 
+import javax.annotation.Nonnull;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,6 +19,7 @@ public class EncryptUtils {
 	/***
 	 * 对指定的字符串进行MD5加密
 	 */
+	@Nonnull
 	public static String encryptByMD5(String originString) {
 		try {
 			//创建具有MD5算法的信息摘要
@@ -28,9 +30,8 @@ public class EncryptUtils {
 			String s = byteArrayToHex(bytes);
 			return s.toUpperCase();
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			throw new IllegalStateException();
 		}
-		return null;
 	}
 	
 	/**
