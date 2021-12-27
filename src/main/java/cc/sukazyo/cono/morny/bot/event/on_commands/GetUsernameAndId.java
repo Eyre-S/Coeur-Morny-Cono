@@ -10,6 +10,8 @@ import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+
 public class GetUsernameAndId {
 	
 	public static void exec (@Nonnull String[] args, @Nonnull Update event) {
@@ -65,7 +67,7 @@ public class GetUsernameAndId {
 					
 					username :
 					- <code>%s</code>""",
-					user.username()
+					escapeHtmlTelegram(user.username())
 			));
 		}
 		if (user.firstName() == null) {
@@ -76,7 +78,7 @@ public class GetUsernameAndId {
 					
 					firstname :
 					- <code>%s</code>""",
-					user.firstName()
+					escapeHtmlTelegram(user.firstName())
 			));
 		}
 		if (user.lastName() == null) {
@@ -87,7 +89,7 @@ public class GetUsernameAndId {
 					
 					lastname :
 					- <code>%s</code>""",
-					user.lastName()
+					escapeHtmlTelegram(user.lastName())
 			));
 		}
 		if (user.languageCode() != null) {
@@ -96,7 +98,7 @@ public class GetUsernameAndId {
 					
 					language-code :
 					- <code>%s</code>""",
-					user.languageCode()
+					escapeHtmlTelegram(user.languageCode())
 			));
 		}
 		

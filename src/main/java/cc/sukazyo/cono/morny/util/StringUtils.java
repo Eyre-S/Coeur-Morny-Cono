@@ -3,16 +3,8 @@ package cc.sukazyo.cono.morny.util;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class StringUtils {
-	
-	@Nonnull
-	public static String repeatChar (char c, int i) {
-		final char[] chars = new char[i];
-		Arrays.fill(chars, c);
-		return new String(chars);
-	}
 	
 	@Nonnull
 	public static String[] formatCommand (@Nonnull String com) {
@@ -64,6 +56,14 @@ public class StringUtils {
 		}
 		builder.append(array[stopIndex]);
 		return builder.toString();
+	}
+	
+	@Nonnull
+	public static String escapeHtmlTelegram (String raw) {
+		raw = raw.replaceAll("&", "&amp;");
+		raw = raw.replaceAll("<", "&lt;");
+		raw = raw.replaceAll(">", "&gt;");
+		return raw;
 	}
 	
 }

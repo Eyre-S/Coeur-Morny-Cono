@@ -10,6 +10,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+
 public class OnUserSlashAction extends EventListener {
 	
 	@Override
@@ -48,11 +50,11 @@ public class OnUserSlashAction extends EventListener {
 					event.message().chat().id(),
 					String.format(
 							"<a href='tg://user?id=%d'>%s</a> %s%s <a href='tg://user?id=%d'>%s</a>%s%s",
-							origin.id(), origin.firstName(),
-							verb, (useVerbSuffix?"了":""),
-							target.id(), (origin==target ? "自己" : target.firstName()),
-							(hasObject ? (useObjectPrefix ?" 的": " ") : ""),
-							(hasObject ? object : "")
+							origin.id(), escapeHtmlTelegram(origin.firstName()),
+							verb, escapeHtmlTelegram((useVerbSuffix?"了":"")),
+							target.id(), escapeHtmlTelegram((origin==target ? "自己" : target.firstName())),
+							escapeHtmlTelegram((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
+							escapeHtmlTelegram((hasObject ? object : ""))
 					)
 			).parseMode(ParseMode.HTML));
 			

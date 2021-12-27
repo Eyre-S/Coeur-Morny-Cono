@@ -13,6 +13,8 @@ import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+
 /**
  * 通过 bot 呼叫主人的事件监听管理类
  * @since 0.4.2.1
@@ -69,11 +71,14 @@ public class OnCallMe extends EventListener {
 	 */
 	private static void requestSteamJoin (Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
-				ME, String.format("""
+				ME, String.format(
+						"""
 						request <b>STEAM LIBRARY</b>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						event.message().from().firstName() + " " + event.message().from().lastName()
+						escapeHtmlTelegram(
+								event.message().from().firstName() + " " + event.message().from().lastName()
+						)
 				)
 		).parseMode(ParseMode.HTML));
 	}
@@ -86,11 +91,14 @@ public class OnCallMe extends EventListener {
 	 */
 	private static void requestHanaParesuJoin (Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
-				ME, String.format("""
+				ME, String.format(
+						"""
 						request <b>Hana Paresu</b>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						event.message().from().firstName() + " " + event.message().from().lastName()
+						escapeHtmlTelegram(
+								event.message().from().firstName() + " " + event.message().from().lastName()
+						)
 				)
 		).parseMode(ParseMode.HTML));
 	}
@@ -111,11 +119,14 @@ public class OnCallMe extends EventListener {
 	 */
 	private static void requestCustomCall (Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
-				ME, String.format("""
+				ME, String.format(
+						"""
 						request <u>[???]</u>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						event.message().from().firstName() + " " + event.message().from().lastName()
+						escapeHtmlTelegram(
+								event.message().from().firstName() + " " + event.message().from().lastName()
+						)
 				)
 		).parseMode(ParseMode.HTML));
 		MornyCoeur.getAccount().execute(new ForwardMessage(

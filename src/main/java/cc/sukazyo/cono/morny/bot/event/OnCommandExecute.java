@@ -10,7 +10,6 @@ import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
 import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
-import cc.sukazyo.cono.morny.util.CommonFormatUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -19,6 +18,9 @@ import com.pengrad.telegrambot.request.SendSticker;
 import javax.annotation.Nonnull;
 
 import static cc.sukazyo.cono.morny.Log.logger;
+import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDate;
+import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDuration;
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
 
 public class OnCommandExecute extends EventListener {
 	
@@ -117,7 +119,8 @@ public class OnCommandExecute extends EventListener {
 	private void onCommandVersionExec (@Nonnull Update event) {
 		MornyCoeur.getAccount().execute(new SendMessage(
 				event.message().chat().id(),
-				String.format("""
+				String.format(
+						"""
 						version:
 						- <code>%s</code>
 						core md5_hash:
@@ -125,10 +128,10 @@ public class OnCommandExecute extends EventListener {
 						compile timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
-						MornySystem.VERSION,
-						MornySystem.getJarMd5(),
+						escapeHtmlTelegram(MornySystem.VERSION),
+						escapeHtmlTelegram(MornySystem.getJarMd5()),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
-						CommonFormatUtils.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
+						escapeHtmlTelegram(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0))
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
@@ -160,24 +163,24 @@ public class OnCommandExecute extends EventListener {
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]""",
 						// system
-						System.getProperty("os.name"),
-						System.getProperty("os.version"),
+						escapeHtmlTelegram(System.getProperty("os.name")),
+						escapeHtmlTelegram(System.getProperty("os.version")),
 						Runtime.getRuntime().availableProcessors(),
 						// java
-						System.getProperty("java.vm.name"),
-						System.getProperty("java.version"),
+						escapeHtmlTelegram(System.getProperty("java.vm.name")),
+						escapeHtmlTelegram(System.getProperty("java.version")),
 						// memory
 						Runtime.getRuntime().totalMemory() / 1024 / 1024,
 						Runtime.getRuntime().maxMemory() / 1024 / 1024,
 						// version
-						MornySystem.VERSION,
-						MornySystem.getJarMd5(),
-						CommonFormatUtils.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0),
+						escapeHtmlTelegram(MornySystem.VERSION),
+						escapeHtmlTelegram(MornySystem.getJarMd5()),
+						escapeHtmlTelegram(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
 						// continuous
-						CommonFormatUtils.formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp),
+						escapeHtmlTelegram(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
 						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
-						CommonFormatUtils.formatDate(MornyCoeur.coeurStartTimestamp, 0),
+						escapeHtmlTelegram(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
 						MornyCoeur.coeurStartTimestamp
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
@@ -190,8 +193,9 @@ public class OnCommandExecute extends EventListener {
 				event.message().chat().id(),
 				String.format(
 						"<a href='tg://user?id=%d'>%s</a> 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
-						event.message().from().id(), event.message().from().firstName(),
-						jrrp, endChar
+						event.message().from().id(),
+						escapeHtmlTelegram(event.message().from().firstName()),
+						jrrp, escapeHtmlTelegram(endChar)
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}

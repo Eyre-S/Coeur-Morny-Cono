@@ -7,10 +7,15 @@ import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
-import org.apache.commons.text.StringEscapeUtils;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+
+/**
+ * {@value IP186QueryHandler#SITE_URL} 查询的 telegram 命令前端
+ * @since 0.4.2.10
+ */
 public class Ip186Query {
 	
 	public static void exec (@Nonnull Update event, @Nonnull InputCommand command) {
@@ -33,12 +38,12 @@ public class Ip186Query {
 			};
 			MornyCoeur.getAccount().execute(new SendMessage(
 					event.message().chat().id(),
-					response.url() + "\n<code>" + StringEscapeUtils.escapeHtml4(response.body()) + "</code>"
+					escapeHtmlTelegram(response.url()) + "\n<code>" + escapeHtmlTelegram(response.body()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 		} catch (Exception e) {
 			MornyCoeur.getAccount().execute(new SendMessage(
 					event.message().chat().id(),
-					"[Exception] in query:\n<code>" + e.getMessage() + "</code>"
+					"[Exception] in query:\n<code>" + escapeHtmlTelegram(e.getMessage()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 		}
 		

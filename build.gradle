@@ -20,7 +20,6 @@ repositories {
 dependencies {
 	
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
-	implementation "org.apache.commons:commons-text:${libApacheCommonsTextVersion}"
 	
 	api "cc.sukazyo:messiva:${libMessivaVersion}"
 	

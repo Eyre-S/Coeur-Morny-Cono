@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.cono.morny.util.StringUtils;
 import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -65,7 +66,7 @@ public class OnEventHackHandle extends EventListener {
 		logger.debug("hacked event by " + x);
 		MornyCoeur.getAccount().execute(new SendMessage(x.fromChatId, String.format(
 				"<code>%s</code>",
-				new GsonBuilder().setPrettyPrinting().create().toJson(update)
+				StringUtils.escapeHtmlTelegram(new GsonBuilder().setPrettyPrinting().create().toJson(update))
 		)).parseMode(ParseMode.HTML).replyToMessageId((int)x.fromMessageId));
 		return true;
 	}

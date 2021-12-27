@@ -8,20 +8,55 @@ import okhttp3.ResponseBody;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 
+/**
+ * 通过 {@value #SITE_URL} 进行 {@link #queryIp ip}/{@link #queryWhois whois} 数据查询的工具类
+ *
+ * @since 0.4.2.10
+ */
 public class IP186QueryHandler {
 	
+	/**
+	 * 请求所使用的 HTTP API 站点链接
+	 * @since 0.4.2.10
+	 */
 	public static final String SITE_URL = "https://ip.186526.xyz/";
 	
+	/**
+	 * 进行 {@link #queryIp ip 查询}时所使用的 API 参数.<br>
+	 * 目的使 API 直接返回原始数据
+	 */
 	private static final String QUERY_IP_PARAM = "type=json&format=true";
+	
+	/**
+	 * 进行 {@link #queryWhois whois 查询}时所使用的 API 参数.<br>
+	 * 目的使 API 直接返回原始数据
+	 */
 	private static final String QUERY_WHOIS_PARAM = "type=plain";
 	
+	/** 请求时使用的 OkHttp 请求工具实例 */
 	private static final OkHttpClient httpClient = new OkHttpClient();
 	
+	/**
+	 * 通过 {@value #SITE_URL} 获取 ip 信息.
+	 * @see #QUERY_IP_PARAM  发送请求时所使用的 API 参数
+	 * @param ip 需要进行查询的 ip
+	 * @return 查询结果。data 根据 {@value #SITE_URL} 的规则以 json 序列化
+	 * @throws IOException 任何请求或解析错误
+	 */
+	@Nonnull
 	public static IP186QueryResponse queryIp (String ip) throws IOException {
 		final String requestUrl = SITE_URL + ip;
 		return commonQuery(requestUrl, QUERY_IP_PARAM);
 	}
 	
+	/**
+	 * 通过 {@value #SITE_URL} 获取域名信息.
+	 * @see #QUERY_WHOIS_PARAM  发送请求时所使用的 API 参数
+	 * @param domain 需要进行查询的域名
+	 * @return 查询结果。data 根据 {@value #SITE_URL} 的规则以 plain 序列化
+	 * @throws IOException 任何请求或解析错误
+	 */
+	@Nonnull
 	public static IP186QueryResponse queryWhois (String domain) throws IOException {
 		final String requestUrl = SITE_URL + "whois/" + domain;
 		return commonQuery(requestUrl, QUERY_WHOIS_PARAM);
