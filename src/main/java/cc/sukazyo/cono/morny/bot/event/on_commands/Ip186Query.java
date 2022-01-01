@@ -20,20 +20,32 @@ public class Ip186Query {
 	
 	public static void exec (@Nonnull Update event, @Nonnull InputCommand command) {
 		
-		if (!command.hasArgs()) { MornyCoeur.getAccount().execute(new SendMessage(
-				event.message().chat().id(),
-				"[Unavailable] No ip defined."
-		).replyToMessageId(event.message().messageId())); return; }
-		
-		if (command.getArgs().length > 1) { MornyCoeur.getAccount().execute(new SendMessage(
-				event.message().chat().id(),
-				"[Unavailable] Too much arguments."
-		).replyToMessageId(event.message().messageId())); return; }
+		String arg = null;
+		if (!command.hasArgs()) {
+			if (event.message().replyToMessage() != null) {
+				arg = event.message().replyToMessage().text();
+			}
+		} else if (command.getArgs().length > 1) {
+			MornyCoeur.getAccount().execute(new SendMessage(
+					event.message().chat().id(),
+					"[Unavailable] Too much arguments."
+			).replyToMessageId(event.message().messageId()));
+			return;
+		} else {
+			arg = command.getArgs()[0];
+		}
+		if (arg == null) {
+			MornyCoeur.getAccount().execute(new SendMessage(
+					event.message().chat().id(),
+					"[Unavailable] No ip defined."
+			).replyToMessageId(event.message().messageId()));
+			return;
+		}
 		
 		try {
 			IP186QueryResponse response = switch (command.getCommand()) {
-				case "/ip" -> IP186QueryHandler.queryIp(command.getArgs()[0]);
-				case "/whois" -> IP186QueryHandler.queryWhois(command.getArgs()[0]);
+				case "/ip" -> IP186QueryHandler.queryIp(arg);
+				case "/whois" -> IP186QueryHandler.queryWhois(arg);
 				default -> throw new IllegalArgumentException("Unknown 186-IP query method " + command.getCommand());
 			};
 			MornyCoeur.getAccount().execute(new SendMessage(

@@ -56,6 +56,9 @@ public class OnCommandExecute extends EventListener {
 			case "/runtime":
 				onCommandRuntimeExec(event);
 				break;
+			case "/save":
+				onSaveDataExec(event);
+				break;
 			case "/jrrp":
 				onCommandJrrpExec(event);
 				break;
@@ -198,6 +201,28 @@ public class OnCommandExecute extends EventListener {
 						jrrp, escapeHtmlTelegram(endChar)
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+	}
+	
+	/**
+	 * @since 0.4.3.0
+	 */
+	private void onSaveDataExec (Update event) {
+		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
+			logger.info(String.format("called save from command by @%s.", event.message().from().username()));
+			MornyCoeur.callSaveData();
+			MornyCoeur.getAccount().execute(new SendSticker(
+							event.message().chat().id(),
+							TelegramStickers.ID_SAVED
+					).replyToMessageId(event.message().messageId())
+			);
+		} else {
+			MornyCoeur.getAccount().execute(new SendSticker(
+							event.message().chat().id(),
+							TelegramStickers.ID_403
+					).replyToMessageId(event.message().messageId())
+			);
+			logger.info("403 call save tag from user @" + event.message().from().username());
+		}
 	}
 	
 }

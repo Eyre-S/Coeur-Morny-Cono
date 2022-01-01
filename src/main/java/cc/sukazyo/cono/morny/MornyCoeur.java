@@ -123,6 +123,14 @@ public class MornyCoeur {
 	}
 	
 	/**
+	 * 向所有的数据管理器发起保存数据的指令
+	 * @since 0.4.3.0
+	 */
+	public void saveDataAll () {
+		TrackerDataManager.save();
+	}
+	
+	/**
 	 * 用于退出时进行缓存的任务处理等进行安全退出
 	 */
 	private void exitCleanup () {
@@ -165,6 +173,15 @@ public class MornyCoeur {
 			}
 		}
 		throw new RuntimeException("Login failed..");
+	}
+	
+	/**
+	 * @see #saveDataAll()
+	 * @since 0.4.3.0
+	 */
+	public static void callSaveData () {
+		INSTANCE.saveDataAll();
+		logger.info("done all save action.");
 	}
 	
 	/**

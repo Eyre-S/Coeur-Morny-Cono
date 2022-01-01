@@ -57,7 +57,7 @@ public class OnEventHackHandle extends EventListener {
 	}
 	
 	private boolean onEventHacked (Update update, long chatId, long fromUser) {
-		logger.debug(String.format("try hack {{%d}}((%d))", chatId, fromUser));
+		logger.debug(String.format("got event signed {{%d}}((%d))", chatId, fromUser));
 		Hacker x;
 		x = hackers.remove(String.format("((%d))", fromUser));
 		if (x == null) x = hackers.remove(String.format("{{%d}}", chatId));
