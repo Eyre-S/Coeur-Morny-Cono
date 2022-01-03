@@ -13,7 +13,7 @@ import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 /**
  * 通过 bot 呼叫主人的事件监听管理类
@@ -76,7 +76,7 @@ public class OnCallMe extends EventListener {
 						request <b>STEAM LIBRARY</b>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						escapeHtmlTelegram(
+						escapeHtml(
 								event.message().from().firstName() + " " + event.message().from().lastName()
 						)
 				)
@@ -96,7 +96,7 @@ public class OnCallMe extends EventListener {
 						request <b>Hana Paresu</b>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						escapeHtmlTelegram(
+						escapeHtml(
 								event.message().from().firstName() + " " + event.message().from().lastName()
 						)
 				)
@@ -124,7 +124,7 @@ public class OnCallMe extends EventListener {
 						request <u>[???]</u>
 						from <a href="tg://user?id=%d">%s</a>""",
 						event.message().from().id(),
-						escapeHtmlTelegram(
+						escapeHtml(
 								event.message().from().firstName() + " " + event.message().from().lastName()
 						)
 				)

@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.bot.event.on_commands;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryResponse;
+import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -10,7 +10,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 /**
  * {@value IP186QueryHandler#SITE_URL} 查询的 telegram 命令前端
@@ -50,12 +50,12 @@ public class Ip186Query {
 			};
 			MornyCoeur.getAccount().execute(new SendMessage(
 					event.message().chat().id(),
-					escapeHtmlTelegram(response.url()) + "\n<code>" + escapeHtmlTelegram(response.body()) + "</code>"
+					escapeHtml(response.url()) + "\n<code>" + escapeHtml(response.body()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 		} catch (Exception e) {
 			MornyCoeur.getAccount().execute(new SendMessage(
 					event.message().chat().id(),
-					"[Exception] in query:\n<code>" + escapeHtmlTelegram(e.getMessage()) + "</code>"
+					"[Exception] in query:\n<code>" + escapeHtml(e.getMessage()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 		}
 		

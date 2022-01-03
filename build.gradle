@@ -21,6 +21,10 @@ dependencies {
 	
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
 	
+	implementation "cc.sukazyo.untitled:util-string-commons:${libUntitledVersion}"
+	implementation "cc.sukazyo.untitled:util-telegram-commons:${libUntitledVersion}"
+	implementation "cc.sukazyo.untitled:util-telegram-api:${libUntitledVersion}"
+	
 	api "cc.sukazyo:messiva:${libMessivaVersion}"
 	
 	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"

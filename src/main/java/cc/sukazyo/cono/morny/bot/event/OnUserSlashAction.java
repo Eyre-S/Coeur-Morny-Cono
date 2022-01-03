@@ -2,7 +2,9 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.util.StringUtils;
+import cc.sukazyo.untitled.util.command.CommonCommand;
+import cc.sukazyo.untitled.util.string.StringArrays;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -10,7 +12,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnUserSlashAction extends EventListener {
 	
@@ -35,10 +37,10 @@ public class OnUserSlashAction extends EventListener {
 				prefixLength = 2;
 			}
 			
-			final String[] action = StringUtils.formatCommand(text.substring(prefixLength));
+			final String[] action = CommonCommand.format(text.substring(prefixLength));
 			final String verb = action[0];
 			final boolean hasObject = action.length != 1;
-			final String object = StringUtils.connectStringArray(action, " ", 1, action.length-1);
+			final String object = StringArrays.connectStringArray(action, " ", 1, action.length-1);
 			final User origin = event.message().from();
 			final User target = (event.message().replyToMessage() == null ? (
 					origin
@@ -50,11 +52,11 @@ public class OnUserSlashAction extends EventListener {
 					event.message().chat().id(),
 					String.format(
 							"<a href='tg://user?id=%d'>%s</a> %s%s <a href='tg://user?id=%d'>%s</a>%s%s",
-							origin.id(), escapeHtmlTelegram(origin.firstName()),
-							verb, escapeHtmlTelegram((useVerbSuffix?"了":"")),
-							target.id(), escapeHtmlTelegram((origin==target ? "自己" : target.firstName())),
-							escapeHtmlTelegram((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
-							escapeHtmlTelegram((hasObject ? object : ""))
+							origin.id(), escapeHtml(origin.firstName()),
+							verb, escapeHtml((useVerbSuffix?"了":"")),
+							target.id(), escapeHtml((origin==target ? "自己" : target.firstName())),
+							escapeHtml((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
+							escapeHtml((hasObject ? object : ""))
 					)
 			).parseMode(ParseMode.HTML));
 			
