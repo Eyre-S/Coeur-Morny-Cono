@@ -7,6 +7,7 @@ import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
 import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
+import cc.sukazyo.cono.morny.bot.event.on_commands.Nbnhhsh;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
@@ -66,6 +67,9 @@ public class OnCommandExecute extends EventListener {
 			case "/ip":
 			case "/whois":
 				Ip186Query.exec(event, command);
+				break;
+			case "/nbnhhsh":
+				Nbnhhsh.exec(event, command);
 				break;
 			default:
 				return nonCommandExecutable(event, command);
