@@ -1,6 +1,8 @@
 package cc.sukazyo.cono.morny.bot.event.on_commands;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
+import cc.sukazyo.cono.morny.bot.api.Executor;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -16,7 +18,7 @@ public class GetUsernameAndId {
 	
 	public static void exec (@Nonnull String[] args, @Nonnull Update event) {
 		
-		if (args.length > 1) { MornyCoeur.getAccount().execute(new SendMessage(
+		if (args.length > 1) { Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
 				event.message().chat().id(),
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
@@ -30,7 +32,7 @@ public class GetUsernameAndId {
 			try {
 				userId = Long.parseLong(args[0]);
 			} catch (NumberFormatException e) {
-				MornyCoeur.getAccount().execute(new SendMessage(
+				Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
 						event.message().chat().id(),
 						"[Unavailable] " + e.getMessage()
 				).replyToMessageId(event.message().messageId()));
@@ -38,12 +40,12 @@ public class GetUsernameAndId {
 			}
 		}
 		
-		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
+		final GetChatMemberResponse response = Executor.as(MornyCoeur.getAccount()).exec(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
 		
 		if (response.chatMember() == null) {
-			MornyCoeur.getAccount().execute(new SendMessage(
+			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
 					event.message().chat().id(),
 					"[Unavailable] user not found."
 			).replyToMessageId(event.message().messageId()));
@@ -102,7 +104,7 @@ public class GetUsernameAndId {
 			));
 		}
 		
-		MornyCoeur.getAccount().execute(new SendMessage(
+		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
 				event.message().chat().id(),
 				userInformation.toString()
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));

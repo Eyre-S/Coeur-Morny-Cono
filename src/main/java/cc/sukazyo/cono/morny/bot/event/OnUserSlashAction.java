@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.untitled.util.command.CommonCommand;
 import cc.sukazyo.untitled.util.string.StringArrays;
 
@@ -48,7 +49,7 @@ public class OnUserSlashAction extends EventListener {
 					event.message().replyToMessage().from()
 			));
 			
-			MornyCoeur.getAccount().execute(new SendMessage(
+			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
 					event.message().chat().id(),
 					String.format(
 							"<a href='tg://user?id=%d'>%s</a> %s%s <a href='tg://user?id=%d'>%s</a>%s%s",

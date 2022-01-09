@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.bot.api;
 
+import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;
 
 import javax.annotation.Nonnull;
@@ -27,10 +28,31 @@ public class EventListenerManager {
 		public void run () {
 			for (EventListener x : listeners) {
 				try {
+					
 					if (exec.apply(x)) return;
+					
+				} catch (EventRuntimeException e) {
+					
+					final StringBuilder errorMessage = new StringBuilder();
+					errorMessage.append("Event runtime breaks: " + e.getMessage()).append('\n');
+					errorMessage.append("at " + e.getStackTrace()[0].toString()).append('\n');
+					errorMessage.append("at " + e.getStackTrace()[1].toString()).append('\n');
+					errorMessage.append("at " + e.getStackTrace()[2].toString()).append('\n');
+					errorMessage.append("at " + e.getStackTrace()[3].toString()).append('\n');
+					if (e instanceof EventRuntimeException.ActionFailed) {
+						errorMessage.append((
+								"\"telegram request track\": " +
+								new GsonBuilder().setPrettyPrinting().create().toJson(((EventRuntimeException.ActionFailed)e).getResponse())
+						).indent(4)).append('\n');
+					}
+					
+					logger.error(errorMessage.toString());
+					
 				} catch (Exception e) {
+					
 					logger.error("Event Error!");
 					e.printStackTrace(System.out);
+					
 				}
 			}
 		}
