@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny;
 
-import com.pengrad.telegrambot.model.ChatMember;
-import com.pengrad.telegrambot.request.GetChatMember;
+import com.pengrad.telegrambot.model.ChatMember.Status;
 
 /**
  * 对用户进行身份权限验证的管理类
@@ -37,13 +36,7 @@ public class MornyTrusted {
 	 */
 	public boolean isTrusted (long userId) {
 		if (userId == MASTER) return true;
-		final ChatMember chatMember = MornyCoeur.getAccount().execute(new GetChatMember(TRUSTED_CHAT_ID, userId)).chatMember();
-		return (
-				chatMember != null && (
-						chatMember.status() == ChatMember.Status.administrator ||
-						chatMember.status() == ChatMember.Status.creator
-				)
-		);
+		return MornyCoeur.extra().isUserInGroup(userId, TRUSTED_CHAT_ID, Status.administrator);
 	}
 	
 }

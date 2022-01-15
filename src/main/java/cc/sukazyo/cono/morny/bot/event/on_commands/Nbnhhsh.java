@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.cono.morny.data.NbnhhshQuery;
 import cc.sukazyo.untitled.util.string.StringArrays;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
@@ -36,13 +35,13 @@ public class Nbnhhsh {
 				}
 			}
 			
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					message.toString()
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 			
 		} catch (Exception e) {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"[Exception] in query:\n<code>" + escapeHtml(e.getMessage()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));

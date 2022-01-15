@@ -4,7 +4,6 @@ import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
 import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
@@ -81,7 +80,7 @@ public class OnCommandExecute extends EventListener {
 	private boolean nonCommandExecutable (Update event, InputCommand command) {
 		if (command.getTarget() == null) return false; // 无法解析的命令，转交事件链后代处理
 		else { // 无法解析的显式命令格式，报错找不到命令
-			Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_404
 					).replyToMessageId(event.message().messageId())
@@ -91,7 +90,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandOnExec (@Nonnull Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+		MornyCoeur.extra().exec(new SendSticker(
 				event.message().chat().id(),
 				TelegramStickers.ID_ONLINE_STATUS_RETURN
 				).replyToMessageId(event.message().messageId())
@@ -99,7 +98,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandHelloExec (@Nonnull Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+		MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
 						TelegramStickers.ID_HELLO
 				).replyToMessageId(event.message().messageId())
@@ -108,7 +107,7 @@ public class OnCommandExecute extends EventListener {
 	
 	private void onCommandExitExec (@Nonnull Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_EXIT
 					).replyToMessageId(event.message().messageId())
@@ -116,7 +115,7 @@ public class OnCommandExecute extends EventListener {
 			logger.info("Morny exited by user @" + event.message().from().username());
 			System.exit(0);
 		} else {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())
@@ -126,7 +125,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandVersionExec (@Nonnull Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
 						"""
@@ -134,7 +133,7 @@ public class OnCommandExecute extends EventListener {
 						- <code>%s</code>
 						core md5_hash:
 						- <code>%s</code>
-						compile time<<sta?>mp:
+						compile timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
 						escapeHtml(MornySystem.VERSION),
@@ -149,7 +148,7 @@ public class OnCommandExecute extends EventListener {
 	 * @since 0.4.1.2
 	 */
 	private void onCommandRuntimeExec (@Nonnull Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format("""
 								system:
@@ -198,7 +197,7 @@ public class OnCommandExecute extends EventListener {
 	private void onCommandJrrpExec (Update event) {
 		final double jrrp = MornyJrrp.getJrrpFromTelegramUser(event.message().from(), System.currentTimeMillis());
 		final String endChar = jrrp>70 ? "!" : jrrp>30 ? ";" : "...";
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
 						"<a href='tg://user?id=%d'>%s</a> 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
@@ -216,13 +215,13 @@ public class OnCommandExecute extends EventListener {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 			logger.info(String.format("called save from command by @%s.", event.message().from().username()));
 			MornyCoeur.callSaveData();
-			Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_SAVED
 					).replyToMessageId(event.message().messageId())
 			);
 		} else {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())

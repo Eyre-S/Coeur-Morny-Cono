@@ -3,7 +3,6 @@ package cc.sukazyo.cono.morny.bot.event;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
@@ -56,7 +55,7 @@ public class OnCallMe extends EventListener {
 				return false;
 			}
 		}
-		Executor.as(MornyCoeur.getAccount()).exec(new SendSticker(
+		MornyCoeur.extra().exec(new SendSticker(
 						update.message().chat().id(),
 						TelegramStickers.ID_SENT
 				).replyToMessageId(update.message().messageId())
@@ -71,7 +70,7 @@ public class OnCallMe extends EventListener {
 	 * @param event 执行呼叫的tg事件
 	 */
 	private static void requestSteamJoin (Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				ME, String.format(
 						"""
 						request <b>STEAM LIBRARY</b>
@@ -91,7 +90,7 @@ public class OnCallMe extends EventListener {
 	 * @param event 执行呼叫的tg事件
 	 */
 	private static void requestHanaParesuJoin (Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				ME, String.format(
 						"""
 						request <b>Hana Paresu</b>
@@ -119,7 +118,7 @@ public class OnCallMe extends EventListener {
 	 * @since 0.4.2.2
 	 */
 	private static void requestCustomCall (Update event) {
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				ME, String.format(
 						"""
 						request <u>[???]</u>
@@ -130,7 +129,7 @@ public class OnCallMe extends EventListener {
 						)
 				)
 		).parseMode(ParseMode.HTML));
-		Executor.as(MornyCoeur.getAccount()).exec(new ForwardMessage(
+		MornyCoeur.extra().exec(new ForwardMessage(
 				ME,
 				event.message().chat().id(),
 				event.message().messageId()

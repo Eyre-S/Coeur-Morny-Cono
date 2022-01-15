@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
 
 import com.google.gson.GsonBuilder;
@@ -66,7 +65,7 @@ public class OnEventHackHandle extends EventListener {
 		if (x == null) x = hackers.remove("[[]]");
 		if (x == null) return false;
 		logger.debug("hacked event by " + x);
-		Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(x.fromChatId, String.format(
+		MornyCoeur.extra().exec(new SendMessage(x.fromChatId, String.format(
 				"<code>%s</code>",
 				MsgEscape.escapeHtml(new GsonBuilder().setPrettyPrinting().create().toJson(update))
 		)).parseMode(ParseMode.HTML).replyToMessageId((int)x.fromMessageId));

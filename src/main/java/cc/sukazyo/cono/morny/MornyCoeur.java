@@ -3,6 +3,8 @@ package cc.sukazyo.cono.morny;
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
+
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -25,6 +27,7 @@ public class MornyCoeur {
 	
 	/** morny 的 bot 账户 */
 	private final TelegramBot account;
+	private final ExtraAction extraActionInstance;
 	/**
 	 * morny 的 bot 账户的用户名<br>
 	 * <br>
@@ -94,6 +97,8 @@ public class MornyCoeur {
 			logger.error(ex.getMessage());
 			throw ex;
 		}
+		
+		this.extraActionInstance = ExtraAction.as(account);
 		
 		logger.info("Bot login succeed.");
 		
@@ -222,6 +227,11 @@ public class MornyCoeur {
 	@Nonnull
 	public static MornyTrusted trustedInstance () {
 		return INSTANCE.trusted;
+	}
+	
+	@Nonnull
+	public static ExtraAction extra () {
+		return INSTANCE.extraActionInstance;
 	}
 	
 }

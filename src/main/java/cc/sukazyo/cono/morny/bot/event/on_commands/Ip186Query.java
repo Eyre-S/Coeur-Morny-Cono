@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.bot.event.on_commands;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryResponse;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler;
@@ -27,7 +26,7 @@ public class Ip186Query {
 				arg = event.message().replyToMessage().text();
 			}
 		} else if (command.getArgs().length > 1) {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"[Unavailable] Too much arguments."
 			).replyToMessageId(event.message().messageId()));
@@ -36,7 +35,7 @@ public class Ip186Query {
 			arg = command.getArgs()[0];
 		}
 		if (arg == null) {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"[Unavailable] No ip defined."
 			).replyToMessageId(event.message().messageId()));
@@ -49,12 +48,12 @@ public class Ip186Query {
 				case "/whois" -> IP186QueryHandler.queryWhois(arg);
 				default -> throw new IllegalArgumentException("Unknown 186-IP query method " + command.getCommand());
 			};
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					escapeHtml(response.url()) + "\n<code>" + escapeHtml(response.body()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 		} catch (Exception e) {
-			Executor.as(MornyCoeur.getAccount()).exec(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"[Exception] in query:\n<code>" + escapeHtml(e.getMessage()) + "</code>"
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));

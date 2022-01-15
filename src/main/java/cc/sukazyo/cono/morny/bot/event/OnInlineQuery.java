@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.api.Executor;
 import cc.sukazyo.cono.morny.util.EncryptUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
@@ -25,7 +24,7 @@ public class OnInlineQuery extends EventListener {
 	 */
 	@Override
 	public boolean onInlineQuery (@Nonnull Update update) {
-		Executor.as(MornyCoeur.getAccount()).exec(new AnswerInlineQuery(update.inlineQuery().id(), new InlineQueryResultArticle[]{
+		MornyCoeur.extra().exec(new AnswerInlineQuery(update.inlineQuery().id(), new InlineQueryResultArticle[]{
 				new InlineQueryResultArticle(
 						EncryptUtils.encryptByMD5(update.inlineQuery().query()),
 						"Raw Input",
