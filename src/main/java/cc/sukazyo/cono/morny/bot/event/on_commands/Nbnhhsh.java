@@ -28,10 +28,19 @@ public class Nbnhhsh {
 			StringBuilder message = new StringBuilder("<a href=\"https://lab.magiconch.com/nbnhhsh/\">## Result of nbnhhsh query :</a>");
 			
 			for (NbnhhshQuery.Word word : response.words) {
-				if (word.trans == null) continue;
+				if (word.trans != null && word.trans.length == 0) word.trans = null;
+				if (word.inputting != null && word.inputting.length == 0) word.inputting = null;
+				if (word.trans == null && word.inputting == null) continue;
 				message.append("\n\n<b>[[ ").append(escapeHtml(word.name)).append(" ]]</b>");
-				for (String trans : word.trans) {
+				if (word.trans != null) for (String trans : word.trans) {
 					message.append("\n* <i>").append(escapeHtml(trans)).append("</i>");
+				}
+				if (word.inputting != null) {
+					if (word.trans != null) message.append("\n");
+					message.append(" maybe:");
+					for (String trans : word.inputting) {
+						message.append("\n` <i>").append(escapeHtml(trans)).append("</i>");
+					}
 				}
 			}
 			

@@ -16,6 +16,7 @@ public class NbnhhshQuery {
 	public static class Word {
 		public String name;
 		public String[] trans;
+		public String[] inputting;
 	}
 	
 	public static class GuessResult {
