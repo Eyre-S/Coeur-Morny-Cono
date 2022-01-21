@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
+import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnUserSlashAction extends EventListener {
@@ -20,6 +21,20 @@ public class OnUserSlashAction extends EventListener {
 	public boolean onMessage (@Nonnull Update event) {
 		final String text = event.message().text();
 		if (text == null) return false;
+		
+		// Due to @Lapis_Apple, we stopped slash action function at .DP7 groups.
+		// It may be enabled after some of updates when the function will not be conflicted to other bots.
+		// if (event.message().chat().id() == ) return false;
+		if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
+			logger.info(String.format("""
+					Chat slash action ignored due to keyword \".DP7\".
+					 - %s
+					 - [%d]""",
+					event.message().chat().title(),
+					event.message().chat().id()
+			));
+			return false;
+		}
 		
 		if (text.startsWith("/")) {
 			int prefixLength = 1;
