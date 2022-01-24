@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -12,8 +13,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
-
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 /**
  * 通过 bot 呼叫主人的事件监听管理类
@@ -74,11 +73,8 @@ public class OnCallMe extends EventListener {
 				ME, String.format(
 						"""
 						request <b>STEAM LIBRARY</b>
-						from <a href="tg://user?id=%d">%s</a>""",
-						event.message().from().id(),
-						escapeHtml(
-								event.message().from().firstName() + " " + event.message().from().lastName()
-						)
+						from %s""",
+						TGToString.as(event.message().from()).fullnameRefHtml()
 				)
 		).parseMode(ParseMode.HTML));
 	}
@@ -94,11 +90,8 @@ public class OnCallMe extends EventListener {
 				ME, String.format(
 						"""
 						request <b>Hana Paresu</b>
-						from <a href="tg://user?id=%d">%s</a>""",
-						event.message().from().id(),
-						escapeHtml(
-								event.message().from().firstName() + " " + event.message().from().lastName()
-						)
+						from %s""",
+						TGToString.as(event.message().from()).fullnameRefHtml()
 				)
 		).parseMode(ParseMode.HTML));
 	}
@@ -122,11 +115,8 @@ public class OnCallMe extends EventListener {
 				ME, String.format(
 						"""
 						request <u>[???]</u>
-						from <a href="tg://user?id=%d">%s</a>""",
-						event.message().from().id(),
-						escapeHtml(
-								event.message().from().firstName() + " " + event.message().from().lastName()
-						)
+						from %s""",
+						TGToString.as(event.message().from()).fullnameRefHtml()
 				)
 		).parseMode(ParseMode.HTML));
 		MornyCoeur.extra().exec(new ForwardMessage(

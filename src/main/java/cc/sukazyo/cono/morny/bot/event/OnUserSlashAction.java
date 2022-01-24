@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.command.CommonCommand;
 import cc.sukazyo.untitled.util.string.StringArrays;
 
@@ -22,21 +23,21 @@ public class OnUserSlashAction extends EventListener {
 		final String text = event.message().text();
 		if (text == null) return false;
 		
-		// Due to @Lapis_Apple, we stopped slash action function at .DP7 groups.
-		// It may be enabled after some of updates when the function will not be conflicted to other bots.
-		// if (event.message().chat().id() == ) return false;
-		if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
-			logger.info(String.format("""
-					Chat slash action ignored due to keyword \".DP7\".
-					 - %s
-					 - [%d]""",
-					event.message().chat().title(),
-					event.message().chat().id()
-			));
-			return false;
-		}
-		
 		if (text.startsWith("/")) {
+			
+			/// Due to @Lapis_Apple, we stopped slash action function at .DP7 groups.
+			/// It may be enabled after some updates when the function will not be conflicted to other bots.
+			// if (event.message().chat().id() == ) return false;
+			if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
+				logger.info(String.format("""
+					Chat slash action ignored due to the following keyword.
+					 - %s
+					 - ".DP7\"""",
+						TGToString.as(event.message().chat()).toStringFullNameId()
+				));
+				return false;
+			}
+			
 			int prefixLength = 1;
 			boolean useVerbSuffix = true;
 			boolean useObjectPrefix = true;
@@ -66,10 +67,12 @@ public class OnUserSlashAction extends EventListener {
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					String.format(
-							"<a href='tg://user?id=%d'>%s</a> %s%s <a href='tg://user?id=%d'>%s</a>%s%s",
-							origin.id(), escapeHtml(origin.firstName()),
+							"%s %s%s %s%s%s",
+							TGToString.as(origin).firstnameRefHtml(),
 							verb, escapeHtml((useVerbSuffix?"了":"")),
-							target.id(), escapeHtml((origin==target ? "自己" : target.firstName())),
+							origin==target ?
+									"<a href='tg://user?id="+target.id()+"'>自己</a>" :
+									TGToString.as(target).firstnameRefHtml(),
 							escapeHtml((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
 							escapeHtml((hasObject ? object : ""))
 					)

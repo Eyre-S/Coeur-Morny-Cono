@@ -17,14 +17,19 @@ repositories {
 	maven { name '-ws'; url 'https://mvn.sukazyo.cc' }
 }
 
+String untitled (String lib, String upd = null) {
+	int majorCode = Integer.parseInt(project.libUntitledVersionMajor)
+	return "cc.sukazyo.untitled:$lib:[$majorCode${upd==null?"":".$upd"}, ${majorCode+1}["
+}
 dependencies {
 	
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
 	
-	implementation "cc.sukazyo.untitled:util-string-commons:${libUntitledVersion}"
-	implementation "cc.sukazyo.untitled:util-telegram-commons:${libUntitledVersion}"
-	implementation "cc.sukazyo.untitled:util-telegram-api:${libUntitledVersion}"
-	
+	implementation untitled("util-command-parser","1.0")
+	implementation untitled("util-string-commons", "1.0")
+	implementation untitled("util-telegram-api", "2.1")
+	implementation untitled("util-telegram-api-formatter", "3.3")
+	implementation untitled("util-telegram-commons", "1.0")
 	api "cc.sukazyo:messiva:${libMessivaVersion}"
 	
 	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"

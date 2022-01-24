@@ -10,6 +10,7 @@ import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
 import cc.sukazyo.cono.morny.bot.event.on_commands.Nbnhhsh;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 
 import com.pengrad.telegrambot.model.Update;
@@ -112,7 +113,7 @@ public class OnCommandExecute extends EventListener {
 							TelegramStickers.ID_EXIT
 					).replyToMessageId(event.message().messageId())
 			);
-			logger.info("Morny exited by user @" + event.message().from().username());
+			logger.info("Morny exited by user " + TGToString.as(event.message().from()).toStringLogTag());
 			System.exit(0);
 		} else {
 			MornyCoeur.extra().exec(new SendSticker(
@@ -120,7 +121,7 @@ public class OnCommandExecute extends EventListener {
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())
 			);
-			logger.info("403 exited tag from user @" + event.message().from().username());
+			logger.info("403 exited tag from user " + TGToString.as(event.message().from()).toStringLogTag());
 		}
 	}
 	
@@ -200,9 +201,8 @@ public class OnCommandExecute extends EventListener {
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
-						"<a href='tg://user?id=%d'>%s</a> 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
-						event.message().from().id(),
-						escapeHtml(event.message().from().firstName()),
+						"%s 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
+						TGToString.as(event.message().from()).fullnameRefHtml(),
 						jrrp, escapeHtml(endChar)
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
@@ -213,7 +213,7 @@ public class OnCommandExecute extends EventListener {
 	 */
 	private void onSaveDataExec (Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
-			logger.info(String.format("called save from command by @%s.", event.message().from().username()));
+			logger.info("called save from command by " + TGToString.as(event.message().from()).toStringLogTag());
 			MornyCoeur.callSaveData();
 			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
@@ -226,7 +226,7 @@ public class OnCommandExecute extends EventListener {
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())
 			);
-			logger.info("403 call save tag from user @" + event.message().from().username());
+			logger.info("403 call save tag from user " + TGToString.as(event.message().from()).toStringLogTag());
 		}
 	}
 	
