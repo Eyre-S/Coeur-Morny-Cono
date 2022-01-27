@@ -1,81 +1,81 @@
-package cc.sukazyo.cono.morny.bot.event;
+package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
-import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
-import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
-import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
-import cc.sukazyo.cono.morny.bot.event.on_commands.Nbnhhsh;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
-
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDate;
 import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDuration;
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
-public class OnCommandExecute extends EventListener {
+public class MornyCommands {
 	
-	@Override
-	public boolean onMessage (@Nonnull Update event) {
-		if (event.message().text() == null) {
-			return false; // 检测到无消息文本，忽略掉命令处理
+	private final Map<String, ITelegramCommand> commands = new HashMap<>();
+	
+	private void pushCommandTo (@Nonnull String name, @Nonnull ITelegramCommand instance) {
+		if (commands.containsKey(name)) {
+			logger.warn(String.format("""
+					Telegram command instance named "%s" already exists and will be override by another command instance
+					- current: %s
+					- new : %s""",
+					name,
+					commands.get(name).getClass().getName(),
+					instance.getClass().getName()
+			));
 		}
-		final InputCommand command = new InputCommand(event.message().text());
-		if (command.getTarget() != null && !MornyCoeur.getUsername().equals(command.getTarget())) {
-			return true; // 检测到命令并非针对 morny，退出整个事件处理链
+		commands.put(name, instance);
+	}
+	
+	public void register (@Nonnull ITelegramCommand... list) {
+		for (ITelegramCommand instance : list) {
+			final String[] aliases = instance.getAliases();
+			pushCommandTo(instance.getName(), instance);
+			if (aliases!=null) for (String alias : aliases) pushCommandTo(alias, instance);
 		}
-		switch (command.getCommand()) {
-			case "/user":
-				GetUsernameAndId.exec(command.getArgs(), event);
-				break;
-			case "/event_hack":
-				EventHack.exec(event, command);
-				break;
-			case "/o":
-				onCommandOnExec(event);
-				break;
-			case "/hi":
-			case "/hello":
-				onCommandHelloExec(event);
-				break;
-			case "/exit":
-				onCommandExitExec(event);
-				break;
-			case "/version":
-				onCommandVersionExec(event);
-				break;
-			case "/runtime":
-				onCommandRuntimeExec(event);
-				break;
-			case "/save":
-				onSaveDataExec(event);
-				break;
-			case "/jrrp":
-				onCommandJrrpExec(event);
-				break;
-			case "/ip":
-			case "/whois":
-				Ip186Query.exec(event, command);
-				break;
-			case "/nbnhhsh":
-				Nbnhhsh.exec(event, command);
-				break;
-			default:
-				return nonCommandExecutable(event, command);
+	}
+	
+	public MornyCommands () {
+		
+		register(
+				// simple commands register
+				new ON(),
+				new Hello(),
+				new Exit(),
+				new Version(),
+				new MornyRuntime(),
+				new Jrrp(),
+				new SaveData(),
+				// rich commands register
+				new EventHack(),
+				new GetUsernameAndId(),
+				new Ip186Query.Ip(),
+				new Ip186Query.Whois(),
+				new Nbnhhsh()
+		);
+		
+	}
+	
+	public boolean execute (@Nonnull InputCommand command, @Nonnull Update event) {
+		if (commands.containsKey(command.getCommand())) {
+			commands.get(command.getCommand()).execute(command, event);
+			return true;
 		}
-		return true; // 命令执行成功，标记事件为已处理，退出事件链
+		return nonCommandExecutable(event, command);
 	}
 	
 	private boolean nonCommandExecutable (Update event, InputCommand command) {
@@ -90,15 +90,30 @@ public class OnCommandExecute extends EventListener {
 		}
 	}
 	
-	private void onCommandOnExec (@Nonnull Update event) {
+	private static class ON implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/on"; }
+		@Nullable
+		@Override public String[] getAliases () { return null; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "检查是否在线"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandOnExec(event); }
+	}
+	private static void onCommandOnExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
-				event.message().chat().id(),
-				TelegramStickers.ID_ONLINE_STATUS_RETURN
+						event.message().chat().id(),
+						TelegramStickers.ID_ONLINE_STATUS_RETURN
 				).replyToMessageId(event.message().messageId())
 		);
 	}
 	
-	private void onCommandHelloExec (@Nonnull Update event) {
+	private static class Hello implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/hello"; }
+		@Nullable @Override public String[] getAliases () { return new String[]{"/hi"}; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "打招呼"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }
+	}
+	private static void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
 						TelegramStickers.ID_HELLO
@@ -106,7 +121,14 @@ public class OnCommandExecute extends EventListener {
 		);
 	}
 	
-	private void onCommandExitExec (@Nonnull Update event) {
+	private static class Exit implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/exit"; }
+		@Nullable @Override public String[] getAliases () { return new String[0]; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "关闭 Bot （仅可信成员）"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandExitExec(event); }
+	}
+	private static void onCommandExitExec (@Nonnull Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
@@ -125,7 +147,14 @@ public class OnCommandExecute extends EventListener {
 		}
 	}
 	
-	private void onCommandVersionExec (@Nonnull Update event) {
+	private static class Version implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/version"; }
+		@Nullable @Override public String[] getAliases () { return null; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "检查 Bot 版本信息"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandVersionExec(event); }
+	}
+	private static void onCommandVersionExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
@@ -145,10 +174,17 @@ public class OnCommandExecute extends EventListener {
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
+	private static class MornyRuntime implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/runtime"; }
+		@Nullable @Override public String[] getAliases () { return null; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandRuntimeExec(event); }
+	}
 	/**
 	 * @since 0.4.1.2
 	 */
-	private void onCommandRuntimeExec (@Nonnull Update event) {
+	private static void onCommandRuntimeExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format("""
@@ -195,7 +231,14 @@ public class OnCommandExecute extends EventListener {
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
-	private void onCommandJrrpExec (Update event) {
+	private static class Jrrp implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/jrrp"; }
+		@Nullable @Override public String[] getAliases () { return null; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "获取 (假的) jrrp"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandJrrpExec(event); }
+	}
+	private static void onCommandJrrpExec (Update event) {
 		final double jrrp = MornyJrrp.getJrrpFromTelegramUser(event.message().from(), System.currentTimeMillis());
 		final String endChar = jrrp>70 ? "!" : jrrp>30 ? ";" : "...";
 		MornyCoeur.extra().exec(new SendMessage(
@@ -208,10 +251,17 @@ public class OnCommandExecute extends EventListener {
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
+	private static class SaveData implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/save"; }
+		@Nullable @Override public String[] getAliases () { return null; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "保存缓存数据到文件（仅可信成员）"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onSaveDataExec(event); }
+	}
 	/**
 	 * @since 0.4.3.0
 	 */
-	private void onSaveDataExec (Update event) {
+	private static void onSaveDataExec (Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 			logger.info("called save from command by " + TGToString.as(event.message().from()).toStringLogTag());
 			MornyCoeur.callSaveData();
@@ -229,5 +279,5 @@ public class OnCommandExecute extends EventListener {
 			logger.info("403 call save tag from user " + TGToString.as(event.message().from()).toStringLogTag());
 		}
 	}
-	
+
 }

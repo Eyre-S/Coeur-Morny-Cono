@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.bot.event.on_commands;
+package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryResponse;
@@ -7,8 +7,10 @@ import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
@@ -18,7 +20,23 @@ import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
  */
 public class Ip186Query {
 	
-	public static void exec (@Nonnull Update event, @Nonnull InputCommand command) {
+	public static class Ip implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/ip"; }
+		@Nullable @Override public String[] getAliases () { return new String[0]; }
+		@Nonnull @Override public String getParamRule () { return "[ip]"; }
+		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询 ip 资料"; }
+		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { exec(event, command); }
+	}
+	
+	public static class Whois implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "/whois"; }
+		@Nullable @Override public String[] getAliases () { return new String[0]; }
+		@Nonnull @Override public String getParamRule () { return "[domain]"; }
+		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询域名资料"; }
+		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { exec(event, command); }
+	}
+	
+	private static void exec (@Nonnull Update event, @Nonnull InputCommand command) {
 		
 		String arg = null;
 		if (!command.hasArgs()) {

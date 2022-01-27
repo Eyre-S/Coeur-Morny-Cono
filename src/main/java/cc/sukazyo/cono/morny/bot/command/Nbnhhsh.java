@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.bot.event.on_commands;
+package cc.sukazyo.cono.morny.bot.command;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -9,11 +9,20 @@ import cc.sukazyo.cono.morny.data.NbnhhshQuery;
 import cc.sukazyo.untitled.util.string.StringArrays;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
-public class Nbnhhsh {
+public class Nbnhhsh implements ITelegramCommand {
 	
-	public static void exec (Update event, InputCommand command) {
+	@Nonnull @Override public String getName () { return "/nbnhhsh"; }
+	@Nullable @Override public String[] getAliases () { return null; }
+	@Nonnull @Override public String getParamRule () { return "[text]"; }
+	@Nonnull @Override public String getDescription () { return "检索文本内 nbnhhsh 词条"; }
+	
+	@Override
+	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
 		try {
 			

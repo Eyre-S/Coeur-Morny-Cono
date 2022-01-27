@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.bot.event.on_commands;
+package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
@@ -9,11 +9,19 @@ import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendSticker;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * {@link OnEventHackHandle} 的命令行前端
  * @since 0.4.2.0
  */
-public class EventHack {
+public class EventHack implements ITelegramCommand {
+	
+	@Nonnull @Override public String getName () { return "/event_hack"; }
+	@Nullable @Override public String[] getAliases () { return null; }
+	@Nonnull @Override public String getParamRule () { return "[(user|group|any)]"; }
+	@Nonnull @Override public String getDescription () { return "输出 bot 下一个获取到的事件序列化数据"; }
 	
 	/**
 	 * {@link OnEventHackHandle} 的命令行前端<br>
@@ -26,7 +34,8 @@ public class EventHack {
 	 * @param command 命令基础参数，解析出的命令对象
 	 * @since 0.4.2.0
 	 */
-	public static void exec (Update event, InputCommand command) {
+	@Override
+	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
 		boolean isOk = false;
 		
