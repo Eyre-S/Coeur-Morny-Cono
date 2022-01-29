@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 
 import com.pengrad.telegrambot.model.Update;
@@ -10,8 +9,6 @@ import com.pengrad.telegrambot.model.Update;
 import javax.annotation.Nonnull;
 
 public class OnTelegramCommand extends EventListener {
-	
-	private final MornyCommands commandManager = new MornyCommands();
 	
 	@Override
 	public boolean onMessage (@Nonnull Update event) {
@@ -22,7 +19,7 @@ public class OnTelegramCommand extends EventListener {
 		if (command.getTarget() != null && !MornyCoeur.getUsername().equals(command.getTarget())) {
 			return true; // 检测到命令并非针对 morny，退出整个事件处理链
 		}
-		return commandManager.execute(command, event); // 转交命令管理器执行命令
+		return MornyCoeur.commandManager().execute(command, event); // 转交命令管理器执行命令
 	}
 	
 }

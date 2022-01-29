@@ -7,15 +7,19 @@ import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
+import com.pengrad.telegrambot.request.SetMyCommands;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static cc.sukazyo.cono.morny.Log.logger;
@@ -25,7 +29,7 @@ import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
 	
-	private final Map<String, ITelegramCommand> commands = new HashMap<>();
+	private final Map<String, ITelegramCommand> commands = new LinkedHashMap<>();
 	
 	private void pushCommandTo (@Nonnull String name, @Nonnull ITelegramCommand instance) {
 		if (commands.containsKey(name)) {
@@ -52,20 +56,18 @@ public class MornyCommands {
 	public MornyCommands () {
 		
 		register(
-				// simple commands register
 				new ON(),
 				new Hello(),
-				new Exit(),
+				new GetUsernameAndId(),
+				new EventHack(),
+				new Nbnhhsh(),
+				new Ip186Query.Ip(),
+				new Ip186Query.Whois(),
+				new SaveData(),
 				new Version(),
 				new MornyRuntime(),
 				new Jrrp(),
-				new SaveData(),
-				// rich commands register
-				new EventHack(),
-				new GetUsernameAndId(),
-				new Ip186Query.Ip(),
-				new Ip186Query.Whois(),
-				new Nbnhhsh()
+				new Exit()
 		);
 		
 	}
@@ -76,6 +78,43 @@ public class MornyCommands {
 			return true;
 		}
 		return nonCommandExecutable(event, command);
+	}
+	
+	public void automaticUpdateList () {
+		BotCommand[] commandList = getCommandListTelegram();
+		MornyCoeur.extra().exec(new SetMyCommands(
+				commandList
+		));
+		logger.info("automatic updated telegram command list :\n" + commandListToString(commandList));
+	}
+	
+	private String commandListToString (@Nonnull BotCommand[] list) {
+		StringBuilder builder = new StringBuilder();
+		for (BotCommand signal : list) {
+			builder.append(signal.command()).append(" - ").append(signal.description()).append("\n");
+		}
+		return builder.substring(0, builder.length()-1);
+	}
+	
+	public BotCommand[] getCommandListTelegram () {
+		final List<BotCommand> telegramFormatListing = new ArrayList<>();
+		commands.forEach((regKey, command) -> {
+			if (regKey.equals(command.getName())) {
+				telegramFormatListing.add(formatTelegramCommandListLine(
+						command.getName(),
+						command.getParamRule(),
+						command.getDescription()
+				));
+				if (command.getAliases() != null) for (String alias : command.getAliases()) {
+					telegramFormatListing.add(formatTelegramCommandListLine(alias, "", "↑"));
+				}
+			}
+		});
+		return telegramFormatListing.toArray(BotCommand[]::new);
+	}
+	
+	private BotCommand formatTelegramCommandListLine (@Nonnull String commandName, @Nonnull String paramRule, @Nonnull String intro) {
+		return new BotCommand(commandName, "".equals(paramRule) ? (intro) : (paramRule+" - "+intro));
 	}
 	
 	private boolean nonCommandExecutable (Update event, InputCommand command) {
@@ -89,6 +128,11 @@ public class MornyCommands {
 			return true;
 		}
 	}
+	
+	/// /// /// /// /// /// /// /// ///
+	///
+	///   Old Simple Command Block
+	///
 	
 	private static class ON implements ITelegramCommand {
 		@Nonnull @Override public String getName () { return "/on"; }

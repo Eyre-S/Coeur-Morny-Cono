@@ -1,11 +1,13 @@
 package cc.sukazyo.cono.morny;
 
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
+import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.DeleteMyCommands;
 import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
@@ -24,10 +26,13 @@ public class MornyCoeur {
 	
 	/** 当前 Morny 的{@link MornyTrusted 信任验证机}实例 */
 	private final MornyTrusted trusted;
+	/** 当前 Morny 的 telegram 命令管理器 */
+	private final MornyCommands commandManager = new MornyCommands();
 	
 	/** morny 的 bot 账户 */
 	private final TelegramBot account;
 	private final ExtraAction extraActionInstance;
+	private final boolean isRemoveCommandListWhenExit;
 	/**
 	 * morny 的 bot 账户的用户名<br>
 	 * <br>
@@ -67,10 +72,12 @@ public class MornyCoeur {
 	 */
 	private MornyCoeur (
 			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, long latestEventTimestamp
+			long master, long trustedChat, long latestEventTimestamp,
+			boolean isRemoveCommandListWhenExit
 	) {
 		
 		this.latestEventTimestamp = latestEventTimestamp;
+		this.isRemoveCommandListWhenExit = isRemoveCommandListWhenExit;
 		configureSafeExit();
 		
 		logger.info("args key:\n  " + botKey);
@@ -113,14 +120,24 @@ public class MornyCoeur {
 	 */
 	public static void main (
 			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, long latestEventTimestamp
+			long master, long trustedChat, long latestEventTimestamp,
+			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
 	) {
 		if (INSTANCE == null) {
 			logger.info("System Starting");
-			INSTANCE = new MornyCoeur(botKey, botUsername, master, trustedChat, latestEventTimestamp);
+			INSTANCE = new MornyCoeur(
+					botKey, botUsername,
+					master, trustedChat,
+					latestEventTimestamp,
+					isRemoveCommandListWhenExit
+			);
 			TrackerDataManager.init();
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
+			if (isAutomaticResetCommandList) {
+				logger.info("resetting telegram command list");
+				commandManager().automaticUpdateList();
+			}
 			logger.info("System start complete");
 			return;
 		}
@@ -141,13 +158,17 @@ public class MornyCoeur {
 	private void exitCleanup () {
 		TrackerDataManager.DAEMON.interrupt();
 		TrackerDataManager.trackingLock.lock();
+		if (isRemoveCommandListWhenExit) {
+			extra().exec(new DeleteMyCommands());
+			logger.info("cleaned up command list.");
+		}
 	}
 	
 	/**
 	 * 为程序在虚拟机上添加退出钩子
 	 */
 	private void configureSafeExit () {
-		Runtime.getRuntime().addShutdownHook(new Thread(this::exitCleanup));
+		Runtime.getRuntime().addShutdownHook(new Thread(this::exitCleanup, "Exit-Cleaning"));
 	}
 	
 	/**
@@ -227,6 +248,11 @@ public class MornyCoeur {
 	@Nonnull
 	public static MornyTrusted trustedInstance () {
 		return INSTANCE.trusted;
+	}
+	
+	@Nonnull
+	public static MornyCommands commandManager () {
+		return INSTANCE.commandManager;
 	}
 	
 	@Nonnull
