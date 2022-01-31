@@ -13,6 +13,7 @@ public class MornyQueries {
 	
 	public MornyQueries () {
 		queryInstances.add(new RawText());
+		queryInstances.add(new MyInformation());
 	}
 	
 	@Nonnull
