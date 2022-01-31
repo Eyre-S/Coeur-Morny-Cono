@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny;
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
+import cc.sukazyo.cono.morny.bot.query.MornyQueries;
 import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 
@@ -28,6 +29,7 @@ public class MornyCoeur {
 	private final MornyTrusted trusted;
 	/** 当前 Morny 的 telegram 命令管理器 */
 	private final MornyCommands commandManager = new MornyCommands();
+	private final MornyQueries queryManager = new MornyQueries();
 	
 	/** morny 的 bot 账户 */
 	private final TelegramBot account;
@@ -253,6 +255,11 @@ public class MornyCoeur {
 	@Nonnull
 	public static MornyCommands commandManager () {
 		return INSTANCE.commandManager;
+	}
+	
+	@Nonnull
+	public static MornyQueries queryManager () {
+		return INSTANCE.queryManager;
 	}
 	
 	@Nonnull
