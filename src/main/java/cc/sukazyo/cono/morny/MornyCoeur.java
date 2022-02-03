@@ -88,7 +88,7 @@ public class MornyCoeur {
 		}
 		
 		try {
-			final LogInResult loginResult = login(botKey);
+			final LogInResult loginResult = login(botKey, botUsername);
 			this.account = loginResult.account;
 			this.username = loginResult.username;
 			this.trusted = new MornyTrusted(master, trustedChat);
@@ -158,6 +158,7 @@ public class MornyCoeur {
 	 * 用于退出时进行缓存的任务处理等进行安全退出
 	 */
 	private void exitCleanup () {
+		logger.info("clean:save tracker data.");
 		TrackerDataManager.DAEMON.interrupt();
 		TrackerDataManager.trackingLock.lock();
 		if (isRemoveCommandListWhenExit) {
@@ -184,15 +185,15 @@ public class MornyCoeur {
 	 * @return 成功登录后的 {@link TelegramBot} 对象
 	 */
 	@Nonnull
-	private LogInResult login (@Nonnull String key) {
+	private static LogInResult login (@Nonnull String key, @Nullable String requireName) {
 		final TelegramBot account = new TelegramBot(key);
 		logger.info("Trying to login...");
 		for (int i = 1; i < 4; i++) {
 			if (i != 1) logger.info("retrying...");
 			try {
 				final String username = account.execute(new GetMe()).user().username();
-				if (this.username != null && !this.username.equals(username))
-					throw new RuntimeException("Required the bot @" + this.username + " but @" + username + " logged in!");
+				if (requireName != null && !requireName.equals(username))
+					throw new RuntimeException("Required the bot @" + requireName + " but @" + username + " logged in!");
 				logger.info("Succeed login to @" + username);
 				return new LogInResult(account, username);
 			} catch (Exception e) {

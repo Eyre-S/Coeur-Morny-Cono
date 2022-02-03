@@ -13,8 +13,6 @@ import com.pengrad.telegrambot.response.GetChatMemberResponse;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
-
 public class GetUsernameAndId implements ITelegramCommand {
 	
 	@Nonnull @Override public String getName () { return "/user"; }

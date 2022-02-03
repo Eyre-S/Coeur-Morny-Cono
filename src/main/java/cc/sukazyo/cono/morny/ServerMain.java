@@ -130,17 +130,6 @@ public class ServerMain {
 					}
 				}
 				
-			} else {
-				
-				if (key == null) {
-					key = args[i];
-					continue;
-				}
-				if (username == null) {
-					username = args[i];
-					continue;
-				}
-				
 			}
 			
 			logger.warn("Can't understand arg to some meaning :\n  " + args[i]);
@@ -170,7 +159,10 @@ public class ServerMain {
 		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
 		if (welcomeEchoMode) return;
 		
-		assert key != null;
+		if (key == null) {
+			logger.info("Parameter required has no value:\n --token.");
+			return;
+		}
 		MornyCoeur.main(
 				key, username,
 				master, trustedChat,
