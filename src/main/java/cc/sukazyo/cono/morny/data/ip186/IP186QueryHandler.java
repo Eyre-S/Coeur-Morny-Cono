@@ -62,6 +62,20 @@ public class IP186QueryHandler {
 		return commonQuery(requestUrl, QUERY_WHOIS_PARAM);
 	}
 	
+	/**
+	 * 将 {@link #queryWhois(String)} 的结果进行裁剪.
+	 * <br>
+	 * 将会删除返回内容中 {@code >>> XXX <<<} 行以后的注释串，
+	 * 以达到只保留重要信息的目的。
+	 * 
+	 * @see #queryWhois(String)
+	 */
+	@Nonnull
+	public static IP186QueryResponse queryWhoisPretty (String domain) throws IOException {
+		final IP186QueryResponse raw = queryWhois(domain);
+		return new IP186QueryResponse(raw.url(), raw.body().substring(0, raw.body().indexOf("<<<")+3));
+	}
+	
 	@Nonnull
 	private static IP186QueryResponse commonQuery (String requestUrl, String queryIpParam) throws IOException {
 		Request request = new Request.Builder().url(requestUrl + "?" + queryIpParam).build();

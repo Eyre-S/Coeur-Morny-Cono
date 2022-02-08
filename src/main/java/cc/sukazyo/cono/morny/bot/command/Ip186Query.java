@@ -63,7 +63,7 @@ public class Ip186Query {
 		try {
 			IP186QueryResponse response = switch (command.getCommand()) {
 				case "/ip" -> IP186QueryHandler.queryIp(arg);
-				case "/whois" -> IP186QueryHandler.queryWhois(arg);
+				case "/whois" -> IP186QueryHandler.queryWhoisPretty(arg);
 				default -> throw new IllegalArgumentException("Unknown 186-IP query method " + command.getCommand());
 			};
 			MornyCoeur.extra().exec(new SendMessage(
