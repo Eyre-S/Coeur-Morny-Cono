@@ -29,9 +29,9 @@ import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
 	
-	private final Map<String, ITelegramCommand> commands = new LinkedHashMap<>();
+	private final Map<String, ISimpleCommand> commands = new LinkedHashMap<>();
 	
-	private void pushCommandTo (@Nonnull String name, @Nonnull ITelegramCommand instance) {
+	private void pushCommandTo (@Nonnull String name, @Nonnull ISimpleCommand instance) {
 		if (commands.containsKey(name)) {
 			logger.warn(String.format("""
 					Telegram command instance named "%s" already exists and will be override by another command instance
@@ -45,8 +45,8 @@ public class MornyCommands {
 		commands.put(name, instance);
 	}
 	
-	public void register (@Nonnull ITelegramCommand... list) {
-		for (ITelegramCommand instance : list) {
+	public void register (@Nonnull ISimpleCommand... list) {
+		for (ISimpleCommand instance : list) {
 			final String[] aliases = instance.getAliases();
 			pushCommandTo(instance.getName(), instance);
 			if (aliases!=null) for (String alias : aliases) pushCommandTo(alias, instance);
@@ -68,6 +68,14 @@ public class MornyCommands {
 				new MornyRuntime(),
 				new Jrrp(),
 				new Exit()
+		);
+		
+		// 统一注册这些奇怪的东西&.&
+		register(
+				new 喵呜.抱抱(),
+				new 喵呜.揉揉(),
+				new 喵呜.蹭蹭(),
+				new 喵呜.贴贴()
 		);
 		
 	}
@@ -99,11 +107,11 @@ public class MornyCommands {
 	public BotCommand[] getCommandListTelegram () {
 		final List<BotCommand> telegramFormatListing = new ArrayList<>();
 		commands.forEach((regKey, command) -> {
-			if (regKey.equals(command.getName())) {
+			if (command instanceof ITelegramCommand && regKey.equals(command.getName())) {
 				telegramFormatListing.add(formatTelegramCommandListLine(
 						command.getName(),
-						command.getParamRule(),
-						command.getDescription()
+						((ITelegramCommand)command).getParamRule(),
+						((ITelegramCommand)command).getDescription()
 				));
 				if (command.getAliases() != null) for (String alias : command.getAliases()) {
 					telegramFormatListing.add(formatTelegramCommandListLine(alias, "", "↑"));
