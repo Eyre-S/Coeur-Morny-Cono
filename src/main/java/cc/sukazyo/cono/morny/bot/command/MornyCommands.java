@@ -143,7 +143,7 @@ public class MornyCommands {
 	///
 	
 	private static class ON implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/on"; }
+		@Nonnull @Override public String getName () { return "/o"; }
 		@Nullable
 		@Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
