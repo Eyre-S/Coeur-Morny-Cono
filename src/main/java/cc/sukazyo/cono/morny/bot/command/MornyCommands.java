@@ -76,7 +76,8 @@ public class MornyCommands {
 				new 喵呜.抱抱(),
 				new 喵呜.揉揉(),
 				new 喵呜.蹭蹭(),
-				new 喵呜.贴贴()
+				new 喵呜.贴贴(),
+				new 私わね()
 		);
 		
 	}
