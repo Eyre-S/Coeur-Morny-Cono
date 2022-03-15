@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.util;
 import com.pengrad.telegrambot.model.User;
 
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+
 public class TelegramUserInformation {
 	
 	public static String informationOutputHTML (User user) {
