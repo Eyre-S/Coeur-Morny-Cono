@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event.on_commands;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -10,13 +11,13 @@ import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class GetUsernameAndId {
 	
 	public static void exec (@Nonnull String[] args, @Nonnull Update event) {
 		
-		if (args.length > 1) { MornyCoeur.getAccount().execute(new SendMessage(
+		if (args.length > 1) { MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
@@ -30,7 +31,7 @@ public class GetUsernameAndId {
 			try {
 				userId = Long.parseLong(args[0]);
 			} catch (NumberFormatException e) {
-				MornyCoeur.getAccount().execute(new SendMessage(
+				MornyCoeur.extra().exec(new SendMessage(
 						event.message().chat().id(),
 						"[Unavailable] " + e.getMessage()
 				).replyToMessageId(event.message().messageId()));
@@ -38,12 +39,12 @@ public class GetUsernameAndId {
 			}
 		}
 		
-		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
+		final GetChatMemberResponse response = MornyCoeur.extra().exec(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
 		
 		if (response.chatMember() == null) {
-			MornyCoeur.getAccount().execute(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"[Unavailable] user not found."
 			).replyToMessageId(event.message().messageId()));
@@ -67,7 +68,7 @@ public class GetUsernameAndId {
 					
 					username :
 					- <code>%s</code>""",
-					escapeHtmlTelegram(user.username())
+					escapeHtml(user.username())
 			));
 		}
 		if (user.firstName() == null) {
@@ -78,7 +79,7 @@ public class GetUsernameAndId {
 					
 					firstname :
 					- <code>%s</code>""",
-					escapeHtmlTelegram(user.firstName())
+					escapeHtml(user.firstName())
 			));
 		}
 		if (user.lastName() == null) {
@@ -89,7 +90,7 @@ public class GetUsernameAndId {
 					
 					lastname :
 					- <code>%s</code>""",
-					escapeHtmlTelegram(user.lastName())
+					escapeHtml(user.lastName())
 			));
 		}
 		if (user.languageCode() != null) {
@@ -98,11 +99,11 @@ public class GetUsernameAndId {
 					
 					language-code :
 					- <code>%s</code>""",
-					escapeHtmlTelegram(user.languageCode())
+					escapeHtml(user.languageCode())
 			));
 		}
 		
-		MornyCoeur.getAccount().execute(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				userInformation.toString()
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));

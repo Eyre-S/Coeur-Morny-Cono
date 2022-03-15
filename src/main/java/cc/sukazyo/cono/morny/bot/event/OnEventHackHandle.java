@@ -2,7 +2,8 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.util.StringUtils;
+import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
+
 import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -57,16 +58,16 @@ public class OnEventHackHandle extends EventListener {
 	}
 	
 	private boolean onEventHacked (Update update, long chatId, long fromUser) {
-		logger.debug(String.format("try hack {{%d}}((%d))", chatId, fromUser));
+		logger.debug(String.format("got event signed {{%d}}((%d))", chatId, fromUser));
 		Hacker x;
 		x = hackers.remove(String.format("((%d))", fromUser));
 		if (x == null) x = hackers.remove(String.format("{{%d}}", chatId));
 		if (x == null) x = hackers.remove("[[]]");
 		if (x == null) return false;
 		logger.debug("hacked event by " + x);
-		MornyCoeur.getAccount().execute(new SendMessage(x.fromChatId, String.format(
+		MornyCoeur.extra().exec(new SendMessage(x.fromChatId, String.format(
 				"<code>%s</code>",
-				StringUtils.escapeHtmlTelegram(new GsonBuilder().setPrettyPrinting().create().toJson(update))
+				MsgEscape.escapeHtml(new GsonBuilder().setPrettyPrinting().create().toJson(update))
 		)).parseMode(ParseMode.HTML).replyToMessageId((int)x.fromMessageId));
 		return true;
 	}

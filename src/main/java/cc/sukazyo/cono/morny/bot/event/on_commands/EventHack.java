@@ -2,9 +2,10 @@ package cc.sukazyo.cono.morny.bot.event.on_commands;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
-import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.bot.event.OnEventHackHandle;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendSticker;
 
@@ -64,13 +65,13 @@ public class EventHack {
 		}
 		
 		if (isOk) {
-			MornyCoeur.getAccount().execute(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_WAITING
 					).replyToMessageId(event.message().messageId())
 			);
 		} else {
-			MornyCoeur.getAccount().execute(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())

@@ -24,7 +24,7 @@ public class OnInlineQuery extends EventListener {
 	 */
 	@Override
 	public boolean onInlineQuery (@Nonnull Update update) {
-		MornyCoeur.getAccount().execute(new AnswerInlineQuery(update.inlineQuery().id(), new InlineQueryResultArticle[]{
+		MornyCoeur.extra().exec(new AnswerInlineQuery(update.inlineQuery().id(), new InlineQueryResultArticle[]{
 				new InlineQueryResultArticle(
 						EncryptUtils.encryptByMD5(update.inlineQuery().query()),
 						"Raw Input",

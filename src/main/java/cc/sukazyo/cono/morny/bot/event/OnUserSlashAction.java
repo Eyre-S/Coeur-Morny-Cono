@@ -2,7 +2,10 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.util.StringUtils;
+import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
+import cc.sukazyo.untitled.util.command.CommonCommand;
+import cc.sukazyo.untitled.util.string.StringArrays;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -10,7 +13,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.cono.morny.Log.logger;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnUserSlashAction extends EventListener {
 	
@@ -20,6 +24,20 @@ public class OnUserSlashAction extends EventListener {
 		if (text == null) return false;
 		
 		if (text.startsWith("/")) {
+			
+			/// Due to @Lapis_Apple, we stopped slash action function at .DP7 groups.
+			/// It may be enabled after some updates when the function will not be conflicted to other bots.
+			// if (event.message().chat().id() == ) return false;
+			if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
+				logger.info(String.format("""
+					Chat slash action ignored due to the following keyword.
+					 - %s
+					 - ".DP7\"""",
+						TGToString.as(event.message().chat()).toStringFullNameId()
+				));
+				return false;
+			}
+			
 			int prefixLength = 1;
 			boolean useVerbSuffix = true;
 			boolean useObjectPrefix = true;
@@ -35,10 +53,10 @@ public class OnUserSlashAction extends EventListener {
 				prefixLength = 2;
 			}
 			
-			final String[] action = StringUtils.formatCommand(text.substring(prefixLength));
+			final String[] action = CommonCommand.format(text.substring(prefixLength));
 			final String verb = action[0];
 			final boolean hasObject = action.length != 1;
-			final String object = StringUtils.connectStringArray(action, " ", 1, action.length-1);
+			final String object = StringArrays.connectStringArray(action, " ", 1, action.length-1);
 			final User origin = event.message().from();
 			final User target = (event.message().replyToMessage() == null ? (
 					origin
@@ -46,15 +64,17 @@ public class OnUserSlashAction extends EventListener {
 					event.message().replyToMessage().from()
 			));
 			
-			MornyCoeur.getAccount().execute(new SendMessage(
+			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					String.format(
-							"<a href='tg://user?id=%d'>%s</a> %s%s <a href='tg://user?id=%d'>%s</a>%s%s",
-							origin.id(), escapeHtmlTelegram(origin.firstName()),
-							verb, escapeHtmlTelegram((useVerbSuffix?"了":"")),
-							target.id(), escapeHtmlTelegram((origin==target ? "自己" : target.firstName())),
-							escapeHtmlTelegram((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
-							escapeHtmlTelegram((hasObject ? object : ""))
+							"%s %s%s %s%s%s",
+							TGToString.as(origin).firstnameRefHtml(),
+							verb, escapeHtml((useVerbSuffix?"了":"")),
+							origin==target ?
+									"<a href='tg://user?id="+target.id()+"'>自己</a>" :
+									TGToString.as(target).firstnameRefHtml(),
+							escapeHtml((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
+							escapeHtml((hasObject ? object : ""))
 					)
 			).parseMode(ParseMode.HTML));
 			

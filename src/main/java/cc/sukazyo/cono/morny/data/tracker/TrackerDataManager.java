@@ -43,9 +43,7 @@ public class TrackerDataManager {
 					logger.info("CALLED TO EXIT! writing cache.");
 				}
 				if (record.size() != 0) {
-					logger.info("start writing tracker data.");
 					save(reset());
-					logger.info("done writing tracker data.");
 				}
 				else logger.info("nothing to do yet");
 			} while (!postProcess);
@@ -66,6 +64,12 @@ public class TrackerDataManager {
 	
 	public static void init () {
 		DAEMON.start();
+	}
+	
+	public static void save () {
+		logger.info("start writing tracker data.");
+		save(reset());
+		logger.info("done writing tracker data.");
 	}
 	
 	private static HashMap<Long, HashMap<Long, TreeSet<Long>>> reset () {

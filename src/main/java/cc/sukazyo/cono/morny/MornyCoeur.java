@@ -3,6 +3,8 @@ package cc.sukazyo.cono.morny;
 import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
+
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -25,6 +27,7 @@ public class MornyCoeur {
 	
 	/** morny 的 bot 账户 */
 	private final TelegramBot account;
+	private final ExtraAction extraActionInstance;
 	/**
 	 * morny 的 bot 账户的用户名<br>
 	 * <br>
@@ -95,6 +98,8 @@ public class MornyCoeur {
 			throw ex;
 		}
 		
+		this.extraActionInstance = ExtraAction.as(account);
+		
 		logger.info("Bot login succeed.");
 		
 	}
@@ -120,6 +125,14 @@ public class MornyCoeur {
 			return;
 		}
 		logger.error("System already started coeur!!!");
+	}
+	
+	/**
+	 * 向所有的数据管理器发起保存数据的指令
+	 * @since 0.4.3.0
+	 */
+	public void saveDataAll () {
+		TrackerDataManager.save();
 	}
 	
 	/**
@@ -168,6 +181,15 @@ public class MornyCoeur {
 	}
 	
 	/**
+	 * @see #saveDataAll()
+	 * @since 0.4.3.0
+	 */
+	public static void callSaveData () {
+		INSTANCE.saveDataAll();
+		logger.info("done all save action.");
+	}
+	
+	/**
 	 * 获取登录成功后的 telegram bot 对象
 	 *
 	 * @return {@link #account MornyCoeur.account}
@@ -205,6 +227,11 @@ public class MornyCoeur {
 	@Nonnull
 	public static MornyTrusted trustedInstance () {
 		return INSTANCE.trusted;
+	}
+	
+	@Nonnull
+	public static ExtraAction extra () {
+		return INSTANCE.extraActionInstance;
 	}
 	
 }

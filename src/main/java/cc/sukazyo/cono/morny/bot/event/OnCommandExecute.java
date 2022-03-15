@@ -4,12 +4,15 @@ import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.bot.api.InputCommand;
 import cc.sukazyo.cono.morny.bot.event.on_commands.EventHack;
 import cc.sukazyo.cono.morny.bot.event.on_commands.GetUsernameAndId;
 import cc.sukazyo.cono.morny.bot.event.on_commands.Ip186Query;
+import cc.sukazyo.cono.morny.bot.event.on_commands.Nbnhhsh;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
+import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -20,7 +23,7 @@ import javax.annotation.Nonnull;
 import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDate;
 import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDuration;
-import static cc.sukazyo.cono.morny.util.StringUtils.escapeHtmlTelegram;
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnCommandExecute extends EventListener {
 	
@@ -56,12 +59,18 @@ public class OnCommandExecute extends EventListener {
 			case "/runtime":
 				onCommandRuntimeExec(event);
 				break;
+			case "/save":
+				onSaveDataExec(event);
+				break;
 			case "/jrrp":
 				onCommandJrrpExec(event);
 				break;
 			case "/ip":
 			case "/whois":
 				Ip186Query.exec(event, command);
+				break;
+			case "/nbnhhsh":
+				Nbnhhsh.exec(event, command);
 				break;
 			default:
 				return nonCommandExecutable(event, command);
@@ -72,7 +81,7 @@ public class OnCommandExecute extends EventListener {
 	private boolean nonCommandExecutable (Update event, InputCommand command) {
 		if (command.getTarget() == null) return false; // 无法解析的命令，转交事件链后代处理
 		else { // 无法解析的显式命令格式，报错找不到命令
-			MornyCoeur.getAccount().execute(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_404
 					).replyToMessageId(event.message().messageId())
@@ -82,7 +91,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandOnExec (@Nonnull Update event) {
-		MornyCoeur.getAccount().execute(new SendSticker(
+		MornyCoeur.extra().exec(new SendSticker(
 				event.message().chat().id(),
 				TelegramStickers.ID_ONLINE_STATUS_RETURN
 				).replyToMessageId(event.message().messageId())
@@ -90,7 +99,7 @@ public class OnCommandExecute extends EventListener {
 	}
 	
 	private void onCommandHelloExec (@Nonnull Update event) {
-		MornyCoeur.getAccount().execute(new SendSticker(
+		MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
 						TelegramStickers.ID_HELLO
 				).replyToMessageId(event.message().messageId())
@@ -99,25 +108,25 @@ public class OnCommandExecute extends EventListener {
 	
 	private void onCommandExitExec (@Nonnull Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
-			MornyCoeur.getAccount().execute(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_EXIT
 					).replyToMessageId(event.message().messageId())
 			);
-			logger.info("Morny exited by user @" + event.message().from().username());
+			logger.info("Morny exited by user " + TGToString.as(event.message().from()).toStringLogTag());
 			System.exit(0);
 		} else {
-			MornyCoeur.getAccount().execute(new SendSticker(
+			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())
 			);
-			logger.info("403 exited tag from user @" + event.message().from().username());
+			logger.info("403 exited tag from user " + TGToString.as(event.message().from()).toStringLogTag());
 		}
 	}
 	
 	private void onCommandVersionExec (@Nonnull Update event) {
-		MornyCoeur.getAccount().execute(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
 						"""
@@ -128,10 +137,10 @@ public class OnCommandExecute extends EventListener {
 						compile timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
-						escapeHtmlTelegram(MornySystem.VERSION),
-						escapeHtmlTelegram(MornySystem.getJarMd5()),
+						escapeHtml(MornySystem.VERSION),
+						escapeHtml(MornySystem.getJarMd5()),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
-						escapeHtmlTelegram(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0))
+						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0))
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
@@ -140,7 +149,7 @@ public class OnCommandExecute extends EventListener {
 	 * @since 0.4.1.2
 	 */
 	private void onCommandRuntimeExec (@Nonnull Update event) {
-		MornyCoeur.getAccount().execute(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format("""
 								system:
@@ -163,24 +172,24 @@ public class OnCommandExecute extends EventListener {
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]""",
 						// system
-						escapeHtmlTelegram(System.getProperty("os.name")),
-						escapeHtmlTelegram(System.getProperty("os.version")),
+						escapeHtml(System.getProperty("os.name")),
+						escapeHtml(System.getProperty("os.version")),
 						Runtime.getRuntime().availableProcessors(),
 						// java
-						escapeHtmlTelegram(System.getProperty("java.vm.name")),
-						escapeHtmlTelegram(System.getProperty("java.version")),
+						escapeHtml(System.getProperty("java.vm.name")),
+						escapeHtml(System.getProperty("java.version")),
 						// memory
 						Runtime.getRuntime().totalMemory() / 1024 / 1024,
 						Runtime.getRuntime().maxMemory() / 1024 / 1024,
 						// version
-						escapeHtmlTelegram(MornySystem.VERSION),
-						escapeHtmlTelegram(MornySystem.getJarMd5()),
-						escapeHtmlTelegram(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
+						escapeHtml(MornySystem.VERSION),
+						escapeHtml(MornySystem.getJarMd5()),
+						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
 						// continuous
-						escapeHtmlTelegram(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
+						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
 						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
-						escapeHtmlTelegram(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
+						escapeHtml(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
 						MornyCoeur.coeurStartTimestamp
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
@@ -189,15 +198,36 @@ public class OnCommandExecute extends EventListener {
 	private void onCommandJrrpExec (Update event) {
 		final double jrrp = MornyJrrp.getJrrpFromTelegramUser(event.message().from(), System.currentTimeMillis());
 		final String endChar = jrrp>70 ? "!" : jrrp>30 ? ";" : "...";
-		MornyCoeur.getAccount().execute(new SendMessage(
+		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
-						"<a href='tg://user?id=%d'>%s</a> 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
-						event.message().from().id(),
-						escapeHtmlTelegram(event.message().from().firstName()),
-						jrrp, escapeHtmlTelegram(endChar)
+						"%s 在(utc的)今天的运气指数是———— <code>%.2f%%</code> %s",
+						TGToString.as(event.message().from()).fullnameRefHtml(),
+						jrrp, escapeHtml(endChar)
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+	}
+	
+	/**
+	 * @since 0.4.3.0
+	 */
+	private void onSaveDataExec (Update event) {
+		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
+			logger.info("called save from command by " + TGToString.as(event.message().from()).toStringLogTag());
+			MornyCoeur.callSaveData();
+			MornyCoeur.extra().exec(new SendSticker(
+							event.message().chat().id(),
+							TelegramStickers.ID_SAVED
+					).replyToMessageId(event.message().messageId())
+			);
+		} else {
+			MornyCoeur.extra().exec(new SendSticker(
+							event.message().chat().id(),
+							TelegramStickers.ID_403
+					).replyToMessageId(event.message().messageId())
+			);
+			logger.info("403 call save tag from user " + TGToString.as(event.message().from()).toStringLogTag());
+		}
 	}
 	
 }
