@@ -49,6 +49,12 @@ public class ServerMain {
 	 *         {@code --outdated-block} 会使得 {@link MornyCoeur#latestEventTimestamp}
 	 *         赋值为程序启动的时间，从而造成阻挡程序启动之前的消息事件处理效果。
 	 *     </li>
+	 *     <li>
+	 *         {@code --auto-cmd-list} 使 morny 在启动时自动依据程序本体更新登录 bot 的命令列表
+	 *     </li>
+	 *     <li>
+	 *         {@code --auto-cmd-remove} 使 morny 在关闭时自动依据程序本体删除 bot 的命令列表
+	 *     </li>
 	 * </ul>
 	 * 除去选项之外，第一个参数会被赋值为 bot 的 telegram bot api token，
 	 * 第二个参数会被赋值为 bot 的 username 限定名。其余的参数会被认定为无法理解。<br>
@@ -59,7 +65,7 @@ public class ServerMain {
 	 * <s>但实际上这并不影响现在的使用，选项赋值目前仍属于测试功能</s><br>
 	 * <b>但请勿混用</b>，这将使两个赋值出现混淆并<b>产生不可知的结果</b>
 	 *
-	 * @see MornyCoeur#main(String, String, long, long, long)
+	 * @see MornyCoeur#main
 	 * @since 0.4.0.0
 	 * @param args 参数组
 	 */
@@ -70,25 +76,27 @@ public class ServerMain {
 		boolean outdatedBlock = false;
 		long master = 793274677L;
 		long trustedChat = -1001541451710L;
+		boolean autoCmdList = false;
+		boolean autoCmdRemove = false;
 		
 		for (int i = 0; i < args.length; i++) {
 			
 			if (args[i].startsWith("-")) {
 				
 				switch (args[i]) {
-					case "--outdated-block" -> {
+					case "--outdated-block", "-ob" -> {
 						outdatedBlock = true;
 						continue;
 					}
-					case "--no-hello" -> {
+					case "--no-hello", "-hf" -> {
 						showWelcome = false;
 						continue;
 					}
-					case "--only-hello" -> {
+					case "--only-hello", "-o" -> {
 						welcomeEchoMode = true;
 						continue;
 					}
-					case "--version" -> {
+					case "--version", "-v" -> {
 						versionEchoMode = true;
 						continue;
 					}
@@ -112,17 +120,14 @@ public class ServerMain {
 						trustedChat = Long.parseLong(args[i]);
 						continue;
 					}
-				}
-				
-			} else {
-				
-				if (key == null) {
-					key = args[i];
-					continue;
-				}
-				if (username == null) {
-					username = args[i];
-					continue;
+					case "--auto-cmd-list", "-ca" -> {
+						autoCmdList = true;
+						continue;
+					}
+					case "--auto-cmd-remove", "-cr" -> {
+						autoCmdRemove = true;
+						continue;
+					}
 				}
 				
 			}
@@ -154,8 +159,16 @@ public class ServerMain {
 		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
 		if (welcomeEchoMode) return;
 		
-		assert key != null;
-		MornyCoeur.main(key, username, master, trustedChat, outdatedBlock?System.currentTimeMillis():0);
+		if (key == null) {
+			logger.info("Parameter required has no value:\n --token.");
+			return;
+		}
+		MornyCoeur.main(
+				key, username,
+				master, trustedChat,
+				outdatedBlock?System.currentTimeMillis():0,
+				autoCmdList, autoCmdRemove
+		);
 		
 	}
 	

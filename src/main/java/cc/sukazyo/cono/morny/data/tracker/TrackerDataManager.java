@@ -43,7 +43,7 @@ public class TrackerDataManager {
 					logger.info("CALLED TO EXIT! writing cache.");
 				}
 				if (record.size() != 0) {
-					save(reset());
+					save();
 				}
 				else logger.info("nothing to do yet");
 			} while (!postProcess);
