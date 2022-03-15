@@ -162,8 +162,7 @@ public class MornyCoeur {
 		TrackerDataManager.DAEMON.interrupt();
 		TrackerDataManager.trackingLock.lock();
 		if (isRemoveCommandListWhenExit) {
-			extra().exec(new DeleteMyCommands());
-			logger.info("cleaned up command list.");
+			commandManager.automaticRemoveList();
 		}
 	}
 	

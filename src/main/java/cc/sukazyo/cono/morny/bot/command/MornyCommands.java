@@ -8,6 +8,7 @@ import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 import com.pengrad.telegrambot.model.BotCommand;
+import com.pengrad.telegrambot.model.DeleteMyCommands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -90,10 +91,16 @@ public class MornyCommands {
 	
 	public void automaticUpdateList () {
 		BotCommand[] commandList = getCommandListTelegram();
+		automaticRemoveList();
 		MornyCoeur.extra().exec(new SetMyCommands(
 				commandList
 		));
 		logger.info("automatic updated telegram command list :\n" + commandListToString(commandList));
+	}
+	
+	public void automaticRemoveList () {
+		MornyCoeur.extra().exec(new DeleteMyCommands());
+		logger.info("cleaned up command list.");
 	}
 	
 	private String commandListToString (@Nonnull BotCommand[] list) {
@@ -143,7 +150,7 @@ public class MornyCommands {
 	///
 	
 	private static class ON implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/on"; }
+		@Nonnull @Override public String getName () { return "/o"; }
 		@Nullable
 		@Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
