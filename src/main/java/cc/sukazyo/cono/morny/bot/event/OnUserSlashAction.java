@@ -38,25 +38,23 @@ public class OnUserSlashAction extends EventListener {
 				return false;
 			}
 			
-			int prefixLength = 1;
-			boolean useVerbSuffix = true;
-			boolean useObjectPrefix = true;
-			if (text.startsWith("//#") || text.startsWith("///")) {
-				useVerbSuffix = false;
-				useObjectPrefix = false;
-				prefixLength = 3;
-			} else if (text.startsWith("/#")) {
-				useObjectPrefix = false;
-				prefixLength = 2;
-			} else if (text.startsWith("//")) {
-				useVerbSuffix = false;
-				prefixLength = 2;
+			final String[] action = CommonCommand.format(text);
+			action[0] = action[0].substring(1);
+			
+			if (action[0].matches("^[a-zA-Z_]+$")) {
+				return false; // 忽略掉 Telegram 命令格式的输入
+			} else if (action[0].contains("/")) {
+				return false; // 忽略掉疑似目录格式的输入
 			}
 			
-			final String[] action = CommonCommand.format(text.substring(prefixLength));
-			final String verb = action[0];
-			final boolean hasObject = action.length != 1;
-			final String object = StringArrays.connectStringArray(action, " ", 1, action.length-1);
+			final boolean isHardParse = "".equals(action[0]);
+			/* 忽略空数据 */ if (isHardParse && action.length < 2) { return false; }
+			final String verb = isHardParse ? action[1] : action[0];
+			final boolean hasObject = action.length != (isHardParse?2:1);
+			final String object =
+					hasObject ?
+					StringArrays.connectStringArray(action, " ", isHardParse?2:1, action.length-1) :
+					"";
 			final User origin = event.message().from();
 			final User target = (event.message().replyToMessage() == null ? (
 					origin
@@ -67,16 +65,15 @@ public class OnUserSlashAction extends EventListener {
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					String.format(
-							"%s %s%s %s%s%s",
+							"%s %s%s %s %s!",
 							TGToString.as(origin).firstnameRefHtml(),
-							verb, escapeHtml((useVerbSuffix?"了":"")),
+							escapeHtml(verb), escapeHtml((hasObject?"":"了")),
 							origin==target ?
 									"<a href='tg://user?id="+target.id()+"'>自己</a>" :
 									TGToString.as(target).firstnameRefHtml(),
-							escapeHtml((hasObject ? (useObjectPrefix ?" 的": " ") : "")),
-							escapeHtml((hasObject ? object : ""))
+							escapeHtml(hasObject ? object+" " : "")
 					)
-			).parseMode(ParseMode.HTML));
+			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 			
 			return true;
 			
