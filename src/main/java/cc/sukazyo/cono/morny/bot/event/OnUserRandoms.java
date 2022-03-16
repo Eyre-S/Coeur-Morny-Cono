@@ -26,6 +26,9 @@ public class OnUserRandoms extends EventListener {
 		if (preProcess.length > 1) return false;
 		final String query = preProcess[0];
 		
+		// ----- START CODE BLOCK COMMENT -----
+		// 这里实现思路和代码优化有至少一半是 copilot 和 IDEA 提供的
+		// 实现思路都可以从人类手里抢一半贡献太恐怖了aba
 		String result = null;
 		final Matcher matcher;
 		if (query.contains("还是")) {
@@ -36,6 +39,7 @@ public class OnUserRandoms extends EventListener {
 		if (matcher.find()) {
 			result = ThreadLocalRandom.current().nextBoolean() ? matcher.group(1) : matcher.group(2);
 		}
+		// ----- STOP CODE BLOCK COMMENT -----
 		
 		if (result == null) return false;
 		MornyCoeur.extra().exec(new SendMessage(
