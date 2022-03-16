@@ -18,6 +18,8 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -245,10 +247,17 @@ public class MornyCommands {
 	 * @since 0.4.1.2
 	 */
 	private static void onCommandRuntimeExec (@Nonnull Update event) {
+		String hostname;
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			hostname = "<unknown>";
+		}
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format("""
 								system:
+								- <code>%s</code>
 								- <code>%s</code>
 								- <code>%s</code>
 								- <code>%d</code> cores
@@ -257,7 +266,7 @@ public class MornyCommands {
 								- <code>%s</code>
 								vm memory:
 								- <code>%d</code> / <code>%d</code> MB
-								morny version:
+								coeur version:
 								- <code>%s</code>
 								- <code>%s</code>
 								- <code>%s [UTC]</code>
@@ -268,6 +277,7 @@ public class MornyCommands {
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]""",
 						// system
+						escapeHtml(hostname),
 						escapeHtml(System.getProperty("os.name")),
 						escapeHtml(System.getProperty("os.version")),
 						Runtime.getRuntime().availableProcessors(),
