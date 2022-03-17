@@ -22,6 +22,7 @@ public class OnKuohuanhuanNeedSleep extends EventListener {
 						time.get(Calendar.HOUR_OF_DAY) < 5
 				)) || ( update.message().from().id() == 1075871712L && (
 						(time.get(Calendar.HOUR_OF_DAY) >= 22 && time.get(Calendar.MINUTE) >= 30) ||
+						time.get(Calendar.HOUR_OF_DAY) >= 23 ||
 						time.get(Calendar.HOUR_OF_DAY) < 5
 				))
 		) {
