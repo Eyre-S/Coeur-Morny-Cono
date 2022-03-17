@@ -14,11 +14,16 @@ public class OnKuohuanhuanNeedSleep extends EventListener {
 	
 	@Override
 	public boolean onMessage (@Nonnull Update update) {
+		final GregorianCalendar time = new GregorianCalendar(Locale.TAIWAN);
+		time.setTimeInMillis(System.currentTimeMillis());
 		if (
-				update.message().from().id() == 786563752L && (
-						new GregorianCalendar(Locale.TAIWAN).get(Calendar.HOUR_OF_DAY) >= 23 ||
-						new GregorianCalendar(Locale.TAIWAN).get(Calendar.HOUR_OF_DAY) < 5
-				)
+				( update.message().from().id() == 786563752L && (
+						time.get(Calendar.HOUR_OF_DAY) >= 23 ||
+						time.get(Calendar.HOUR_OF_DAY) < 5
+				)) || ( update.message().from().id() == 1075871712L && (
+						(time.get(Calendar.HOUR_OF_DAY) >= 22 && time.get(Calendar.MINUTE) >= 30) ||
+						time.get(Calendar.HOUR_OF_DAY) < 5
+				))
 		) {
 			MornyCoeur.extra().exec(
 					new DeleteMessage(update.message().chat().id(),

@@ -23,7 +23,7 @@ public class NbnhhshQuery {
 		public Word[] words;
 	}
 	
-	public static record GuessReq (String text) {
+	public record GuessReq (String text) {
 	}
 	
 	public static final String API_URL = "https://lab.magiconch.com/api/nbnhhsh/";
@@ -45,10 +45,6 @@ public class NbnhhshQuery {
 			final String x = "{ \"words\": " + body.string() + " }";
 			return new Gson().fromJson(x, GuessResult.class);
 		}
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(new Gson().toJson(new GuessReq("8h28oey8 qe89 aoHO*)I'[ IK\"@+ )EOI)D\"{AIR\")Q @}")));
 	}
 	
 }
