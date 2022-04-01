@@ -73,6 +73,11 @@ public class MornyCommands {
 				new Exit()
 		);
 		
+		// 特殊的命令
+		register(
+				new DirectMsgClear()
+		);
+		
 		// 统一注册这些奇怪的东西&.&
 		register(
 				new 喵呜.抱抱(),
