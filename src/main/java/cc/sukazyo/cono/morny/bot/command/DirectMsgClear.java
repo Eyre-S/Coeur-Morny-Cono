@@ -10,6 +10,8 @@ import com.pengrad.telegrambot.request.GetChatMember;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static cc.sukazyo.cono.morny.Log.logger;
+
 public class DirectMsgClear implements ISimpleCommand {
 	
 	@Nonnull @Override public String getName () { return "/r"; }
@@ -19,11 +21,15 @@ public class DirectMsgClear implements ISimpleCommand {
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
+		logger.debug("Executing command /r");
 		if (event.message().replyToMessage() == null) return;
+		logger.trace("Message is a reply");
 		if (event.message().replyToMessage().from().id() != MornyCoeur.getUserid()) return;
-		if (event.message().replyToMessage().date() - System.currentTimeMillis()/1000 < 48*60*60) return;
+		logger.trace("Message is from me");
+		if (System.currentTimeMillis()/1000 - event.message().replyToMessage().date() > 48*60*60) return;
+		logger.trace("Message is not older than 48 hours");
 		
-		final boolean isTrusted = MornyCoeur.trustedInstance().isTrusted(event.message().chat().id());
+		final boolean isTrusted = MornyCoeur.trustedInstance().isTrusted(event.message().from().id());
 		
 		if (
 				isTrusted || (
@@ -45,7 +51,7 @@ public class DirectMsgClear implements ISimpleCommand {
 				));
 			}
 			
-		}
+		} else logger.trace("User is not trusted");
 		
 	}
 	
