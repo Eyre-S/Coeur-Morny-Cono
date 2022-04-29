@@ -5,5 +5,5 @@ package cc.sukazyo.cono.morny;
  */
 public class GradleProjectConfigures {
 	public static final String VERSION = "0.6.3.0";
-	public static final long COMPILE_TIMESTAMP = 1651635619528L;
+	public static final long COMPILE_TIMESTAMP = 1651804975121L;
 }
