@@ -6,14 +6,11 @@ import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
 import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
-
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.DeleteMyCommands;
 import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Set;
 
 import static cc.sukazyo.cono.morny.Log.logger;
