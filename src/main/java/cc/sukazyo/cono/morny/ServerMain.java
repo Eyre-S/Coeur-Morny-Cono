@@ -125,6 +125,7 @@ public class ServerMain {
 						continue;
 					}
 					case "--trusted-reader-dinner" -> {
+						i++;
 						trustedReadersOfDinner.add(Long.parseLong(args[i]));
 						continue;
 					}
