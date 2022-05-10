@@ -143,7 +143,7 @@ public class OnCallMe extends EventListener {
 						%s""",
 						TGToString.as(event.message().from()).fullnameRefHtml(),
 						isAllowed ? "Allowed and returned " + String.format(
-								"https://t.me/c/%d/%d", lastDinnerData.forwardFromChat().id(), lastDinnerData.forwardFromMessageId()
+								"https://t.me/c/%d/%d", Math.abs(lastDinnerData.forwardFromChat().id()+1000000000000L), lastDinnerData.forwardFromMessageId()
 						) : "Forbidden by perm check."
 				)
 		).parseMode(ParseMode.HTML));
