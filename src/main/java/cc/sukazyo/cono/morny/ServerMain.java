@@ -4,6 +4,9 @@ import cc.sukazyo.cono.morny.util.CommonFormatUtils;
 
 import javax.annotation.Nonnull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
@@ -75,6 +78,7 @@ public class ServerMain {
 		String username = null;
 		boolean outdatedBlock = false;
 		long master = 793274677L;
+		Set<Long> trustedReadersOfDinner = new HashSet<>();
 		long trustedChat = -1001541451710L;
 		boolean autoCmdList = false;
 		boolean autoCmdRemove = false;
@@ -118,6 +122,10 @@ public class ServerMain {
 					case "--trusted-chat" -> {
 						i++;
 						trustedChat = Long.parseLong(args[i]);
+						continue;
+					}
+					case "--trusted-reader-dinner" -> {
+						trustedReadersOfDinner.add(Long.parseLong(args[i]));
 						continue;
 					}
 					case "--auto-cmd-list", "-ca" -> {
@@ -165,7 +173,7 @@ public class ServerMain {
 		}
 		MornyCoeur.main(
 				key, username,
-				master, trustedChat,
+				master, trustedChat, trustedReadersOfDinner,
 				outdatedBlock?System.currentTimeMillis():0,
 				autoCmdList, autoCmdRemove
 		);

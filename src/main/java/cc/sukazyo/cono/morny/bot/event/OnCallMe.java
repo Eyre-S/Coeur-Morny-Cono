@@ -4,13 +4,18 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.cono.morny.util.CommonFormatUtils;
 import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
+import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
 import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.ForwardMessage;
+import com.pengrad.telegrambot.request.GetChat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
+import com.pengrad.telegrambot.response.SendResponse;
 
 import javax.annotation.Nonnull;
 
@@ -46,6 +51,8 @@ public class OnCallMe extends EventListener {
 					requestSteamJoin(update);
 			case "hana paresu", "花宫", "内群" ->
 					requestHanaParesuJoin(update);
+			case "dinner", "lunch", "breakfast", "meal", "eating", "安妮今天吃什么" ->
+					requestLastDinner(update);
 			default -> {
 				if (update.message().text().startsWith("cc::")) {
 					requestCustomCall(update);
@@ -92,6 +99,52 @@ public class OnCallMe extends EventListener {
 						request <b>Hana Paresu</b>
 						from %s""",
 						TGToString.as(event.message().from()).fullnameRefHtml()
+				)
+		).parseMode(ParseMode.HTML));
+	}
+	
+	/**
+	 * 对访问最近一次的饭局的请求进行回复<br>
+	 *
+	 * @param event 执行呼叫的tg事件
+	 */
+	private static void requestLastDinner (Update event) {
+		boolean isAllowed = false;
+		Message lastDinnerData = null;
+		if (MornyCoeur.trustedInstance().isTrustedForDinnerRead(event.message().from().id())) {
+			lastDinnerData = MornyCoeur.extra().exec(new GetChat(MornyCoeur.DINNER_CHAT_ID)).chat().pinnedMessage();
+			SendResponse sendResp = MornyCoeur.extra().exec(new ForwardMessage(
+					event.message().from().id(),
+					lastDinnerData.forwardFromChat().id(),
+					lastDinnerData.forwardFromMessageId()
+			));
+			MornyCoeur.extra().exec(new SendMessage(
+					event.message().from().id(),
+					String.format("<i>on</i> <code>%s [UTC+8]</code>\n- <code>%s</code> <i>before</i>",
+							MsgEscape.escapeHtml(
+									CommonFormatUtils.formatDate((long)lastDinnerData.forwardDate()*1000, 8)
+							), MsgEscape.escapeHtml(
+									CommonFormatUtils.formatDuration(System.currentTimeMillis()-(long)lastDinnerData.forwardDate()*1000)
+							)
+					)
+			).replyToMessageId(sendResp.message().messageId()).parseMode(ParseMode.HTML));
+			isAllowed = true;
+		} else {
+			MornyCoeur.extra().exec(new SendSticker(
+					event.message().from().id(),
+					TelegramStickers.ID_403
+			).replyToMessageId(event.message().messageId()));
+		}
+		MornyCoeur.extra().exec(new SendMessage(
+				ME, String.format(
+						"""
+						request <b>Last Annie Dinner</b>
+						from %s
+						%s""",
+						TGToString.as(event.message().from()).fullnameRefHtml(),
+						isAllowed ? "Allowed and returned " + String.format(
+								"https://t.me/c/%d/%d", lastDinnerData.forwardFromChat().id(), lastDinnerData.forwardFromMessageId()
+						) : "Forbidden by perm check."
 				)
 		).parseMode(ParseMode.HTML));
 	}

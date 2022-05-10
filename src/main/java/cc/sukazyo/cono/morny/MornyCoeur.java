@@ -14,6 +14,8 @@ import com.pengrad.telegrambot.request.GetMe;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.util.Set;
+
 import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
@@ -58,6 +60,8 @@ public class MornyCoeur {
 	 */
 	public static final long coeurStartTimestamp = System.currentTimeMillis();
 	
+	public static final long DINNER_CHAT_ID = -1001707106392L;
+	
 	private record LogInResult(TelegramBot account, String username) { }
 	
 	/**
@@ -74,7 +78,8 @@ public class MornyCoeur {
 	 */
 	private MornyCoeur (
 			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, long latestEventTimestamp,
+			long master, long trustedChat, Set<Long> trustedRDinner,
+			long latestEventTimestamp,
 			boolean isRemoveCommandListWhenExit
 	) {
 		
@@ -91,7 +96,7 @@ public class MornyCoeur {
 			final LogInResult loginResult = login(botKey, botUsername);
 			this.account = loginResult.account;
 			this.username = loginResult.username;
-			this.trusted = new MornyTrusted(master, trustedChat);
+			this.trusted = new MornyTrusted(master, trustedChat, trustedRDinner);
 			logger.info(String.format("""
 					trusted param set:
 					- master (id)
@@ -122,14 +127,14 @@ public class MornyCoeur {
 	 */
 	public static void main (
 			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, long latestEventTimestamp,
+			long master, long trustedChat, Set<Long> trustedRDinner, long latestEventTimestamp,
 			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
 	) {
 		if (INSTANCE == null) {
 			logger.info("System Starting");
 			INSTANCE = new MornyCoeur(
 					botKey, botUsername,
-					master, trustedChat,
+					master, trustedChat, trustedRDinner,
 					latestEventTimestamp,
 					isRemoveCommandListWhenExit
 			);

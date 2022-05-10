@@ -1,6 +1,8 @@
 package cc.sukazyo.cono.morny;
 
 import com.pengrad.telegrambot.model.ChatMember.Status;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 对用户进行身份权限验证的管理类
@@ -19,9 +21,15 @@ public class MornyTrusted {
 	 */
 	public final long MASTER;
 	
-	public MornyTrusted (long master, long trustedChatId) {
+	public final Set<Long> TRUSTED_READERS_OF_DINNER;
+	
+	public MornyTrusted (long master, long trustedChatId, Set<Long> trustedRDinner) {
 		this.TRUSTED_CHAT_ID = trustedChatId;
 		this.MASTER = master;
+		this.TRUSTED_READERS_OF_DINNER = new HashSet<>(){{
+			this.add(master);
+			this.addAll(trustedRDinner);
+		}};
 	}
 	
 	/**
@@ -37,6 +45,10 @@ public class MornyTrusted {
 	public boolean isTrusted (long userId) {
 		if (userId == MASTER) return true;
 		return MornyCoeur.extra().isUserInGroup(userId, TRUSTED_CHAT_ID, Status.administrator);
+	}
+	
+	public boolean isTrustedForDinnerRead (long userId) {
+		return TRUSTED_READERS_OF_DINNER.contains(userId);
 	}
 	
 }
