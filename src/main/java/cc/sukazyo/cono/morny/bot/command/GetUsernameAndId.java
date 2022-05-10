@@ -32,7 +32,7 @@ public class GetUsernameAndId implements ITelegramCommand {
 		
 		long userId = event.message().from().id();
 		
-		if ( event.message().replyToMessage()!= null) {
+		if (event.message().replyToMessage()!= null) {
 			userId = event.message().replyToMessage().from().id();
 		}
 		if (args.length > 0) {
@@ -61,6 +61,14 @@ public class GetUsernameAndId implements ITelegramCommand {
 		
 		final User user = response.chatMember().user();
 		
+		if (user.id() == 136817688) {
+			MornyCoeur.extra().exec(new SendMessage(
+				event.message().chat().id(),
+				"<code>$__channel_identify</code>"
+			));
+			return;
+		}
+
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				TelegramUserInformation.informationOutputHTML(user)

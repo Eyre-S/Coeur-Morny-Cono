@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.bot.query;
 
+import cc.sukazyo.cono.morny.bot.api.InlineQueryUnit;
 import cc.sukazyo.cono.morny.util.EncryptUtils;
 
 import javax.annotation.Nullable;
@@ -15,13 +16,13 @@ public class RawText implements ITelegramQuery<InlineQueryResultArticle> {
 	
 	@Override
 	@Nullable
-	public InlineQueryResultArticle query (Update event) {
+	public InlineQueryUnit<InlineQueryResultArticle> query (Update event) {
 		if (event.inlineQuery().query() == null || "".equals(event.inlineQuery().query())) return null;
-		return new InlineQueryResultArticle(
+		return new InlineQueryUnit<>(new InlineQueryResultArticle(
 				ID_PREFIX + EncryptUtils.encryptByMD5(event.inlineQuery().query()),
 				TITLE,
 				new InputTextMessageContent(event.inlineQuery().query())
-		);
+		));
 	}
 	
 }

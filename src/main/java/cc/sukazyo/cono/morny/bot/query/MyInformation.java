@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.query;
 
 import javax.annotation.Nullable;
 
+import cc.sukazyo.cono.morny.bot.api.InlineQueryUnit;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
 import com.pengrad.telegrambot.model.request.InputTextMessageContent;
@@ -16,11 +17,14 @@ public class MyInformation implements ITelegramQuery<InlineQueryResultArticle> {
 	
 	@Override
 	@Nullable
-	public InlineQueryResultArticle query(Update event) {
+	public InlineQueryUnit<InlineQueryResultArticle> query(Update event) {
 		if (!(event.inlineQuery().query() == null || "".equals(event.inlineQuery().query()))) return null;
-		return new InlineQueryResultArticle(ID_PREFIX, TITLE, new InputTextMessageContent(
-				TelegramUserInformation.informationOutputHTML(event.inlineQuery().from())
-		).parseMode(ParseMode.HTML));
+		return new InlineQueryUnit<>(new InlineQueryResultArticle(
+				ID_PREFIX, TITLE,
+				new InputTextMessageContent(
+						TelegramUserInformation.informationOutputHTML(event.inlineQuery().from())
+				).parseMode(ParseMode.HTML)
+		)).isPersonal(true).cacheTime(10);
 	}
 	
 }

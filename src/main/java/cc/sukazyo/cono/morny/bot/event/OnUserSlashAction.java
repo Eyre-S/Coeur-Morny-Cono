@@ -2,12 +2,13 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
+import cc.sukazyo.cono.morny.util.tgapi.TGToStringFromMessage;
 import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.command.CommonCommand;
 import cc.sukazyo.untitled.util.string.StringArrays;
 
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 
@@ -55,22 +56,22 @@ public class OnUserSlashAction extends EventListener {
 					hasObject ?
 					StringArrays.connectStringArray(action, " ", isHardParse?2:1, action.length-1) :
 					"";
-			final User origin = event.message().from();
-			final User target = (event.message().replyToMessage() == null ? (
+			final Message origin = event.message();
+			final Message target = (event.message().replyToMessage() == null ? (
 					origin
 			): (
-					event.message().replyToMessage().from()
+					event.message().replyToMessage()
 			));
 			
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					String.format(
 							"%s %s%s %s %s!",
-							TGToString.as(origin).firstnameRefHtml(),
+							TGToStringFromMessage.as(origin).getSenderFirstNameRefHtml(),
 							escapeHtml(verb), escapeHtml((hasObject?"":"了")),
 							origin==target ?
-									"<a href='tg://user?id="+target.id()+"'>自己</a>" :
-									TGToString.as(target).firstnameRefHtml(),
+									"<a href='tg://user?id="+TGToStringFromMessage.as(target).getSenderId()+"'>自己</a>" :
+							TGToStringFromMessage.as(target).getSenderFirstNameRefHtml(),
 							escapeHtml(hasObject ? object+" " : "")
 					)
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
