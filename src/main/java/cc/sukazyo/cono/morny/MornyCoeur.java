@@ -94,13 +94,16 @@ public class MornyCoeur {
 			this.account = loginResult.account;
 			this.username = loginResult.username;
 			this.trusted = new MornyTrusted(master, trustedChat, trustedRDinner);
+			StringBuilder trustedReadersDinnerIds = new StringBuilder();
+			trusted.getTrustedReadersOfDinnerSet().forEach(id -> trustedReadersDinnerIds.append("\n    ").append(id));
 			logger.info(String.format("""
 					trusted param set:
 					- master (id)
 					    %d
 					- trusted chat (id)
-					    %d""",
-					master, trustedChat
+					    %d
+					- trusted reader-of-dinner (id)%s""",
+					master, trustedChat, trustedReadersDinnerIds
 			));
 		}
 		catch (Exception e) {

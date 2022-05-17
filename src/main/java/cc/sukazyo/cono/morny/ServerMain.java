@@ -168,6 +168,12 @@ public class ServerMain {
 		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
 		if (welcomeEchoMode) return;
 		
+		logger.info(String.format("""
+				ServerMain.java Loaded >>>
+				- version %s(%s)(%d)""",
+				MornySystem.VERSION, MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP
+		));
+		
 		if (key == null) {
 			logger.info("Parameter required has no value:\n --token.");
 			return;
