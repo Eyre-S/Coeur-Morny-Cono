@@ -53,6 +53,9 @@ public class ServerMain {
 	 *         赋值为程序启动的时间，从而造成阻挡程序启动之前的消息事件处理效果。
 	 *     </li>
 	 *     <li>
+	 *         {@code --auto-cmd} (下面两个)选项 {@code --auto-cmd-list} 和 {@code --auto-cmd-remove} 的合并版本
+	 *     </li>
+	 *     <li>
 	 *         {@code --auto-cmd-list} 使 morny 在启动时自动依据程序本体更新登录 bot 的命令列表
 	 *     </li>
 	 *     <li>
@@ -92,11 +95,11 @@ public class ServerMain {
 						outdatedBlock = true;
 						continue;
 					}
-					case "--no-hello", "-hf" -> {
+					case "--no-hello", "-hf", "--quiet", "-q" -> {
 						showWelcome = false;
 						continue;
 					}
-					case "--only-hello", "-o" -> {
+					case "--only-hello", "-ho", "-o", "-hi" -> {
 						welcomeEchoMode = true;
 						continue;
 					}
@@ -104,29 +107,35 @@ public class ServerMain {
 						versionEchoMode = true;
 						continue;
 					}
-					case "--token" -> {
+					case "--token", "-t" -> {
 						i++;
 						key = args[i];
 						continue;
 					}
-					case "--username" -> {
+					case "--username", "-u" -> {
 						i++;
 						username = args[i];
 						continue;
 					}
-					case "--master" -> {
+					case "--master", "-mm" -> {
 						i++;
 						master = Long.parseLong(args[i]);
 						continue;
 					}
-					case "--trusted-chat" -> {
+					case "--trusted-chat", "-trs" -> {
 						i++;
 						trustedChat = Long.parseLong(args[i]);
 						continue;
 					}
-					case "--trusted-reader-dinner" -> {
+					//noinspection SpellCheckingInspection
+					case "--trusted-reader-dinner", "-trsd" -> {
 						i++;
 						trustedReadersOfDinner.add(Long.parseLong(args[i]));
+						continue;
+					}
+					case "--auto-cmd", "-cmd", "-c" -> {
+						autoCmdList = true;
+						autoCmdRemove = true;
 						continue;
 					}
 					case "--auto-cmd-list", "-ca" -> {
