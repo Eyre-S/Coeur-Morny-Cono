@@ -20,6 +20,9 @@ public class MornyDaemons {
 		TrackerDataManager.DAEMON.interrupt();
 		TrackerDataManager.trackingLock.lock();
 		
+		medicationTimerInstance.interrupt();
+		try { medicationTimerInstance.join(); } catch (InterruptedException e) { e.printStackTrace(System.out); }
+		
 		logger.info("Morny Daemons stopped.");
 		
 	}
