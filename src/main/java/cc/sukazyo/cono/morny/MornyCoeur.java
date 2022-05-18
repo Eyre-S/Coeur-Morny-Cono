@@ -4,7 +4,8 @@ import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
-import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.cono.morny.daemon.MornyDaemons;
+import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 
 import com.pengrad.telegrambot.TelegramBot;
@@ -140,7 +141,7 @@ public class MornyCoeur {
 					latestEventTimestamp,
 					isRemoveCommandListWhenExit
 			);
-			TrackerDataManager.init();
+			MornyDaemons.start();
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
 			if (isAutomaticResetCommandList) {
@@ -166,8 +167,7 @@ public class MornyCoeur {
 	 */
 	private void exitCleanup () {
 		logger.info("clean:save tracker data.");
-		TrackerDataManager.DAEMON.interrupt();
-		TrackerDataManager.trackingLock.lock();
+		MornyDaemons.stop();
 		if (isRemoveCommandListWhenExit) {
 			commandManager.automaticRemoveList();
 		}

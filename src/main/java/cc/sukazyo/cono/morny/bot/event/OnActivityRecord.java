@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 
