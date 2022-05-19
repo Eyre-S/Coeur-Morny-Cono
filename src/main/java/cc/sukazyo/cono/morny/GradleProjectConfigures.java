@@ -5,5 +5,5 @@ package cc.sukazyo.cono.morny;
  */
 public class GradleProjectConfigures {
 	public static final String VERSION = "0.7.0.4-sp.medication_timer";
-	public static final long COMPILE_TIMESTAMP = 1652863640036L;
+	public static final long COMPILE_TIMESTAMP = 1652943745313L;
 }

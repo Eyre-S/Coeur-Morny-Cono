@@ -10,6 +10,7 @@ public class MornyDaemons {
 		logger.info("ALL Morny Daemons starting...");
 		TrackerDataManager.init();
 		medicationTimerInstance = new MedicationTimer();
+		medicationTimerInstance.start();
 		logger.info("Morny Daemons started.");
 	}
 	
@@ -18,12 +19,12 @@ public class MornyDaemons {
 		logger.info("ALL Morny Daemons stopping...");
 		
 		TrackerDataManager.DAEMON.interrupt();
-		TrackerDataManager.trackingLock.lock();
-		
 		medicationTimerInstance.interrupt();
+		
+		TrackerDataManager.trackingLock.lock();
 		try { medicationTimerInstance.join(); } catch (InterruptedException e) { e.printStackTrace(System.out); }
 		
-		logger.info("Morny Daemons stopped.");
+		logger.info("ALL Morny Daemons STOPPED.");
 		
 	}
 	

@@ -134,7 +134,7 @@ public class MornyCoeur {
 			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
 	) {
 		if (INSTANCE == null) {
-			logger.info("System Starting");
+			logger.info("Coeur Starting");
 			INSTANCE = new MornyCoeur(
 					botKey, botUsername,
 					master, trustedChat,
@@ -148,10 +148,10 @@ public class MornyCoeur {
 				logger.info("resetting telegram command list");
 				commandManager().automaticUpdateList();
 			}
-			logger.info("System start complete");
+			logger.info("Coeur start complete");
 			return;
 		}
-		logger.error("System already started coeur!!!");
+		logger.error("Coeur already started!!!");
 	}
 	
 	/**

@@ -27,6 +27,7 @@ public class TrackerDataManager {
 		@Override
 		public void run () {
 			trackingLock.lock();
+			logger.info("Tracker started.");
 			long lastWaitTimestamp = System.currentTimeMillis();
 			boolean postProcess = false;
 			do {
@@ -48,6 +49,7 @@ public class TrackerDataManager {
 				else logger.info("nothing to do yet");
 			} while (!postProcess);
 			trackingLock.unlock();
+			logger.info("Tracker exited.");
 		}
 		
 	}

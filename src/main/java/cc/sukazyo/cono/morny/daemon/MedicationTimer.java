@@ -11,13 +11,13 @@ public class MedicationTimer extends Thread {
 	public static final long NOTIFY_RECEIVE_CHAT = 5028252995L;
 	
 	MedicationTimer () {
-		logger.info("MedicationTimer started");
-		this.start();
+		super("TIMER_Medication");
 	}
 	
 	@Override
 	public void run () {
-		while (interrupted()) {
+		logger.info("MedicationTimer started");
+		while (!interrupted()) {
 			try {
 				waitToNextRoutine();
 				sendNotification();
@@ -37,8 +37,7 @@ public class MedicationTimer extends Thread {
 	}
 	
 	private static long calcNextRoutineTimestamp () {
-		// todo
-		return System.currentTimeMillis() + 1000 * 60 * 60 * 24;
+		return ((System.currentTimeMillis()+8*60*60*1000) / (12*60*60*1000) + 1) * 12*60*60*1000 - 8*60*60*1000;
 	}
 	
 	private void waitToNextRoutine () throws InterruptedException {
