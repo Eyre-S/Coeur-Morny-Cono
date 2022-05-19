@@ -61,6 +61,7 @@ public class MornyCommands {
 		register(
 				new ON(),
 				new Hello(),
+				new HelloOnStart(),
 				new GetUsernameAndId(),
 				new EventHack(),
 				new Nbnhhsh(),
@@ -180,6 +181,7 @@ public class MornyCommands {
 		@Nonnull @Override public String getDescription () { return "打招呼"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }
 	}
+	private static class HelloOnStart implements ISimpleCommand { @Nonnull @Override public String getName () { return "/start"; }@Nullable @Override public String[] getAliases () { return new String[0]; }@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }}
 	private static void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
@@ -265,12 +267,12 @@ public class MornyCommands {
 								- <code>%s</code>
 								- <code>%s</code>
 								- <code>%s</code>
-								- <code>%d</code> cores
 								java runtime:
 								- <code>%s</code>
 								- <code>%s</code>
 								vm memory:
 								- <code>%d</code> / <code>%d</code> MB
+								- <code>%d</code> cores
 								coeur version:
 								- <code>%s</code>
 								- <code>%s</code>
@@ -283,15 +285,15 @@ public class MornyCommands {
 								- [<code>%d</code>]""",
 						// system
 						escapeHtml(hostname),
-						escapeHtml(System.getProperty("os.name")),
+						escapeHtml(String.format("%s (%s)", System.getProperty("os.name"), System.getProperty("os.arch"))),
 						escapeHtml(System.getProperty("os.version")),
-						Runtime.getRuntime().availableProcessors(),
 						// java
-						escapeHtml(System.getProperty("java.vm.name")),
-						escapeHtml(System.getProperty("java.version")),
+						escapeHtml(System.getProperty("java.vm.vendor")+"."+System.getProperty("java.vm.name")),
+						escapeHtml(System.getProperty("java.vm.version")),
 						// memory
 						Runtime.getRuntime().totalMemory() / 1024 / 1024,
 						Runtime.getRuntime().maxMemory() / 1024 / 1024,
+						Runtime.getRuntime().availableProcessors(),
 						// version
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.getJarMd5()),
