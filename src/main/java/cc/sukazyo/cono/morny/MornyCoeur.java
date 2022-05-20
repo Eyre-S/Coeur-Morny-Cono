@@ -4,7 +4,8 @@ import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
-import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.cono.morny.daemon.MornyDaemons;
+import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 
 import com.pengrad.telegrambot.TelegramBot;
@@ -133,24 +134,24 @@ public class MornyCoeur {
 			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
 	) {
 		if (INSTANCE == null) {
-			logger.info("System Starting");
+			logger.info("Coeur Starting");
 			INSTANCE = new MornyCoeur(
 					botKey, botUsername,
 					master, trustedChat,
 					latestEventTimestamp,
 					isRemoveCommandListWhenExit
 			);
-			TrackerDataManager.init();
+			MornyDaemons.start();
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
 			if (isAutomaticResetCommandList) {
 				logger.info("resetting telegram command list");
 				commandManager().automaticUpdateList();
 			}
-			logger.info("System start complete");
+			logger.info("Coeur start complete");
 			return;
 		}
-		logger.error("System already started coeur!!!");
+		logger.error("Coeur already started!!!");
 	}
 	
 	/**
@@ -166,8 +167,7 @@ public class MornyCoeur {
 	 */
 	private void exitCleanup () {
 		logger.info("clean:save tracker data.");
-		TrackerDataManager.DAEMON.interrupt();
-		TrackerDataManager.trackingLock.lock();
+		MornyDaemons.stop();
 		if (isRemoveCommandListWhenExit) {
 			commandManager.automaticRemoveList();
 		}

@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.tracker;
+package cc.sukazyo.cono.morny.daemon;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +27,7 @@ public class TrackerDataManager {
 		@Override
 		public void run () {
 			trackingLock.lock();
+			logger.info("Tracker started.");
 			long lastWaitTimestamp = System.currentTimeMillis();
 			boolean postProcess = false;
 			do {
@@ -48,6 +49,7 @@ public class TrackerDataManager {
 				else logger.info("nothing to do yet");
 			} while (!postProcess);
 			trackingLock.unlock();
+			logger.info("Tracker exited.");
 		}
 		
 	}
