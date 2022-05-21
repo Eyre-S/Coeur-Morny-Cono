@@ -19,7 +19,10 @@ import com.pengrad.telegrambot.request.SendSticker;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import com.pengrad.telegrambot.response.GetChatResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+
+import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnCallMsgSend extends EventListener {
 	
@@ -70,7 +73,7 @@ public class OnCallMsgSend extends EventListener {
 								sendResponse.errorCode(),
 								sendResponse.description()
 						)
-				).replyToMessageId(update.message().messageId()));
+				).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
 			}
 			return true;
 			// 发送完成/失败 - 事件结束
@@ -95,10 +98,51 @@ public class OnCallMsgSend extends EventListener {
 		}
 		
 		// 输出发送目标信息
-		MornyCoeur.extra().exec(new SendMessage(
-				update.message().chat().id(),
-				MornyCoeur.extra().exec(new GetChat(msgsendReqBody.targetId())).chat().title()
-		).replyToMessageId(update.message().messageId()));
+		GetChatResponse targetChatReq = MornyCoeur.getAccount().execute(new GetChat(msgsendReqBody.targetId()));
+		if (!targetChatReq.isOk()) {
+			MornyCoeur.extra().exec(new SendMessage(
+					update.message().chat().id(),
+					String.format("""
+							<b><u>%d</u> FAILED</b>
+							<code>%s</code>""",
+							targetChatReq.errorCode(),
+							targetChatReq.description()
+					)
+			).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
+		} {
+			MornyCoeur.extra().exec(new SendMessage(
+					update.message().chat().id(),
+					targetChatReq.chat().type()== Chat.Type.Private ? (
+							String.format("""
+									<i><u>%d</u>@%s</i>
+									🔒 <b>%s</b> %s""",
+									msgsendReqBody.targetId(),
+									escapeHtml(targetChatReq.chat().type().name()),
+									escapeHtml(targetChatReq.chat().firstName()+(targetChatReq.chat().lastName()==null?"":" "+targetChatReq.chat().lastName())),
+									targetChatReq.chat().username()==null?
+											String.format("<a href='tg://user?id=%d'>@@</a>", targetChatReq.chat().id()):
+											(escapeHtml("@"+targetChatReq.chat().username()))
+							)
+					) : (
+							String.format("""
+									<i><u>%d</u>@%s</i>:::
+									%s <b>%s</b>%s""",
+									msgsendReqBody.targetId(),
+									escapeHtml(targetChatReq.chat().type().name()),
+									switch (targetChatReq.chat().type()) {
+										case group -> "💭";
+										case channel -> "📢";
+										case supergroup -> "💬";
+										default -> "⭕️";
+									},
+									escapeHtml(targetChatReq.chat().title()),
+									targetChatReq.chat().username() != null?String.format(
+											"  @%s", escapeHtml(targetChatReq.chat().username())
+									):""
+							)
+					)
+			).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
+		}
 		// 发送文本测试
 		SendResponse testSendResp = MornyCoeur.getAccount().execute(
 				parseMessageToSend(msgsendReqBody, update.message().chat().id()).replyToMessageId(update.message().messageId())
@@ -112,7 +156,7 @@ public class OnCallMsgSend extends EventListener {
 							testSendResp.errorCode(),
 							testSendResp.description()
 					)
-			).replyToMessageId(update.message().messageId()));
+			).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
 		}
 		
 		return true;
@@ -131,7 +175,7 @@ public class OnCallMsgSend extends EventListener {
 				case "*html" -> ParseMode.HTML;
 				default -> null;
 			};
-			final int offset = 2;
+			final int offset = "*msg".length()+matcher.group(1).length()+(matcher.group(2)==null?0:matcher.group(2).length())+1;
 			final ArrayList<MessageEntity> entities = new ArrayList<>();
 			if (requestBody.entities() != null) for (MessageEntity entity : requestBody.entities()) {
 				final MessageEntity parsed = new MessageEntity(entity.type(), entity.offset() - offset, entity.length());
