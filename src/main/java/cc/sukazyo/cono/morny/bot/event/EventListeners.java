@@ -13,6 +13,7 @@ public class EventListeners {
 	public static final OnEventHackHandle EVENT_HACK_HANDLE = new OnEventHackHandle();
 	public static final OnKuohuanhuanNeedSleep KUOHUANHUAN_NEED_SLEEP = new OnKuohuanhuanNeedSleep();
 	public static final OnUserRandoms USER_RANDOMS = new OnUserRandoms();
+	public static final OnCallMsgSend CALL_MSG_SEND = new OnCallMsgSend();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
@@ -24,6 +25,7 @@ public class EventListeners {
 				USER_SLASH_ACTION,
 				INLINE_QUERY,
 				CALL_ME,
+				CALL_MSG_SEND,
 				EVENT_HACK_HANDLE
 		);
 	}
