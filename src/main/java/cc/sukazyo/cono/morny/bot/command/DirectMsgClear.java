@@ -14,7 +14,7 @@ import static cc.sukazyo.cono.morny.Log.logger;
 
 public class DirectMsgClear implements ISimpleCommand {
 	
-	@Nonnull @Override public String getName () { return "/r"; }
+	@Nonnull @Override public String getName () { return "r"; }
 	
 	@Nullable @Override public String[] getAliases () { return new String[0]; }
 	

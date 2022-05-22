@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public class 喵呜 {
 	
 	public static class 抱抱 implements ISimpleCommand {
-		@Nonnull @Override public String getName () { return "/抱抱"; }
+		@Nonnull @Override public String getName () { return "抱抱"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 			MornyCoeur.extra().exec(new SendMessage(
@@ -24,7 +24,7 @@ public class 喵呜 {
 	}
 	
 	public static class 揉揉 implements ISimpleCommand {
-		@Nonnull @Override public String getName () { return "/揉揉"; }
+		@Nonnull @Override public String getName () { return "揉揉"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 			MornyCoeur.extra().exec(new SendMessage(
@@ -35,7 +35,7 @@ public class 喵呜 {
 	}
 	
 	public static class 蹭蹭 implements ISimpleCommand {
-		@Nonnull @Override public String getName () { return "/蹭蹭"; }
+		@Nonnull @Override public String getName () { return "蹭蹭"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 			MornyCoeur.extra().exec(new SendMessage(
@@ -46,7 +46,7 @@ public class 喵呜 {
 	}
 	
 	public static class 贴贴 implements ISimpleCommand {
-		@Nonnull @Override public String getName () { return "/贴贴"; }
+		@Nonnull @Override public String getName () { return "贴贴"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 			MornyCoeur.extra().exec(new SendMessage(

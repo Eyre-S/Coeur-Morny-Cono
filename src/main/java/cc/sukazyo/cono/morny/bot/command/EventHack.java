@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
  */
 public class EventHack implements ITelegramCommand {
 	
-	@Nonnull @Override public String getName () { return "/event_hack"; }
+	@Nonnull @Override public String getName () { return "event_hack"; }
 	@Nullable @Override public String[] getAliases () { return null; }
 	@Nonnull @Override public String getParamRule () { return "[(user|group|any)]"; }
 	@Nonnull @Override public String getDescription () { return "输出 bot 下一个获取到的事件序列化数据"; }

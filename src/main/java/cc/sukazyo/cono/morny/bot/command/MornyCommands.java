@@ -159,7 +159,7 @@ public class MornyCommands {
 	///
 	
 	private static class ON implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/o"; }
+		@Nonnull @Override public String getName () { return "o"; }
 		@Nullable
 		@Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
@@ -175,8 +175,8 @@ public class MornyCommands {
 	}
 	
 	private static class Hello implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/hello"; }
-		@Nullable @Override public String[] getAliases () { return new String[]{"/hi"}; }
+		@Nonnull @Override public String getName () { return "hello"; }
+		@Nullable @Override public String[] getAliases () { return new String[]{"hi"}; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "打招呼"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }
@@ -191,7 +191,7 @@ public class MornyCommands {
 	}
 	
 	private static class Exit implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/exit"; }
+		@Nonnull @Override public String getName () { return "exit"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "关闭 Bot （仅可信成员）"; }
@@ -217,7 +217,7 @@ public class MornyCommands {
 	}
 	
 	private static class Version implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/version"; }
+		@Nonnull @Override public String getName () { return "version"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "检查 Bot 版本信息"; }
@@ -244,7 +244,7 @@ public class MornyCommands {
 	}
 	
 	private static class MornyRuntime implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/runtime"; }
+		@Nonnull @Override public String getName () { return "runtime"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
@@ -309,7 +309,7 @@ public class MornyCommands {
 	}
 	
 	private static class Jrrp implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/jrrp"; }
+		@Nonnull @Override public String getName () { return "jrrp"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "获取 (假的) jrrp"; }
@@ -329,7 +329,7 @@ public class MornyCommands {
 	}
 	
 	private static class SaveData implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/save"; }
+		@Nonnull @Override public String getName () { return "save"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "保存缓存数据到文件（仅可信成员）"; }
