@@ -74,6 +74,11 @@ public class OnCallMsgSend extends EventListener {
 								sendResponse.description()
 						)
 				).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
+			} else { // 发送成功信号
+				MornyCoeur.extra().exec(new SendSticker(
+						update.message().chat().id(),
+						TelegramStickers.ID_SENT
+				).replyToMessageId(update.message().messageId()));
 			}
 			return true;
 			// 发送完成/失败 - 事件结束
@@ -109,10 +114,10 @@ public class OnCallMsgSend extends EventListener {
 							targetChatReq.description()
 					)
 			).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
-		} {
+		} else {
 			MornyCoeur.extra().exec(new SendMessage(
 					update.message().chat().id(),
-					targetChatReq.chat().type()== Chat.Type.Private ? (
+					targetChatReq.chat().type() == Chat.Type.Private ? (
 							String.format("""
 									<i><u>%d</u>@%s</i>
 									🔒 <b>%s</b> %s""",
