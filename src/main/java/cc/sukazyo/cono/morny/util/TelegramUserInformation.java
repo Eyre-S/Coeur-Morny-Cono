@@ -60,28 +60,14 @@ public class TelegramUserInformation {
 			if (dataCenter == null) { userInformation.append("\ndatacenter : <u>null</u>"); }
 			else { userInformation.append(String.format("\ndatacenter : <code>%s</code>", escapeHtml(dataCenter))); }
 		}
-		if (user.firstName() == null) {
-			userInformation.append("\nfirstname : <u>null</u>");
-		} else {
-			userInformation.append(String.format(
-					"""
-					
-					firstname :
-					- <code>%s</code>""",
-					escapeHtml(user.firstName())
-			));
-		}
-		if (user.lastName() == null) {
-			userInformation.append("\nlastname : <u>null</u>");
-		} else {
-			userInformation.append(String.format(
-					"""
-					
-					lastname :
-					- <code>%s</code>""",
-					escapeHtml(user.lastName())
-			));
-		}
+		userInformation.append(String.format(
+				"""
+				
+				display name :
+				- <code>%s</code>%s""",
+				escapeHtml(user.firstName()),
+				user.lastName()==null ? "" : String.format("\n- <code>%s</code>", escapeHtml(user.lastName()))
+		));
 		if (user.languageCode() != null) {
 			userInformation.append(String.format(
 					"""
