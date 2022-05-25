@@ -4,9 +4,11 @@ import cc.sukazyo.cono.morny.bot.api.OnUpdate;
 import cc.sukazyo.cono.morny.bot.command.MornyCommands;
 import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
-import cc.sukazyo.cono.morny.data.tracker.TrackerDataManager;
+import cc.sukazyo.cono.morny.daemon.MornyDaemons;
+import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
@@ -43,7 +45,13 @@ public class MornyCoeur {
 	 * 如果在登陆之前就定义了此字段，则登陆代码会验证登陆的 bot 的 username
 	 * 是否与定义的 username 符合。如果不符合则会报错。
 	 */
-	private final String username;
+	public final String username;
+	/**
+	 * morny 的 bot 账户的 telegram id<br>
+	 * <br>
+	 * 这个字段将会在登陆成功后赋值为登录到的 bot 的 id。
+	 */
+	public final long userid;
 	/**
 	 * morny 的事件忽略前缀时间<br>
 	 * <br>
@@ -59,7 +67,7 @@ public class MornyCoeur {
 	
 	public static final long DINNER_CHAT_ID = -1001707106392L;
 	
-	private record LogInResult(TelegramBot account, String username) { }
+	private record LogInResult(TelegramBot account, String username, long userid) { }
 	
 	/**
 	 * 执行 bot 初始化
@@ -93,6 +101,7 @@ public class MornyCoeur {
 			final LogInResult loginResult = login(botKey, botUsername);
 			this.account = loginResult.account;
 			this.username = loginResult.username;
+			this.userid = loginResult.userid;
 			this.trusted = new MornyTrusted(master, trustedChat, trustedRDinner);
 			StringBuilder trustedReadersDinnerIds = new StringBuilder();
 			trusted.getTrustedReadersOfDinnerSet().forEach(id -> trustedReadersDinnerIds.append("\n    ").append(id));
@@ -131,24 +140,24 @@ public class MornyCoeur {
 			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
 	) {
 		if (INSTANCE == null) {
-			logger.info("System Starting");
+			logger.info("Coeur Starting");
 			INSTANCE = new MornyCoeur(
 					botKey, botUsername,
 					master, trustedChat, trustedRDinner,
 					latestEventTimestamp,
 					isRemoveCommandListWhenExit
 			);
-			TrackerDataManager.init();
+			MornyDaemons.start();
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
 			if (isAutomaticResetCommandList) {
 				logger.info("resetting telegram command list");
 				commandManager().automaticUpdateList();
 			}
-			logger.info("System start complete");
+			logger.info("Coeur start complete");
 			return;
 		}
-		logger.error("System already started coeur!!!");
+		logger.error("Coeur already started!!!");
 	}
 	
 	/**
@@ -164,8 +173,7 @@ public class MornyCoeur {
 	 */
 	private void exitCleanup () {
 		logger.info("clean:save tracker data.");
-		TrackerDataManager.DAEMON.interrupt();
-		TrackerDataManager.trackingLock.lock();
+		MornyDaemons.stop();
 		if (isRemoveCommandListWhenExit) {
 			commandManager.automaticRemoveList();
 		}
@@ -195,11 +203,11 @@ public class MornyCoeur {
 		for (int i = 1; i < 4; i++) {
 			if (i != 1) logger.info("retrying...");
 			try {
-				final String username = account.execute(new GetMe()).user().username();
-				if (requireName != null && !requireName.equals(username))
-					throw new RuntimeException("Required the bot @" + requireName + " but @" + username + " logged in!");
-				logger.info("Succeed login to @" + username);
-				return new LogInResult(account, username);
+				final User remote = account.execute(new GetMe()).user();
+				if (requireName != null && !requireName.equals(remote.username()))
+					throw new RuntimeException("Required the bot @" + requireName + " but @" + remote.username() + " logged in!");
+				logger.info("Succeed login to @" + remote.username());
+				return new LogInResult(account, remote.username(), remote.id());
 			} catch (Exception e) {
 				e.printStackTrace(System.out);
 				logger.error("login failed.");
@@ -271,5 +279,7 @@ public class MornyCoeur {
 	public static ExtraAction extra () {
 		return INSTANCE.extraActionInstance;
 	}
+	
+	public static long getUserid () { return INSTANCE.userid; }
 	
 }

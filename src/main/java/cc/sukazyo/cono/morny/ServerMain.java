@@ -18,10 +18,8 @@ import static cc.sukazyo.cono.morny.Log.logger;
  */
 public class ServerMain {
 	
-	private static boolean versionEchoMode = false;
-	private static boolean welcomeEchoMode = false;
-	
-	private static boolean showWelcome = true;
+	public static final String PROP_TOKEN_KEY = "TELEGRAM_BOT_API_TOKEN";
+	public static final String PROP_TOKEN_MORNY_KEY = "MORNY_TG_TOKEN";
 	
 	/**
 	 * 程序入口，也是参数处理器<br>
@@ -77,6 +75,13 @@ public class ServerMain {
 	 */
 	public static void main (@Nonnull String[] args) {
 		
+		//#
+		//# 启动参数设置区块
+		//#
+		
+		boolean versionEchoMode = false;
+		boolean welcomeEchoMode = false;
+		boolean showWelcome = true;
 		String key = null;
 		String username = null;
 		boolean outdatedBlock = false;
@@ -154,6 +159,19 @@ public class ServerMain {
 			
 		}
 		
+		String propToken = null;
+		String propTokenKey = null;
+		for (String iKey : new String[]{PROP_TOKEN_KEY, PROP_TOKEN_MORNY_KEY}) {
+			if (System.getenv(iKey) != null) {
+				propToken = System.getenv(iKey);
+				propTokenKey = iKey;
+			}
+		}
+		
+		//#
+		//# 启动相关参数的检查和处理
+		//#
+		
 		if (versionEchoMode) {
 			
 			logger.info(String.format("""
@@ -183,6 +201,14 @@ public class ServerMain {
 				MornySystem.VERSION, MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP
 		));
 		
+		//#
+		//# Coeur 参数检查和正式启动主程序
+		//#
+		
+		if (propToken != null) {
+			key = propToken;
+			logger.info("Parameter <token> set by EnvVar $"+propTokenKey);
+		}
 		if (key == null) {
 			logger.info("Parameter required has no value:\n --token.");
 			return;

@@ -20,8 +20,11 @@ import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
  */
 public class Ip186Query {
 	
+	public static final String CMD_IP = "ip";
+	public static final String CMD_WHOIS = "whois";
+	
 	public static class Ip implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/ip"; }
+		@Nonnull @Override public String getName () { return CMD_IP; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return "[ip]"; }
 		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询 ip 资料"; }
@@ -29,7 +32,7 @@ public class Ip186Query {
 	}
 	
 	public static class Whois implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/whois"; }
+		@Nonnull @Override public String getName () { return CMD_WHOIS; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return "[domain]"; }
 		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询域名资料"; }
@@ -62,8 +65,8 @@ public class Ip186Query {
 		
 		try {
 			IP186QueryResponse response = switch (command.getCommand()) {
-				case "/ip" -> IP186QueryHandler.queryIp(arg);
-				case "/whois" -> IP186QueryHandler.queryWhoisPretty(arg);
+				case CMD_IP -> IP186QueryHandler.queryIp(arg);
+				case CMD_WHOIS -> IP186QueryHandler.queryWhoisPretty(arg);
 				default -> throw new IllegalArgumentException("Unknown 186-IP query method " + command.getCommand());
 			};
 			MornyCoeur.extra().exec(new SendMessage(

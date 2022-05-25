@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class 私わね implements ISimpleCommand {
 	
 	@Nonnull
-	@Override public String getName () { return "/me"; }
+	@Override public String getName () { return "me"; }
 	
 	@Nullable
 	@Override public String[] getAliases () { return null; }
