@@ -229,12 +229,14 @@ public class MornyCommands {
 				String.format(
 						"""
 						version:
+						- Morny <code>%s</code>
 						- <code>%s</code>
 						core md5_hash:
 						- <code>%s</code>
 						compile timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
+						escapeHtml(MornySystem.CODENAME.toUpperCase()),
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.getJarMd5()),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
@@ -274,7 +276,7 @@ public class MornyCommands {
 								- <code>%d</code> / <code>%d</code> MB
 								- <code>%d</code> cores
 								coeur version:
-								- <code>%s</code>
+								- <code>%s</code> (<code>%s</code>)
 								- <code>%s</code>
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]
@@ -296,6 +298,7 @@ public class MornyCommands {
 						Runtime.getRuntime().availableProcessors(),
 						// version
 						escapeHtml(MornySystem.VERSION),
+						escapeHtml(MornySystem.CODENAME),
 						escapeHtml(MornySystem.getJarMd5()),
 						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,

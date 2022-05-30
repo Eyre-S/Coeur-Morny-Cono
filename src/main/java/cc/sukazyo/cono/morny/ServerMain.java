@@ -177,13 +177,13 @@ public class ServerMain {
 			logger.info(String.format("""
 					Morny Cono Version
 					- version :
-					    %s
+					    %s  %s
 					- md5hash :
 					    %s
 					- co.time :
 					    %d
 					    %s [UTC]""",
-					MornySystem.VERSION,
+					MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
 					MornySystem.getJarMd5(),
 					GradleProjectConfigures.COMPILE_TIMESTAMP,
 					CommonFormatUtils.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
@@ -197,8 +197,9 @@ public class ServerMain {
 		
 		logger.info(String.format("""
 				ServerMain.java Loaded >>>
-				- version %s(%s)(%d)""",
-				MornySystem.VERSION, MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP
+				- version %s %s (%s)(%d)""",
+				MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
+				MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP
 		));
 		
 		//#

@@ -19,6 +19,16 @@ public class MornySystem {
 	public static final String VERSION = GradleProjectConfigures.VERSION;
 	
 	/**
+	 * Morny Coeur 当前的版本代号.<br>
+	 * 一个单个单词，一般作为一个大版本的名称，只在重大更新改变<br>
+	 * 格式保持为仅由小写字母和数字组成<br>
+	 * 有时也可能是复合词或特殊的词句<br>
+	 * <br>
+	 * 会由 gradle 任务 {@code updateVersionCode} 更新
+	 */
+	public static final String CODENAME = GradleProjectConfigures.CODENAME;
+	
+	/**
 	 * 获取程序 jar 文件的 md5-hash 值<br>
 	 * <br>
 	 * 只支持 jar 文件方式启动的程序 ——
