@@ -2,7 +2,9 @@ package cc.sukazyo.cono.morny.daemon;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
+import com.pengrad.telegrambot.request.PinChatMessage;
 import com.pengrad.telegrambot.request.SendSticker;
+import com.pengrad.telegrambot.response.SendResponse;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
@@ -33,7 +35,8 @@ public class MedicationTimer extends Thread {
 	}
 	
 	private static void sendNotification () {
-		MornyCoeur.extra().exec(new SendSticker(NOTIFY_RECEIVE_CHAT, TelegramStickers.ID_PROGYNOVA));
+		SendResponse m = MornyCoeur.extra().exec(new SendSticker(NOTIFY_RECEIVE_CHAT, TelegramStickers.ID_PROGYNOVA));
+		if (m.isOk()) MornyCoeur.extra().exec(new PinChatMessage(NOTIFY_RECEIVE_CHAT, m.message().messageId()));
 	}
 	
 	private static long calcNextRoutineTimestamp () {
