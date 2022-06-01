@@ -12,6 +12,8 @@
 
 # ~~给所有喜欢morny的大家的~~ Morny Coeur 源代码
 
+~~"你们又有意见又不发issue这样子我很为难的啊"~~
+
 ![social preview card](morny-github-social-preview-card@0.75x.png)
 
 一个 telegram 上的服侍 A.C.Sukazyo Eyre 和它的花宫成员的 bot 的内核源
