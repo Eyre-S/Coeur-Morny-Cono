@@ -21,7 +21,7 @@ public class MornyTrusted {
 	 */
 	public final long MASTER;
 	
-	public final Set<Long> TRUSTED_READERS_OF_DINNER;
+	private final Set<Long> TRUSTED_READERS_OF_DINNER;
 	
 	public MornyTrusted (long master, long trustedChatId, Set<Long> trustedRDinner) {
 		this.TRUSTED_CHAT_ID = trustedChatId;
@@ -49,6 +49,10 @@ public class MornyTrusted {
 	
 	public boolean isTrustedForDinnerRead (long userId) {
 		return TRUSTED_READERS_OF_DINNER.contains(userId);
+	}
+	
+	public Set<Long> getTrustedReadersOfDinnerSet () {
+		return Set.copyOf(TRUSTED_READERS_OF_DINNER);
 	}
 	
 }

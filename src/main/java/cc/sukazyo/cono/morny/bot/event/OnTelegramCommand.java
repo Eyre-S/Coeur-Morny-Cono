@@ -12,10 +12,10 @@ public class OnTelegramCommand extends EventListener {
 	
 	@Override
 	public boolean onMessage (@Nonnull Update event) {
-		if (event.message().text() == null) {
-			return false; // 检测到无消息文本，忽略掉命令处理
+		if (event.message().text() == null || !event.message().text().startsWith("/")) {
+			return false; // 检测到非(命令格式)文本，忽略掉命令处理
 		}
-		final InputCommand command = new InputCommand(event.message().text());
+		final InputCommand command = new InputCommand(event.message().text().substring(1));
 		if (command.getTarget() != null && !MornyCoeur.getUsername().equals(command.getTarget())) {
 			return true; // 检测到命令并非针对 morny，退出整个事件处理链
 		}

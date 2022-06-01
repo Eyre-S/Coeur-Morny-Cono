@@ -16,7 +16,7 @@ import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class Nbnhhsh implements ITelegramCommand {
 	
-	@Nonnull @Override public String getName () { return "/nbnhhsh"; }
+	@Nonnull @Override public String getName () { return "nbnhhsh"; }
 	@Nullable @Override public String[] getAliases () { return null; }
 	@Nonnull @Override public String getParamRule () { return "[text]"; }
 	@Nonnull @Override public String getDescription () { return "检索文本内 nbnhhsh 词条"; }

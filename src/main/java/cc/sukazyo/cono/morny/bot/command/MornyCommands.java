@@ -61,6 +61,7 @@ public class MornyCommands {
 		register(
 				new ON(),
 				new Hello(),
+				new HelloOnStart(),
 				new GetUsernameAndId(),
 				new EventHack(),
 				new Nbnhhsh(),
@@ -71,6 +72,11 @@ public class MornyCommands {
 				new MornyRuntime(),
 				new Jrrp(),
 				new Exit()
+		);
+		
+		// 特殊的命令
+		register(
+				new DirectMsgClear()
 		);
 		
 		// 统一注册这些奇怪的东西&.&
@@ -153,7 +159,7 @@ public class MornyCommands {
 	///
 	
 	private static class ON implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/o"; }
+		@Nonnull @Override public String getName () { return "o"; }
 		@Nullable
 		@Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
@@ -169,12 +175,13 @@ public class MornyCommands {
 	}
 	
 	private static class Hello implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/hello"; }
-		@Nullable @Override public String[] getAliases () { return new String[]{"/hi"}; }
+		@Nonnull @Override public String getName () { return "hello"; }
+		@Nullable @Override public String[] getAliases () { return new String[]{"hi"}; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "打招呼"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }
 	}
+	private static class HelloOnStart implements ISimpleCommand { @Nonnull @Override public String getName () { return "start"; }@Nullable @Override public String[] getAliases () { return new String[0]; }@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }}
 	private static void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
@@ -184,7 +191,7 @@ public class MornyCommands {
 	}
 	
 	private static class Exit implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/exit"; }
+		@Nonnull @Override public String getName () { return "exit"; }
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "关闭 Bot （仅可信成员）"; }
@@ -210,7 +217,7 @@ public class MornyCommands {
 	}
 	
 	private static class Version implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/version"; }
+		@Nonnull @Override public String getName () { return "version"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "检查 Bot 版本信息"; }
@@ -222,12 +229,14 @@ public class MornyCommands {
 				String.format(
 						"""
 						version:
+						- Morny <code>%s</code>
 						- <code>%s</code>
 						core md5_hash:
 						- <code>%s</code>
 						compile timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
+						escapeHtml(MornySystem.CODENAME.toUpperCase()),
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.getJarMd5()),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
@@ -237,7 +246,7 @@ public class MornyCommands {
 	}
 	
 	private static class MornyRuntime implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/runtime"; }
+		@Nonnull @Override public String getName () { return "runtime"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
@@ -260,14 +269,14 @@ public class MornyCommands {
 								- <code>%s</code>
 								- <code>%s</code>
 								- <code>%s</code>
-								- <code>%d</code> cores
 								java runtime:
 								- <code>%s</code>
 								- <code>%s</code>
 								vm memory:
 								- <code>%d</code> / <code>%d</code> MB
+								- <code>%d</code> cores
 								coeur version:
-								- <code>%s</code>
+								- <code>%s</code> (<code>%s</code>)
 								- <code>%s</code>
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]
@@ -278,17 +287,18 @@ public class MornyCommands {
 								- [<code>%d</code>]""",
 						// system
 						escapeHtml(hostname),
-						escapeHtml(System.getProperty("os.name")),
+						escapeHtml(String.format("%s (%s)", System.getProperty("os.name"), System.getProperty("os.arch"))),
 						escapeHtml(System.getProperty("os.version")),
-						Runtime.getRuntime().availableProcessors(),
 						// java
-						escapeHtml(System.getProperty("java.vm.name")),
-						escapeHtml(System.getProperty("java.version")),
+						escapeHtml(System.getProperty("java.vm.vendor")+"."+System.getProperty("java.vm.name")),
+						escapeHtml(System.getProperty("java.vm.version")),
 						// memory
 						Runtime.getRuntime().totalMemory() / 1024 / 1024,
 						Runtime.getRuntime().maxMemory() / 1024 / 1024,
+						Runtime.getRuntime().availableProcessors(),
 						// version
 						escapeHtml(MornySystem.VERSION),
+						escapeHtml(MornySystem.CODENAME),
 						escapeHtml(MornySystem.getJarMd5()),
 						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
 						GradleProjectConfigures.COMPILE_TIMESTAMP,
@@ -302,7 +312,7 @@ public class MornyCommands {
 	}
 	
 	private static class Jrrp implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/jrrp"; }
+		@Nonnull @Override public String getName () { return "jrrp"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "获取 (假的) jrrp"; }
@@ -322,7 +332,7 @@ public class MornyCommands {
 	}
 	
 	private static class SaveData implements ITelegramCommand {
-		@Nonnull @Override public String getName () { return "/save"; }
+		@Nonnull @Override public String getName () { return "save"; }
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "保存缓存数据到文件（仅可信成员）"; }

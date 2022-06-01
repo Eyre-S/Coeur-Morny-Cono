@@ -3,7 +3,6 @@ package cc.sukazyo.cono.morny.bot.event;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.util.tgapi.TGToStringFromMessage;
-import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
 import cc.sukazyo.untitled.util.command.CommonCommand;
 import cc.sukazyo.untitled.util.string.StringArrays;
 
@@ -14,7 +13,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class OnUserSlashAction extends EventListener {
@@ -24,20 +22,21 @@ public class OnUserSlashAction extends EventListener {
 		final String text = event.message().text();
 		if (text == null) return false;
 		
-		if (text.startsWith("/")) {
+		if (text.startsWith("/"))
+		{
 			
 			/// Due to @Lapis_Apple, we stopped slash action function at .DP7 groups.
 			/// It may be enabled after some updates when the function will not be conflicted to other bots.
 			// if (event.message().chat().id() == ) return false;
-			if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
-				logger.info(String.format("""
-					Chat slash action ignored due to the following keyword.
-					 - %s
-					 - ".DP7\"""",
-						TGToString.as(event.message().chat()).toStringFullNameId()
-				));
-				return false;
-			}
+//{			if (event.message().chat().title() != null && event.message().chat().title().contains(".DP7")) {
+//				logger.info(String.format("""
+//					Chat slash action ignored due to the following keyword.
+//					 - %s
+//					 - ".DP7\"""",
+//						TGToString.as(event.message().chat()).toStringFullNameId()
+//				));
+//				return false;
+//			}
 			
 			final String[] action = CommonCommand.format(text);
 			action[0] = action[0].substring(1);

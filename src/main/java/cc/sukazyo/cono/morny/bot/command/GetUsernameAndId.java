@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 public class GetUsernameAndId implements ITelegramCommand {
 	
-	@Nonnull @Override public String getName () { return "/user"; }
+	@Nonnull @Override public String getName () { return "user"; }
 	@Nullable @Override public String[] getAliases () { return null; }
 	@Nonnull @Override public String getParamRule () { return "[userid]"; }
 	@Nonnull @Override public String getDescription () { return "获取指定或回复的用户相关信息"; }
