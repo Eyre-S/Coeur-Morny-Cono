@@ -43,6 +43,14 @@ public class ServerMain {
 	 *         {@code --username} {@link MornyCoeur#getUsername() bot 的 username} 预定义
 	 *     </li>
 	 *     <li>
+	 *         {@code --api} 设定 {@link MornyCoeur#getAccount() bot client} 使用的 telegram bot api server。
+	 *         需要注意的是如果带有后缀 {@code /bot} 则会单独设定 api server
+	 *         而不会适应性的同时为 {@code --api-files} 设定值。
+	 *     </li>
+	 *     <li>
+	 *         {@code --api-files} 单独设定 {@link MornyCoeur#getAccount() bot client} 使用的 telegram bot file api server
+	 *     </li>
+	 *     <li>
 	 *         {@code --no-hello} 不在主程序启动时输出用于欢迎消息的字符画。
 	 *         与 {@code --only-hello} 参数不兼容 —— 会导致程序完全没有任何输出
 	 *     </li>
@@ -60,14 +68,11 @@ public class ServerMain {
 	 *         {@code --auto-cmd-remove} 使 morny 在关闭时自动依据程序本体删除 bot 的命令列表
 	 *     </li>
 	 * </ul>
-	 * 除去选项之外，第一个参数会被赋值为 bot 的 telegram bot api token，
-	 * 第二个参数会被赋值为 bot 的 username 限定名。其余的参数会被认定为无法理解。<br>
-	 * <br>
+	 * <s>除去选项之外，第一个参数会被赋值为 bot 的 telegram bot api token，</s>
+	 * <s>第二个参数会被赋值为 bot 的 username 限定名。其余的参数会被认定为无法理解。</s><br>
 	 * <b>自 {@code 0.4.2.3}，token 和 username 的赋值已被选项组支持</b><br>
-	 * 使用参数所进行取值的 token 和 username 已被转移至 {@code --token} 和 {@code --username} 参数，
-	 * <u>或许，直接参数赋值的支持将计划在 {@code 0.4.3} 标记废弃并在 {@code 0.5} 删除。</u>
-	 * <s>但实际上这并不影响现在的使用，选项赋值目前仍属于测试功能</s><br>
-	 * <b>但请勿混用</b>，这将使两个赋值出现混淆并<b>产生不可知的结果</b>
+	 * <b>自 {@code 0.5.0.4}，旧的直接通过参数为 bot token & username 赋值的方式已被删除</b>
+	 * 使用参数所进行取值的 token 和 username 已被转移至 {@code --token} 和 {@code --username} 参数<br>
 	 *
 	 * @see MornyCoeur#main
 	 * @since 0.4.0.0
@@ -90,6 +95,8 @@ public class ServerMain {
 		long trustedChat = -1001541451710L;
 		boolean autoCmdList = false;
 		boolean autoCmdRemove = false;
+		String api = null;
+		String api4File = null;
 		
 		for (int i = 0; i < args.length; i++) {
 			
@@ -151,6 +158,16 @@ public class ServerMain {
 						autoCmdRemove = true;
 						continue;
 					}
+					case "--api", "-a" -> {
+						i++;
+						api = args[i];
+						continue;
+					}
+					case "--api-files", "files-api", "-af" -> {
+						i++;
+						api4File = args[i];
+						continue;
+					}
 				}
 				
 			}
@@ -197,9 +214,11 @@ public class ServerMain {
 		
 		logger.info(String.format("""
 				ServerMain.java Loaded >>>
-				- version %s %s (%s)(%d)""",
-				MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
-				MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP
+				- version %s (%s)(%d)
+				- Morny %s""",
+				MornySystem.VERSION,
+				MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP,
+				MornySystem.CODENAME.toUpperCase()
 		));
 		
 		//#
@@ -215,6 +234,7 @@ public class ServerMain {
 			return;
 		}
 		MornyCoeur.main(
+				api, api4File,
 				key, username,
 				master, trustedChat, trustedReadersOfDinner,
 				outdatedBlock?System.currentTimeMillis():0,

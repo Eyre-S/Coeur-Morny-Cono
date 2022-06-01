@@ -8,6 +8,7 @@ import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
 import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.impl.FileApi;
 import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.request.GetMe;
 
@@ -82,6 +83,7 @@ public class MornyCoeur {
 	 *                             单位为毫秒
 	 */
 	private MornyCoeur (
+			@Nullable String botApi, @Nullable String botApi4File,
 			@Nonnull String botKey, @Nullable String botUsername,
 			long master, long trustedChat, Set<Long> trustedRDinner,
 			long latestEventTimestamp,
@@ -98,7 +100,7 @@ public class MornyCoeur {
 		}
 		
 		try {
-			final LogInResult loginResult = login(botKey, botUsername);
+			final LogInResult loginResult = login(botApi, botApi4File, botKey, botUsername);
 			this.account = loginResult.account;
 			this.username = loginResult.username;
 			this.userid = loginResult.userid;
@@ -135,6 +137,7 @@ public class MornyCoeur {
 	 * @see #MornyCoeur 程序初始化方法
 	 */
 	public static void main (
+			@Nullable String botApi, @Nullable String botApi4File,
 			@Nonnull String botKey, @Nullable String botUsername,
 			long master, long trustedChat, Set<Long> trustedRDinner, long latestEventTimestamp,
 			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
@@ -142,6 +145,7 @@ public class MornyCoeur {
 		if (INSTANCE == null) {
 			logger.info("Coeur Starting");
 			INSTANCE = new MornyCoeur(
+					botApi, botApi4File,
 					botKey, botUsername,
 					master, trustedChat, trustedRDinner,
 					latestEventTimestamp,
@@ -193,12 +197,42 @@ public class MornyCoeur {
 	 * 会通过 GetMe 动作验证是否连接上了 telegram api 服务器，
 	 * 同时也要求登录获得的 username 和 {@link #username} 声明值相等
 	 *
+	 * @param api bot client 将会连接到的 telegram bot api 位置
+	 * @param api4File bot client 将会连接到的 telegram file api 位置，如果不指定则会跟随 {@code api} 选项的设定
 	 * @param key bot 的 api-token
+	 * @param requireName 要求登录到的需要的 username，如果登陆后的 username 与此不同则会报错退出
 	 * @return 成功登录后的 {@link TelegramBot} 对象
 	 */
 	@Nonnull
-	private static LogInResult login (@Nonnull String key, @Nullable String requireName) {
-		final TelegramBot account = new TelegramBot(key);
+	private static LogInResult login (
+			@Nullable String api, @Nullable String api4File,
+			@Nonnull String key, @Nullable String requireName
+	) {
+		final TelegramBot.Builder accountConfig = new TelegramBot.Builder(key);
+		boolean isCustomApi = false;
+		String apiUrlSet = "https://api.telegram.org/bot";
+		String api4FileUrlSet = FileApi.FILE_API;
+		if (api != null) {
+			api = api.endsWith("/") ? api.substring(0, api.length() - 1) : api;
+			accountConfig.apiUrl(apiUrlSet = api.endsWith("/bot")? api : api + "/bot");
+			isCustomApi = true;
+		}
+		if (api4File != null) {
+			api4File = api4File.endsWith("/") ? api4File : api4File + "/";
+			accountConfig.fileApiUrl(api4FileUrlSet = api4File.endsWith("/file/bot")? api4File : api4File + "/file/bot");
+			isCustomApi = true;
+		} else if (api != null && !api.endsWith("/bot")) {
+			accountConfig.fileApiUrl(api4FileUrlSet = api + "/file/bot");
+		}
+		if (isCustomApi) {
+			logger.info(String.format("""
+					Telegram Bot API set to :
+					- %s
+					- %s""",
+					apiUrlSet, api4FileUrlSet
+			));
+		}
+		final TelegramBot account = accountConfig.build();
 		logger.info("Trying to login...");
 		for (int i = 1; i < 4; i++) {
 			if (i != 1) logger.info("retrying...");
