@@ -41,7 +41,7 @@ public class OnUserSlashAction extends EventListener {
 			final String[] action = CommonCommand.format(text);
 			action[0] = action[0].substring(1);
 			
-			if (action[0].matches("^[a-zA-Z_]+$")) {
+			if (action[0].matches("^\\w+(@\\w+)?$")) {
 				return false; // 忽略掉 Telegram 命令格式的输入
 			} else if (action[0].contains("/")) {
 				return false; // 忽略掉疑似目录格式的输入
