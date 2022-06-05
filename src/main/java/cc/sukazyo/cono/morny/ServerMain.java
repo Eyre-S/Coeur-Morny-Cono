@@ -21,6 +21,8 @@ public class ServerMain {
 	public static final String PROP_TOKEN_KEY = "TELEGRAM_BOT_API_TOKEN";
 	public static final String PROP_TOKEN_MORNY_KEY = "MORNY_TG_TOKEN";
 	
+	private static final String THREAD_MORNY_INIT = "morny-init";
+	
 	/**
 	 * 程序入口，也是参数处理器<br>
 	 * <br>
@@ -233,6 +235,7 @@ public class ServerMain {
 			logger.info("Parameter required has no value:\n --token.");
 			return;
 		}
+		Thread.currentThread().setName(THREAD_MORNY_INIT);
 		MornyCoeur.main(
 				api, api4File,
 				key, username,
