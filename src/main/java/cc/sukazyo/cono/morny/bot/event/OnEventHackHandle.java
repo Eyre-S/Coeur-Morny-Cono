@@ -84,12 +84,12 @@ public class OnEventHackHandle extends EventListener {
 	
 	@Override
 	public boolean onChannelPost (@Nonnull Update update) {
-		return onEventHacked(update, update.channelPost().chat().id(), update.channelPost().from().id());
+		return onEventHacked(update, update.channelPost().chat().id(), update.channelPost().chat().id());
 	}
 	
 	@Override
 	public boolean onEditedChannelPost (@Nonnull Update update) {
-		return onEventHacked(update, update.editedChannelPost().chat().id(), update.editedChannelPost().from().id());
+		return onEventHacked(update, update.editedChannelPost().chat().id(), update.editedChannelPost().chat().id());
 	}
 	
 	@Override
