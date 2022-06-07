@@ -90,7 +90,7 @@ publishing {
 	repositories{
 		maven {
 			name 'builds'
-			url = "file://" + new File("./build/publishing").getAbsolutePath()
+			url publishLocalArchiveRepoUrl
 		}
 		maven {
 			name '-ws-'
