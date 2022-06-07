@@ -4,12 +4,11 @@ import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MornyDaemons {
 	
-	static MedicationTimer medicationTimerInstance;
+	public static final MedicationTimer medicationTimerInstance = new MedicationTimer();
 	
 	public static void start () {
 		logger.info("ALL Morny Daemons starting...");
 		TrackerDataManager.init();
-		medicationTimerInstance = new MedicationTimer();
 		medicationTimerInstance.start();
 		logger.info("Morny Daemons started.");
 	}
