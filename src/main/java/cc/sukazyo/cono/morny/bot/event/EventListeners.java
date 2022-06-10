@@ -14,6 +14,7 @@ public class EventListeners {
 	@SuppressWarnings("unused") static final OnKuohuanhuanNeedSleep KUOHUANHUAN_NEED_SLEEP = new OnKuohuanhuanNeedSleep();
 	public static final OnUserRandoms USER_RANDOMS = new OnUserRandoms();
 	public static final OnCallMsgSend CALL_MSG_SEND = new OnCallMsgSend();
+	public static final OnMedicationNotifyApply MEDICATION_NOTIFY_APPLY = new OnMedicationNotifyApply();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
@@ -26,6 +27,7 @@ public class EventListeners {
 				INLINE_QUERY,
 				CALL_ME,
 				CALL_MSG_SEND,
+				MEDICATION_NOTIFY_APPLY,
 				EVENT_HACK_HANDLE
 		);
 	}

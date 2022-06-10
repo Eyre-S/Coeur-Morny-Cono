@@ -14,6 +14,7 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 import com.pengrad.telegrambot.request.SetMyCommands;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,8 +61,7 @@ public class MornyCommands {
 		
 		register(
 				new ON(),
-				new Hello(),
-				new HelloOnStart(),
+				new Hello(), new HelloOnStart(),
 				new GetUsernameAndId(),
 				new EventHack(),
 				new Nbnhhsh(),
@@ -71,7 +71,7 @@ public class MornyCommands {
 				new Version(),
 				new MornyRuntime(),
 				new Jrrp(),
-				new Exit()
+				new Exit(), new ExitAlias()
 		);
 		
 		// 特殊的命令
@@ -196,6 +196,11 @@ public class MornyCommands {
 		@Nonnull @Override public String getParamRule () { return ""; }
 		@Nonnull @Override public String getDescription () { return "关闭 Bot （仅可信成员）"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandExitExec(event); }
+	}
+	private static class ExitAlias implements ISimpleCommand {
+		@Nonnull @Override public String getName () { return "quit"; }
+		@Nullable @Override public String[] getAliases () { return new String[]{"stop"}; }
+		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { onCommandExitExec(event); }
 	}
 	private static void onCommandExitExec (@Nonnull Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {

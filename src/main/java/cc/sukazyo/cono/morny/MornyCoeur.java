@@ -152,6 +152,7 @@ public class MornyCoeur {
 					isRemoveCommandListWhenExit
 			);
 			MornyDaemons.start();
+			logger.info("start telegram events listening");
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
 			if (isAutomaticResetCommandList) {
@@ -187,7 +188,7 @@ public class MornyCoeur {
 	 * 为程序在虚拟机上添加退出钩子
 	 */
 	private void configureSafeExit () {
-		Runtime.getRuntime().addShutdownHook(new Thread(this::exitCleanup, "Exit-Cleaning"));
+		Runtime.getRuntime().addShutdownHook(new Thread(this::exitCleanup, "exit-cleaning"));
 	}
 	
 	/**

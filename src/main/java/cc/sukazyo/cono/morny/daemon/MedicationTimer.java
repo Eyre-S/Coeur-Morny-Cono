@@ -1,19 +1,31 @@
 package cc.sukazyo.cono.morny.daemon;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.data.TelegramStickers;
-import com.pengrad.telegrambot.request.PinChatMessage;
-import com.pengrad.telegrambot.request.SendSticker;
+import cc.sukazyo.cono.morny.util.CommonFormatUtils;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.MessageEntity;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.EditMessageText;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MedicationTimer extends Thread {
 	
-	public static final long NOTIFY_RECEIVE_CHAT = 5028252995L;
+	public static final long NOTIFY_CHAT = -1001729016815L;
+	public static final String NOTIFY_MESSAGE = "\uD83C\uDF65⏲";
+	private static final String DAEMON_THREAD_NAME = "TIMER_Medication";
+	
+	private static final long LAST_NOTIFY_ID_NULL = -1L;
+	private long lastNotify = LAST_NOTIFY_ID_NULL;
+	
 	
 	MedicationTimer () {
-		super("TIMER_Medication");
+		super(DAEMON_THREAD_NAME);
 	}
 	
 	@Override
@@ -34,9 +46,25 @@ public class MedicationTimer extends Thread {
 		logger.info("MedicationTimer stopped");
 	}
 	
-	private static void sendNotification () {
-		SendResponse m = MornyCoeur.extra().exec(new SendSticker(NOTIFY_RECEIVE_CHAT, TelegramStickers.ID_PROGYNOVA));
-		if (m.isOk()) MornyCoeur.extra().exec(new PinChatMessage(NOTIFY_RECEIVE_CHAT, m.message().messageId()));
+	private void sendNotification () {
+		final SendResponse resp = MornyCoeur.extra().exec(new SendMessage(NOTIFY_CHAT, NOTIFY_MESSAGE));
+		if (resp.isOk()) lastNotify = resp.message().messageId();
+		else lastNotify = LAST_NOTIFY_ID_NULL;
+	}
+	
+	public void refreshNotificationWrite (Message edited) {
+		if (edited.messageId() != lastNotify) return;
+		final String editTime = CommonFormatUtils.formatDate(edited.editDate()*1000, 8);
+		ArrayList<MessageEntity> entities = new ArrayList<>();
+		if (edited.entities() != null) entities.addAll(List.of(edited.entities()));
+		entities.add(new MessageEntity(MessageEntity.Type.italic, edited.text().length() + "\n-- ".length(), editTime.length()));
+		EditMessageText sending = new EditMessageText(
+				NOTIFY_CHAT,
+				edited.messageId(),
+				edited.text() + "\n-- " + editTime + " --"
+		).parseMode(ParseMode.HTML).entities(entities.toArray(MessageEntity[]::new));
+		MornyCoeur.extra().exec(sending);
+		lastNotify = LAST_NOTIFY_ID_NULL;
 	}
 	
 	private static long calcNextRoutineTimestamp () {
