@@ -14,7 +14,7 @@ mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
 
 repositories {
 	mavenCentral()
-	maven { name '-ws'; url 'https://mvn.sukazyo.cc' }
+	maven { name '-ws'; url 'https://mvn.sukazyo.cc/releases' }
 }
 
 String untitled (String lib, String upd = null) {
