@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
 import com.pengrad.telegrambot.model.request.InputTextMessageContent;
 
 import static cc.sukazyo.cono.morny.util.CommonConvert.byteArrayToHex;
-import static cc.sukazyo.cono.morny.util.CommonEncrypt.encryptByMD5;
+import static cc.sukazyo.cono.morny.util.CommonEncrypt.hashMd5;
 
 public class RawText implements ITelegramQuery<InlineQueryResultArticle> {
 	
@@ -21,7 +21,7 @@ public class RawText implements ITelegramQuery<InlineQueryResultArticle> {
 	public InlineQueryUnit<InlineQueryResultArticle> query (Update event) {
 		if (event.inlineQuery().query() == null || "".equals(event.inlineQuery().query())) return null;
 		return new InlineQueryUnit<>(new InlineQueryResultArticle(
-				ID_PREFIX + byteArrayToHex(encryptByMD5(event.inlineQuery().query())),
+				ID_PREFIX + byteArrayToHex(hashMd5(event.inlineQuery().query())),
 				TITLE,
 				new InputTextMessageContent(event.inlineQuery().query())
 		));
