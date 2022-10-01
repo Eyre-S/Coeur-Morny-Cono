@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static cc.sukazyo.cono.morny.Log.logger;
-import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDate;
-import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDuration;
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
 import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {

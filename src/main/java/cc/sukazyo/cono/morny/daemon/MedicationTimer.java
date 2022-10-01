@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.daemon;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.util.CommonFormatUtils;
+import cc.sukazyo.cono.morny.util.CommonFormat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.MessageEntity;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -54,7 +54,7 @@ public class MedicationTimer extends Thread {
 	
 	public void refreshNotificationWrite (Message edited) {
 		if (edited.messageId() != lastNotify) return;
-		final String editTime = CommonFormatUtils.formatDate(edited.editDate()*1000, 8);
+		final String editTime = CommonFormat.formatDate(edited.editDate()*1000, 8);
 		ArrayList<MessageEntity> entities = new ArrayList<>();
 		if (edited.entities() != null) entities.addAll(List.of(edited.entities()));
 		entities.add(new MessageEntity(MessageEntity.Type.italic, edited.text().length() + "\n-- ".length(), editTime.length()));

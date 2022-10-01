@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny;
 
-import cc.sukazyo.cono.morny.util.CommonFormatUtils;
+import cc.sukazyo.cono.morny.util.CommonFormat;
 
 import javax.annotation.Nonnull;
 
@@ -205,7 +205,7 @@ public class ServerMain {
 					MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
 					MornySystem.getJarMd5(),
 					GradleProjectConfigures.COMPILE_TIMESTAMP,
-					CommonFormatUtils.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
+					CommonFormat.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
 			));
 			return;
 			

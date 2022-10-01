@@ -59,7 +59,7 @@ public class MornyCoeur {
 	 * {@link cc.sukazyo.cono.morny.bot.event.OnUpdateTimestampOffsetLock}
 	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
 	 */
-	public long latestEventTimestamp;
+	public final long latestEventTimestamp;
 	/**
 	 * morny 主程序启动时间<br>
 	 * 用于统计数据
