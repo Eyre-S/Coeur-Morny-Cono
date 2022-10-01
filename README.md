@@ -20,7 +20,7 @@
 
 [Task Listing][todo] | [~~BBS~~][issues] | [Published][artifact]
 
-[说明书][book] | [FindInTelegram][tg-account]
+**[说明书][book] | [FindInTelegram][tg-account]**
 
 <br>
 

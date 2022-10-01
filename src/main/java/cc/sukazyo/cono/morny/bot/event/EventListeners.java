@@ -15,13 +15,16 @@ public class EventListeners {
 	public static final OnUserRandoms USER_RANDOMS = new OnUserRandoms();
 	public static final OnCallMsgSend CALL_MSG_SEND = new OnCallMsgSend();
 	public static final OnMedicationNotifyApply MEDICATION_NOTIFY_APPLY = new OnMedicationNotifyApply();
+	public static final OnRandomlyTriggered RANDOMLY_TRIGGERED = new OnRandomlyTriggered();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
 				ACTIVITY_RECORDER,
 				UPDATE_TIMESTAMP_OFFSET_LOCK,
+				/* write functional event behind here */
 //				KUOHUANHUAN_NEED_SLEEP,
 				COMMANDS_LISTENER,
+				RANDOMLY_TRIGGERED,
 				USER_RANDOMS,
 				USER_SLASH_ACTION,
 				INLINE_QUERY,

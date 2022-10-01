@@ -47,7 +47,7 @@ public class GetUsernameAndId implements ITelegramCommand {
 			}
 		}
 		
-		final GetChatMemberResponse response = MornyCoeur.extra().exec(
+		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
 		
