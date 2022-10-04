@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;

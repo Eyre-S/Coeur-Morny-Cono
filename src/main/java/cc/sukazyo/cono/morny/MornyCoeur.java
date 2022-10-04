@@ -6,7 +6,7 @@ import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
 import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
-import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
+import cc.sukazyo.cono.morny.util.tgapi.ExtraAction;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.impl.FileApi;
 import com.pengrad.telegrambot.model.User;

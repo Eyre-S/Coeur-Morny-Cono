@@ -5,8 +5,8 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
-import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.DeleteMyCommands;
 import com.pengrad.telegrambot.model.Update;
@@ -29,7 +29,7 @@ import java.util.Map;
 import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
 import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
 	

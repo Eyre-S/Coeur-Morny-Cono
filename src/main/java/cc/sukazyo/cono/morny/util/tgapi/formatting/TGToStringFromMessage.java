@@ -1,7 +1,5 @@
-package cc.sukazyo.cono.morny.util.tgapi;
+package cc.sukazyo.cono.morny.util.tgapi.formatting;
 
-import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
-import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
 import com.pengrad.telegrambot.model.Message;
 
 import javax.annotation.Nonnull;
@@ -12,7 +10,6 @@ public class TGToStringFromMessage extends TGToString {
 	private final Message message;
 	
 	public TGToStringFromMessage (@Nonnull Message message) { this.message = message; }
-	public static TGToStringFromMessage as (@Nonnull Message message) { return new TGToStringFromMessage(message); }
 	
 	@Nonnull
 	public String getSenderFirstNameRefHtml () {

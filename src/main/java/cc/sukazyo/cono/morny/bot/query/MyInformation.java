@@ -8,7 +8,7 @@ import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
 import com.pengrad.telegrambot.model.request.InputTextMessageContent;
 import com.pengrad.telegrambot.model.request.ParseMode;
 
-import cc.sukazyo.cono.morny.util.TelegramUserInformation;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation;
 
 public class MyInformation implements ITelegramQuery<InlineQueryResultArticle> {
 	

@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.util;
+package cc.sukazyo.cono.morny.util.tgapi.formatting;
 
 import com.pengrad.telegrambot.model.User;
 import okhttp3.OkHttpClient;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class TelegramUserInformation {
 	

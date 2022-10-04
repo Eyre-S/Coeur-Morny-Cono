@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.untitled.util.command.CommonCommand;
+import cc.sukazyo.cono.morny.util.UniversalCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class OnUserRandoms extends EventListener {
 		if (update.message().text() == null) return false;
 		if (!update.message().text().startsWith("/")) return false;
 		
-		final String[] preProcess = CommonCommand.format(update.message().text());
+		final String[] preProcess = UniversalCommand.format(update.message().text());
 		if (preProcess.length > 1) return false;
 		final String query = preProcess[0];
 		

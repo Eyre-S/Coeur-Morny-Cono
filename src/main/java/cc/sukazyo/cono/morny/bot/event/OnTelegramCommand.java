@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 
 import com.pengrad.telegrambot.model.Update;
 
