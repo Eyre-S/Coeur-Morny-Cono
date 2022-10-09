@@ -68,6 +68,7 @@ public class MornyCommands {
 				new Nbnhhsh(),
 				new Ip186Query.Ip(),
 				new Ip186Query.Whois(),
+				new EncUtils(),
 				new SaveData(),
 				new Version(),
 				new MornyRuntime(),
