@@ -78,6 +78,7 @@ public class MornyCommands {
 		
 		// 特殊的命令
 		register(
+				new Testing(),
 				new DirectMsgClear()
 		);
 		

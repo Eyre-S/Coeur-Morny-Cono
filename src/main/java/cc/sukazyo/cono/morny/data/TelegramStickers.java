@@ -15,5 +15,6 @@ public class TelegramStickers {
 	public static final String ID_SENT = "CAACAgEAAx0CSQh32gABA--zYbiyU_wOijEitp-0tSl_k7W6l3gAAgMmAAJ4_MYF4GrompjXPx4jBA";
 	public static final String ID_SAVED = "CAACAgEAAx0CSQh32gABBExuYdB_G0srfhQldRWkBYxWzCOv4-IAApooAAJ4_MYFcjuNZszfQcQjBA";
 	public static final String ID_PROGYNOVA = "CAACAgUAAxkBAAICm2KEuL7UQqNP7vSPCg2DHJIND6UsAAKLAwACH4WSBszIo722aQ3jJAQ";
+	public static final String ID_NETWORK_ERR = "CAACAgEAAxkBAAID0WNJgNEkD726KW4vZeFlw0FlVVyNAAIXJgACePzGBb50o7O1RbxoKgQ";
 	
 }

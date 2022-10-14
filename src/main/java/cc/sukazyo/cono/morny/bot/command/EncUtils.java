@@ -8,12 +8,17 @@ import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.request.SendDocument;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Base64;
+
+import static cc.sukazyo.cono.morny.Log.logger;
 
 public class EncUtils implements ITelegramCommand {
 	
@@ -64,26 +69,74 @@ public class EncUtils implements ITelegramCommand {
 			}
 		}
 		
-		// for now, only support reply to A TEXT MESSAGE and encrypt/hash the text value.
+		// for now, only support reply to A TEXT MESSAGE or ONE UNIVERSAL FILE
+		// if the replied message contains a UNIVERSAL FILE, it will use the file and will not use the text with it
+		// do not support TELEGRAM INLINE IMAGE/VIDEO/AUDIO yet
+		// do not support MULTI_FILE yet
 		// if there's no text message in reply, it will report null as result.
-		if (event.message().replyToMessage() == null || event.message().replyToMessage().text() == null) {
+		boolean inputText;
+		byte[] data;
+		String dataName;
+		if (event.message().replyToMessage() != null && event.message().replyToMessage().document() != null) {
+			inputText = false;
+			try {
+				data = MornyCoeur.getAccount().getFileContent(MornyCoeur.extra().exec(new GetFile(
+						event.message().replyToMessage().document().fileId()
+				)).file());
+			} catch (IOException e) {
+				logger.warn("NetworkRequest error: TelegramFileAPI:\n\t" + e.getMessage());
+				MornyCoeur.extra().exec(new SendSticker(
+						event.message().chat().id(),
+						TelegramStickers.ID_NETWORK_ERR
+				).replyToMessageId(event.message().messageId()));
+				return;
+			}
+			dataName = event.message().replyToMessage().document().fileName();
+		} else if (event.message().replyToMessage() != null && event.message().replyToMessage().text() != null) {
+			inputText = true;
+			data = event.message().replyToMessage().text().getBytes(CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
+			dataName = null;
+		} else {
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),
 					"<i><u>null</u></i>"
 			).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 			return;
 		}
-		final String data = event.message().replyToMessage().text();
 		
-		String result;
+		boolean echoString = true;
+		String resultString = null;
+		byte[] result = null;
+		String resultName = null;
 		switch (command.getArgs()[0]) {
-			case "base64", "b64" -> result = Base64.getEncoder().encodeToString(data.getBytes(CommonEncrypt.ENCRYPT_STANDARD_CHARSET));
-			case "base64decode", "base64d", "b64d" -> result = new String(
-					Base64.getDecoder().decode(data.getBytes(CommonEncrypt.ENCRYPT_STANDARD_CHARSET)), CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
-			case "md5" -> result = CommonConvert.byteArrayToHex(CommonEncrypt.hashMd5(data));
-			case "sha1" -> result = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha1(data));
-			case "sha256" -> result = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha256(data));
-			case "sha512" -> result = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha512(data));
+			case "base64", "b64" -> {
+				result = Base64.getEncoder().encode(data);
+				if (!inputText) {
+					echoString = false;
+					resultName = dataName+".b64.txt";
+				} else {
+					resultString = new String(result, CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
+				}
+			}
+			case "base64decode", "base64d", "b64d" -> {
+				try { result = Base64.getDecoder().decode(data); }
+				catch (IllegalArgumentException e) {
+					MornyCoeur.extra().exec(new SendSticker(
+							event.message().chat().id(), TelegramStickers.ID_404
+					).replyToMessageId(event.message().messageId()));
+					return;
+				}
+				if (!inputText) {
+					echoString = false;
+					resultName = CommonEncrypt.base64FilenameLint(dataName);
+				} else {
+					resultString = new String(result, CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
+				}
+			}
+			case "md5" -> resultString = CommonConvert.byteArrayToHex(CommonEncrypt.hashMd5(data));
+			case "sha1" -> resultString = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha1(data));
+			case "sha256" -> resultString = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha256(data));
+			case "sha512" -> resultString = CommonConvert.byteArrayToHex(CommonEncrypt.hashSha512(data));
 			default -> {
 				MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(), TelegramStickers.ID_404
@@ -96,8 +149,10 @@ public class EncUtils implements ITelegramCommand {
 			// it means md5, sha1, sha256, sha512 here.
 			// other will report wrong param.
 			switch (command.getArgs()[0]) {
-				case "md5", "sha1", "sha256", "sha512" ->
-						result = result.toUpperCase();
+				case "md5", "sha1", "sha256", "sha512" -> {
+					assert resultString != null;
+					resultString = resultString.toUpperCase();
+				}
 				default -> {
 					MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(), TelegramStickers.ID_404
@@ -106,10 +161,17 @@ public class EncUtils implements ITelegramCommand {
 				}
 			}
 		}
-		MornyCoeur.extra().exec(new SendMessage(
-				event.message().chat().id(),
-				"<pre><code>" + MsgEscape.escapeHtml(result) + "</code></pre>"
-		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		if (echoString) {
+			MornyCoeur.extra().exec(new SendMessage(
+					event.message().chat().id(),
+					"<pre><code>" + MsgEscape.escapeHtml(resultString) + "</code></pre>"
+			).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		} else {
+			MornyCoeur.extra().exec(new SendDocument(
+					event.message().chat().id(),
+					result
+			).fileName(resultName).replyToMessageId(event.message().messageId()));
+		}
 		
 	}
 	

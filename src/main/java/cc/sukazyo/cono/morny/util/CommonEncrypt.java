@@ -126,4 +126,19 @@ public class CommonEncrypt {
 		return hashMd5(originString.getBytes(ENCRYPT_STANDARD_CHARSET));
 	}
 	
+	@Nonnull
+	public static String base64FilenameLint (String inputName) {
+		if (inputName.endsWith(".b64")) {
+			return inputName.substring(0, inputName.length()-".b64".length());
+		} else if (inputName.endsWith(".b64.txt")) {
+			return inputName.substring(0, inputName.length()-".b64.txt".length());
+		} else if (inputName.endsWith(".base64")) {
+			return inputName.substring(0, inputName.length()-".base64".length());
+		} else if (inputName.endsWith(".base64.txt")) {
+			return inputName.substring(0, inputName.length()-".base64.txt".length());
+		} else {
+			return inputName;
+		}
+	}
+	
 }
