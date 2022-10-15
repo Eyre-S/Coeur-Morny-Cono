@@ -6,6 +6,7 @@ import cc.sukazyo.cono.morny.util.CommonConvert;
 import cc.sukazyo.cono.morny.util.CommonEncrypt;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.GetFile;
@@ -92,6 +93,28 @@ public class Encryptor implements ITelegramCommand {
 				return;
 			}
 			dataName = event.message().replyToMessage().document().fileName();
+		} else if (event.message().replyToMessage() != null && event.message().replyToMessage().photo() != null) {
+			inputText = false;
+			try {
+				PhotoSize originPhoto = null;
+				long photoSize = 0;
+				for (PhotoSize size : event.message().replyToMessage().photo()) if (photoSize < (long)size.width() *size.height()) {
+					originPhoto = size;
+					photoSize = (long)size.width() *size.height();
+				} // found max size (original) image in available sizes
+				if (originPhoto==null) throw new IOException("no photo object from api.");
+				data = MornyCoeur.getAccount().getFileContent(MornyCoeur.extra().exec(new GetFile(
+						originPhoto.fileId()
+				)).file());
+			} catch (IOException e) {
+				logger.warn("NetworkRequest error: TelegramFileAPI:\n\t" + e.getMessage());
+				MornyCoeur.extra().exec(new SendSticker(
+						event.message().chat().id(),
+						TelegramStickers.ID_NETWORK_ERR
+				).replyToMessageId(event.message().messageId()));
+				return;
+			}
+			dataName = "photo"+CommonConvert.byteArrayToHex(CommonEncrypt.hashMd5(String.valueOf(System.currentTimeMillis()))).substring(32-12).toUpperCase()+".png";
 		} else if (event.message().replyToMessage() != null && event.message().replyToMessage().text() != null) {
 			inputText = true;
 			data = event.message().replyToMessage().text().getBytes(CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
