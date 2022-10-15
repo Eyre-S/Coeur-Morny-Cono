@@ -20,7 +20,7 @@ import java.util.Base64;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
-public class EncUtils implements ITelegramCommand {
+public class Encryptor implements ITelegramCommand {
 	
 	@Nonnull @Override public String getName () { return "encrypt"; }
 	@Nullable @Override public String[] getAliases () { return new String[0]; }
