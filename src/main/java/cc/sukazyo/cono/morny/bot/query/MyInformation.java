@@ -10,21 +10,26 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation;
 
-public class MyInformation implements ITelegramQuery<InlineQueryResultArticle> {
+import java.util.Collections;
+import java.util.List;
+
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds;
+
+public class MyInformation implements ITelegramQuery {
 	
 	public static final String ID_PREFIX = "[morny/info/me]";
 	public static final String TITLE = "My Account Information";
 	
 	@Override
 	@Nullable
-	public InlineQueryUnit<InlineQueryResultArticle> query(Update event) {
+	public List<InlineQueryUnit<?>> query(Update event) {
 		if (!(event.inlineQuery().query() == null || "".equals(event.inlineQuery().query()))) return null;
-		return new InlineQueryUnit<>(new InlineQueryResultArticle(
-				ID_PREFIX, TITLE,
+		return Collections.singletonList(new InlineQueryUnit<>(new InlineQueryResultArticle(
+				inlineIds(ID_PREFIX), TITLE,
 				new InputTextMessageContent(
 						TelegramUserInformation.informationOutputHTML(event.inlineQuery().from())
 				).parseMode(ParseMode.HTML)
-		)).isPersonal(true).cacheTime(10);
+		)).isPersonal(true).cacheTime(10));
 	}
 	
 }

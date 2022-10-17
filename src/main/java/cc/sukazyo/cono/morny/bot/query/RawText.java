@@ -8,23 +8,24 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle;
 import com.pengrad.telegrambot.model.request.InputTextMessageContent;
 
-import static cc.sukazyo.cono.morny.util.CommonConvert.byteArrayToHex;
-import static cc.sukazyo.cono.morny.util.CommonEncrypt.hashMd5;
+import java.util.Collections;
+import java.util.List;
 
-public class RawText implements ITelegramQuery<InlineQueryResultArticle> {
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds;
+
+public class RawText implements ITelegramQuery {
 	
 	public static final String ID_PREFIX = "[morny/r/text]";
 	public static final String TITLE = "Raw Text";
 	
 	@Override
 	@Nullable
-	public InlineQueryUnit<InlineQueryResultArticle> query (Update event) {
+	public List<InlineQueryUnit<?>> query (Update event) {
 		if (event.inlineQuery().query() == null || "".equals(event.inlineQuery().query())) return null;
-		return new InlineQueryUnit<>(new InlineQueryResultArticle(
-				ID_PREFIX + byteArrayToHex(hashMd5(event.inlineQuery().query())),
-				TITLE,
+		return Collections.singletonList(new InlineQueryUnit<>(new InlineQueryResultArticle(
+				inlineIds(ID_PREFIX, event.inlineQuery().query()), TITLE,
 				new InputTextMessageContent(event.inlineQuery().query())
-		));
+		)));
 	}
 	
 }
