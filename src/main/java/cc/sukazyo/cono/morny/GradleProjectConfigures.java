@@ -6,5 +6,5 @@ package cc.sukazyo.cono.morny;
 public class GradleProjectConfigures {
 	public static final String VERSION = "0.8.0.8";
 	public static final String CODENAME = "putian";
-	public static final long COMPILE_TIMESTAMP = 1665999835121L;
+	public static final long COMPILE_TIMESTAMP = 1666028272898L;
 }
