@@ -39,7 +39,9 @@ public class Encryptor implements ITelegramCommand {
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(), """
 					<b><u>base64</u></b>, b64
+					<b><u>base64url</u></b>, base64u, b64u
 					<b><u>base64decode</u></b>, base64d, b64d
+					<b><u>base64url-decode</u></b>, base64ud, b64ud
 					<b><u>sha1</u></b>
 					<b><u>sha256</u></b>
 					<b><u>sha512</u></b>
@@ -132,8 +134,9 @@ public class Encryptor implements ITelegramCommand {
 		byte[] result = null;
 		String resultName = null;
 		switch (command.getArgs()[0]) {
-			case "base64", "b64" -> {
-				result = Base64.getEncoder().encode(data);
+			case "base64", "b64", "base64url", "base64u", "b64u" -> {
+				final Base64.Encoder b64tool = command.getArgs()[0].contains("u") ? Base64.getUrlEncoder() : Base64.getEncoder();
+				result = b64tool.encode(data);
 				if (!inputText) {
 					echoString = false;
 					resultName = dataName+".b64.txt";
@@ -141,8 +144,9 @@ public class Encryptor implements ITelegramCommand {
 					resultString = new String(result, CommonEncrypt.ENCRYPT_STANDARD_CHARSET);
 				}
 			}
-			case "base64decode", "base64d", "b64d" -> {
-				try { result = Base64.getDecoder().decode(data); }
+			case "base64decode", "base64d", "b64d", "base64url-decode", "base64ud", "b64ud" -> {
+				final Base64.Decoder b64tool = command.getArgs()[0].contains("u") ? Base64.getUrlDecoder() : Base64.getDecoder();
+				try { result = b64tool.decode(data); }
 				catch (IllegalArgumentException e) {
 					MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(), TelegramStickers.ID_404
