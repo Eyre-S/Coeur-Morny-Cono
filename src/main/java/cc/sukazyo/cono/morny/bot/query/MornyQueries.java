@@ -15,6 +15,7 @@ public class MornyQueries {
 		queryInstances.add(new RawText());
 		queryInstances.add(new MyInformation());
 		queryInstances.add(new ShareToolTwitter());
+		queryInstances.add(new ShareToolBilibili());
 	}
 	
 	@Nonnull
