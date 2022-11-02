@@ -2,8 +2,8 @@ package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryResponse;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
+
 
 /**
  * {@value IP186QueryHandler#SITE_URL} 查询的 telegram 命令前端

@@ -9,19 +9,21 @@ import java.util.List;
 
 public class MornyQueries {
 	
-	private final List<ITelegramQuery<?>> queryInstances = new ArrayList<>();
+	private final List<ITelegramQuery> queryInstances = new ArrayList<>();
 	
 	public MornyQueries () {
 		queryInstances.add(new RawText());
 		queryInstances.add(new MyInformation());
+		queryInstances.add(new ShareToolTwitter());
+		queryInstances.add(new ShareToolBilibili());
 	}
 	
 	@Nonnull
 	public List<InlineQueryUnit<?>> query (@Nonnull Update event) {
 		final List<InlineQueryUnit<?>> results = new ArrayList<>();
-		for (ITelegramQuery<?> instance : queryInstances) {
-			final InlineQueryUnit<?> r = instance.query(event);
-			if (r!=null) results.add(r);
+		for (ITelegramQuery instance : queryInstances) {
+			final List<InlineQueryUnit<?>> r = instance.query(event);
+			if (r!=null) results.addAll(r);
 		}
 		return results;
 	}

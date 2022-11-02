@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape;
 
 import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;

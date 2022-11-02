@@ -4,9 +4,9 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
-import cc.sukazyo.cono.morny.util.CommonFormatUtils;
-import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
-import cc.sukazyo.untitled.util.telegram.formatting.MsgEscape;
+import cc.sukazyo.cono.morny.util.CommonFormat;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -122,9 +122,9 @@ public class OnCallMe extends EventListener {
 					event.message().from().id(),
 					String.format("<i>on</i> <code>%s [UTC+8]</code>\n- <code>%s</code> <i>before</i>",
 							MsgEscape.escapeHtml(
-									CommonFormatUtils.formatDate((long)lastDinnerData.forwardDate()*1000, 8)
+									CommonFormat.formatDate((long)lastDinnerData.forwardDate()*1000, 8)
 							), MsgEscape.escapeHtml(
-									CommonFormatUtils.formatDuration(System.currentTimeMillis()-(long)lastDinnerData.forwardDate()*1000)
+									CommonFormat.formatDuration(System.currentTimeMillis()-(long)lastDinnerData.forwardDate()*1000)
 							)
 					)
 			).replyToMessageId(sendResp.message().messageId()).parseMode(ParseMode.HTML));

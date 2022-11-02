@@ -6,7 +6,7 @@ import cc.sukazyo.cono.morny.bot.event.EventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
 import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
-import cc.sukazyo.untitled.telegram.api.extra.ExtraAction;
+import cc.sukazyo.cono.morny.util.tgapi.ExtraAction;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.impl.FileApi;
 import com.pengrad.telegrambot.model.User;
@@ -59,7 +59,7 @@ public class MornyCoeur {
 	 * {@link cc.sukazyo.cono.morny.bot.event.OnUpdateTimestampOffsetLock}
 	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
 	 */
-	public long latestEventTimestamp;
+	public final long latestEventTimestamp;
 	/**
 	 * morny 主程序启动时间<br>
 	 * 用于统计数据

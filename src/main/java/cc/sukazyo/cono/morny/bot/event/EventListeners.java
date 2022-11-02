@@ -5,7 +5,7 @@ import cc.sukazyo.cono.morny.bot.api.EventListenerManager;
 public class EventListeners {
 	
 	public static final OnTelegramCommand COMMANDS_LISTENER = new OnTelegramCommand();
-	public static final OnActivityRecord ACTIVITY_RECORDER = new OnActivityRecord();
+	@SuppressWarnings("unused") public static final OnActivityRecord ACTIVITY_RECORDER = new OnActivityRecord();
 	public static final OnUserSlashAction USER_SLASH_ACTION = new OnUserSlashAction();
 	public static final OnUpdateTimestampOffsetLock UPDATE_TIMESTAMP_OFFSET_LOCK = new OnUpdateTimestampOffsetLock();
 	public static final OnInlineQueries INLINE_QUERY = new OnInlineQueries();
@@ -19,7 +19,7 @@ public class EventListeners {
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
-				ACTIVITY_RECORDER,
+//				ACTIVITY_RECORDER,
 				UPDATE_TIMESTAMP_OFFSET_LOCK,
 				/* write functional event behind here */
 //				KUOHUANHUAN_NEED_SLEEP,

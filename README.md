@@ -2,7 +2,7 @@
 [tg-account]: https://t.me/morny_cono_annie_bot
 [issues]: https://github.com/Eyre-S/Coeur-Morny-Cono/issues
 [todo]: https://github.com/users/Eyre-S/projects/1
-[artifact]: https://mvn.sukazyo.cc/main/cc/sukazyo/morny-coeur
+[artifact]: https://mvn.sukazyo.cc/#/releases/cc/sukazyo/morny-coeur
 
 [tg4j]: https://github.com/pengrad/java-telegram-bot-api
 [spotbugs]: https://spotbugs.github.io/

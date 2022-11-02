@@ -22,7 +22,8 @@ import cc.sukazyo.cono.morny.data.TelegramStickers;
 import com.pengrad.telegrambot.response.GetChatResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
+
 
 public class OnCallMsgSend extends EventListener {
 	

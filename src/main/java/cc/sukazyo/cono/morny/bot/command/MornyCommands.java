@@ -5,8 +5,8 @@ import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
-import cc.sukazyo.untitled.telegram.api.formatting.TGToString;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.DeleteMyCommands;
 import com.pengrad.telegrambot.model.Update;
@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import static cc.sukazyo.cono.morny.Log.logger;
-import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDate;
-import static cc.sukazyo.cono.morny.util.CommonFormatUtils.formatDuration;
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
 	
@@ -57,6 +57,7 @@ public class MornyCommands {
 		}
 	}
 	
+	@SuppressWarnings("NonAsciiCharacters")
 	public MornyCommands () {
 		
 		register(
@@ -67,7 +68,9 @@ public class MornyCommands {
 				new Nbnhhsh(),
 				new Ip186Query.Ip(),
 				new Ip186Query.Whois(),
+				new Encryptor(),
 				new SaveData(),
+				new MornyInformations(),
 				new Version(),
 				new MornyRuntime(),
 				new Jrrp(),
@@ -76,6 +79,7 @@ public class MornyCommands {
 		
 		// 特殊的命令
 		register(
+				new Testing(),
 				new DirectMsgClear()
 		);
 		
@@ -85,7 +89,8 @@ public class MornyCommands {
 				new 喵呜.揉揉(),
 				new 喵呜.蹭蹭(),
 				new 喵呜.贴贴(),
-				new 私わね()
+				new 私わね(),
+				new 喵呜.Progynova()
 		);
 		
 	}

@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.data;
 
-import cc.sukazyo.cono.morny.util.EncryptUtils;
+import cc.sukazyo.cono.morny.util.CommonConvert;
+import cc.sukazyo.cono.morny.util.CommonEncrypt;
 import com.pengrad.telegrambot.model.User;
 
 /**
@@ -39,7 +40,7 @@ public class MornyJrrp {
 	 * @return 算法得到的 jrrp 值，取值为 {@code [0.00. 100.00]}
 	 */
 	public static double calcJrrpXmomi (long userId, long dayStamp) {
-		return (double)Long.parseLong(EncryptUtils.encryptByMD5(userId + "@" + dayStamp).substring(0, 4), 16) / (double)0xffff;
+		return (double)Long.parseLong(CommonConvert.byteArrayToHex(CommonEncrypt.hashMd5(userId + "@" + dayStamp)).substring(0, 4), 16) / (double)0xffff;
 	}
 	
 }

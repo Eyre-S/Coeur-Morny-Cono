@@ -2,9 +2,8 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.util.tgapi.TGToStringFromMessage;
-import cc.sukazyo.untitled.util.command.CommonCommand;
-import cc.sukazyo.untitled.util.string.StringArrays;
+import cc.sukazyo.cono.morny.util.UniversalCommand;
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -13,7 +12,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 
-import static cc.sukazyo.untitled.util.telegram.formatting.MsgEscape.escapeHtml;
+import static cc.sukazyo.cono.morny.util.CommonConvert.stringsConnecting;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class OnUserSlashAction extends EventListener {
 	
@@ -38,7 +38,7 @@ public class OnUserSlashAction extends EventListener {
 //				return false;
 //			}
 			
-			final String[] action = CommonCommand.format(text);
+			final String[] action = UniversalCommand.format(text);
 			action[0] = action[0].substring(1);
 			
 			if (action[0].matches("^\\w+(@\\w+)?$")) {
@@ -53,7 +53,7 @@ public class OnUserSlashAction extends EventListener {
 			final boolean hasObject = action.length != (isHardParse?2:1);
 			final String object =
 					hasObject ?
-					StringArrays.connectStringArray(action, " ", isHardParse?2:1, action.length-1) :
+					stringsConnecting(action, " ", isHardParse?2:1, action.length-1) :
 					"";
 			final Message origin = event.message();
 			final Message target = (event.message().replyToMessage() == null ? (
@@ -66,11 +66,11 @@ public class OnUserSlashAction extends EventListener {
 					event.message().chat().id(),
 					String.format(
 							"%s %s%s %s %s!",
-							TGToStringFromMessage.as(origin).getSenderFirstNameRefHtml(),
+							TGToString.as(origin).getSenderFirstNameRefHtml(),
 							escapeHtml(verb), escapeHtml((hasObject?"":"了")),
 							origin==target ?
-									"<a href='tg://user?id="+TGToStringFromMessage.as(target).getSenderId()+"'>自己</a>" :
-							TGToStringFromMessage.as(target).getSenderFirstNameRefHtml(),
+							"<a href='tg://user?id="+TGToString.as(target).getSenderId()+"'>自己</a>" :
+							TGToString.as(target).getSenderFirstNameRefHtml(),
 							escapeHtml(hasObject ? object+" " : "")
 					)
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
