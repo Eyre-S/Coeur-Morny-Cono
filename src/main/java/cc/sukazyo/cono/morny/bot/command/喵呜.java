@@ -1,10 +1,12 @@
 package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.untitled.util.telegram.object.InputCommand;
+import cc.sukazyo.cono.morny.data.TelegramStickers;
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,6 +55,19 @@ public class 喵呜 {
 					event.message().chat().id(),
 					"<tg-spoiler>(贴贴喵呜&amp;.&amp;)</tg-spoiler>"
 			).parseMode(ParseMode.HTML));
+		}
+	}
+	
+	public static class Progynova implements ITelegramCommand {
+		@Nonnull @Override public String getName () { return "install"; }
+		@Nullable @Override public String[] getAliases () { return new String[0]; }
+		@Nonnull @Override public String getParamRule () { return ""; }
+		@Nonnull @Override public String getDescription () { return "抽取一个神秘盒子"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
+			MornyCoeur.extra().exec(new SendSticker(
+					event.message().chat().id(),
+					TelegramStickers.ID_PROGYNOVA
+			).replyToMessageId(event.message().messageId()));
 		}
 	}
 	

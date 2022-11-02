@@ -1,9 +1,8 @@
 package cc.sukazyo.cono.morny.bot.api;
 
+import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException;
 import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;
-
-import cc.sukazyo.untitled.telegram.api.event.EventRuntimeException;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

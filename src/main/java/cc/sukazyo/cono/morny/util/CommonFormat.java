@@ -6,10 +6,12 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-public class CommonFormatUtils {
+public class CommonFormat {
+	
+	public static final String DATE_TIME_PATTERN_FULL_MILLIS = "yyyy-MM-dd HH:mm:ss:SSS";
 	
 	public static String formatDate (long timestamp, int utcOffset) {
-		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS").format(LocalDateTime.ofInstant(
+		return DateTimeFormatter.ofPattern(DATE_TIME_PATTERN_FULL_MILLIS).format(LocalDateTime.ofInstant(
 				Instant.ofEpochMilli(timestamp),
 				ZoneId.ofOffset("UTC", ZoneOffset.ofHours(utcOffset))
 		));
