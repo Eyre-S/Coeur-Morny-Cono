@@ -1,3 +1,5 @@
+import org.ajoberstar.grgit.Status
+
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
@@ -8,6 +10,27 @@ plugins {
 	id 'application'
 	id 'com.github.johnrengelman.shadow' version '7.1.0'
 	id 'com.github.gmazzo.buildconfig' version '3.1.0'
+	id 'org.ajoberstar.grgit' version '5.0.0'
+}
+
+final boolean proj_git = grgit!=null
+final String proj_commit = proj_git ? grgit.head().id : null
+final boolean proj_clean = isCleanBuild()
+if (!proj_git)
+	print "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
+else if (isCleanBuild()) {
+	print "git: clean build at ${grgit.head().id}"
+} else {
+	final Status status = grgit.status()
+	println "git: non-clean-build"
+	if (!status.unstaged.allChanges.empty) {
+		println "git: unstaged changes"
+		listChanges(status.unstaged)
+	}
+	if (!status.staged.allChanges.empty) {
+		println "[MornyBuild] git: staged changes"
+		listChanges(status.staged)
+	}
 }
 
 final String proj_group = 'cc.sukazyo'
@@ -17,7 +40,9 @@ final String proj_archive_name = MORNY_ARCHIVE_NAME
 final String proj_version_base = VERSION
 final String proj_version_delta = VERSION_DELTA
 final String proj_version_use_delta = Boolean.parseBoolean(VERSION_DELTA)
-final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
+String proj_version = proj_version_base
+if (proj_version_use_delta) proj_version += "-δ${proj_version_delta}"
+if (proj_git) proj_version += "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ")
 final String proj_version_codename = CODENAME
 
 final JavaVersion proj_java = JavaVersion.VERSION_17
@@ -79,10 +104,12 @@ buildConfig {
 	
 	packageName(proj_package)
 	
-	buildConfigField('String', 'VERSION',           "\"${proj_version}\"")
-	buildConfigField('String', 'VERSION_DELTA',     "\"${proj_version_delta}\"")
-	buildConfigField('String', 'CODENAME',          "\"${proj_version_codename}\"")
-	buildConfigField('long',   'COMPILE_TIMESTAMP', "${System.currentTimeMillis()}L")
+	buildConfigField('String', 'VERSION', "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_DELTA', "\"${proj_version_delta}\"")
+	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")
+	buildConfigField('long', 'COMPILE_TIMESTAMP', "${System.currentTimeMillis()}L")
+	buildConfigField('String',  'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
+	buildConfigField('boolean', 'CLEAN_BUILD', "${proj_clean}")
 	
 }
 
@@ -90,6 +117,27 @@ shadowJar {
 	archiveBaseName.set("${project.ext.archiveBaseName}")
 	archiveVersion.set("${project.version}")
 	archiveClassifier.set("fat")
+}
+
+@SuppressWarnings("all")
+boolean isCleanBuild () {
+	if (grgit == null) return false
+	Set<String> changes = grgit.status().unstaged.allChanges + grgit.status().staged.allChanges
+	for (String file in changes) {
+		if (file.startsWith("src/")) return false
+		if (file == "build.gradle") return false
+		if (file == "gradle.properties") return false
+	}
+	return true
+}
+
+void listChanges (Status.Changes listing) {
+	for (String file in listing.added)
+		println "    add: ${file}"
+	for (String file in listing.modified)
+		println "    mod: ${file}"
+	for (String file in listing.removed)
+		println "    del: ${file}"
 }
 
 publishing {
