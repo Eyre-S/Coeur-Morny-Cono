@@ -243,14 +243,14 @@ public class MornyCommands {
 						- <code>%s</code>
 						core md5_hash:
 						- <code>%s</code>
-						compile timestamp:
+						coding timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
 						escapeHtml(MornySystem.CODENAME.toUpperCase()),
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.getJarMd5()),
-						BuildConfig.COMPILE_TIMESTAMP,
-						escapeHtml(formatDate(BuildConfig.COMPILE_TIMESTAMP, 0))
+						BuildConfig.CODE_TIMESTAMP,
+						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0))
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
@@ -310,8 +310,8 @@ public class MornyCommands {
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.CODENAME),
 						escapeHtml(MornySystem.getJarMd5()),
-						escapeHtml(formatDate(BuildConfig.COMPILE_TIMESTAMP, 0)),
-						BuildConfig.COMPILE_TIMESTAMP,
+						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0)),
+						BuildConfig.CODE_TIMESTAMP,
 						// continuous
 						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
 						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
