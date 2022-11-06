@@ -14,7 +14,6 @@ import com.pengrad.telegrambot.request.GetMe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Set;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
@@ -27,6 +26,9 @@ public class MornyCoeur {
 	/** 当前程序的 Morny Coeur 实例 */
 	private static MornyCoeur INSTANCE;
 	
+	/** 当前 Morny 的启动配置 */
+	public final MornyConfig config;
+	
 	/** 当前 Morny 的{@link MornyTrusted 信任验证机}实例 */
 	private final MornyTrusted trusted;
 	/** 当前 Morny 的 telegram 命令管理器 */
@@ -36,7 +38,6 @@ public class MornyCoeur {
 	/** morny 的 bot 账户 */
 	private final TelegramBot account;
 	private final ExtraAction extraActionInstance;
-	private final boolean isRemoveCommandListWhenExit;
 	/**
 	 * morny 的 bot 账户的用户名<br>
 	 * <br>
@@ -54,57 +55,35 @@ public class MornyCoeur {
 	 */
 	public final long userid;
 	/**
-	 * morny 的事件忽略前缀时间<br>
-	 * <br>
-	 * {@link cc.sukazyo.cono.morny.bot.event.OnUpdateTimestampOffsetLock}
-	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
-	 */
-	public final long latestEventTimestamp;
-	/**
 	 * morny 主程序启动时间<br>
 	 * 用于统计数据
 	 */
-	public static final long coeurStartTimestamp = System.currentTimeMillis();
-	
-	public static final long DINNER_CHAT_ID = -1001707106392L;
+	public static final long coeurStartTimestamp = ServerMain.systemStartupTime;
 	
 	private record LogInResult(TelegramBot account, String username, long userid) { }
 	
 	/**
 	 * 执行 bot 初始化
 	 *
-	 * @param botKey bot 的 telegram bot api token
-	 * @param botUsername bot 的 username 限定。如果为 null 则表示不限定，
-	 *                    如果指定，则登录时会检查所登陆的 bot 的用户名是否与此相等
-	 * @param master morny 实例所信任的主人的 id。用于初始化 {@link #trusted}
-	 * @param trustedChat morny 实例所信任的群组的 id。用于初始化 {@link #trusted}
-	 * @param latestEventTimestamp 事件处理器会处理事件的最早时间戳 ——
-	 *                             只有限定的 message 事件会受此影响。
-	 *                             单位为毫秒
+	 * @param config Morny 实例的配置选项数据
 	 */
-	private MornyCoeur (
-			@Nullable String botApi, @Nullable String botApi4File,
-			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, Set<Long> trustedRDinner,
-			long latestEventTimestamp,
-			boolean isRemoveCommandListWhenExit
-	) {
+	private MornyCoeur (MornyConfig config) {
 		
-		this.latestEventTimestamp = latestEventTimestamp;
-		this.isRemoveCommandListWhenExit = isRemoveCommandListWhenExit;
+		this.config = config;
+		
 		configureSafeExit();
 		
-		logger.info("args key:\n  " + botKey);
-		if (botUsername != null) {
-			logger.info("login as:\n  " + botUsername);
+		logger.info("args key:\n  " + config.telegramBotKey);
+		if (config.telegramBotUsername != null) {
+			logger.info("login as:\n  " + config.telegramBotUsername);
 		}
 		
 		try {
-			final LogInResult loginResult = login(botApi, botApi4File, botKey, botUsername);
+			final LogInResult loginResult = login(config.telegramBotApiServer, config.telegramBotApiServer4File, config.telegramBotKey, config.telegramBotUsername);
 			this.account = loginResult.account;
 			this.username = loginResult.username;
 			this.userid = loginResult.userid;
-			this.trusted = new MornyTrusted(master, trustedChat, trustedRDinner);
+			this.trusted = new MornyTrusted(this);
 			StringBuilder trustedReadersDinnerIds = new StringBuilder();
 			trusted.getTrustedReadersOfDinnerSet().forEach(id -> trustedReadersDinnerIds.append("\n    ").append(id));
 			logger.info(String.format("""
@@ -114,7 +93,7 @@ public class MornyCoeur {
 					- trusted chat (id)
 					    %d
 					- trusted reader-of-dinner (id)%s""",
-					master, trustedChat, trustedReadersDinnerIds
+					config.trustedMaster, config.trustedChat, trustedReadersDinnerIds
 			));
 		}
 		catch (Exception e) {
@@ -135,32 +114,28 @@ public class MornyCoeur {
 	 * 如果 morny 已经初始化，则不会进行初始化，抛出错误消息并直接退出方法。
 	 *
 	 * @see #MornyCoeur 程序初始化方法
+	 * @param config morny 实例的配置选项数据
 	 */
-	public static void main (
-			@Nullable String botApi, @Nullable String botApi4File,
-			@Nonnull String botKey, @Nullable String botUsername,
-			long master, long trustedChat, Set<Long> trustedRDinner, long latestEventTimestamp,
-			boolean isAutomaticResetCommandList, boolean isRemoveCommandListWhenExit
-	) {
+	public static void main (MornyConfig config) {
 		if (INSTANCE == null) {
+			
 			logger.info("Coeur Starting");
-			INSTANCE = new MornyCoeur(
-					botApi, botApi4File,
-					botKey, botUsername,
-					master, trustedChat, trustedRDinner,
-					latestEventTimestamp,
-					isRemoveCommandListWhenExit
-			);
+			INSTANCE = new MornyCoeur(config);
+			
 			MornyDaemons.start();
+			
 			logger.info("start telegram events listening");
 			EventListeners.registerAllListeners();
 			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
-			if (isAutomaticResetCommandList) {
+			
+			if (config.commandLoginRefresh) {
 				logger.info("resetting telegram command list");
 				commandManager().automaticUpdateList();
 			}
+			
 			logger.info("Coeur start complete");
 			return;
+			
 		}
 		logger.error("Coeur already started!!!");
 	}
@@ -179,7 +154,7 @@ public class MornyCoeur {
 	private void exitCleanup () {
 		logger.info("clean:save tracker data.");
 		MornyDaemons.stop();
-		if (isRemoveCommandListWhenExit) {
+		if (config.commandLogoutClear) {
 			commandManager.automaticRemoveList();
 		}
 	}
@@ -192,16 +167,20 @@ public class MornyCoeur {
 	}
 	
 	/**
-	 * 登录 bot<br>
-	 * <br>
+	 * 登录 bot.
+	 * <p>
 	 * 会反复尝试三次进行登录。如果登录失败，则会直接抛出 RuntimeException 结束处理。
 	 * 会通过 GetMe 动作验证是否连接上了 telegram api 服务器，
 	 * 同时也要求登录获得的 username 和 {@link #username} 声明值相等
 	 *
-	 * @param api bot client 将会连接到的 telegram bot api 位置
-	 * @param api4File bot client 将会连接到的 telegram file api 位置，如果不指定则会跟随 {@code api} 选项的设定
-	 * @param key bot 的 api-token
-	 * @param requireName 要求登录到的需要的 username，如果登陆后的 username 与此不同则会报错退出
+	 * @param api bot client 将会连接到的 telegram bot api 位置。
+	 *            填入 {@code null} 则使用默认的 {@code "https://api.telegram.org/bot"}
+	 * @param api4File bot client 将会连接到的 telegram file api 位置。
+	 *                 如果传入 {@code null} 则会跟随 {@param api} 选项的设定（具体为在 {@param api} 路径的后面添加 {@code /file} 路径）。
+	 *                 如果两者都为 {@code null}，则跟随默认的 {@value FileApi#FILE_API}
+	 * @param key bot 的 api-token. 必要值
+	 * @param requireName 要求登录到的需要的 username，如果登陆后的 username 与此不同则会报错退出。
+	 *                    填入 {@code null} 则表示不对 username 作要求
 	 * @return 成功登录后的 {@link TelegramBot} 对象
 	 */
 	@Nonnull
@@ -281,13 +260,13 @@ public class MornyCoeur {
 	}
 	
 	/**
+	 * 获取当前 morny 的配置数据
 	 *
-	 * 获取忽略时间点
-	 *
-	 * @return {@link #latestEventTimestamp MornyCoeur.latestEventTimestamp}
+	 * @return {@link #config MornyCoeur.config}
 	 */
-	public static long getLatestEventTimestamp () {
-		return INSTANCE.latestEventTimestamp;
+	@Nonnull
+	public static MornyConfig config () {
+		return INSTANCE.config;
 	}
 	
 	/**

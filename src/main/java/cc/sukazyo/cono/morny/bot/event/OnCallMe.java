@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.MornyTrusted;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.CommonFormat;
@@ -27,10 +26,10 @@ public class OnCallMe extends EventListener {
 	
 	/**
 	 * 主人的 telegram user id，同时被用于 chat id<br>
-	 * 跟随 {@link MornyTrusted#MASTER} 的值
+	 * 跟随 {@link cc.sukazyo.cono.morny.MornyConfig#trustedMaster} 的值
 	 * @since 0.4.2.1
 	 */
-	private static final long ME = MornyCoeur.trustedInstance().MASTER;
+	private static final long ME = MornyCoeur.config().trustedMaster;
 	
 	/**
 	 * 监听私聊 bot 的消息进行呼叫关键字匹配。
@@ -112,7 +111,7 @@ public class OnCallMe extends EventListener {
 		boolean isAllowed = false;
 		Message lastDinnerData = null;
 		if (MornyCoeur.trustedInstance().isTrustedForDinnerRead(event.message().from().id())) {
-			lastDinnerData = MornyCoeur.extra().exec(new GetChat(MornyCoeur.DINNER_CHAT_ID)).chat().pinnedMessage();
+			lastDinnerData = MornyCoeur.extra().exec(new GetChat(MornyCoeur.config().dinnerChatId)).chat().pinnedMessage();
 			SendResponse sendResp = MornyCoeur.extra().exec(new ForwardMessage(
 					event.message().from().id(),
 					lastDinnerData.forwardFromChat().id(),
