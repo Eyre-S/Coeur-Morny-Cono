@@ -192,8 +192,8 @@ public class ServerMain {
 					    %s [UTC]""",
 					MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
 					MornySystem.getJarMd5(),
-					GradleProjectConfigures.COMPILE_TIMESTAMP,
-					CommonFormat.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
+					BuildConfig.COMPILE_TIMESTAMP,
+					CommonFormat.formatDate(BuildConfig.COMPILE_TIMESTAMP, 0)
 			));
 			return;
 			
@@ -207,7 +207,7 @@ public class ServerMain {
 				- version %s (%s)(%d)
 				- Morny %s""",
 				MornySystem.VERSION,
-				MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP,
+				MornySystem.getJarMd5(), BuildConfig.COMPILE_TIMESTAMP,
 				MornySystem.CODENAME.toUpperCase()
 		));
 		

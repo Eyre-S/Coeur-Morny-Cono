@@ -16,7 +16,7 @@ public class MornySystem {
 	 * 程序的语义化版本号<br>
 	 * 会由 gradle 任务 {@code updateVersionCode} 更新
 	 */
-	public static final String VERSION = GradleProjectConfigures.VERSION;
+	public static final String VERSION = BuildConfig.VERSION;
 	
 	/**
 	 * Morny Coeur 当前的版本代号.<br>
@@ -26,7 +26,7 @@ public class MornySystem {
 	 * <br>
 	 * 会由 gradle 任务 {@code updateVersionCode} 更新
 	 */
-	public static final String CODENAME = GradleProjectConfigures.CODENAME;
+	public static final String CODENAME = BuildConfig.CODENAME;
 	
 	/**
 	 * 获取程序 jar 文件的 md5-hash 值<br>
@@ -43,7 +43,6 @@ public class MornySystem {
 		try {
 			return FileUtils.getMD5Three(MornyCoeur.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace(System.out);
 			return "<non-jar-runtime>";
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace(System.out);

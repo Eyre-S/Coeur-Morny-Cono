@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.bot.command;
 
-import cc.sukazyo.cono.morny.GradleProjectConfigures;
+import cc.sukazyo.cono.morny.BuildConfig;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
@@ -249,8 +249,8 @@ public class MornyCommands {
 						escapeHtml(MornySystem.CODENAME.toUpperCase()),
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.getJarMd5()),
-						GradleProjectConfigures.COMPILE_TIMESTAMP,
-						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0))
+						BuildConfig.COMPILE_TIMESTAMP,
+						escapeHtml(formatDate(BuildConfig.COMPILE_TIMESTAMP, 0))
 				)
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
@@ -310,8 +310,8 @@ public class MornyCommands {
 						escapeHtml(MornySystem.VERSION),
 						escapeHtml(MornySystem.CODENAME),
 						escapeHtml(MornySystem.getJarMd5()),
-						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
-						GradleProjectConfigures.COMPILE_TIMESTAMP,
+						escapeHtml(formatDate(BuildConfig.COMPILE_TIMESTAMP, 0)),
+						BuildConfig.COMPILE_TIMESTAMP,
 						// continuous
 						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
 						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,

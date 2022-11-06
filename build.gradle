@@ -1,16 +1,33 @@
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+
 plugins {
 	id 'java'
 	id 'java-library'
 	id 'maven-publish'
 	id 'application'
 	id 'com.github.johnrengelman.shadow' version '7.1.0'
+	id 'com.github.gmazzo.buildconfig' version '3.1.0'
 }
 
-group 'cc.sukazyo'
-version VERSION
-project.ext.archiveBaseName = 'Coeur_Morny_Cono'
-project.ext.artifactId = 'morny-coeur'
-mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
+final String proj_group = 'cc.sukazyo'
+final String proj_package = "${proj_group}.cono.morny"
+final String proj_archive_name = MORNY_ARCHIVE_NAME
+
+final String proj_version_base = VERSION
+final String proj_version_delta = VERSION_DELTA
+final String proj_version_use_delta = Boolean.parseBoolean(VERSION_DELTA)
+final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
+final String proj_version_codename = CODENAME
+
+final JavaVersion proj_java = JavaVersion.VERSION_17
+final Charset proj_file_encoding = StandardCharsets.UTF_8
+
+group proj_group
+version proj_version
+project.ext.archiveBaseName = proj_archive_name
+project.ext.artifactId = proj_archive_name
+mainClassName = "${proj_package}.ServerMain"
 
 repositories {
 	mavenCentral()
@@ -31,45 +48,42 @@ dependencies {
 	
 }
 
-task updateVersionCode {
-	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'CODENAME = ["a-zA-Z0-9]+;', replace:"CODENAME = \"${CODENAME}\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'COMPILE_TIMESTAMP = [0-9]+L;', replace:"COMPILE_TIMESTAMP = ${System.currentTimeMillis()}L;", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-}
-
-compileJava.dependsOn updateVersionCode
-
 test {
 	useJUnitPlatform()
 }
 
 java {
 	
-	sourceCompatibility JavaVersion.VERSION_17
-	targetCompatibility JavaVersion.VERSION_17
+	sourceCompatibility proj_java
+	targetCompatibility proj_java
 	
 	withSourcesJar()
 	
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+	options.encoding = proj_file_encoding.name()
 }
 
 tasks.withType(Javadoc) {
-	options.encoding = 'UTF-8'
-	options.docEncoding = 'UTF-8'
-	options.charSet = 'UTF-8'
+	options.encoding = proj_file_encoding.name()
+	options.docEncoding = proj_file_encoding.name()
+	options.charSet = proj_file_encoding.name()
 }
 
 tasks.test {
 	useJUnitPlatform()
+}
+
+buildConfig {
+	
+	packageName(proj_package)
+	
+	buildConfigField('String', 'VERSION',           "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_DELTA',     "\"${proj_version_delta}\"")
+	buildConfigField('String', 'CODENAME',          "\"${proj_version_codename}\"")
+	buildConfigField('long',   'COMPILE_TIMESTAMP', "${System.currentTimeMillis()}L")
+	
 }
 
 shadowJar {
