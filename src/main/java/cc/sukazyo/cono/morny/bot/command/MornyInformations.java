@@ -25,7 +25,10 @@ public class MornyInformations implements ITelegramCommand {
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
-		if (!command.hasArgs()) echoRuntime(command, event);
+		if (!command.hasArgs()) {
+			MornyCommands.onCommandRuntimeExec(event);
+			return;
+		}
 		
 		final String action = command.getArgs()[0];
 		
