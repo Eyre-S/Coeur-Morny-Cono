@@ -184,14 +184,24 @@ public class ServerMain {
 			logger.info(String.format("""
 					Morny Cono Version
 					- version :
-					    %s  %s
+					    Morny %s
+					    %s%s
 					- md5hash :
+					    %s
+					- gitstat :
 					    %s
 					- co.time :
 					    %d
 					    %s [UTC]""",
-					MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
+					MornySystem.CODENAME.toUpperCase(),
+					MornySystem.VERSION_BASE,
+					MornySystem.isUseDelta() ? "-δ"+MornySystem.VERSION_DELTA : "",
 					MornySystem.getJarMd5(),
+					MornySystem.isGitBuild() ? (String.format(
+							"on commit %s\n    %s",
+							MornySystem.isCleanBuild() ? "- clean-build" : "<δ/non-clean-build>",
+							BuildConfig.COMMIT
+					)) : "<non-git-build>",
 					BuildConfig.CODE_TIMESTAMP,
 					CommonFormat.formatDate(BuildConfig.CODE_TIMESTAMP, 0)
 			));
@@ -204,11 +214,12 @@ public class ServerMain {
 		
 		logger.info(String.format("""
 				ServerMain.java Loaded >>>
-				- version %s (%s)(%d)
-				- Morny %s""",
+				- version %s
+				- Morny %s
+				- <%s> [%d]""",
 				MornySystem.VERSION,
-				MornySystem.getJarMd5(), BuildConfig.CODE_TIMESTAMP,
-				MornySystem.CODENAME.toUpperCase()
+				MornySystem.CODENAME.toUpperCase(),
+				MornySystem.getJarMd5(), BuildConfig.CODE_TIMESTAMP
 		));
 		
 		//#

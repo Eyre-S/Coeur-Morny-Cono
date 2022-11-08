@@ -37,7 +37,7 @@ public class OnCallMsgSend extends EventListener {
 	) { }
 	
 	@Override
-	public boolean onMessage(Update update) {
+	public boolean onMessage(@Nonnull Update update) {
 		
 		// 执行体检查
 		if (update.message().chat().type() != Chat.Type.Private) return false;

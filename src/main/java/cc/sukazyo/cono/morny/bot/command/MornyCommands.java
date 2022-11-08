@@ -21,10 +21,7 @@ import javax.annotation.Nullable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
@@ -226,28 +223,33 @@ public class MornyCommands {
 		}
 	}
 	
-	private static class Version implements ITelegramCommand {
+	private static class Version implements ISimpleCommand {
 		@Nonnull @Override public String getName () { return "version"; }
 		@Nullable @Override public String[] getAliases () { return null; }
-		@Nonnull @Override public String getParamRule () { return ""; }
-		@Nonnull @Override public String getDescription () { return "检查 Bot 版本信息"; }
+		@Nonnull @Deprecated public String getParamRule () { return ""; }
+		@Nonnull @Deprecated public String getDescription () { return "检查 Bot 版本信息"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandVersionExec(event); }
 	}
-	private static void onCommandVersionExec (@Nonnull Update event) {
+	public static void onCommandVersionExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				String.format(
 						"""
 						version:
 						- Morny <code>%s</code>
-						- <code>%s</code>
+						- <code>%s</code>%s%s
 						core md5_hash:
 						- <code>%s</code>
 						coding timestamp:
 						- <code>%d</code>
 						- <code>%s [UTC]</code>""",
 						escapeHtml(MornySystem.CODENAME.toUpperCase()),
-						escapeHtml(MornySystem.VERSION),
+						escapeHtml(MornySystem.VERSION_BASE),
+						MornySystem.isUseDelta() ? String.format("-δ<code>%s</code>", escapeHtml(Objects.requireNonNull(MornySystem.VERSION_DELTA))) : "",
+						MornySystem.isGitBuild()?"\n- git "+ (MornySystem.currentCodePath()==null ?
+								String.format("<code>%s</code>", BuildConfig.COMMIT.substring(0, 8)) :
+								String.format("<a href='%s'>%s</a>", MornySystem.currentCodePath(), BuildConfig.COMMIT.substring(0, 8))
+						) + (MornySystem.isCleanBuild() ? "" : ".<code>δ</code>") : "",
 						escapeHtml(MornySystem.getJarMd5()),
 						BuildConfig.CODE_TIMESTAMP,
 						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0))
@@ -255,17 +257,17 @@ public class MornyCommands {
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
-	private static class MornyRuntime implements ITelegramCommand {
+	private static class MornyRuntime implements ISimpleCommand {
 		@Nonnull @Override public String getName () { return "runtime"; }
 		@Nullable @Override public String[] getAliases () { return null; }
-		@Nonnull @Override public String getParamRule () { return ""; }
-		@Nonnull @Override public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
+		@Nonnull @Deprecated public String getParamRule () { return ""; }
+		@Nonnull @Deprecated public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandRuntimeExec(event); }
 	}
 	/**
 	 * @since 0.4.1.2
 	 */
-	private static void onCommandRuntimeExec (@Nonnull Update event) {
+	public static void onCommandRuntimeExec (@Nonnull Update event) {
 		String hostname;
 		try {
 			hostname = InetAddress.getLocalHost().getHostName();
@@ -286,7 +288,7 @@ public class MornyCommands {
 								- <code>%d</code> / <code>%d</code> MB
 								- <code>%d</code> cores
 								coeur version:
-								- <code>%s</code> (<code>%s</code>)
+								- <code>%s</code>%s%s*<code>%s</code>
 								- <code>%s</code>
 								- <code>%s [UTC]</code>
 								- [<code>%d</code>]
@@ -307,8 +309,14 @@ public class MornyCommands {
 						Runtime.getRuntime().maxMemory() / 1024 / 1024,
 						Runtime.getRuntime().availableProcessors(),
 						// version
-						escapeHtml(MornySystem.VERSION),
-						escapeHtml(MornySystem.CODENAME),
+						escapeHtml(MornySystem.VERSION_BASE),
+						MornySystem.isUseDelta() ? String.format("-δ<code>%s</code>", escapeHtml(Objects.requireNonNull(MornySystem.VERSION_DELTA))) : "",
+						MornySystem.isGitBuild()?String.format("-git.%s%s", MornySystem.currentCodePath()==null ? (
+								String.format("<code>%s</code>", BuildConfig.COMMIT.substring(0, 8))
+						) : (
+								String.format("<a href='%s'>%s</a>", MornySystem.currentCodePath(), BuildConfig.COMMIT.substring(0, 8))
+						), MornySystem.isCleanBuild()?"":".<code>δ</code>"):"",
+						escapeHtml(MornySystem.CODENAME.toUpperCase()),
 						escapeHtml(MornySystem.getJarMd5()),
 						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0)),
 						BuildConfig.CODE_TIMESTAMP,

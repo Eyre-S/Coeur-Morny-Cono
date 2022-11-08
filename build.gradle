@@ -14,7 +14,9 @@ plugins {
 }
 
 final boolean proj_git = grgit!=null
+final String proj_store = MORNY_CODE_STORE
 final String proj_commit = proj_git ? grgit.head().id : null
+final String proj_commit_path = MORNY_COMMIT_PATH
 final boolean proj_clean = isCleanBuild()
 if (!proj_git)
 	print "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
@@ -120,11 +122,14 @@ buildConfig {
 	packageName(proj_package)
 	
 	buildConfigField('String', 'VERSION', "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_BASE', "\"${proj_version_base}\"")
 	buildConfigField('String', 'VERSION_DELTA', proj_version_use_delta ? "\"${proj_version_delta}\"" : "null")
 	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")
 	buildConfigField('long', 'CODE_TIMESTAMP', "${proj_code_time}L")
 	buildConfigField('String',  'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
 	buildConfigField('boolean', 'CLEAN_BUILD', "${proj_clean}")
+	buildConfigField('String', 'CODE_STORE', proj_store==""?"null":"\"${proj_store}\"")
+	buildConfigField('String', 'COMMIT_PATH', proj_commit_path==""?"null":"\"${proj_commit_path}\"")
 	
 }
 
