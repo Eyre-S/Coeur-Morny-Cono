@@ -43,9 +43,8 @@ final String proj_application_main = "${proj_package}.ServerMain"
 final String proj_version_base = VERSION
 final String proj_version_delta = VERSION_DELTA
 final boolean proj_version_use_delta = Boolean.parseBoolean(USE_DELTA)
-String proj_version = proj_version_base
-if (proj_version_use_delta) proj_version += "-δ${proj_version_delta}"
-if (proj_git) proj_version += "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ")
+final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
+final String proj_version_full = proj_version + (proj_git ? "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ") : "")
 final String proj_version_codename = CODENAME
 final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
 
@@ -64,7 +63,7 @@ if (project.hasProperty("publishMvnRepoUrl")) {
 }
 
 group proj_group
-version proj_version
+version proj_version_full
 setArchivesBaseName proj_archive_name
 
 repositories {
@@ -122,6 +121,7 @@ buildConfig {
 	packageName(proj_package)
 	
 	buildConfigField('String', 'VERSION', "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_FULL', "\"${proj_version_full}\"")
 	buildConfigField('String', 'VERSION_BASE', "\"${proj_version_base}\"")
 	buildConfigField('String', 'VERSION_DELTA', proj_version_use_delta ? "\"${proj_version_delta}\"" : "null")
 	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")

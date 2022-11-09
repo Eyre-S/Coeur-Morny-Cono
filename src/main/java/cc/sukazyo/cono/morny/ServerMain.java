@@ -217,7 +217,7 @@ public class ServerMain {
 				- version %s
 				- Morny %s
 				- <%s> [%d]""",
-				MornySystem.VERSION,
+				MornySystem.VERSION_FULL,
 				MornySystem.CODENAME.toUpperCase(),
 				MornySystem.getJarMd5(), BuildConfig.CODE_TIMESTAMP
 		));

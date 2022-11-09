@@ -17,11 +17,23 @@ public class MornySystem {
 	/**
 	 * 程序的语义化版本号.
 	 * <p>
-	 * 这个版本号是完整(verbose)构建的——它包含了以下的 {@link #VERSION_BASE}, {@link #VERSION_DELTA},
-	 * 和简写的 {@link BuildConfig#COMMIT} 字段.
+	 * 这个版本号包含了以下的 {@link #VERSION_BASE}, {@link #VERSION_DELTA} 字段，
+	 * 但不包含作为附加属性的构建时的{@link BuildConfig#COMMIT git 状态}属性
+	 * <p>
+	 * 这个格式的版本号也是在 maven 包仓库中所使用的版本号
 	 * @since 1.0.0-alpha4
 	 */
 	@BuildConfigField @Nonnull public static final String VERSION = BuildConfig.VERSION;
+	/**
+	 * 程序的完整语义化版本号.
+	 * <p>
+	 * 包含了全部的 {@link #VERSION_BASE}, {@link #VERSION_DELTA}, 以及{@link BuildConfig#COMMIT git 状态}属性。
+	 * <small>虽然仍旧不包含{@link #CODENAME}属性</small>
+	 * <p>
+	 * 这个格式的版本号也是 gradle 构建配置使用的版本号，也在普通打包时生成文件时使用
+	 * @since 1.0.0-alpha4.2
+	 */
+	@BuildConfigField @Nonnull public static final String VERSION_FULL = BuildConfig.VERSION_FULL;
 	/**
 	 * 程序的基础版本号.
 	 * <p>
@@ -37,6 +49,9 @@ public class MornySystem {
 	 * {@link null} 作为值，表示这个字段没有被使用.
 	 * <p>
 	 * 版本 delta 会以 {@code -δversion-delta} 的形式附着在 {@link #VERSION_BASE} 之后.
+	 * 两者合并后的版本号格式即为 {@link #VERSION}
+	 * <p>
+	 * 在发行版本中一般不应该被使用.
 	 * <p>
 	 * <small>目前并不多被使用.</small>
 	 * @since 1.0.0-alpha4
