@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command;
 import cc.sukazyo.cono.morny.BuildConfig;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
+import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
@@ -220,6 +221,7 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("403 exited tag from user " + TGToString.as(event.message().from()).toStringLogTag());
+			MornyReport.unauthenticatedAction("/exit", event.message().from());
 		}
 	}
 	
@@ -375,6 +377,7 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("403 call save tag from user " + TGToString.as(event.message().from()).toStringLogTag());
+			MornyReport.unauthenticatedAction("/save", event.message().from());
 		}
 	}
 

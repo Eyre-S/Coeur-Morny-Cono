@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny;
 
+import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.util.BuildConfigField;
 import cc.sukazyo.cono.morny.util.FileUtils;
 
@@ -135,7 +136,8 @@ public class MornySystem {
 		} catch (IOException | URISyntaxException e) {
 			return "<non-jar-runtime>";
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace(System.out);
+			Log.logger.error(Log.exceptionLog(e));
+			MornyReport.exception(e, "<coeur-md5/calculation-error>");
 			return "<calculation-error>";
 		}
 	}

@@ -89,11 +89,25 @@ public class MornyConfig {
 	public final boolean commandLogoutClear;
 	
 	/* ======================================= *
+	 *  system: morny report                   *
+	 * ======================================= */
+	
+	/**
+	 * 控制 Morny Coeur 系统的报告的报告对象.
+	 * @since 1.0.0-alpha5
+	 */
+	public final long reportToChat;
+	
+	/* ======================================= *
 	 *  function: dinner query tool            *
 	 * ======================================= */
 	
 	@Nonnull public final Set<Long> dinnerTrustedReaders;
 	public final long dinnerChatId;
+	
+	/* ======================================= *
+	 *  End Configs | ConfigBuilder            *
+	 * ======================================= */
 	
 	public MornyConfig (@Nonnull Prototype prototype) throws CheckFailure {
 		this.telegramBotApiServer = prototype.telegramBotApiServer;
@@ -110,6 +124,7 @@ public class MornyConfig {
 		this.commandLogoutClear = prototype.commandLogoutClear;
 		this.dinnerTrustedReaders = prototype.dinnerTrustedReaders;
 		this.dinnerChatId = prototype.dinnerChatId;
+		this.reportToChat = prototype.reportToChat;
 	}
 	
 	public static class CheckFailure extends Exception {
@@ -131,6 +146,7 @@ public class MornyConfig {
 		public boolean commandLogoutClear = false;
 		@Nonnull public Set<Long> dinnerTrustedReaders = new HashSet<>();
 		public long dinnerChatId = -1001707106392L;
+		public long reportToChat = -1001650050443L;
 		
 	}
 	

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static cc.sukazyo.cono.morny.Log.exceptionLog;
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class TrackerDataManager {
@@ -113,8 +114,10 @@ public class TrackerDataManager {
 					));
 					
 				} catch (Exception e) {
-					logger.error(String.format("exception in write tracker data: %d/%d/%d", chat, user, timestamp));
-					e.printStackTrace(System.out);
+					final String message = String.format("exception in write tracker data: %d/%d/%d", chat, user, timestamp);
+					logger.error(message);
+					logger.error(exceptionLog(e));
+					MornyReport.exception(e, message);
 				}
 			}
 			

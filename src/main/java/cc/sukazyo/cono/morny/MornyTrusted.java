@@ -27,6 +27,7 @@ public class MornyTrusted {
 	 */
 	public boolean isTrusted (long userId) {
 		if (userId == instance.config.trustedMaster) return true;
+		if (instance.config.trustedChat == -1) return false;
 		return MornyCoeur.extra().isUserInGroup(userId, instance.config.trustedChat, Status.administrator);
 	}
 	

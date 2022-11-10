@@ -49,6 +49,9 @@ public class ServerMain {
 	 *         {@code --api-files} 单独设定 {@link MornyCoeur#getAccount() bot client} 使用的 telegram bot file api server
 	 *     </li>
 	 *     <li>
+	 *         {@code --report-to} 设定 {@link cc.sukazyo.cono.morny.daemon.MornyReport} 的运行报告要发送到的 telegram 频道
+	 *     </li>
+	 *     <li>
 	 *         {@code --no-hello} 不在主程序启动时输出用于欢迎消息的字符画。
 	 *         与 {@code --only-hello} 参数不兼容 —— 会导致程序完全没有任何输出
 	 *     </li>
@@ -156,6 +159,10 @@ public class ServerMain {
 					case "--api-files", "files-api", "-af" -> {
 						i++;
 						config.telegramBotApiServer4File = args[i];
+						continue;
+					}
+					case "--report-to" -> {
+						config.reportToChat = Long.parseLong(args[i]);
 						continue;
 					}
 				}

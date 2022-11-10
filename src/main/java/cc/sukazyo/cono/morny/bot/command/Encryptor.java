@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
+import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.CommonConvert;
 import cc.sukazyo.cono.morny.util.CommonEncrypt;
@@ -88,6 +89,7 @@ public class Encryptor implements ITelegramCommand {
 				)).file());
 			} catch (IOException e) {
 				logger.warn("NetworkRequest error: TelegramFileAPI:\n\t" + e.getMessage());
+				MornyReport.exception(e, "NetworkRequest error: TelegramFileAPI");
 				MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
 						TelegramStickers.ID_NETWORK_ERR
@@ -110,6 +112,7 @@ public class Encryptor implements ITelegramCommand {
 				)).file());
 			} catch (IOException e) {
 				logger.warn("NetworkRequest error: TelegramFileAPI:\n\t" + e.getMessage());
+				MornyReport.exception(e, "NetworkRequest error: TelegramFileAPI");
 				MornyCoeur.extra().exec(new SendSticker(
 						event.message().chat().id(),
 						TelegramStickers.ID_NETWORK_ERR

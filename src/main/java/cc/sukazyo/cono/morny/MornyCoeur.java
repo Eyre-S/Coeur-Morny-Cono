@@ -223,7 +223,7 @@ public class MornyCoeur {
 				logger.info("Succeed login to @" + remote.username());
 				return new LogInResult(account, remote.username(), remote.id());
 			} catch (Exception e) {
-				e.printStackTrace(System.out);
+				logger.error(Log.exceptionLog(e));
 				logger.error("login failed.");
 			}
 		}
@@ -237,6 +237,14 @@ public class MornyCoeur {
 	public static void callSaveData () {
 		INSTANCE.saveDataAll();
 		logger.info("done all save action.");
+	}
+	
+	/**
+	 * 检查 Coeur 是否已经完成初始化.
+	 * @since 1.0.0-alpha5
+	 */
+	public static boolean available() {
+		return INSTANCE != null;
 	}
 	
 	/**
