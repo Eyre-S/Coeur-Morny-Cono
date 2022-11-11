@@ -162,6 +162,7 @@ public class ServerMain {
 						continue;
 					}
 					case "--report-to" -> {
+						i++;
 						config.reportToChat = Long.parseLong(args[i]);
 						continue;
 					}

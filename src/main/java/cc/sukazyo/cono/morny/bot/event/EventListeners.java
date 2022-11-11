@@ -16,6 +16,7 @@ public class EventListeners {
 	public static final OnCallMsgSend CALL_MSG_SEND = new OnCallMsgSend();
 	public static final OnMedicationNotifyApply MEDICATION_NOTIFY_APPLY = new OnMedicationNotifyApply();
 	public static final OnRandomlyTriggered RANDOMLY_TRIGGERED = new OnRandomlyTriggered();
+	public static final OnUniMeowTrigger UNI_MEOW_TRIGGER = new OnUniMeowTrigger();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
@@ -24,6 +25,7 @@ public class EventListeners {
 				/* write functional event behind here */
 //				KUOHUANHUAN_NEED_SLEEP,
 				COMMANDS_LISTENER,
+				UNI_MEOW_TRIGGER,
 				RANDOMLY_TRIGGERED,
 				USER_RANDOMS,
 				USER_SLASH_ACTION,

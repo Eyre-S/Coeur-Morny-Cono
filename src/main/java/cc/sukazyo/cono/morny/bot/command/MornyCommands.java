@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command;
 import cc.sukazyo.cono.morny.BuildConfig;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
+import cc.sukazyo.cono.morny.bot.event.OnUniMeowTrigger;
 import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
@@ -83,12 +84,15 @@ public class MornyCommands {
 		
 		// 统一注册这些奇怪的东西&.&
 		register(
+				new 私わね(),
+				new 喵呜.Progynova()
+		);
+		// special: 注册出于兼容使用的特别 event 的数据
+		OnUniMeowTrigger.register(
 				new 喵呜.抱抱(),
 				new 喵呜.揉揉(),
 				new 喵呜.蹭蹭(),
-				new 喵呜.贴贴(),
-				new 私わね(),
-				new 喵呜.Progynova()
+				new 喵呜.贴贴()
 		);
 		
 	}
