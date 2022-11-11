@@ -60,6 +60,8 @@ public class MornyCoeur {
 	 */
 	public static final long coeurStartTimestamp = ServerMain.systemStartupTime;
 	
+	private Object whileExitReason = null;
+	
 	private record LogInResult(TelegramBot account, String username, long userid) { }
 	
 	/**
@@ -152,7 +154,6 @@ public class MornyCoeur {
 	 * 用于退出时进行缓存的任务处理等进行安全退出
 	 */
 	private void exitCleanup () {
-		logger.info("clean:save tracker data.");
 		MornyDaemons.stop();
 		if (config.commandLogoutClear) {
 			commandManager.automaticRemoveList();
@@ -303,5 +304,14 @@ public class MornyCoeur {
 	}
 	
 	public static long getUserid () { return INSTANCE.userid; }
+	
+	public static void exit (int status, Object reason) {
+		INSTANCE.whileExitReason = reason;
+		System.exit(status);
+	}
+	
+	public static Object getExitReason () {
+		return INSTANCE.whileExitReason;
+	}
 	
 }

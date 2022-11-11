@@ -2,10 +2,19 @@ package cc.sukazyo.cono.morny;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.annotation.*;
 import java.util.HashSet;
 import java.util.Set;
 
 public class MornyConfig {
+	
+	/**
+	 * 表示一个字段的值属于敏感数据，不应该被执行打印等操作。
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	public @interface Sensitive {}
 	
 	/* ======================================= *
 	 *  Config props Names Definition          *
@@ -37,7 +46,7 @@ public class MornyConfig {
 	 * <p>
 	 * 这个值必须设定。
 	 */
-	@Nonnull public final String telegramBotKey;
+	@Nonnull @Sensitive public final String telegramBotKey;
 	/**
 	 * morny 所使用的 bot 的 username.
 	 * <p>

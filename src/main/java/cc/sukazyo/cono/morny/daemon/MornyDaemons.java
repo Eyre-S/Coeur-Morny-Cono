@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny.daemon;
 
+import cc.sukazyo.cono.morny.MornyCoeur;
+
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MornyDaemons {
@@ -10,6 +12,7 @@ public class MornyDaemons {
 		logger.info("ALL Morny Daemons starting...");
 //		TrackerDataManager.init();
 		medicationTimerInstance.start();
+		MornyReport.onMornyLogIn();
 		logger.info("Morny Daemons started.");
 	}
 	
@@ -23,6 +26,7 @@ public class MornyDaemons {
 //		TrackerDataManager.trackingLock.lock();
 		try { medicationTimerInstance.join(); } catch (InterruptedException e) { e.printStackTrace(System.out); }
 		
+		MornyReport.onMornyExit(MornyCoeur.getExitReason());
 		logger.info("ALL Morny Daemons STOPPED.");
 		
 	}

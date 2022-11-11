@@ -27,12 +27,12 @@ import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class OnCallMsgSend extends EventListener {
 	
-	private static final Pattern REGEX_MSG_SENDREQ_DATA_HEAD = Pattern.compile("^\\*msg([\\d-]+)(\\*\\S+)?\\n([\\s\\S]+)$");
+	private static final Pattern REGEX_MSG_SENDREQ_DATA_HEAD = Pattern.compile("^\\*msg(-?\\d+)(\\*\\S+)?(?:\\n([\\s\\S]+))?$");
 	
 	private record MessageToSend (
-			String message,
-			MessageEntity[] entities,
-			ParseMode parseMode,
+			@Nullable String message,
+			@Nullable MessageEntity[] entities,
+			@Nullable ParseMode parseMode,
 			long targetId
 	) { }
 	
@@ -62,7 +62,7 @@ public class OnCallMsgSend extends EventListener {
 			// 发送体处理
 			if (update.message().replyToMessage() == null) return answer404(update);
 			msgsendReqBody = parseRequest(update.message().replyToMessage());
-			if (msgsendReqBody == null) return answer404(update);
+			if (msgsendReqBody == null || msgsendReqBody.message == null) return answer404(update);
 			// 执行发送任务
 			SendResponse sendResponse = MornyCoeur.getAccount().execute(parseMessageToSend(msgsendReqBody));
 			if (!sendResponse.isOk()) { // 发送失败
@@ -150,7 +150,8 @@ public class OnCallMsgSend extends EventListener {
 			).replyToMessageId(update.message().messageId()).parseMode(ParseMode.HTML));
 		}
 		// 发送文本测试
-		SendResponse testSendResp = MornyCoeur.getAccount().execute(
+		if (msgsendReqBody.message == null) return true;
+		final SendResponse testSendResp = MornyCoeur.getAccount().execute(
 				parseMessageToSend(msgsendReqBody, update.message().chat().id()).replyToMessageId(update.message().messageId())
 		);
 		if (!testSendResp.isOk()) {

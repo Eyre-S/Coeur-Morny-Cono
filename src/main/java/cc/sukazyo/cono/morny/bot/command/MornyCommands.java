@@ -213,7 +213,7 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("Morny exited by user " + TGToString.as(event.message().from()).toStringLogTag());
-			System.exit(0);
+			MornyCoeur.exit(0, event.message().from());
 		} else {
 			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
