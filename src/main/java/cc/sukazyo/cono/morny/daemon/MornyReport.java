@@ -21,8 +21,12 @@ import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyReport {
 	
+	private static boolean unsupported () {
+		return !MornyCoeur.available() || MornyCoeur.config().reportToChat == -1;
+	}
+	
 	private static <T extends BaseRequest<T, R>, R extends BaseResponse> void executeReport (@Nonnull T report) {
-		if (!MornyCoeur.available()) return;
+		if (unsupported()) return;
 		try {
 			MornyCoeur.extra().exec(report);
 		} catch (EventRuntimeException.ActionFailed e) {
@@ -34,7 +38,7 @@ public class MornyReport {
 	}
 	
 	public static void exception (@Nonnull Exception e, @Nullable String description) {
-		if (!MornyCoeur.available()) return;
+		if (unsupported()) return;
 		executeReport(new SendMessage(
 				MornyCoeur.config().reportToChat,
 				String.format("""
@@ -55,7 +59,7 @@ public class MornyReport {
 	public static void exception (@Nonnull Exception e) { exception(e, null); }
 	
 	public static void unauthenticatedAction (@Nonnull String action, @Nonnull User user) {
-		if (!MornyCoeur.available()) return;
+		if (unsupported()) return;
 		executeReport(new SendMessage(
 				MornyCoeur.config().reportToChat,
 				String.format("""
@@ -131,7 +135,7 @@ public class MornyReport {
 	 *        传入 {@link null} 则表示不表明原因。
 	 */
 	static void onMornyExit (@Nullable Object causedBy) {
-		if (!MornyCoeur.available()) return;
+		if (unsupported()) return;
 		String causedTag = null;
 		if (causedBy != null) {
 			if (causedBy instanceof User)
