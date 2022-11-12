@@ -1,14 +1,25 @@
 package cc.sukazyo.cono.morny.bot.command;
 
+import cc.sukazyo.cono.morny.BuildConfig;
 import cc.sukazyo.cono.morny.MornyCoeur;
+import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.tgapi.ExtraAction;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Objects;
+
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
+import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
+import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyInformations implements ITelegramCommand {
 	
@@ -26,7 +37,7 @@ public class MornyInformations implements ITelegramCommand {
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
 		if (!command.hasArgs()) {
-			MornyCommands.onCommandRuntimeExec(event);
+			echoRuntime(event);
 			return;
 		}
 		
@@ -35,9 +46,9 @@ public class MornyInformations implements ITelegramCommand {
 		if (action.startsWith(SUB_STICKER)) {
 			echoStickers(command, event);
 		} else if (action.equals(SUB_RUNTIME)) {
-			echoRuntime(command, event);
+			echoRuntime(event);
 		} else if (action.equals(SUB_VERSION) || action.equals(SUB_VERSION_2)) {
-			echoVersion(command, event);
+			echoVersion(event);
 		} else {
 			echo404(event);
 		}
@@ -85,20 +96,134 @@ public class MornyInformations implements ITelegramCommand {
 	 * /info 子命令 {@value #SUB_RUNTIME}
 	 * @since 1.0.0-alpha4
 	 */
-	public static void echoRuntime (@Nonnull InputCommand command, @Nonnull Update event) {
-		if (command.getArgs().length == 1)
-			MornyCommands.onCommandRuntimeExec(event);
-		else echo404(event);
+	public static void echoRuntime (@Nonnull Update event) {
+		MornyCoeur.extra().exec(new SendMessage(
+				event.message().chat().id(),
+				String.format("""
+								system:
+								- <code>%s</code>
+								- <code>%s</code> (<code>%s</code>) <code>%s</code>
+								java runtime:
+								- <code>%s</code>
+								- <code>%s</code>
+								vm memory:
+								- <code>%d</code> / <code>%d</code> MB
+								- <code>%d</code> cores
+								coeur version:
+								- %s
+								- <code>%s</code>
+								- <code>%s [UTC]</code>
+								- [<code>%d</code>]
+								continuous:
+								- <code>%s</code>
+								- [<code>%d</code>]
+								- <code>%s [UTC]</code>
+								- [<code>%d</code>]""",
+						// system
+						escapeHtml(getRuntimeHostName()==null ? "<unknown-host>" : getRuntimeHostName()),
+						escapeHtml(System.getProperty("os.name")),
+						escapeHtml(System.getProperty("os.arch")),
+						escapeHtml(System.getProperty("os.version")),
+						// java
+						escapeHtml(System.getProperty("java.vm.vendor")+"."+System.getProperty("java.vm.name")),
+						escapeHtml(System.getProperty("java.vm.version")),
+						// memory
+						Runtime.getRuntime().totalMemory() / 1024 / 1024,
+						Runtime.getRuntime().maxMemory() / 1024 / 1024,
+						Runtime.getRuntime().availableProcessors(),
+						// version
+						getVersionAllFullTagHtml(),
+						escapeHtml(MornySystem.getJarMd5()),
+						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0)),
+						BuildConfig.CODE_TIMESTAMP,
+						// continuous
+						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
+						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
+						escapeHtml(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
+						MornyCoeur.coeurStartTimestamp
+				)
+		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 	}
 	
 	/**
 	 * /info 子命令 {@value #SUB_VERSION}
 	 * @since 1.0.0-alpha4
 	 */
-	public static void echoVersion (@Nonnull InputCommand command, @Nonnull Update event) {
-		if (command.getArgs().length == 1)
-			MornyCommands.onCommandVersionExec(event);
-		else echo404(event);
+	public static void echoVersion (@Nonnull Update event) {
+		MornyCoeur.extra().exec(new SendMessage(
+				event.message().chat().id(),
+				String.format(
+						"""
+						version:
+						- Morny <code>%s</code>
+						- <code>%s</code>%s%s
+						core md5_hash:
+						- <code>%s</code>
+						coding timestamp:
+						- <code>%d</code>
+						- <code>%s [UTC]</code>""",
+						escapeHtml(MornySystem.CODENAME.toUpperCase()),
+						escapeHtml(MornySystem.VERSION_BASE),
+						MornySystem.isUseDelta() ? String.format("-δ<code>%s</code>", escapeHtml(Objects.requireNonNull(MornySystem.VERSION_DELTA))) : "",
+						MornySystem.isGitBuild() ? "\n- git "+getVersionGitTagHtml() : "",
+						escapeHtml(MornySystem.getJarMd5()),
+						BuildConfig.CODE_TIMESTAMP,
+						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0))
+				)
+		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+	}
+	
+	/**
+	 * 取得 {@link MornySystem} 的 git commit 相关版本信息的 HTML 格式化标签.
+	 * @return 格式类似于 <u>{@code 28e8c82a.δ}</u> 的以 HTML 方式格式化的版本号组件。
+	 *         其中 {@code .δ} 对应着 {@link MornySystem#isCleanBuild}；
+	 *         commit tag 字段如果支援 {@link MornySystem#currentCodePath} 则会以链接形式解析，否则则为 code 格式
+	 *         <small>为了对 telegram api html 格式兼容所以不支援嵌套链接与code标签</small>。
+	 *         如果 {@link MornySystem#isGitBuild} 为 {@link false}，则方法会返回 {@link ""}
+	 * @since 1.0.0-beta2
+	 */
+	@Nonnull
+	public static String getVersionGitTagHtml () {
+		if (!MornySystem.isGitBuild()) return "";
+		final StringBuilder g = new StringBuilder();
+		final String cp = MornySystem.currentCodePath();
+		if (cp == null) g.append(String.format("<code>%s</code>", BuildConfig.COMMIT.substring(0, 8)));
+		else g.append(String.format("<a href='%s'>%s</a>", MornySystem.currentCodePath(), BuildConfig.COMMIT.substring(0, 8)));
+		if (!MornySystem.isCleanBuild()) g.append(".<code>δ</code>");
+		return g.toString();
+	}
+	
+	/**
+	 * 取得完整 Morny 版本的 HTML 格式化标签.
+	 * <p>
+	 * 相比于 {@link MornySystem#VERSION_FULL}，这个版本号还包含了 {@link MornySystem#CODENAME 版本 codename}。
+	 * 各个部分也被以 HTML 的格式进行了格式化以可以更好的在富文本中插入使用.
+	 * @return 基于 HTML 标签进行了格式化了的类似于
+	 *         <u><code>{@link MornySystem#VERSION_BASE 5.38.2-alpha1}{@link MornySystem#isUseDelta() -δ}{@link MornySystem#VERSION_DELTA tt}{@link MornySystem#isGitBuild() +git.}{@link #getVersionGitTagHtml() 28e8c82a.δ}*{@link MornySystem#CODENAME TOKYO}</code></u>
+	 *         的版本号。
+	 * @since 1.0.0-beta2
+	 */
+	@Nonnull
+	public static String getVersionAllFullTagHtml () {
+		final StringBuilder v = new StringBuilder();
+		v.append("<code>").append(MornySystem.VERSION_BASE).append("</code>");
+		if (MornySystem.isUseDelta()) v.append("-δ<code>").append(MornySystem.VERSION_DELTA).append("</code>");
+		if (MornySystem.isGitBuild()) v.append("+git.").append(getVersionGitTagHtml());
+		v.append("*<code>").append(MornySystem.CODENAME.toUpperCase()).append("</code>");
+		return v.toString();
+	}
+	
+	/**
+	 * 获取 coeur 运行时的宿主机的主机名
+	 * @return coeur 宿主机主机名，或者 {@link null} 表示获取失败
+	 */
+	@Nullable
+	public static String getRuntimeHostName () {
+		try {
+			return InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			return null;
+		}
 	}
 	
 	private static void echo404 (@Nonnull Update event) {

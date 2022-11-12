@@ -1,8 +1,6 @@
 package cc.sukazyo.cono.morny.bot.command;
 
-import cc.sukazyo.cono.morny.BuildConfig;
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.MornySystem;
 import cc.sukazyo.cono.morny.bot.event.OnUniMeowTrigger;
 import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
@@ -21,13 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 
 import static cc.sukazyo.cono.morny.Log.logger;
-import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
-import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
 import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
@@ -234,33 +228,7 @@ public class MornyCommands {
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Deprecated public String getParamRule () { return ""; }
 		@Nonnull @Deprecated public String getDescription () { return "检查 Bot 版本信息"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandVersionExec(event); }
-	}
-	public static void onCommandVersionExec (@Nonnull Update event) {
-		MornyCoeur.extra().exec(new SendMessage(
-				event.message().chat().id(),
-				String.format(
-						"""
-						version:
-						- Morny <code>%s</code>
-						- <code>%s</code>%s%s
-						core md5_hash:
-						- <code>%s</code>
-						coding timestamp:
-						- <code>%d</code>
-						- <code>%s [UTC]</code>""",
-						escapeHtml(MornySystem.CODENAME.toUpperCase()),
-						escapeHtml(MornySystem.VERSION_BASE),
-						MornySystem.isUseDelta() ? String.format("-δ<code>%s</code>", escapeHtml(Objects.requireNonNull(MornySystem.VERSION_DELTA))) : "",
-						MornySystem.isGitBuild()?"\n- git "+ (MornySystem.currentCodePath()==null ?
-								String.format("<code>%s</code>", BuildConfig.COMMIT.substring(0, 8)) :
-								String.format("<a href='%s'>%s</a>", MornySystem.currentCodePath(), BuildConfig.COMMIT.substring(0, 8))
-						) + (MornySystem.isCleanBuild() ? "" : ".<code>δ</code>") : "",
-						escapeHtml(MornySystem.getJarMd5()),
-						BuildConfig.CODE_TIMESTAMP,
-						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0))
-				)
-		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoVersion(event); }
 	}
 	
 	private static class MornyRuntime implements ISimpleCommand {
@@ -268,71 +236,7 @@ public class MornyCommands {
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Deprecated public String getParamRule () { return ""; }
 		@Nonnull @Deprecated public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandRuntimeExec(event); }
-	}
-	/**
-	 * @since 0.4.1.2
-	 */
-	public static void onCommandRuntimeExec (@Nonnull Update event) {
-		String hostname;
-		try {
-			hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			hostname = "<unknown>";
-		}
-		MornyCoeur.extra().exec(new SendMessage(
-				event.message().chat().id(),
-				String.format("""
-								system:
-								- <code>%s</code>
-								- <code>%s</code>
-								- <code>%s</code>
-								java runtime:
-								- <code>%s</code>
-								- <code>%s</code>
-								vm memory:
-								- <code>%d</code> / <code>%d</code> MB
-								- <code>%d</code> cores
-								coeur version:
-								- <code>%s</code>%s%s*<code>%s</code>
-								- <code>%s</code>
-								- <code>%s [UTC]</code>
-								- [<code>%d</code>]
-								continuous:
-								- <code>%s</code>
-								- [<code>%d</code>]
-								- <code>%s [UTC]</code>
-								- [<code>%d</code>]""",
-						// system
-						escapeHtml(hostname),
-						escapeHtml(String.format("%s (%s)", System.getProperty("os.name"), System.getProperty("os.arch"))),
-						escapeHtml(System.getProperty("os.version")),
-						// java
-						escapeHtml(System.getProperty("java.vm.vendor")+"."+System.getProperty("java.vm.name")),
-						escapeHtml(System.getProperty("java.vm.version")),
-						// memory
-						Runtime.getRuntime().totalMemory() / 1024 / 1024,
-						Runtime.getRuntime().maxMemory() / 1024 / 1024,
-						Runtime.getRuntime().availableProcessors(),
-						// version
-						escapeHtml(MornySystem.VERSION_BASE),
-						MornySystem.isUseDelta() ? String.format("-δ<code>%s</code>", escapeHtml(Objects.requireNonNull(MornySystem.VERSION_DELTA))) : "",
-						MornySystem.isGitBuild()?String.format("-git.%s%s", MornySystem.currentCodePath()==null ? (
-								String.format("<code>%s</code>", BuildConfig.COMMIT.substring(0, 8))
-						) : (
-								String.format("<a href='%s'>%s</a>", MornySystem.currentCodePath(), BuildConfig.COMMIT.substring(0, 8))
-						), MornySystem.isCleanBuild()?"":".<code>δ</code>"):"",
-						escapeHtml(MornySystem.CODENAME.toUpperCase()),
-						escapeHtml(MornySystem.getJarMd5()),
-						escapeHtml(formatDate(BuildConfig.CODE_TIMESTAMP, 0)),
-						BuildConfig.CODE_TIMESTAMP,
-						// continuous
-						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
-						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
-						escapeHtml(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
-						MornyCoeur.coeurStartTimestamp
-				)
-		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoRuntime(event); }
 	}
 	
 	private static class Jrrp implements ITelegramCommand {

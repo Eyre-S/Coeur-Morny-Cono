@@ -1,8 +1,7 @@
 package cc.sukazyo.cono.morny.daemon;
 
-import cc.sukazyo.cono.morny.Log;
-import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.MornyConfig;
+import cc.sukazyo.cono.morny.*;
+import cc.sukazyo.cono.morny.bot.command.MornyInformations;
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException;
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 import com.google.gson.GsonBuilder;
@@ -74,16 +73,18 @@ public class MornyReport {
 	 * morny 登陆时的报告发送，包含已登录的账号 id 以及启动配置。
 	 * @since 1.0.0-alpha6
 	 */
-	public static void onMornyLogIn () {
+	static void onMornyLogIn () {
 		executeReport(new SendMessage(
 				MornyCoeur.config().reportToChat,
 				String.format("""
 						<b>▌Morny Logged in</b>
+						-v %s
 						as user @%s
 						
 						as config fields:
 						%s
 						""",
+						MornyInformations.getVersionAllFullTagHtml(),
 						MornyCoeur.getUsername(),
 						sectionConfigFields(MornyCoeur.config())
 				)
