@@ -4,9 +4,6 @@ import cc.sukazyo.cono.morny.util.CommonFormat;
 
 import javax.annotation.Nonnull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
@@ -18,8 +15,7 @@ import static cc.sukazyo.cono.morny.Log.logger;
  */
 public class ServerMain {
 	
-	public static final String PROP_TOKEN_KEY = "TELEGRAM_BOT_API_TOKEN";
-	public static final String PROP_TOKEN_MORNY_KEY = "MORNY_TG_TOKEN";
+	public static final long systemStartupTime = System.currentTimeMillis();
 	
 	private static final String THREAD_MORNY_INIT = "morny-init";
 	
@@ -53,11 +49,14 @@ public class ServerMain {
 	 *         {@code --api-files} 单独设定 {@link MornyCoeur#getAccount() bot client} 使用的 telegram bot file api server
 	 *     </li>
 	 *     <li>
+	 *         {@code --report-to} 设定 {@link cc.sukazyo.cono.morny.daemon.MornyReport} 的运行报告要发送到的 telegram 频道
+	 *     </li>
+	 *     <li>
 	 *         {@code --no-hello} 不在主程序启动时输出用于欢迎消息的字符画。
 	 *         与 {@code --only-hello} 参数不兼容 —— 会导致程序完全没有任何输出
 	 *     </li>
 	 *     <li>
-	 *         {@code --outdated-block} 会使得 {@link MornyCoeur#latestEventTimestamp}
+	 *         {@code --outdated-block} 会使得 {@link MornyConfig#eventIgnoreOutdated}
 	 *         赋值为程序启动的时间，从而造成阻挡程序启动之前的消息事件处理效果。
 	 *     </li>
 	 *     <li>
@@ -85,20 +84,12 @@ public class ServerMain {
 		//#
 		//# 启动参数设置区块
 		//#
-		
+		final MornyConfig.Prototype config = new MornyConfig.Prototype();
 		boolean versionEchoMode = false;
 		boolean welcomeEchoMode = false;
 		boolean showWelcome = true;
-		String key = null;
-		String username = null;
-		boolean outdatedBlock = false;
-		long master = 793274677L;
-		Set<Long> trustedReadersOfDinner = new HashSet<>();
-		long trustedChat = -1001541451710L;
-		boolean autoCmdList = false;
-		boolean autoCmdRemove = false;
-		String api = null;
-		String api4File = null;
+		
+		config.eventOutdatedTimestamp = systemStartupTime;
 		
 		for (int i = 0; i < args.length; i++) {
 			
@@ -106,7 +97,7 @@ public class ServerMain {
 				
 				switch (args[i]) {
 					case "--outdated-block", "-ob" -> {
-						outdatedBlock = true;
+						config.eventIgnoreOutdated = true;
 						continue;
 					}
 					case "--no-hello", "-hf", "--quiet", "-q" -> {
@@ -123,51 +114,56 @@ public class ServerMain {
 					}
 					case "--token", "-t" -> {
 						i++;
-						key = args[i];
+						config.telegramBotKey = args[i];
 						continue;
 					}
 					case "--username", "-u" -> {
 						i++;
-						username = args[i];
+						config.telegramBotUsername = args[i];
 						continue;
 					}
 					case "--master", "-mm" -> {
 						i++;
-						master = Long.parseLong(args[i]);
+						config.trustedMaster = Long.parseLong(args[i]);
 						continue;
 					}
 					case "--trusted-chat", "-trs" -> {
 						i++;
-						trustedChat = Long.parseLong(args[i]);
+						config.trustedChat = Long.parseLong(args[i]);
 						continue;
 					}
 					//noinspection SpellCheckingInspection
 					case "--trusted-reader-dinner", "-trsd" -> {
 						i++;
-						trustedReadersOfDinner.add(Long.parseLong(args[i]));
+						config.dinnerTrustedReaders.add(Long.parseLong(args[i]));
 						continue;
 					}
 					case "--auto-cmd", "-cmd", "-c" -> {
-						autoCmdList = true;
-						autoCmdRemove = true;
+						config.commandLoginRefresh = true;
+						config.commandLogoutClear = true;
 						continue;
 					}
 					case "--auto-cmd-list", "-ca" -> {
-						autoCmdList = true;
+						config.commandLoginRefresh = true;
 						continue;
 					}
 					case "--auto-cmd-remove", "-cr" -> {
-						autoCmdRemove = true;
+						config.commandLogoutClear = true;
 						continue;
 					}
 					case "--api", "-a" -> {
 						i++;
-						api = args[i];
+						config.telegramBotApiServer = args[i];
 						continue;
 					}
 					case "--api-files", "files-api", "-af" -> {
 						i++;
-						api4File = args[i];
+						config.telegramBotApiServer4File = args[i];
+						continue;
+					}
+					case "--report-to" -> {
+						i++;
+						config.reportToChat = Long.parseLong(args[i]);
 						continue;
 					}
 				}
@@ -180,7 +176,7 @@ public class ServerMain {
 		
 		String propToken = null;
 		String propTokenKey = null;
-		for (String iKey : new String[]{PROP_TOKEN_KEY, PROP_TOKEN_MORNY_KEY}) {
+		for (String iKey : MornyConfig.PROP_TOKEN_KEY) {
 			if (System.getenv(iKey) != null) {
 				propToken = System.getenv(iKey);
 				propTokenKey = iKey;
@@ -196,16 +192,26 @@ public class ServerMain {
 			logger.info(String.format("""
 					Morny Cono Version
 					- version :
-					    %s  %s
+					    Morny %s
+					    %s%s
 					- md5hash :
+					    %s
+					- gitstat :
 					    %s
 					- co.time :
 					    %d
 					    %s [UTC]""",
-					MornySystem.VERSION, MornySystem.CODENAME.toUpperCase(),
+					MornySystem.CODENAME.toUpperCase(),
+					MornySystem.VERSION_BASE,
+					MornySystem.isUseDelta() ? "-δ"+MornySystem.VERSION_DELTA : "",
 					MornySystem.getJarMd5(),
-					GradleProjectConfigures.COMPILE_TIMESTAMP,
-					CommonFormat.formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)
+					MornySystem.isGitBuild() ? (String.format(
+							"on commit %s\n    %s",
+							MornySystem.isCleanBuild() ? "- clean-build" : "<δ/non-clean-build>",
+							BuildConfig.COMMIT
+					)) : "<non-git-build>",
+					BuildConfig.CODE_TIMESTAMP,
+					CommonFormat.formatDate(BuildConfig.CODE_TIMESTAMP, 0)
 			));
 			return;
 			
@@ -216,11 +222,12 @@ public class ServerMain {
 		
 		logger.info(String.format("""
 				ServerMain.java Loaded >>>
-				- version %s (%s)(%d)
-				- Morny %s""",
-				MornySystem.VERSION,
-				MornySystem.getJarMd5(), GradleProjectConfigures.COMPILE_TIMESTAMP,
-				MornySystem.CODENAME.toUpperCase()
+				- version %s
+				- Morny %s
+				- <%s> [%d]""",
+				MornySystem.VERSION_FULL,
+				MornySystem.CODENAME.toUpperCase(),
+				MornySystem.getJarMd5(), BuildConfig.CODE_TIMESTAMP
 		));
 		
 		//#
@@ -228,21 +235,19 @@ public class ServerMain {
 		//#
 		
 		if (propToken != null) {
-			key = propToken;
+			config.telegramBotKey = propToken;
 			logger.info("Parameter <token> set by EnvVar $"+propTokenKey);
 		}
-		if (key == null) {
-			logger.info("Parameter required has no value:\n --token.");
-			return;
-		}
+		
 		Thread.currentThread().setName(THREAD_MORNY_INIT);
-		MornyCoeur.main(
-				api, api4File,
-				key, username,
-				master, trustedChat, trustedReadersOfDinner,
-				outdatedBlock?System.currentTimeMillis():0,
-				autoCmdList, autoCmdRemove
-		);
+		try {
+			MornyCoeur.main(new MornyConfig(config));
+		} catch (MornyConfig.CheckFailure.NullTelegramBotKey ignore) {
+			logger.info("Parameter required has no value:\n --token.");
+		} catch (MornyConfig.CheckFailure e) {
+			logger.error("Unknown failure occurred while starting ServerMain!:");
+			e.printStackTrace(System.out);
+		}
 		
 	}
 	

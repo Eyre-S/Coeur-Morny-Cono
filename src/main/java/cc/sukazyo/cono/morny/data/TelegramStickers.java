@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 
 /**
@@ -24,7 +25,14 @@ public class TelegramStickers {
 	public static final String ID_PROGYNOVA = "CAACAgUAAxkBAAICm2KEuL7UQqNP7vSPCg2DHJIND6UsAAKLAwACH4WSBszIo722aQ3jJAQ";
 	public static final String ID_NETWORK_ERR = "CAACAgEAAxkBAAID0WNJgNEkD726KW4vZeFlw0FlVVyNAAIXJgACePzGBb50o7O1RbxoKgQ";
 	
-	public static void echoAllStickers (ExtraAction actionObject, long sentChat, int replyToMessageId) {
+	/**
+	 * 向 telegram 输出当前的 {@link TelegramStickers} 中的所有 stickers.
+	 * @param actionObject 要使用的 telegram account 包装实例
+	 * @param sentChat 目标 telegram chat id
+	 * @param replyToMessageId 输出时回复指定的消息的 id。使用 {@link -1} 表示不回复消息
+	 * @since 0.8.0.6
+	 */
+	public static void echoAllStickers (@Nonnull ExtraAction actionObject, long sentChat, int replyToMessageId) {
 		
 		for (Field object : TelegramStickers.class.getFields()) {
 			if (object.getType()==String.class && object.getName().startsWith("ID_")) {
@@ -45,7 +53,18 @@ public class TelegramStickers {
 		
 	}
 	
-	public static void echoStickerByID (String stickerFieldID, ExtraAction actionObject, long sentChat, int replyToMessageId) {
+	/**
+	 * 向 telegram 输出当前的 {@link TelegramStickers} 中的某个特定 sticker.
+	 * @param stickerFieldID 要输出的 sticker 在 {@link TelegramStickers} 当中的字段名
+	 * @param actionObject 要使用的 telegram account 包装实例
+	 * @param sentChat 目标 telegram chat id
+	 * @param replyToMessageId 输出时回复指定的消息的 id。使用 {@link -1} 表示不回复消息
+	 * @since 0.8.0.6
+	 */
+	public static void echoStickerByID (
+			@Nonnull String stickerFieldID,
+			@Nonnull ExtraAction actionObject, long sentChat, int replyToMessageId
+	) {
 		try {
 			// normally get the sticker and echo
 			Field sticker = TelegramStickers.class.getField(stickerFieldID);

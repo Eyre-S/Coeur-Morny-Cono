@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.bot.command;
 
-import cc.sukazyo.cono.morny.GradleProjectConfigures;
 import cc.sukazyo.cono.morny.MornyCoeur;
-import cc.sukazyo.cono.morny.MornySystem;
+import cc.sukazyo.cono.morny.bot.event.OnUniMeowTrigger;
+import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.data.MornyJrrp;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
@@ -19,16 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cc.sukazyo.cono.morny.Log.logger;
-import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
-import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
 import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
 public class MornyCommands {
@@ -85,12 +78,15 @@ public class MornyCommands {
 		
 		// 统一注册这些奇怪的东西&.&
 		register(
+				new 私わね(),
+				new 喵呜.Progynova()
+		);
+		// special: 注册出于兼容使用的特别 event 的数据
+		OnUniMeowTrigger.register(
 				new 喵呜.抱抱(),
 				new 喵呜.揉揉(),
 				new 喵呜.蹭蹭(),
-				new 喵呜.贴贴(),
-				new 私わね(),
-				new 喵呜.Progynova()
+				new 喵呜.贴贴()
 		);
 		
 	}
@@ -215,7 +211,7 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("Morny exited by user " + TGToString.as(event.message().from()).toStringLogTag());
-			System.exit(0);
+			MornyCoeur.exit(0, event.message().from());
 		} else {
 			MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
@@ -223,102 +219,24 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("403 exited tag from user " + TGToString.as(event.message().from()).toStringLogTag());
+			MornyReport.unauthenticatedAction("/exit", event.message().from());
 		}
 	}
 	
-	private static class Version implements ITelegramCommand {
+	private static class Version implements ISimpleCommand {
 		@Nonnull @Override public String getName () { return "version"; }
 		@Nullable @Override public String[] getAliases () { return null; }
-		@Nonnull @Override public String getParamRule () { return ""; }
-		@Nonnull @Override public String getDescription () { return "检查 Bot 版本信息"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandVersionExec(event); }
-	}
-	private static void onCommandVersionExec (@Nonnull Update event) {
-		MornyCoeur.extra().exec(new SendMessage(
-				event.message().chat().id(),
-				String.format(
-						"""
-						version:
-						- Morny <code>%s</code>
-						- <code>%s</code>
-						core md5_hash:
-						- <code>%s</code>
-						compile timestamp:
-						- <code>%d</code>
-						- <code>%s [UTC]</code>""",
-						escapeHtml(MornySystem.CODENAME.toUpperCase()),
-						escapeHtml(MornySystem.VERSION),
-						escapeHtml(MornySystem.getJarMd5()),
-						GradleProjectConfigures.COMPILE_TIMESTAMP,
-						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0))
-				)
-		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		@Nonnull @Deprecated public String getParamRule () { return ""; }
+		@Nonnull @Deprecated public String getDescription () { return "检查 Bot 版本信息"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoVersion(event); }
 	}
 	
-	private static class MornyRuntime implements ITelegramCommand {
+	private static class MornyRuntime implements ISimpleCommand {
 		@Nonnull @Override public String getName () { return "runtime"; }
 		@Nullable @Override public String[] getAliases () { return null; }
-		@Nonnull @Override public String getParamRule () { return ""; }
-		@Nonnull @Override public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandRuntimeExec(event); }
-	}
-	/**
-	 * @since 0.4.1.2
-	 */
-	private static void onCommandRuntimeExec (@Nonnull Update event) {
-		String hostname;
-		try {
-			hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			hostname = "<unknown>";
-		}
-		MornyCoeur.extra().exec(new SendMessage(
-				event.message().chat().id(),
-				String.format("""
-								system:
-								- <code>%s</code>
-								- <code>%s</code>
-								- <code>%s</code>
-								java runtime:
-								- <code>%s</code>
-								- <code>%s</code>
-								vm memory:
-								- <code>%d</code> / <code>%d</code> MB
-								- <code>%d</code> cores
-								coeur version:
-								- <code>%s</code> (<code>%s</code>)
-								- <code>%s</code>
-								- <code>%s [UTC]</code>
-								- [<code>%d</code>]
-								continuous:
-								- <code>%s</code>
-								- [<code>%d</code>]
-								- <code>%s [UTC]</code>
-								- [<code>%d</code>]""",
-						// system
-						escapeHtml(hostname),
-						escapeHtml(String.format("%s (%s)", System.getProperty("os.name"), System.getProperty("os.arch"))),
-						escapeHtml(System.getProperty("os.version")),
-						// java
-						escapeHtml(System.getProperty("java.vm.vendor")+"."+System.getProperty("java.vm.name")),
-						escapeHtml(System.getProperty("java.vm.version")),
-						// memory
-						Runtime.getRuntime().totalMemory() / 1024 / 1024,
-						Runtime.getRuntime().maxMemory() / 1024 / 1024,
-						Runtime.getRuntime().availableProcessors(),
-						// version
-						escapeHtml(MornySystem.VERSION),
-						escapeHtml(MornySystem.CODENAME),
-						escapeHtml(MornySystem.getJarMd5()),
-						escapeHtml(formatDate(GradleProjectConfigures.COMPILE_TIMESTAMP, 0)),
-						GradleProjectConfigures.COMPILE_TIMESTAMP,
-						// continuous
-						escapeHtml(formatDuration(System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp)),
-						System.currentTimeMillis() - MornyCoeur.coeurStartTimestamp,
-						escapeHtml(formatDate(MornyCoeur.coeurStartTimestamp, 0)),
-						MornyCoeur.coeurStartTimestamp
-				)
-		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
+		@Nonnull @Deprecated public String getParamRule () { return ""; }
+		@Nonnull @Deprecated public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoRuntime(event); }
 	}
 	
 	private static class Jrrp implements ITelegramCommand {
@@ -367,6 +285,7 @@ public class MornyCommands {
 					).replyToMessageId(event.message().messageId())
 			);
 			logger.info("403 call save tag from user " + TGToString.as(event.message().from()).toStringLogTag());
+			MornyReport.unauthenticatedAction("/save", event.message().from());
 		}
 	}
 

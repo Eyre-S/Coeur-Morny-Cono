@@ -1,16 +1,70 @@
+import org.ajoberstar.grgit.Status
+
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+
 plugins {
 	id 'java'
 	id 'java-library'
-	id 'maven-publish'
 	id 'application'
-	id 'com.github.johnrengelman.shadow' version '7.1.0'
+	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'com.github.gmazzo.buildconfig' version '3.1.0'
+	id 'org.ajoberstar.grgit' version '5.0.0'
 }
 
-group 'cc.sukazyo'
-version VERSION
-project.ext.archiveBaseName = 'Coeur_Morny_Cono'
-project.ext.artifactId = 'morny-coeur'
-mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
+final boolean proj_git = grgit!=null
+final String proj_store = MORNY_CODE_STORE
+final String proj_commit = proj_git ? grgit.head().id : null
+final String proj_commit_path = MORNY_COMMIT_PATH
+final boolean proj_clean = isCleanBuild()
+if (!proj_git)
+	print "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
+else if (isCleanBuild()) {
+	print "git: clean build at ${grgit.head().id}"
+} else {
+	final Status status = grgit.status()
+	print "git: non-clean-build"
+	if (!status.unstaged.allChanges.empty) {
+		print "\ngit: unstaged changes"
+		listChanges(status.unstaged)
+	}
+	if (!status.staged.allChanges.empty) {
+		print "\ngit: staged changes"
+		listChanges(status.staged)
+	}
+}
+
+final String proj_group = 'cc.sukazyo'
+final String proj_package = "${proj_group}.cono.morny"
+final String proj_archive_name = MORNY_ARCHIVE_NAME
+final String proj_application_main = "${proj_package}.ServerMain"
+
+final String proj_version_base = VERSION
+final String proj_version_delta = VERSION_DELTA
+final boolean proj_version_use_delta = Boolean.parseBoolean(USE_DELTA)
+final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
+final String proj_version_full = proj_version + (proj_git ? "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ") : "")
+final String proj_version_codename = CODENAME
+final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
+
+final JavaVersion proj_java = JavaVersion.VERSION_17
+final Charset proj_file_encoding = StandardCharsets.UTF_8
+
+String publish_local_url = null
+String publish_remote_url = null
+String publish_remote_username = null
+String publish_remote_password = null
+if (project.hasProperty("publishLocalArchiveRepoUrl")) publish_local_url = publishLocalArchiveRepoUrl
+if (project.hasProperty("publishMvnRepoUrl")) {
+	publish_remote_url = publishMvnRepoUrl
+	publish_remote_username = publishMvnRepoUsername
+	publish_remote_password = publishMvnRepoPassword
+}
+
+group proj_group
+version proj_version_full
+setArchivesBaseName proj_archive_name
 
 repositories {
 	mavenCentral()
@@ -31,19 +85,9 @@ dependencies {
 	
 }
 
-task updateVersionCode {
-	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'CODENAME = ["a-zA-Z0-9]+;', replace:"CODENAME = \"${CODENAME}\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'COMPILE_TIMESTAMP = [0-9]+L;', replace:"COMPILE_TIMESTAMP = ${System.currentTimeMillis()}L;", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
+application {
+	mainClass = proj_application_main
 }
-
-compileJava.dependsOn updateVersionCode
 
 test {
 	useJUnitPlatform()
@@ -51,54 +95,90 @@ test {
 
 java {
 	
-	sourceCompatibility JavaVersion.VERSION_17
-	targetCompatibility JavaVersion.VERSION_17
+	sourceCompatibility proj_java
+	targetCompatibility proj_java
 	
 	withSourcesJar()
 	
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+	options.encoding = proj_file_encoding.name()
 }
 
 tasks.withType(Javadoc) {
-	options.encoding = 'UTF-8'
-	options.docEncoding = 'UTF-8'
-	options.charSet = 'UTF-8'
+	options.encoding = proj_file_encoding.name()
+	options.docEncoding = proj_file_encoding.name()
+	options.charSet = proj_file_encoding.name()
 }
 
 tasks.test {
 	useJUnitPlatform()
 }
 
+buildConfig {
+	
+	packageName(proj_package)
+	
+	buildConfigField('String', 'VERSION', "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_FULL', "\"${proj_version_full}\"")
+	buildConfigField('String', 'VERSION_BASE', "\"${proj_version_base}\"")
+	buildConfigField('String', 'VERSION_DELTA', proj_version_use_delta ? "\"${proj_version_delta}\"" : "null")
+	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")
+	buildConfigField('long', 'CODE_TIMESTAMP', "${proj_code_time}L")
+	buildConfigField('String',  'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
+	buildConfigField('boolean', 'CLEAN_BUILD', "${proj_clean}")
+	buildConfigField('String', 'CODE_STORE', proj_store==""?"null":"\"${proj_store}\"")
+	buildConfigField('String', 'COMMIT_PATH', proj_commit_path==""?"null":"\"${proj_commit_path}\"")
+	
+}
+
 shadowJar {
-	archiveBaseName.set("${project.ext.archiveBaseName}")
-	archiveVersion.set("${project.version}")
-	archiveClassifier.set("fat")
+	archiveClassifier.set "fat"
+}
+
+@SuppressWarnings("all")
+boolean isCleanBuild () {
+	if (grgit == null) return false
+	Set<String> changes = grgit.status().unstaged.allChanges + grgit.status().staged.allChanges
+	for (String file in changes) {
+		if (file.startsWith("src/")) return false
+		if (file == "build.gradle") return false
+		if (file == "gradle.properties") return false
+	}
+	return true
+}
+
+void listChanges (Status.Changes listing) {
+	for (String file in listing.added)
+		print "\n    add: ${file}"
+	for (String file in listing.modified)
+		print "\n    mod: ${file}"
+	for (String file in listing.removed)
+		print "\n    del: ${file}"
 }
 
 publishing {
 	repositories{
-		maven {
-			name 'builds'
-			url publishLocalArchiveRepoUrl
+		if (publish_local_url != null) maven {
+			name 'archives'
+			url publish_local_url
 		}
-		maven {
+		if (publish_remote_url != null) maven {
 			name '-ws-'
-			url publishMvnRepoUrl
+			url publish_remote_url
 			credentials {
-				username publishMvnRepoUsername
-				password publishMvnRepoPassword
+				username publish_remote_username
+				password publish_remote_password
 			}
 		}
 	}
 	publications {
 		main (MavenPublication) {
 			from components.java
-			groupId = project.group
-			artifactId = project.ext.artifactId
-			version = project.version
+			groupId = proj_group
+			artifactId = proj_archive_name
+			version = proj_version
 		}
 	}
 }

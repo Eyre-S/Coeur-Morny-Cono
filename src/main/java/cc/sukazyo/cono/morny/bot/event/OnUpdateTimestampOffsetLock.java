@@ -7,7 +7,7 @@ import com.pengrad.telegrambot.model.Update;
 import javax.annotation.Nonnull;
 
 /**
- * 阻止 {@link MornyCoeur#latestEventTimestamp 指定时间} 之前的事件处理.
+ * 阻止 {@link cc.sukazyo.cono.morny.MornyConfig#eventOutdatedTimestamp 指定时间} 之前的事件处理.
  * <p>
  * 只支持以下事件
  * <ul>
@@ -27,7 +27,7 @@ public class OnUpdateTimestampOffsetLock extends EventListener {
 	 * @since 0.4.2.7
 	 */
 	public boolean isOutdated(long timestamp) {
-		return timestamp < MornyCoeur.getLatestEventTimestamp()/1000;
+		return timestamp < MornyCoeur.config().eventOutdatedTimestamp/1000;
 	}
 	
 	@Override

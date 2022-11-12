@@ -9,7 +9,7 @@ public class MornyCLI {
 	public static void main (String[] args) {
 		
 		Scanner line = new Scanner(System.in);
-		System.out.print("$ java -jar morny-coeur-"+GradleProjectConfigures.VERSION+".jar " );
+		System.out.print("$ java -jar morny-coeur-"+MornySystem.VERSION_FULL+".jar " );
 		String x = line.nextLine();
 		ServerMain.main(UniversalCommand.format(x));
 		

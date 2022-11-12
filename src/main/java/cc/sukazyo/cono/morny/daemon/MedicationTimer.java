@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cc.sukazyo.cono.morny.Log.exceptionLog;
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MedicationTimer extends Thread {
@@ -40,7 +41,8 @@ public class MedicationTimer extends Thread {
 				logger.info("MedicationTimer was interrupted, will be exit now");
 			} catch (Exception e) {
 				logger.error("Unexpected error occurred");
-				e.printStackTrace(System.out);
+				logger.error(exceptionLog(e));
+				MornyReport.exception(e);
 			}
 		}
 		logger.info("MedicationTimer stopped");

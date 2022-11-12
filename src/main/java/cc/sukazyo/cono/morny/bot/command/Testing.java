@@ -28,7 +28,7 @@ public class Testing implements ISimpleCommand {
 		
 		MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
-				"<b>Just<b/> a TEST command."
+				"<b>Just</b> a TEST command."
 		).replyToMessageId(event.message().messageId()).parseMode(ParseMode.HTML));
 		
 	}

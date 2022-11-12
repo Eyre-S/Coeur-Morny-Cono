@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny.bot.api;
 
+import cc.sukazyo.cono.morny.Log;
+import cc.sukazyo.cono.morny.daemon.MornyReport;
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException;
 import com.google.gson.GsonBuilder;
 import com.pengrad.telegrambot.model.Update;
@@ -32,27 +34,20 @@ public class EventListenerManager {
 					
 					if (exec.apply(x)) return;
 					
-				} catch (EventRuntimeException e) {
-					
-					final StringBuilder errorMessage = new StringBuilder();
-					errorMessage.append("Event runtime breaks: " + e.getMessage()).append('\n');
-					errorMessage.append("at " + e.getStackTrace()[0].toString()).append('\n');
-					errorMessage.append("at " + e.getStackTrace()[1].toString()).append('\n');
-					errorMessage.append("at " + e.getStackTrace()[2].toString()).append('\n');
-					errorMessage.append("at " + e.getStackTrace()[3].toString()).append('\n');
-					if (e instanceof EventRuntimeException.ActionFailed) {
-						errorMessage.append((
-								"\"telegram request track\": " +
-								new GsonBuilder().setPrettyPrinting().create().toJson(((EventRuntimeException.ActionFailed)e).getResponse())
-						).indent(4)).append('\n');
-					}
-					
-					logger.error(errorMessage.toString());
-					
 				} catch (Exception e) {
 					
-					logger.error("Event Error!");
-					e.printStackTrace(System.out);
+					final StringBuilder errorMessage = new StringBuilder();
+					errorMessage.append("Event throws unexpected exception:\n");
+					errorMessage.append(Log.exceptionLog(e).indent(4));
+					if (e instanceof EventRuntimeException.ActionFailed) {
+						errorMessage.append("\ntg-api action: response track: ");
+						errorMessage.append(new GsonBuilder().setPrettyPrinting().create().toJson(
+								((EventRuntimeException.ActionFailed)e).getResponse()
+						).indent(4)).append('\n');
+					}
+					logger.error(errorMessage.toString());
+					
+					MornyReport.exception(e, "on event running");
 					
 				}
 			}
