@@ -9,14 +9,19 @@ import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static cc.sukazyo.cono.morny.Log.exceptionLog;
 import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MedicationTimer extends Thread {
 	
+	public static final ZoneOffset USE_TIME_ZONE = ZoneOffset.ofHours(8);
+	public static final Set<Integer> NOTIFY_AT_HOUR = Set.of(12);
 	public static final long NOTIFY_CHAT = -1001729016815L;
 	public static final String NOTIFY_MESSAGE = "\uD83C\uDF65⏲";
 	private static final String DAEMON_THREAD_NAME = "TIMER_Medication";
@@ -69,12 +74,19 @@ public class MedicationTimer extends Thread {
 		lastNotify = LAST_NOTIFY_ID_NULL;
 	}
 	
-	private static long calcNextRoutineTimestamp () {
-		return ((System.currentTimeMillis()+8*60*60*1000) / (12*60*60*1000) + 1) * 12*60*60*1000 - 8*60*60*1000;
+	public static long calcNextRoutineTimestamp (long baseTimeMillis, ZoneOffset useTimeZone, Set<Integer> atHours) {
+		LocalDateTime time = LocalDateTime.ofEpochSecond(
+				baseTimeMillis/1000, (int)baseTimeMillis%1000*1000*1000,
+				useTimeZone
+		).withMinute(0).withSecond(0).withNano(0);
+		do {
+			time = time.plusHours(1);
+		} while (!atHours.contains(time.getHour()));
+		return time.withMinute(0).withSecond(0).withNano(0).toInstant(useTimeZone).toEpochMilli();
 	}
 	
 	private void waitToNextRoutine () throws InterruptedException {
-		sleep(calcNextRoutineTimestamp() - System.currentTimeMillis());
+		sleep(calcNextRoutineTimestamp(System.currentTimeMillis(), USE_TIME_ZONE, NOTIFY_AT_HOUR) - System.currentTimeMillis());
 	}
 	
 }
