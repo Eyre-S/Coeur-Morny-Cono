@@ -76,7 +76,7 @@ public class MedicationTimer extends Thread {
 	
 	public static long calcNextRoutineTimestamp (long baseTimeMillis, ZoneOffset useTimeZone, Set<Integer> atHours) {
 		LocalDateTime time = LocalDateTime.ofEpochSecond(
-				baseTimeMillis/1000, (int)baseTimeMillis%1000*1000*1000,
+				baseTimeMillis/1000, (int)baseTimeMillis%1000*1000,
 				useTimeZone
 		).withMinute(0).withSecond(0).withNano(0);
 		do {
