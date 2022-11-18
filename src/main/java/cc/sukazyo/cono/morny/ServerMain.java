@@ -4,6 +4,8 @@ import cc.sukazyo.cono.morny.util.CommonFormat;
 
 import javax.annotation.Nonnull;
 
+import java.time.ZoneOffset;
+
 import static cc.sukazyo.cono.morny.Log.logger;
 
 /**
@@ -164,6 +166,22 @@ public class ServerMain {
 					case "--report-to" -> {
 						i++;
 						config.reportToChat = Long.parseLong(args[i]);
+						continue;
+					}
+					case "--medication-notify-chat", "-medc" -> {
+						i++;
+						config.medicationNotifyToChat = Long.parseLong(args[i]);
+						continue;
+					}
+					case "--medication-notify-timezone", "-medtz" -> {
+						i++;
+						config.medicationTimerUseTimezone = ZoneOffset.ofHours(Integer.parseInt(args[i]));
+						continue;
+					}
+					case "--medication-notify-times", "-medt" -> {
+						i++;
+						for (String u : args[i].split(","))
+							config.medicationNotifyAt.add(Integer.parseInt(u));
 						continue;
 					}
 				}

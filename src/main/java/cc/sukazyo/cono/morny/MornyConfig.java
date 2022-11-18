@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.*;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -115,6 +116,16 @@ public class MornyConfig {
 	public final long dinnerChatId;
 	
 	/* ======================================= *
+	 *  function: medication timer             *
+	 * ======================================= */
+	
+	public final long medicationNotifyToChat;
+	
+	@Nonnull public final ZoneOffset medicationTimerUseTimezone;
+	
+	@Nonnull public final Set<Integer> medicationNotifyAt;
+	
+	/* ======================================= *
 	 *  End Configs | ConfigBuilder            *
 	 * ======================================= */
 	
@@ -134,11 +145,16 @@ public class MornyConfig {
 		this.dinnerTrustedReaders = prototype.dinnerTrustedReaders;
 		this.dinnerChatId = prototype.dinnerChatId;
 		this.reportToChat = prototype.reportToChat;
+		this.medicationNotifyToChat = prototype.medicationNotifyToChat;
+		this.medicationTimerUseTimezone = prototype.medicationTimerUseTimezone;
+		prototype.medicationNotifyAt.forEach(i -> { if (i < 0 || i > 23) throw new CheckFailure.UnavailableTimeInMedicationNotifyAt(); });
+		this.medicationNotifyAt = prototype.medicationNotifyAt;
 	}
 	
-	public static class CheckFailure extends Exception {
+	public static class CheckFailure extends RuntimeException {
 		public static class NullTelegramBotKey extends CheckFailure {}
 		public static class UnsetEventOutdatedTimestamp extends CheckFailure {}
+		public static class UnavailableTimeInMedicationNotifyAt extends CheckFailure {}
 	}
 	
 	public static class Prototype {
@@ -156,6 +172,9 @@ public class MornyConfig {
 		@Nonnull public Set<Long> dinnerTrustedReaders = new HashSet<>();
 		public long dinnerChatId = -1001707106392L;
 		public long reportToChat = -1001650050443L;
+		public long medicationNotifyToChat = -1001729016815L;
+		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
+		@Nonnull public Set<Integer> medicationNotifyAt = new HashSet<>();
 		
 	}
 	

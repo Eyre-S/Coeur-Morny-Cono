@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event;
 
+import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.daemon.MedicationTimer;
 import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -20,7 +20,7 @@ public class OnMedicationNotifyApply extends EventListener {
 	}
 	
 	private boolean editedMessageProcess (Message edited) {
-		if (edited.chat().id() != MedicationTimer.NOTIFY_CHAT) return false;
+		if (edited.chat().id() != MornyCoeur.config().medicationNotifyToChat) return false;
 		MornyDaemons.medicationTimerInstance.refreshNotificationWrite(edited);
 		return true;
 	}

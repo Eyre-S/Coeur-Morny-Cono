@@ -20,15 +20,16 @@ import static cc.sukazyo.cono.morny.Log.logger;
 
 public class MedicationTimer extends Thread {
 	
-	public static final ZoneOffset USE_TIME_ZONE = ZoneOffset.ofHours(8);
-	public static final Set<Integer> NOTIFY_AT_HOUR = Set.of(12);
-	public static final long NOTIFY_CHAT = -1001729016815L;
+	private final ZoneOffset USE_TIME_ZONE = MornyCoeur.config().medicationTimerUseTimezone;
+	private final Set<Integer> NOTIFY_AT_HOUR = MornyCoeur.config().medicationNotifyAt;
+	private final long NOTIFY_CHAT = MornyCoeur.config().medicationNotifyToChat;
 	public static final String NOTIFY_MESSAGE = "\uD83C\uDF65⏲";
 	private static final String DAEMON_THREAD_NAME = "TIMER_Medication";
 	
 	private static final long LAST_NOTIFY_ID_NULL = -1L;
 	private long lastNotify = LAST_NOTIFY_ID_NULL;
 	
+	public static class NoNotifyTimeTag extends Throwable { private NoNotifyTimeTag(){} }
 	
 	MedicationTimer () {
 		super(DAEMON_THREAD_NAME);
@@ -44,6 +45,9 @@ public class MedicationTimer extends Thread {
 			} catch (InterruptedException e) {
 				interrupt();
 				logger.info("MedicationTimer was interrupted, will be exit now");
+			} catch (NoNotifyTimeTag ignored) {
+				logger.warn("Notify Time not Set and the MedicationTimer will not working!\nMedicationTimer will be exit now.");
+				interrupt();
 			} catch (Exception e) {
 				logger.error("Unexpected error occurred");
 				logger.error(exceptionLog(e));
@@ -74,9 +78,11 @@ public class MedicationTimer extends Thread {
 		lastNotify = LAST_NOTIFY_ID_NULL;
 	}
 	
-	public static long calcNextRoutineTimestamp (long baseTimeMillis, ZoneOffset useTimeZone, Set<Integer> atHours) {
+	public static long calcNextRoutineTimestamp (long baseTimeMillis, ZoneOffset useTimeZone, Set<Integer> atHours)
+	throws NoNotifyTimeTag {
+		if (atHours.isEmpty()) throw new NoNotifyTimeTag();
 		LocalDateTime time = LocalDateTime.ofEpochSecond(
-				baseTimeMillis/1000, (int)baseTimeMillis%1000*1000,
+				baseTimeMillis/1000, (int)(baseTimeMillis%1000)*1000*1000,
 				useTimeZone
 		).withMinute(0).withSecond(0).withNano(0);
 		do {
@@ -85,7 +91,7 @@ public class MedicationTimer extends Thread {
 		return time.withMinute(0).withSecond(0).withNano(0).toInstant(useTimeZone).toEpochMilli();
 	}
 	
-	private void waitToNextRoutine () throws InterruptedException {
+	private void waitToNextRoutine () throws InterruptedException, NoNotifyTimeTag {
 		sleep(calcNextRoutineTimestamp(System.currentTimeMillis(), USE_TIME_ZONE, NOTIFY_AT_HOUR) - System.currentTimeMillis());
 	}
 	
