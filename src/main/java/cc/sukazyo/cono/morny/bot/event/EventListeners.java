@@ -17,6 +17,7 @@ public class EventListeners {
 	public static final OnMedicationNotifyApply MEDICATION_NOTIFY_APPLY = new OnMedicationNotifyApply();
 	public static final OnRandomlyTriggered RANDOMLY_TRIGGERED = new OnRandomlyTriggered();
 	public static final OnUniMeowTrigger UNI_MEOW_TRIGGER = new OnUniMeowTrigger();
+	public static final OnQuestionMarkReply QUESTION_MARK_REPLY = new OnQuestionMarkReply();
 	
 	public static void registerAllListeners () {
 		EventListenerManager.addListener(
@@ -28,6 +29,7 @@ public class EventListeners {
 				UNI_MEOW_TRIGGER,
 				RANDOMLY_TRIGGERED,
 				USER_RANDOMS,
+				QUESTION_MARK_REPLY,
 				USER_SLASH_ACTION,
 				INLINE_QUERY,
 				CALL_ME,

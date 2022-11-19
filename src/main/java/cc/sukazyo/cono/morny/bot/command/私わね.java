@@ -7,7 +7,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.ThreadLocalRandom;
+
+import static cc.sukazyo.cono.morny.util.CommonRandom.probabilityTrue;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class 私わね implements ISimpleCommand {
@@ -20,7 +21,7 @@ public class 私わね implements ISimpleCommand {
 	
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
-		if (ThreadLocalRandom.current().nextInt(521) == 0) {
+		if (probabilityTrue(521)) {
 			// 可以接入未来的心情系统（如果有的话）
 //			final String text = switch (ThreadLocalRandom.current().nextInt(11)) {
 //				case 0,7,8,9,10 -> "才不是";

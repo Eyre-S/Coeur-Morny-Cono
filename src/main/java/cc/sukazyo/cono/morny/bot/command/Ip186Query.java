@@ -7,7 +7,6 @@ import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +28,7 @@ public class Ip186Query {
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return "[ip]"; }
 		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询 ip 资料"; }
-		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { exec(event, command); }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { exec(event, command); }
 	}
 	
 	public static class Whois implements ITelegramCommand {
@@ -37,7 +36,7 @@ public class Ip186Query {
 		@Nullable @Override public String[] getAliases () { return new String[0]; }
 		@Nonnull @Override public String getParamRule () { return "[domain]"; }
 		@Nonnull @Override public String getDescription () { return "通过 https://ip.186526.xyz 查询域名资料"; }
-		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { exec(event, command); }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { exec(event, command); }
 	}
 	
 	private static void exec (@Nonnull Update event, @Nonnull InputCommand command) {

@@ -5,17 +5,18 @@ import cc.sukazyo.cono.morny.bot.api.EventListener;
 import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class OnMedicationNotifyApply extends EventListener {
 	
 	@Override
-	public boolean onEditedChannelPost (@NotNull Update update) {
+	public boolean onEditedChannelPost (@Nonnull Update update) {
 		return editedMessageProcess(update.editedChannelPost());
 	}
 	
 	@Override
-	public boolean onEditedMessage (@NotNull Update update) {
+	public boolean onEditedMessage (@Nonnull Update update) {
 		return editedMessageProcess(update.editedMessage());
 	}
 	

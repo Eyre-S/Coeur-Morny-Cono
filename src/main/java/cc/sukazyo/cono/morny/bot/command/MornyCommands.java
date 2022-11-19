@@ -14,7 +14,6 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 import com.pengrad.telegrambot.request.SetMyCommands;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -201,7 +200,7 @@ public class MornyCommands {
 	private static class ExitAlias implements ISimpleCommand {
 		@Nonnull @Override public String getName () { return "quit"; }
 		@Nullable @Override public String[] getAliases () { return new String[]{"stop"}; }
-		@Override public void execute (@NotNull InputCommand command, @NotNull Update event) { onCommandExitExec(event); }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandExitExec(event); }
 	}
 	private static void onCommandExitExec (@Nonnull Update event) {
 		if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
