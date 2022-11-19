@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.model.Update;
 
 import javax.annotation.Nonnull;
 
+@Deprecated
 public class OnActivityRecord extends EventListener {
 	
 	@Override

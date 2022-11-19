@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.bot.api.EventListener;
-import cc.sukazyo.cono.morny.util.UniversalCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +12,8 @@ import java.util.regex.Pattern;
 
 public class OnUserRandoms extends EventListener {
 	
-	private static final Pattern USER_OR_CN_QUERY = Pattern.compile("(.+)还是(.+)");
-	private static final Pattern USER_OR_EN_QUERY = Pattern.compile("(.+)or(.+)");
+	private static final Pattern USER_OR_QUERY = Pattern.compile("(.+)(?:还是|or)(.+)");
+	private static final Pattern USER_IF_QUERY = Pattern.compile("(.+)[吗?|？]+$");
 	
 	@Override
 	public boolean onMessage (@NotNull Update update) {
@@ -22,24 +21,14 @@ public class OnUserRandoms extends EventListener {
 		if (update.message().text() == null) return false;
 		if (!update.message().text().startsWith("/")) return false;
 		
-		final String[] preProcess = UniversalCommand.format(update.message().text());
-		if (preProcess.length > 1) return false;
-		final String query = preProcess[0];
-		
-		// ----- START CODE BLOCK COMMENT -----
-		// 这里实现思路和代码优化有至少一半是 copilot 和 IDEA 提供的
-		// 实现思路都可以从人类手里抢一半贡献太恐怖了aba
+		final String query = update.message().text().substring(1);
 		String result = null;
-		final Matcher matcher;
-		if (query.contains("还是")) {
-			matcher = USER_OR_CN_QUERY.matcher(query);
-		} else {
-			matcher = USER_OR_EN_QUERY.matcher(query);
-		}
-		if (matcher.find()) {
+		Matcher matcher;
+		if ((matcher = USER_OR_QUERY.matcher(query)).find()) {
 			result = ThreadLocalRandom.current().nextBoolean() ? matcher.group(1) : matcher.group(2);
+		} else if ((matcher = USER_IF_QUERY.matcher(query)).matches()) {
+			result = (ThreadLocalRandom.current().nextBoolean()?"":"不") + matcher.group(1);
 		}
-		// ----- STOP CODE BLOCK COMMENT -----
 		
 		if (result == null) return false;
 		MornyCoeur.extra().exec(new SendMessage(
