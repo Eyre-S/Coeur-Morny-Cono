@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.bot.command;
 
+import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -7,6 +8,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.data.NbnhhshQuery;
+import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,13 +26,17 @@ public class Nbnhhsh implements ITelegramCommand {
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
+		class TagNoContent extends Exception {}
 		try {
 			
-			String queryTarget = "";
+			String queryTarget;
 			if (event.message().replyToMessage() != null && event.message().replyToMessage().text() != null)
 				queryTarget = event.message().replyToMessage().text();
-			if (command.hasArgs())
+			else if (command.hasArgs())
 				queryTarget = stringsConnecting(command.getArgs(), " ", 0, command.getArgs().length-1);
+			else {
+				throw new TagNoContent();
+			}
 			
 			NbnhhshQuery.GuessResult response = NbnhhshQuery.sendGuess(queryTarget);
 			
@@ -58,6 +64,10 @@ public class Nbnhhsh implements ITelegramCommand {
 					message.toString()
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
 			
+		} catch (TagNoContent tag) {
+			MornyCoeur.extra().exec(new SendSticker(
+					event.message().chat().id(), TelegramStickers.ID_404
+			).replyToMessageId(event.message().messageId()));
 		} catch (Exception e) {
 			MornyCoeur.extra().exec(new SendMessage(
 					event.message().chat().id(),

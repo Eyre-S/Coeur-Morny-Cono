@@ -18,6 +18,12 @@ public class Log {
 	 */
 	public static final Logger logger = new Logger(new ConsoleAppender());
 	
+	/**
+	 * 获取异常的堆栈信息.
+	 * @param e 异常体
+	 * @return {@link String} 格式的异常的堆栈报告信息.
+	 * @see 1.0.0-alpha5
+	 */
 	public static String exceptionLog (Exception e) {
 		final StringWriter stackTrace = new StringWriter();
 		e.printStackTrace(new PrintWriter(stackTrace));
