@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds;
 
 public class ShareToolBilibili implements ITelegramQuery {
@@ -22,7 +21,7 @@ public class ShareToolBilibili implements ITelegramQuery {
 	public static final String TITLE_BILI_BV = "[bilibili] Share video / BV";
 	public static final String ID_PREFIX_BILI_AV = "[morny/share/bili/av]";
 	public static final String ID_PREFIX_BILI_BV = "[morny/share/bili/bv]";
-	public static final Pattern REGEX_BILI_VIDEO = Pattern.compile("^(?:(?:https?://)?(?:www\\.)?bilibili\\.com(?:/s)?/video/((?:av|AV)(\\d+)|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]+))/?(\\?(?:p=(\\d+))?.*)?|(?:av|AV)(\\d+)|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]+))$");
+	public static final Pattern REGEX_BILI_VIDEO = Pattern.compile("^(?:(?:https?://)?(?:www\\.)?bilibili\\.com(?:/s)?/video/((?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))/?(\\?(?:p=(\\d+))?.*)?|(?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))$");
 	
 	private static final String SHARE_FORMAT_HTML = "<a href='%s'>%s</a>";
 	

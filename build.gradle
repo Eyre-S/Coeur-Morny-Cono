@@ -102,11 +102,11 @@ java {
 	
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = proj_file_encoding.name()
 }
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
 	options.encoding = proj_file_encoding.name()
 	options.docEncoding = proj_file_encoding.name()
 	options.charSet = proj_file_encoding.name()

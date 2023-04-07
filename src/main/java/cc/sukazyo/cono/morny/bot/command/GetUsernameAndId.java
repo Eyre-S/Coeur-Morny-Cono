@@ -25,16 +25,20 @@ public class GetUsernameAndId implements ITelegramCommand {
 		
 		final String[] args = command.getArgs();
 		
+		// 不支持大于一个参数
 		if (args.length > 1) { MornyCoeur.extra().exec(new SendMessage(
 				event.message().chat().id(),
 				"[Unavailable] Too much arguments."
 		).replyToMessageId(event.message().messageId())); return; }
 		
+		// 发送者自己的 id
 		long userId = event.message().from().id();
 		
+		// 如果有回复某个人，则使用被回复人的 id
 		if (event.message().replyToMessage()!= null) {
 			userId = event.message().replyToMessage().from().id();
 		}
+		// 如果有指定 id，则使用指定的 id
 		if (args.length > 0) {
 			try {
 				userId = Long.parseLong(args[0]);
@@ -47,6 +51,7 @@ public class GetUsernameAndId implements ITelegramCommand {
 			}
 		}
 		
+		// 重新获取用户对象
 		final GetChatMemberResponse response = MornyCoeur.getAccount().execute(
 				new GetChatMember(event.message().chat().id(), userId)
 		);
@@ -59,6 +64,7 @@ public class GetUsernameAndId implements ITelegramCommand {
 			return;
 		}
 		
+		// 获取并发送用户信息
 		final User user = response.chatMember().user();
 		
 		if (user.id() == 136817688) {
