@@ -5,6 +5,8 @@ import cc.sukazyo.cono.morny.util.CommonFormat;
 import javax.annotation.Nonnull;
 
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cc.sukazyo.cono.morny.Log.logger;
 
@@ -93,11 +95,17 @@ public class ServerMain {
 		
 		config.eventOutdatedTimestamp = systemStartupTime;
 		
+		List<String> unknownArgs = new ArrayList<>();
+		
 		for (int i = 0; i < args.length; i++) {
 			
 			if (args[i].startsWith("-")) {
 				
 				switch (args[i]) {
+					case "-d", "--dbg", "--debug" -> {
+						Log.debug(true);
+						continue;
+					}
 					case "--outdated-block", "-ob" -> {
 						config.eventIgnoreOutdated = true;
 						continue;
@@ -188,9 +196,16 @@ public class ServerMain {
 				
 			}
 			
-			logger.warn("Can't understand arg to some meaning :\n  " + args[i]);
+			unknownArgs.add(args[i]);
 			
 		}
+		
+		unknownArgs.forEach(arg -> logger.warn("Can't understand arg to some meaning :\n  " + arg));
+		
+		if (Log.debug())
+			logger.warn("Debug log output enabled.\n  It may lower your performance, make sure that you are not in production environment.");
+		
+		logger.debug("Debug log output enabled.");
 		
 		String propToken = null;
 		String propTokenKey = null;

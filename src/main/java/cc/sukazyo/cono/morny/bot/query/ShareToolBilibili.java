@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static cc.sukazyo.cono.morny.Log.logger;
 import static cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds;
 
 public class ShareToolBilibili implements ITelegramQuery {
@@ -32,25 +33,25 @@ public class ShareToolBilibili implements ITelegramQuery {
 		final Matcher regex = REGEX_BILI_VIDEO.matcher(event.inlineQuery().query());
 		if (regex.matches()) {
 			
-//			logger.debug(String.format(
-//					"====== ok\n1: %s\n2: %s\n3: %s\n4: %s\n5: %s\n6: %s\n7: %s",
-//					regex.group(1), regex.group(2), regex.group(3), regex.group(4),
-//					regex.group(5), regex.group(6), regex.group(7)
-//			));
+			logger.debug(String.format(
+					"====== Share Tool Bilibili Catch ok\n1: %s\n2: %s\n3: %s\n4: %s\n5: %s\n6: %s\n7: %s",
+					regex.group(1), regex.group(2), regex.group(3), regex.group(4),
+					regex.group(5), regex.group(6), regex.group(7)
+			));
 			
 			// get video id from input, also get video part id
 			String av = regex.group(2)==null ? regex.group(6)==null ? null : regex.group(6) : regex.group(2);
 			String bv = regex.group(3)==null ? regex.group(7)==null ? null : regex.group(7) : regex.group(3);
-//			logger.trace(String.format("catch id av[%s] bv[%s]", av, bv));
+			logger.trace(String.format("catch id av[%s] bv[%s]", av, bv));
 			final int part = regex.group(5)==null ? -1 : Integer.parseInt(regex.group(5));
-//			logger.trace(String.format("catch part [%s]", part));
+			logger.trace(String.format("catch part [%s]", part));
 			if (av == null) {
 				assert bv != null;
 				av = String.valueOf(BiliTool.toAv(bv));
-//				logger.trace(String.format("converted bv[%s] to av[%s]", bv, av));
+				logger.trace(String.format("converted bv[%s] to av[%s]", bv, av));
 			} else {
 				bv = BiliTool.toBv(Long.parseLong(av));
-//				logger.trace(String.format("converted av[%s] to bv[%s]", av, bv));
+				logger.trace(String.format("converted av[%s] to bv[%s]", av, bv));
 			}
 			// build standard share links
 			final String linkPartParam = part==-1 ? "" : "?p="+part;
@@ -58,7 +59,7 @@ public class ShareToolBilibili implements ITelegramQuery {
 			final String linkBv = "https://www.bilibili.com/video/BV"+bv + linkPartParam;
 			final String idAv = "av"+av;
 			final String idBv = "BV"+bv;
-//			logger.trace("built all data.");
+			logger.trace("built all data.");
 			
 			// build share message element
 			List<InlineQueryUnit<?>> result = new ArrayList<>();
