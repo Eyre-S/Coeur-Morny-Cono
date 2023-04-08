@@ -200,6 +200,14 @@ public class ServerMain {
 			
 		}
 		
+		//#
+		//# 启动信息输出
+		//# 启动相关参数的检查和处理
+		//#
+		
+		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
+		if (welcomeEchoMode) return;
+		
 		unknownArgs.forEach(arg -> logger.warn("Can't understand arg to some meaning :\n  " + arg));
 		
 		if (Log.debug())
@@ -215,10 +223,6 @@ public class ServerMain {
 				propTokenKey = iKey;
 			}
 		}
-		
-		//#
-		//# 启动相关参数的检查和处理
-		//#
 		
 		if (versionEchoMode) {
 			
@@ -249,9 +253,6 @@ public class ServerMain {
 			return;
 			
 		}
-		
-		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
-		if (welcomeEchoMode) return;
 		
 		logger.info(String.format("""
 				ServerMain.java Loaded >>>
