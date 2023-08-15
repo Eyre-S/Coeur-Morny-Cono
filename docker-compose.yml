@@ -1,0 +1,4 @@
+services:
+  coeur-app:
+    build: .
+    command: -v

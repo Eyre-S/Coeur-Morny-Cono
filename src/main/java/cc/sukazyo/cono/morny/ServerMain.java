@@ -97,6 +97,7 @@ public class ServerMain {
 		
 		List<String> unknownArgs = new ArrayList<>();
 		
+		//# 从命令行参数设置启动参数
 		for (int i = 0; i < args.length; i++) {
 			
 			if (args[i].startsWith("-")) {
@@ -200,6 +201,17 @@ public class ServerMain {
 			
 		}
 		
+		//# 从环境变量设置启动参数
+		String propToken = null;
+		String propTokenKey = null;
+		for (String iKey : MornyConfig.PROP_TOKEN_KEY) {
+			if (System.getenv(iKey) != null) {
+				propToken = System.getenv(iKey);
+				propTokenKey = iKey;
+			}
+		}
+		
+		
 		//#
 		//# 启动信息输出
 		//# 启动相关参数的检查和处理
@@ -214,15 +226,6 @@ public class ServerMain {
 			logger.warn("Debug log output enabled.\n  It may lower your performance, make sure that you are not in production environment.");
 		
 		logger.debug("Debug log output enabled.");
-		
-		String propToken = null;
-		String propTokenKey = null;
-		for (String iKey : MornyConfig.PROP_TOKEN_KEY) {
-			if (System.getenv(iKey) != null) {
-				propToken = System.getenv(iKey);
-				propTokenKey = iKey;
-			}
-		}
 		
 		if (versionEchoMode) {
 			

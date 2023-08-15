@@ -1,0 +1,17 @@
+
+# IDE
+.idea/
+.vscode/
+.gradle/
+.settings/
+/src/test/java/test/*
+/src/test/resources/test/*
+
+#build
+/build/
+/bin/
+.project
+lcoal.properties
+
+# debug dir
+/run/

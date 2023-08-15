@@ -1,17 +1,17 @@
-import org.ajoberstar.grgit.Status
-
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
-
 plugins {
 	id 'java'
 	id 'java-library'
 	id 'application'
 	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'com.github.gmazzo.buildconfig' version '3.1.0'
-	id 'org.ajoberstar.grgit' version '5.0.0'
+	id 'org.ajoberstar.grgit' version '5.2.0'
 }
+
+import org.ajoberstar.grgit.Status
+
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 final boolean proj_git = grgit!=null
 final String proj_store = MORNY_CODE_STORE
@@ -19,18 +19,18 @@ final String proj_commit = proj_git ? grgit.head().id : null
 final String proj_commit_path = MORNY_COMMIT_PATH
 final boolean proj_clean = isCleanBuild()
 if (!proj_git)
-	print "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
+	println "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
 else if (isCleanBuild()) {
-	print "git: clean build at ${grgit.head().id}"
+	println "git: clean build at ${grgit.head().id}"
 } else {
 	final Status status = grgit.status()
-	print "git: non-clean-build"
+	println "git: non-clean-build"
 	if (!status.unstaged.allChanges.empty) {
-		print "\ngit: unstaged changes"
+		println "git: unstaged changes"
 		listChanges(status.unstaged)
 	}
 	if (!status.staged.allChanges.empty) {
-		print "\ngit: staged changes"
+		println "git: staged changes"
 		listChanges(status.staged)
 	}
 }
@@ -134,7 +134,15 @@ buildConfig {
 }
 
 shadowJar {
+	
 	archiveClassifier.set "fat"
+	
+	if (project.hasProperty("dockerBuild")) {
+		println "shadow-jar: using docker build name"
+		archiveVersion.set ""
+		archiveClassifier.set "docker-build"
+	}
+	
 }
 
 @SuppressWarnings("all")
@@ -151,11 +159,11 @@ boolean isCleanBuild () {
 
 void listChanges (Status.Changes listing) {
 	for (String file in listing.added)
-		print "\n    add: ${file}"
+		println "    add: ${file}"
 	for (String file in listing.modified)
-		print "\n    mod: ${file}"
+		println "    mod: ${file}"
 	for (String file in listing.removed)
-		print "\n    del: ${file}"
+		println "    del: ${file}"
 }
 
 publishing {
