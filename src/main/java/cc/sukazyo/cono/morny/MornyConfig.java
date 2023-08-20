@@ -169,12 +169,12 @@ public class MornyConfig {
 		public long eventOutdatedTimestamp = -1;
 		public boolean commandLoginRefresh = false;
 		public boolean commandLogoutClear = false;
-		@Nonnull public Set<Long> dinnerTrustedReaders = new HashSet<>();
+		@Nonnull public final Set<Long> dinnerTrustedReaders = new HashSet<>();
 		public long dinnerChatId = -1001707106392L;
 		public long reportToChat = -1001650050443L;
 		public long medicationNotifyToChat = -1001729016815L;
 		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
-		@Nonnull public Set<Integer> medicationNotifyAt = new HashSet<>();
+		@Nonnull public final Set<Integer> medicationNotifyAt = new HashSet<>();
 		
 	}
 	

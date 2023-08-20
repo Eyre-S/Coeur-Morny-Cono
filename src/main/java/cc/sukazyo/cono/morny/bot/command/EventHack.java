@@ -37,50 +37,57 @@ public class EventHack implements ITelegramCommand {
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
-		boolean isOk = false;
+		enum Status {
+			OK,
+			FORBIDDEN_FOR_ANY
+		}
+		Status status;
 		
 		String x_mode = "";
 		if (command.hasArgs()) {
 			x_mode = command.getArgs()[0];
 		}
-		
 		switch (x_mode) {
-			case "any":
+			case "any" -> {
 				if (MornyCoeur.trustedInstance().isTrusted(event.message().from().id())) {
 					OnEventHackHandle.registerHack(
 							event.message().messageId(),
 							event.message().from().id(),
 							event.message().chat().id(),
 							OnEventHackHandle.HackType.ANY
-					);isOk = true;
+					);
+					status = Status.OK;
+				} else {
+					status = Status.FORBIDDEN_FOR_ANY;
 				}
-				break;
-			case "group":
+			}
+			case "group" -> {
 				OnEventHackHandle.registerHack(
 						event.message().messageId(),
 						event.message().from().id(),
 						event.message().chat().id(),
 						OnEventHackHandle.HackType.GROUP
-				);isOk = true;
-				break;
-			default:
+				);
+				status = Status.OK;
+			}
+			default -> {
 				OnEventHackHandle.registerHack(
 						event.message().messageId(),
 						event.message().from().id(),
 						event.message().chat().id(),
 						OnEventHackHandle.HackType.USER
-				);isOk = true;
-				break;
+				);
+				status = Status.OK;
+			}
 		}
 		
-		if (isOk) {
-			MornyCoeur.extra().exec(new SendSticker(
+		switch (status) {
+			case OK -> MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_WAITING
 					).replyToMessageId(event.message().messageId())
 			);
-		} else {
-			MornyCoeur.extra().exec(new SendSticker(
+			case FORBIDDEN_FOR_ANY -> MornyCoeur.extra().exec(new SendSticker(
 							event.message().chat().id(),
 							TelegramStickers.ID_403
 					).replyToMessageId(event.message().messageId())

@@ -4,7 +4,7 @@ plugins {
 	id 'application'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
-	id 'com.github.gmazzo.buildconfig' version '3.1.0'
+	id 'com.github.gmazzo.buildconfig' version '4.1.2'
 	id 'org.ajoberstar.grgit' version '5.2.0'
 }
 
@@ -73,15 +73,16 @@ repositories {
 
 dependencies {
 	
-	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
+	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${lib_spotbugs_v}"
 	
-	api "cc.sukazyo:messiva:${libMessivaVersion}"
+	api "cc.sukazyo:messiva:${lib_messiva_v}"
 	
-	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"
+	implementation "com.github.pengrad:java-telegram-bot-api:${lib_javatelegramapi_v}"
+	implementation "com.squareup.okhttp3:okhttp:${lib_okhttp_v}"
+	implementation "com.google.code.gson:gson:${lib_gson_v}"
 	
-	testImplementation "org.junit.jupiter:junit-jupiter-api:${libJunitVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:${libJunitVersion}"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${libJunitVersion}"
+	testImplementation platform("org.junit:junit-bom:${lib_junit_v}")
+	testImplementation "org.junit.jupiter:junit-jupiter"
 	
 }
 
@@ -91,6 +92,9 @@ application {
 
 test {
 	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
 
 java {

@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.util;
+package cc.sukazyo.cono.morny.internal;
 
 
 import java.lang.annotation.Documented;

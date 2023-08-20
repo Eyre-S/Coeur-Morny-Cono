@@ -118,7 +118,7 @@ public class MornyCoeur {
 	 * @see #MornyCoeur 程序初始化方法
 	 * @param config morny 实例的配置选项数据
 	 */
-	public static void main (MornyConfig config) {
+	public static void init (MornyConfig config) {
 		if (INSTANCE == null) {
 			
 			logger.info("Coeur Starting");

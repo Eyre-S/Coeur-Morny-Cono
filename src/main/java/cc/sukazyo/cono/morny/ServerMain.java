@@ -79,7 +79,7 @@ public class ServerMain {
 	 * <b>自 {@code 0.5.0.4}，旧的直接通过参数为 bot token & username 赋值的方式已被删除</b>
 	 * 使用参数所进行取值的 token 和 username 已被转移至 {@code --token} 和 {@code --username} 参数<br>
 	 *
-	 * @see MornyCoeur#main
+	 * @see MornyCoeur#init
 	 * @since 0.4.0.0
 	 * @param args 参数组
 	 */
@@ -143,10 +143,15 @@ public class ServerMain {
 						config.trustedChat = Long.parseLong(args[i]);
 						continue;
 					}
-					//noinspection SpellCheckingInspection
+					// noinspection SpellCheckingInspection
 					case "--trusted-reader-dinner", "-trsd" -> {
 						i++;
 						config.dinnerTrustedReaders.add(Long.parseLong(args[i]));
+						continue;
+					}
+					case "--dinner-chat", "-chd" -> {
+						i++;
+						config.dinnerChatId = Long.parseLong(args[i]);
 						continue;
 					}
 					case "--auto-cmd", "-cmd", "-c" -> {
@@ -278,7 +283,7 @@ public class ServerMain {
 		
 		Thread.currentThread().setName(THREAD_MORNY_INIT);
 		try {
-			MornyCoeur.main(new MornyConfig(config));
+			MornyCoeur.init(new MornyConfig(config));
 		} catch (MornyConfig.CheckFailure.NullTelegramBotKey ignore) {
 			logger.info("Parameter required has no value:\n --token.");
 		} catch (MornyConfig.CheckFailure e) {

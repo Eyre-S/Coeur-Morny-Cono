@@ -4,10 +4,10 @@ import cc.sukazyo.cono.morny.bot.api.EventListener;
 
 public class OnRandomlyTriggered extends EventListener {
 	
-	/**
-	 * function CODE_IK0XA1
-	 */
-	//	@Override
+//	/**
+//	 * function CODE_IK0XA1
+//	 */
+//	//	@Override
 //	public boolean onMessage (@Nonnull Update update) {
 //
 //		if (update.message().text() == null) return false;
