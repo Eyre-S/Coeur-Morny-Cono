@@ -64,7 +64,6 @@ if (project.hasProperty("publishMvnRepoUrl")) {
 
 group proj_group
 version proj_version_full
-setArchivesBaseName proj_archive_name
 
 repositories {
 	mavenCentral()
@@ -75,7 +74,8 @@ dependencies {
 	
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${lib_spotbugs_v}"
 	
-	api "cc.sukazyo:messiva:${lib_messiva_v}"
+	implementation "cc.sukazyo:messiva:${lib_messiva_v}"
+	implementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
 	
 	implementation "com.github.pengrad:java-telegram-bot-api:${lib_javatelegramapi_v}"
 	implementation "com.squareup.okhttp3:okhttp:${lib_okhttp_v}"
@@ -139,6 +139,7 @@ buildConfig {
 
 shadowJar {
 	
+	archiveBaseName.set proj_archive_name
 	archiveClassifier.set "fat"
 	
 	if (project.hasProperty("dockerBuild")) {

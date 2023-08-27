@@ -34,7 +34,7 @@ public class ServerMain {
 	 *         {@code --version} 只输出版本信息，不运行主程序。此参数会导致其它所有参数失效（优先级最高）
 	 *     </li>
 	 *     <li>
-	 *         {@code --only-hello} 只输出欢迎字符画({@link MornyHello})，不运行主程序。
+	 *         {@code --only-hello} 只输出欢迎字符画({@link MornyAbout#MORNY_PREVIEW_IMAGE_ASCII})，不运行主程序。
 	 *         不要同时使用 {@code --no-hello}，原因见下。
 	 *     </li>
 	 *     <li>
@@ -222,7 +222,7 @@ public class ServerMain {
 		//# 启动相关参数的检查和处理
 		//#
 		
-		if (showWelcome) logger.info(MornyHello.MORNY_PREVIEW_IMAGE_ASCII);
+		if (showWelcome) logger.info(MornyAbout.MORNY_PREVIEW_IMAGE_ASCII);
 		if (welcomeEchoMode) return;
 		
 		unknownArgs.forEach(arg -> logger.warn("Can't understand arg to some meaning :\n  " + arg));

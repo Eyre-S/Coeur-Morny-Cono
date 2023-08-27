@@ -1,14 +1,18 @@
 package cc.sukazyo.cono.morny.bot.command;
 
 import cc.sukazyo.cono.morny.BuildConfig;
+import cc.sukazyo.cono.morny.MornyAbout;
 import cc.sukazyo.cono.morny.MornyCoeur;
 import cc.sukazyo.cono.morny.MornySystem;
+import cc.sukazyo.cono.morny.data.TelegramImages;
 import cc.sukazyo.cono.morny.data.TelegramStickers;
 import cc.sukazyo.cono.morny.util.tgapi.ExtraAction;
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand;
+
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.request.SendSticker;
 
 import javax.annotation.Nonnull;
@@ -21,7 +25,7 @@ import static cc.sukazyo.cono.morny.util.CommonFormat.formatDate;
 import static cc.sukazyo.cono.morny.util.CommonFormat.formatDuration;
 import static cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml;
 
-public class MornyInformations implements ITelegramCommand {
+public class MornyInformation implements ITelegramCommand {
 	
 	private static final String SUB_STICKER = "stickers";
 	private static final String SUB_RUNTIME = "runtime";
@@ -30,14 +34,14 @@ public class MornyInformations implements ITelegramCommand {
 	
 	@Nonnull @Override public String getName () { return "info"; }
 	@Nullable @Override public String[] getAliases () { return new String[0]; }
-	@Nonnull @Override public String getParamRule () { return "[subcommand]"; }
+	@Nonnull @Override public String getParamRule () { return "[(version|runtime|stickers[.IDs])]"; }
 	@Nonnull @Override public String getDescription () { return "输出当前 Morny 的各种信息"; }
 	
 	@Override
 	public void execute (@Nonnull InputCommand command, @Nonnull Update event) {
 		
 		if (!command.hasArgs()) {
-			echoRuntime(event);
+			echoInfo(event.message().chat().id(), event.message().messageId());
 			return;
 		}
 		
@@ -56,7 +60,26 @@ public class MornyInformations implements ITelegramCommand {
 	}
 	
 	/**
-	 * /info 子命令 {@value #SUB_STICKER}
+	 * Subcommand <u>/info</u> without params.
+	 *
+	 * @since 1.0.0-RC4
+	 */
+	public void echoInfo (long chatId, int replayToMessage) {
+		MornyCoeur.extra().exec(new SendPhoto(
+				chatId,
+				getAboutPic()
+		).caption("""
+				<b>Morny Cono</b>
+				来自安妮的侍从小鼠。
+				————————————————
+				%s""".formatted(getMornyAboutLinksHTML())
+		).parseMode(ParseMode.HTML).replyToMessageId(replayToMessage));
+	}
+	
+	/**
+	 * subcommand <u>/info stickers</u>
+	 *
+	 * @see #SUB_STICKER
 	 */
 	public void echoStickers (@Nonnull InputCommand command, @Nonnull Update event) {
 		final long echoTo = event.message().chat().id();
@@ -78,22 +101,28 @@ public class MornyInformations implements ITelegramCommand {
 	}
 	
 	/**
-	 * 向 telegram 输出一个或全部 sticker
+	 * 向 telegram 输出一个或全部 sticker.
+	 *
 	 * @param id
 	 *        sticker 在 {@link TelegramStickers} 中的字段名。
 	 *        使用 {@link ""}(空字符串)(不是{@link null}) 表示输出全部 sticker
 	 * @param chatId 目标 chat id
-	 * @param messageId 要回复的消息 id，特殊值跟随上游逻辑
+	 * @param messageId 要回复的消息 id，依据 {@link TelegramStickers#echoStickerByID(String, ExtraAction, long, int) 上游}
+	 *                  逻辑，使用 {@link -1} 表示不回复消息。
+	 *
 	 * @see TelegramStickers#echoStickerByID(String, ExtraAction, long, int)
 	 * @see TelegramStickers#echoAllStickers(ExtraAction, long, int)
 	 */
 	public static void echoStickers (@Nonnull String id, long chatId, int messageId) {
-		if ("".equals(id)) TelegramStickers.echoAllStickers(MornyCoeur.extra(), chatId, messageId);
+		if (id.isEmpty()) TelegramStickers.echoAllStickers(MornyCoeur.extra(), chatId, messageId);
 		else TelegramStickers.echoStickerByID(id, MornyCoeur.extra(), chatId, messageId);
 	}
 	
 	/**
-	 * /info 子命令 {@value #SUB_RUNTIME}
+	 * Subcommand <u>/info runtime</u>.
+	 *
+	 * @see #SUB_RUNTIME
+	 *
 	 * @since 1.0.0-alpha4
 	 */
 	public static void echoRuntime (@Nonnull Update event) {
@@ -146,7 +175,11 @@ public class MornyInformations implements ITelegramCommand {
 	}
 	
 	/**
-	 * /info 子命令 {@value #SUB_VERSION}
+	 * Subcommand <u>/info version</u> or <u>/info v</u>.
+	 *
+	 * @see #SUB_VERSION
+	 * @see #SUB_VERSION_2
+	 *
 	 * @since 1.0.0-alpha4
 	 */
 	public static void echoVersion (@Nonnull Update event) {
@@ -175,11 +208,13 @@ public class MornyInformations implements ITelegramCommand {
 	
 	/**
 	 * 取得 {@link MornySystem} 的 git commit 相关版本信息的 HTML 格式化标签.
+	 *
 	 * @return 格式类似于 <u>{@code 28e8c82a.δ}</u> 的以 HTML 方式格式化的版本号组件。
 	 *         其中 {@code .δ} 对应着 {@link MornySystem#isCleanBuild}；
 	 *         commit tag 字段如果支援 {@link MornySystem#currentCodePath} 则会以链接形式解析，否则则为 code 格式
 	 *         <small>为了对 telegram api html 格式兼容所以不支援嵌套链接与code标签</small>。
 	 *         如果 {@link MornySystem#isGitBuild} 为 {@link false}，则方法会返回 {@link ""}
+	 *
 	 * @since 1.0.0-beta2
 	 */
 	@Nonnull
@@ -226,11 +261,41 @@ public class MornyInformations implements ITelegramCommand {
 		}
 	}
 	
+	/**
+	 * Get the about-pic (intro picture or featured image) of Morny.
+	 *
+	 * @return the Telegram file binary data of the about-pic.
+	 * @throws IllegalStateException {@link TelegramImages.AssetsFileImage#get() get() image data} may
+	 *                               throws {@link IllegalStateException} while read error.
+	 */
+	@Nonnull
+	public static byte[] getAboutPic () {
+		return TelegramImages.IMG_ABOUT.get();
+	}
+	
 	private static void echo404 (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
 				event.message().chat().id(),
 				TelegramStickers.ID_404
 		).replyToMessageId(event.message().messageId()));
+	}
+	
+	/**
+	 * The formatted about links of Morny Cono and Morny Coeur.
+	 * <p>
+	 * With the Telegram HTML formatting, used in <u>/info</u> and <u>/start</u>.
+	 * Provided the end user the links that can find resources about Morny.
+	 */
+	@Nonnull
+	public static String getMornyAboutLinksHTML () {
+		return """
+				<a href='%s'>source code</a> | <a href='%s'>backup</a>
+				<a href='%s'>反馈 / issue tracker</a>
+				<a href='%s'>使用说明书 / user guide & docs</a>""".formatted(
+				MornyAbout.MORNY_SOURCECODE_LINK, MornyAbout.MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK,
+				MornyAbout.MORNY_ISSUE_TRACKER_LINK,
+				MornyAbout.MORNY_USER_GUIDE_LINK
+		);
 	}
 	
 }

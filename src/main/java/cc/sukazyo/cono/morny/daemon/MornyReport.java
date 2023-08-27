@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.daemon;
 
 import cc.sukazyo.cono.morny.*;
-import cc.sukazyo.cono.morny.bot.command.MornyInformations;
+import cc.sukazyo.cono.morny.bot.command.MornyInformation;
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException;
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString;
 import com.google.gson.GsonBuilder;
@@ -88,7 +88,7 @@ public class MornyReport {
 						as config fields:
 						%s
 						""",
-						MornyInformations.getVersionAllFullTagHtml(),
+						MornyInformation.getVersionAllFullTagHtml(),
 						MornyCoeur.getUsername(),
 						sectionConfigFields(MornyCoeur.config())
 				)

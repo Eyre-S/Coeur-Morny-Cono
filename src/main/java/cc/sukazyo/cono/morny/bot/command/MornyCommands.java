@@ -54,7 +54,8 @@ public class MornyCommands {
 		
 		register(
 				new ON(),
-				new Hello(), new HelloOnStart(),
+				new Hello(), /* new {@link HelloOnStart}, */
+				new MornyInfoOnHello(),
 				new GetUsernameAndId(),
 				new EventHack(),
 				new Nbnhhsh(),
@@ -62,7 +63,7 @@ public class MornyCommands {
 				new Ip186Query.Whois(),
 				new Encryptor(),
 				new SaveData(),
-				new MornyInformations(),
+				new MornyInformation(),
 				new Version(),
 				new MornyRuntime(),
 				new Jrrp(),
@@ -138,7 +139,7 @@ public class MornyCommands {
 	}
 	
 	private BotCommand formatTelegramCommandListLine (@Nonnull String commandName, @Nonnull String paramRule, @Nonnull String intro) {
-		return new BotCommand(commandName, "".equals(paramRule) ? (intro) : (paramRule+" - "+intro));
+		return new BotCommand(commandName, paramRule.isEmpty() ? (intro) : (paramRule+" - "+intro));
 	}
 	
 	private boolean nonCommandExecutable (Update event, InputCommand command) {
@@ -181,6 +182,11 @@ public class MornyCommands {
 		@Nonnull @Override public String getDescription () { return "打招呼"; }
 		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }
 	}
+	/**
+	 * {@link Hello} on special command /start
+	 * Deprecated due to new {@link MornyInfoOnHello}
+	 */
+	@Deprecated @SuppressWarnings("unused")
 	private static class HelloOnStart implements ISimpleCommand { @Nonnull @Override public String getName () { return "start"; }@Nullable @Override public String[] getAliases () { return new String[0]; }@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { onCommandHelloExec(event); }}
 	private static void onCommandHelloExec (@Nonnull Update event) {
 		MornyCoeur.extra().exec(new SendSticker(
@@ -227,7 +233,7 @@ public class MornyCommands {
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Deprecated public String getParamRule () { return ""; }
 		@Nonnull @Deprecated public String getDescription () { return "检查 Bot 版本信息"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoVersion(event); }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformation.echoVersion(event); }
 	}
 	
 	private static class MornyRuntime implements ISimpleCommand {
@@ -235,7 +241,7 @@ public class MornyCommands {
 		@Nullable @Override public String[] getAliases () { return null; }
 		@Nonnull @Deprecated public String getParamRule () { return ""; }
 		@Nonnull @Deprecated public String getDescription () { return "获取 Bot 运行时信息（包括版本号）"; }
-		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformations.echoRuntime(event); }
+		@Override public void execute (@Nonnull InputCommand command, @Nonnull Update event) { MornyInformation.echoRuntime(event); }
 	}
 	
 	private static class Jrrp implements ITelegramCommand {
