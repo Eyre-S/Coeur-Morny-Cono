@@ -1,5 +1,5 @@
 plugins {
-	id 'java'
+	id 'scala'
 	id 'java-library'
 	id 'application'
 	id 'maven-publish'
@@ -50,7 +50,9 @@ final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpo
 
 final JavaVersion proj_java = JavaVersion.VERSION_17
 final Charset proj_file_encoding = StandardCharsets.UTF_8
-
+final proj_scala_api = 3
+//final proj_scala_lib = proj_scala_api+'.4.0-RC1-bin-20230901-89e8dba-NIGHTLY'
+final proj_scala_lib = proj_scala_api+'.3.1-RC7'
 String publish_local_url = null
 String publish_remote_url = null
 String publish_remote_username = null
@@ -72,6 +74,7 @@ repositories {
 
 dependencies {
 	
+	api "org.scala-lang:scala3-library_3:${proj_scala_lib}"
 	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${lib_spotbugs_v}"
 	
 	implementation "cc.sukazyo:messiva:${lib_messiva_v}"
@@ -86,8 +89,30 @@ dependencies {
 	
 }
 
-application {
-	mainClass = proj_application_main
+sourceSets {
+	main {
+		scala { srcDirs = ['src/main/scala', 'src/main/old'] }
+	}
+}
+
+scala {
+	
+	compileJava {
+		
+		sourceCompatibility '17'
+		targetCompatibility '17'
+		
+		options.encoding = proj_file_encoding.name()
+		
+	}
+	
+	compileScala {
+		
+		options.encoding = proj_file_encoding.name()
+		scalaCompileOptions.encoding = proj_file_encoding.name()
+		
+	}
+	
 }
 
 test {
@@ -97,27 +122,8 @@ test {
 	}
 }
 
-java {
-	
-	sourceCompatibility proj_java
-	targetCompatibility proj_java
-	
-	withSourcesJar()
-	
-}
-
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = proj_file_encoding.name()
-}
-
-tasks.withType(Javadoc).configureEach {
-	options.encoding = proj_file_encoding.name()
-	options.docEncoding = proj_file_encoding.name()
-	options.charSet = proj_file_encoding.name()
-}
-
-tasks.test {
-	useJUnitPlatform()
+application {
+	mainClass = proj_application_main
 }
 
 buildConfig {

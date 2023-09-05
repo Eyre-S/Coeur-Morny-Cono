@@ -10,6 +10,8 @@
 #build
 /build/
 /bin/
+.metals/
+.bloop/
 .project
 lcoal.properties
 
