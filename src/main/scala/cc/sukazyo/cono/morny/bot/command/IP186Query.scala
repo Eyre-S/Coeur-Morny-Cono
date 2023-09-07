@@ -16,19 +16,19 @@ object IP186Query {
 		case WHOIS extends Subs("whois")
 	
 	object IP extends ITelegramCommand:
-		override def getName: String = "ip"
-		override def getAliases: Array[String] = null
-		override def getParamRule: String = "[ip]"
-		override def getDescription: String = "通过 https://ip.186526.xyz 查询 ip 资料"
-		override def execute (command: InputCommand, event: Update): Unit = query(event, command)
+		override val name: String = "ip"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override val paramRule: String = "[ip]"
+		override val description: String = "通过 https://ip.186526.xyz 查询 ip 资料"
+		override def execute (using command: InputCommand, event: Update): Unit = query
 	object Whois extends ITelegramCommand:
-		override def getName: String = "whois"
-		override def getAliases: Array[String] = null
-		override def getParamRule: String = "[domain]"
-		override def getDescription: String = "通过 https://ip.186526.xyz 查询域名资料"
-		override def execute (command: InputCommand, event: Update): Unit = query(event, command)
+		override val name: String = "whois"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override val paramRule: String = "[domain]"
+		override val description: String = "通过 https://ip.186526.xyz 查询域名资料"
+		override def execute (using command: InputCommand, event: Update): Unit = query
 	
-	private def query (event: Update, command: InputCommand): Unit = {
+	private def query (using event: Update, command: InputCommand): Unit = {
 		
 		val target: String|Null =
 			if (command.getArgs isEmpty)

@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.bot.command
+
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation
 import cc.sukazyo.cono.morny.util.tgapi.{InputCommand, Standardize}
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{GetChatMember, SendMessage}
@@ -10,12 +11,12 @@ import scala.language.postfixOps
 
 object GetUsernameAndId extends ITelegramCommand {
 	
-	override def getName: String = "user"
-	override def getAliases: Array[String] = Array()
-	override def getParamRule: String = "[userid]"
-	override def getDescription: String = "获取指定或回复的用户相关信息"
+	override val name: String = "user"
+	override val aliases: Array[ICommandAlias] | Null = null
+	override val paramRule: String = "[userid]"
+	override val description: String = "获取指定或回复的用户相关信息"
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val args = command.getArgs
 		
@@ -49,7 +50,7 @@ object GetUsernameAndId extends ITelegramCommand {
 		
 		val user = response.chatMember.user
 		
-		if (user.id eq Standardize.CHANNEL_SPEAKER_MAGIC_ID)
+		if (user.id == Standardize.CHANNEL_SPEAKER_MAGIC_ID)
 			MornyCoeur.extra exec SendMessage(
 				event.message.chat.id,
 				"<code>$__channel_identify</code>"

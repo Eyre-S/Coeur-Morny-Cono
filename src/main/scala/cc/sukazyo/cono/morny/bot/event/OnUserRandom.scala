@@ -12,7 +12,7 @@ object OnUserRandom extends EventListener {
 	private val USER_OR_QUERY = "(.+)(?:还是|or)(.+)"r
 	private val USER_IF_QUERY = "(.+)[吗?|？]+$"r
 	
-	override def onMessage(update: Update): Boolean = {
+	override def onMessage(using update: Update): Boolean = {
 		
 		if update.message.text == null then return false
 		if update.message.text startsWith "/" then return false

@@ -30,12 +30,11 @@ object IP186QueryHandler {
 	@throws[IOException]
 	private def commonQuery (requestUrl: String, queryParam: String): IP186Response = {
 		val request = Request.Builder().url(requestUrl + "?" + queryParam).build
-		var _body_string: String|Null = null
 		Using ((httpClient newCall request) execute) { response =>
-			if response.body ne null then _body_string = response.body.string
-		}
-		if _body_string eq null then throw IOException("Response of ip186: body is empty!")
-		IP186Response(requestUrl, _body_string)
+			val _body = response.body
+			if _body eq null then throw IOException("Response of ip186: body is empty!")
+			IP186Response(requestUrl, _body.string)
+		}.get
 	}
 	
 }

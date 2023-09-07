@@ -11,10 +11,10 @@ import scala.language.postfixOps
 
 object DirectMsgClear extends ISimpleCommand {
 	
-	override def getName: String = "r"
-	override def getAliases: Array[String] = null
+	override val name: String = "r"
+	override val aliases: Array[ICommandAlias] | Null = null
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		logger debug "executing command /r"
 		if (event.message.replyToMessage == null) return;

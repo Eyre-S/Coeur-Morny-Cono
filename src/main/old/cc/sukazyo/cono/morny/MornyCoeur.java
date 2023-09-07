@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny;
 
-import cc.sukazyo.cono.morny.bot.api.OnUpdate;
+import cc.sukazyo.cono.morny.bot.api.TelegramUpdatesListener$;
 import cc.sukazyo.cono.morny.bot.command.MornyCommands;
-import cc.sukazyo.cono.morny.bot.event.EventListeners;
+import cc.sukazyo.cono.morny.bot.event.MornyEventListeners;
 import cc.sukazyo.cono.morny.bot.query.MornyQueries;
 import cc.sukazyo.cono.morny.daemon.MornyDaemons;
 import cc.sukazyo.cono.morny.daemon.TrackerDataManager;
@@ -31,8 +31,6 @@ public class MornyCoeur {
 	
 	/** 当前 Morny 的{@link MornyTrusted 信任验证机}实例 */
 	private final MornyTrusted trusted;
-	/** 当前 Morny 的 telegram 命令管理器 */
-	private final MornyCommands commandManager = new MornyCommands();
 	private final MornyQueries queryManager = new MornyQueries();
 	
 	/** morny 的 bot 账户 */
@@ -127,12 +125,12 @@ public class MornyCoeur {
 			MornyDaemons.start();
 			
 			logger.info("start telegram events listening");
-			EventListeners.registerAllListeners();
-			INSTANCE.account.setUpdatesListener(OnUpdate::onNormalUpdate);
+			MornyEventListeners.registerAllEvents();
+			INSTANCE.account.setUpdatesListener(TelegramUpdatesListener$.MODULE$);
 			
 			if (config.commandLoginRefresh) {
 				logger.info("resetting telegram command list");
-				commandManager().automaticUpdateList();
+				MornyCommands.automaticTGListUpdate();
 			}
 			
 			logger.info("Coeur start complete");
@@ -156,7 +154,7 @@ public class MornyCoeur {
 	private void exitCleanup () {
 		MornyDaemons.stop();
 		if (config.commandLogoutClear) {
-			commandManager.automaticRemoveList();
+			MornyCommands.automaticTGListRemove();
 		}
 	}
 	
@@ -286,11 +284,6 @@ public class MornyCoeur {
 	@Nonnull
 	public static MornyTrusted trustedInstance () {
 		return INSTANCE.trusted;
-	}
-	
-	@Nonnull
-	public static MornyCommands commandManager () {
-		return INSTANCE.commandManager;
 	}
 	
 	@Nonnull

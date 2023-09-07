@@ -15,7 +15,7 @@ object OnCallMe extends EventListener {
 	
 	private val me = MornyCoeur.config.trustedMaster
 	
-	override def onMessage (update: Update): Boolean = {
+	override def onMessage (using update: Update): Boolean = {
 		
 		if update.message.text == null then return false
 		if update.message.chat.`type` != (Chat.Type Private) then return false

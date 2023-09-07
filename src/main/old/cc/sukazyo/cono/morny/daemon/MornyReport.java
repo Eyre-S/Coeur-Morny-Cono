@@ -37,7 +37,7 @@ public class MornyReport {
 		}
 	}
 	
-	public static void exception (@Nonnull Exception e, @Nullable String description) {
+	public static void exception (@Nonnull Throwable e, @Nullable String description) {
 		if (unsupported()) return;
 		executeReport(new SendMessage(
 				MornyCoeur.config().reportToChat,

@@ -11,7 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 @Deprecated
-public class OnKuohuanhuanNeedSleep extends EventListener {
+public class OnKuohuanhuanNeedSleep implements EventListener {
 	
 	@Override
 	public boolean onMessage (@Nonnull Update update) {

@@ -8,12 +8,12 @@ import com.pengrad.telegrambot.request.SendPhoto
 
 import scala.language.postfixOps
 
-object MornyInfoOnHello extends ISimpleCommand {
+object MornyInfoOnStart extends ISimpleCommand {
 	
-	override def getName: String = "start"
-	override def getAliases: Array[String] = Array()
+	override val name: String = "start"
+	override val aliases: Array[ICommandAlias] | Null = null
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		MornyCoeur.extra exec new SendPhoto(
 			event.message.chat.id,

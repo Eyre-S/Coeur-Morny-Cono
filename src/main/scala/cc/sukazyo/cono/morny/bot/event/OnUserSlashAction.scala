@@ -15,9 +15,9 @@ object OnUserSlashAction extends EventListener {
 	
 	private val TG_FORMAT = "^\\w+(@\\w+)?$"r
 	
-	override def onMessage (update: Update): Boolean = {
+	override def onMessage (using update: Update): Boolean = {
 		
-		val text = update.message.text;
+		val text = update.message.text
 		if text == null then return false
 		
 		if (text startsWith "/") {
@@ -31,6 +31,7 @@ object OnUserSlashAction extends EventListener {
 				case TG_FORMAT(_) =>
 					return false
 				case x if x contains "/" => return false
+				case _ =>
 			
 			val isHardParse = actions(0) isBlank
 			def hp_len(i: Int) = if isHardParse then i+1 else i
@@ -39,7 +40,7 @@ object OnUserSlashAction extends EventListener {
 			val hasObject = actions.length != hp_len(1)
 			val v_object =
 				if hasObject then
-					actions slice(hp_len(1), actions.length) mkString(" ")
+					actions slice(hp_len(1), actions.length) mkString " "
 				else ""
 			val origin = update.message
 			val target =

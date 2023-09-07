@@ -18,12 +18,12 @@ import scala.language.postfixOps
 
 object Encryptor extends ITelegramCommand {
 	
-	override def getName: String = "encrypt"
-	override def getAliases: Array[String] = null
-	override def getParamRule: String = "[algorithm|(l)] [(uppercase)]"
-	override def getDescription: String = "通过指定算法加密回复的内容 (目前只支持文本)"
+	override val name: String = "encrypt"
+	override val aliases: Array[ICommandAlias] | Null = null
+	override val paramRule: String = "[algorithm|(l)] [(uppercase)]"
+	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val args = command.getArgs
 		

@@ -11,12 +11,12 @@ import scala.language.postfixOps
 
 object EventHack extends ITelegramCommand {
 	
-	override def getName: String = "event_hack"
-	override def getAliases: Array[String] = null
-	override def getParamRule: String = "[(user|group|any)]"
-	override def getDescription: String = "输出 bot 下一个获取到的事件序列化数据"
+	override val name: String = "event_hack"
+	override val aliases: Array[ICommandAlias] | Null = null
+	override val paramRule: String = "[(user|group|any)]"
+	override val description: String = "输出 bot 下一个获取到的事件序列化数据"
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val x_mode = if (command.hasArgs) command.getArgs()(0) else ""
 		

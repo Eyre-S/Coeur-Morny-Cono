@@ -99,8 +99,8 @@ scala {
 	
 	compileJava {
 		
-		sourceCompatibility '17'
-		targetCompatibility '17'
+		sourceCompatibility proj_java.getMajorVersion()
+		targetCompatibility proj_java.getMajorVersion()
 		
 		options.encoding = proj_file_encoding.name()
 		
@@ -108,8 +108,13 @@ scala {
 	
 	compileScala {
 		
+		sourceCompatibility proj_java.getMajorVersion()
+		targetCompatibility proj_java.getMajorVersion()
+		
 		options.encoding = proj_file_encoding.name()
 		scalaCompileOptions.encoding = proj_file_encoding.name()
+		
+//		scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
 		
 	}
 	

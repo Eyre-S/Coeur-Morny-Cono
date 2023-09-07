@@ -8,7 +8,7 @@ import com.pengrad.telegrambot.model.Update;
 import javax.annotation.Nonnull;
 
 @Deprecated
-public class OnActivityRecord extends EventListener {
+public class OnActivityRecord implements EventListener {
 	
 	@Override
 	public boolean onMessage (@Nonnull Update update) {
@@ -22,7 +22,7 @@ public class OnActivityRecord extends EventListener {
 					(long)update.message().date() * 1000
 			);
 		}
-		return super.onMessage(update);
+		return false;
 	}
 	
 }

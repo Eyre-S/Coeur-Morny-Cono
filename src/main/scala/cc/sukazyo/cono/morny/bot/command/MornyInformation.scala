@@ -23,12 +23,12 @@ object MornyInformation extends ITelegramCommand {
 		val VERSION_2 = "v"
 	}
 	
-	override def getName: String = "info"
-	override def getAliases: Array[String] = Array()
-	override def getParamRule: String = "[(version|runtime|stickers[.IDs])]"
-	override def getDescription: String = "输出当前 Morny 的各种信息"
+	override val name: String = "info"
+	override val aliases: Array[ICommandAlias]|Null = null
+	override val paramRule: String = "[(version|runtime|stickers[.IDs])]"
+	override val description: String = "输出当前 Morny 的各种信息"
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		if (!command.hasArgs) {
 			echoInfo(event.message.chat.id, event.message.messageId)
@@ -38,10 +38,10 @@ object MornyInformation extends ITelegramCommand {
 		val action: String = command.getArgs()(0)
 		
 		action match {
-			case Subs.STICKERS => echoStickers(command, event)
-			case Subs.RUNTIME => echoRuntime(event)
-			case Subs.VERSION | Subs.VERSION_2 => echoVersion(event)
-			case _ => echo404(event)
+			case Subs.STICKERS => echoStickers
+			case Subs.RUNTIME => echoRuntime
+			case Subs.VERSION | Subs.VERSION_2 => echoVersion
+			case _ => echo404
 		}
 		
 	}
@@ -92,11 +92,11 @@ object MornyInformation extends ITelegramCommand {
 		).parseMode(ParseMode HTML).replyToMessageId(replyTo)
 	}
 	
-	private def echoStickers (command: InputCommand, event: Update): Unit = {
+	private def echoStickers (using command: InputCommand, event: Update): Unit = {
 		val chat = event.message.chat.id
 		val replyTo = event.message.messageId
 		var sid: String|Null = null
-		if (command.getArgs()(0) eq Subs.STICKERS) {
+		if (command.getArgs()(0) == Subs.STICKERS) {
 			if (command.getArgs.length == 1) sid = ""
 			else if (command.getArgs.length == 2) sid = command.getArgs()(1)
 		} else if (command.getArgs.length == 1) {
@@ -104,7 +104,7 @@ object MornyInformation extends ITelegramCommand {
 				sid = command.getArgs()(0) substring Subs.STICKERS.length+1
 			}
 		}
-		if (sid == null) echo404(event)
+		if (sid == null) echo404
 		else echoStickers(sid, chat, replyTo)
 	}
 	
@@ -113,11 +113,12 @@ object MornyInformation extends ITelegramCommand {
 		else TelegramStickers echoStickerByID(sid, MornyCoeur.extra, send_chat, send_replyTo)
 	}
 	
-	private[command] def echoVersion (event: Update): Unit = {
+	private[command] def echoVersion (using event: Update): Unit = {
 		val versionDeltaHTML = if (MornySystem.isUseDelta) s"-δ<code>${h(MornySystem.VERSION_DELTA)}</code>" else ""
 		val versionGitHTML = if (MornySystem.isGitBuild) s"git $getVersionGitTagHTML" else ""
 		MornyCoeur.extra exec new SendMessage(
 			event.message.chat.id,
+			// language=html
 			s"""version:
 			   |- Morny <code>${h(MornySystem.CODENAME toUpperCase)}</code>
 			   |- <code>${h(MornySystem.VERSION_BASE)}</code>$versionDeltaHTML${if (MornySystem.isGitBuild) "\n- " + versionGitHTML else ""}
@@ -130,11 +131,11 @@ object MornyInformation extends ITelegramCommand {
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 	}
 	
-	private[command] def echoRuntime (event: Update): Unit = {
+	private[command] def echoRuntime (using event: Update): Unit = {
 		def sysprop (p: String): String = System.getProperty(p)
 		MornyCoeur.extra exec new SendMessage(
 			event.message.chat.id,
-			/* html */
+			/* language=html */
 			s"""system:
 			   |- Morny <code>${h(if (getRuntimeHostname == null) "<unknown-host>" else getRuntimeHostname)}</code>
 			   |- <code>${h(sysprop("os.name"))}</code> <code>${h(sysprop("os.arch"))}</code> <code>${h(sysprop("os.version"))}</code>
@@ -158,7 +159,7 @@ object MornyInformation extends ITelegramCommand {
 		).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 	}
 	
-	private def echo404 (event: Update): Unit =
+	private def echo404 (using event: Update): Unit =
 		MornyCoeur.extra exec new SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_404

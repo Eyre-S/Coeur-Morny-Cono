@@ -1,6 +1,5 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.bot.api.InlineQueryUnit
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation
 import com.pengrad.telegrambot.model.Update

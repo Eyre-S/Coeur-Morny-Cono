@@ -15,39 +15,39 @@ import scala.language.postfixOps
 object 喵呜 {
 	
 	object 抱抱 extends ISimpleCommand {
-		override def getName: String = "抱抱"
-		override def getAliases: Array[String] = Array()
-		override def execute (command: InputCommand, event: Update): Unit =
-			replyingSet(event, "贴贴", "贴贴")
+		override val name: String = "抱抱"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override def execute (using command: InputCommand, event: Update): Unit =
+			replyingSet("贴贴", "贴贴")
 	}
 	
 	object 揉揉 extends ISimpleCommand {
-		override def getName: String = "揉揉"
-		override def getAliases: Array[String] = Array()
-		override def execute (command: InputCommand, event: Update): Unit =
-			replyingSet(event, "蹭蹭", "摸摸")
+		override val name: String = "揉揉"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override def execute (using command: InputCommand, event: Update): Unit =
+			replyingSet("蹭蹭", "摸摸")
 	}
 	
 	object 蹭蹭 extends ISimpleCommand {
-		override def getName: String = "蹭蹭"
-		override def getAliases: Array[String] = Array()
-		override def execute (command: InputCommand, event: Update): Unit =
-			replyingSet(event, "揉揉", "蹭蹭")
+		override val name: String = "蹭蹭"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override def execute (using command: InputCommand, event: Update): Unit =
+			replyingSet("揉揉", "蹭蹭")
 	}
 	
 	object 贴贴 extends ISimpleCommand {
-		override def getName: String = "贴贴"
-		override def getAliases: Array[String] = Array()
-		override def execute (command: InputCommand, event: Update): Unit =
-			replyingSet(event, "贴贴", "贴贴")
+		override val name: String = "贴贴"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override def execute (using command: InputCommand, event: Update): Unit =
+			replyingSet("贴贴", "贴贴")
 	}
 	
 	object Progynova extends ITelegramCommand {
-		override def getName: String = "install"
-		override def getAliases: Array[String] = Array()
-		override def getParamRule: String = ""
-		override def getDescription: String = "抽取一个神秘盒子"
-		override def execute (command: InputCommand, event: Update): Unit = {
+		override val name: String = "install"
+		override val aliases: Array[ICommandAlias]|Null = null
+		override val paramRule: String = ""
+		override val description: String = "抽取一个神秘盒子"
+		override def execute (using command: InputCommand, event: Update): Unit = {
 			MornyCoeur.extra exec new SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_PROGYNOVA
@@ -55,7 +55,7 @@ object 喵呜 {
 		}
 	}
 	
-	private def replyingSet (event: Update, whileRec: String, whileNew: String): Unit = {
+	private def replyingSet (whileRec: String, whileNew: String)(using event: Update): Unit = {
 		val isNew = event.message.replyToMessage == null;
 		val target = if (isNew) event.message else event.message.replyToMessage
 		MornyCoeur.extra exec new SendMessage(

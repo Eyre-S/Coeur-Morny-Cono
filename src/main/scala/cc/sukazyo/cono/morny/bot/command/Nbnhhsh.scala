@@ -13,14 +13,16 @@ import scala.language.postfixOps
 
 object Nbnhhsh extends ITelegramCommand {
 	
-	private val NBNHHSH_RESULT_HEAD_HTML = "<a href=\"https://lab.magiconch.com/nbnhhsh/\">## Result of nbnhhsh query :</a>"
+	private val NBNHHSH_RESULT_HEAD_HTML =
+		// language=html
+		"<a href=\"https://lab.magiconch.com/nbnhhsh/\">## Result of nbnhhsh query :</a>"
 	
-	override def getName: String = "nbnhhsh"
-	override def getAliases: Array[String]|Null = null
-	override def getParamRule: String = "[text]"
-	override def getDescription: String = "检索文本内 nbnhhsh 词条"
+	override val name: String = "nbnhhsh"
+	override val aliases: Array[ICommandAlias]|Null = null
+	override val paramRule: String = "[text]"
+	override val description: String = "检索文本内 nbnhhsh 词条"
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val queryTarget: String|Null =
 			import cc.sukazyo.cono.morny.util.CommonConvert.stringsConnecting
@@ -47,17 +49,17 @@ object Nbnhhsh extends ITelegramCommand {
 			logger debug s"**xx len=${queryResp.words.length}"
 			for (_word <- queryResp.words) {
 				logger debug "**exec"
-				if ((_word.trans ne null) && (_word.trans isEmpty)) _word.trans = null
-				if ((_word.inputting ne null) && (_word.inputting isEmpty)) _word.inputting = null
-				if ((_word.trans ne null) || (_word.inputting ne null))
+				val _use_trans = (_word.trans ne null) && (_word.trans nonEmpty)
+				val _use_inputting = (_word.inputting ne null) && (_word.inputting nonEmpty)
+				if (_use_trans || _use_inputting)
 					message ++= s"\n\n<b>[[ ${h(_word.name)} ]]</b>"
 					logger debug s"**used [${_word.name}]"
-					if (_word.trans != null) for (_trans <- _word.trans)
+					if (_use_trans) for (_trans <- _word.trans)
 						message ++= s"\n* <i>${h(_trans)}</i>"
 						logger debug s"**used [${_word.name}] used `${_trans}``"
-					if (_word.inputting != null)
+					if (_use_inputting)
 						logger debug s"**used [${_word.name}] inputting"
-						if (_word.trans != null)
+						if (_use_trans)
 							message += '\n'
 						message ++= " maybe:"
 						for (_inputting <- _word.inputting)

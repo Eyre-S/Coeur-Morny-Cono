@@ -8,10 +8,10 @@ import com.pengrad.telegrambot.request.SendMessage
 
 object 私わね extends ISimpleCommand {
 	
-	override def getName: String = "me"
-	override def getAliases: Array[String] = Array()
+	override val name: String = "me"
+	override val aliases: Array[ICommandAlias] | Null = null
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		if (probabilityTrue(521)) {
 			val text = "/打假"

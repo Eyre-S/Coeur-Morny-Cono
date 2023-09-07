@@ -2,7 +2,8 @@ package cc.sukazyo.cono.morny.bot.event;
 
 import cc.sukazyo.cono.morny.bot.api.EventListener;
 
-public class OnRandomlyTriggered extends EventListener {
+@Deprecated
+public class OnRandomlyTriggered implements EventListener {
 	
 //	/**
 //	 * function CODE_IK0XA1

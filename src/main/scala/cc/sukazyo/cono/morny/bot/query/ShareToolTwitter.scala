@@ -1,6 +1,5 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.bot.api.InlineQueryUnit
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
 

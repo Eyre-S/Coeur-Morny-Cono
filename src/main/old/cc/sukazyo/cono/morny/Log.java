@@ -5,6 +5,7 @@ import cc.sukazyo.messiva.log.LogLevel;
 import cc.sukazyo.messiva.logger.Logger;
 import cc.sukazyo.messiva.appender.ConsoleAppender;
 
+import javax.annotation.Nonnull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -48,7 +49,7 @@ public class Log {
 	 * @return {@link String} 格式的异常的堆栈报告信息.
 	 * @see 1.0.0-alpha5
 	 */
-	public static String exceptionLog (Exception e) {
+	public static String exceptionLog (@Nonnull Throwable e) {
 		final StringWriter stackTrace = new StringWriter();
 		e.printStackTrace(new PrintWriter(stackTrace));
 		return stackTrace.toString();

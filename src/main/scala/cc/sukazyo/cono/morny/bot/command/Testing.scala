@@ -12,17 +12,15 @@ import scala.language.postfixOps
 
 object Testing extends ISimpleCommand {
 	
-	override def getName: String = "test"
-	override def getAliases: Array[String] = null
+	override val name: String = "test"
+	override val aliases: Array[ICommandAlias] | Null = null
 	
-	override def execute (command: InputCommand, event: Update): Unit = {
-		
-		val a = StringBuilder("value")
-		a ++= "Changed"
+	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		MornyCoeur.extra exec new SendMessage(
 			event.message.chat.id,
-			"<b>Just</b> a TEST command. num is:" + (a toString)
+			// language=html
+			"<b>Just</b> a TEST command."
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 		
 	}
