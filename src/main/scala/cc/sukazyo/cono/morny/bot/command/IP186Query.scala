@@ -65,12 +65,12 @@ object IP186Query {
 			
 		} catch case e: Exception =>
 			import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
-			MornyCoeur.extra().exec(new SendMessage(
+			MornyCoeur.extra exec new SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""
 				.stripMargin
-			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId()));
+			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId())
 		
 	}
 	

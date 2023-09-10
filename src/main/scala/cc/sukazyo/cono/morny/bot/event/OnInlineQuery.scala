@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
-import cc.sukazyo.cono.morny.bot.query.InlineQueryUnit
+import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, MornyQueries}
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResult
 import com.pengrad.telegrambot.request.AnswerInlineQuery
@@ -15,7 +15,7 @@ object OnInlineQuery extends EventListener {
 	
 	override def onInlineQuery (using update: Update): Boolean = {
 		
-		val results: List[InlineQueryUnit[_]] = MornyCoeur.queryManager query update
+		val results: List[InlineQueryUnit[_]] = MornyQueries query update
 		
 		var cacheTime = Int.MaxValue
 		var isPersonal = InlineQueryUnit.defaults.IS_PERSONAL

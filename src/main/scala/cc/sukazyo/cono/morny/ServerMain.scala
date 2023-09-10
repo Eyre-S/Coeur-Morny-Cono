@@ -109,7 +109,7 @@ object ServerMain {
 					   |    Morny ${MornySystem.CODENAME toUpperCase}
 					   |    ${MornySystem.VERSION_BASE}${if (MornySystem.isUseDelta) "-δ"+MornySystem.VERSION_DELTA else ""}
 					   |- md5hash :
-					   |    ${MornySystem.getJarMd5}
+					   |    ${MornySystem.getJarMD5}
 					   |- gitstat :
 					   |${ if (MornySystem.isGitBuild) {
 							s"""    on commit ${if (MornySystem.isCleanBuild) "- clean-build" else "<δ/non-clean-build>"}
@@ -128,7 +128,7 @@ object ServerMain {
 				s"""ServerMain.java Loaded >>>
 				   |- version ${MornySystem.VERSION_FULL}
 				   |- Morny ${MornySystem.CODENAME toUpperCase}
-				   |- <${MornySystem.getJarMd5}> [${BuildConfig.CODE_TIMESTAMP}]""".stripMargin
+				   |- <${MornySystem.getJarMD5}> [${BuildConfig.CODE_TIMESTAMP}]""".stripMargin
 		
 		///
 		/// Check Coeur arguments
@@ -143,7 +143,7 @@ object ServerMain {
 		Thread.currentThread setName THREAD_MORNY_INIT
 		
 		try
-			MornyCoeur.init(new MornyConfig(config))
+			MornyCoeur.init(using config build)
 		catch {
 			case _: CheckFailure.NullTelegramBotKey =>
 				logger.info("Parameter required has no value:\n --token.")

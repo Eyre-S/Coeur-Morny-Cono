@@ -22,7 +22,7 @@ object OnTelegramCommand extends EventListener {
 		if (!(inputCommand.getCommand matches "^\\w+$"))
 			logger debug "not command"
 			false
-		else if ((inputCommand.getTarget ne null) && (inputCommand.getTarget ne MornyCoeur.getUsername))
+		else if ((inputCommand.getTarget ne null) && (inputCommand.getTarget ne MornyCoeur.username))
 			logger debug "not morny command"
 			false
 		else

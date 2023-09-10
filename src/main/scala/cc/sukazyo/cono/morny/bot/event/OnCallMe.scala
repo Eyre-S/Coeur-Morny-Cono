@@ -1,6 +1,5 @@
 package cc.sukazyo.cono.morny.bot.event
 
-import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.data.TelegramStickers
@@ -20,6 +19,7 @@ object OnCallMe extends EventListener {
 		if update.message.text == null then return false
 		if update.message.chat.`type` != (Chat.Type Private) then return false
 		
+		//noinspection ScalaUnnecessaryParentheses
 		(update.message.text toLowerCase) match
 			case "steam" | "sbeam" | "sdeam" =>
 				requestItem(update.message.from, "<b>STEAM LIBRARY</b>")
@@ -51,7 +51,7 @@ object OnCallMe extends EventListener {
 	private def requestLastDinner (req: Message): Unit = {
 		var isAllowed = false
 		var lastDinnerData: Message|Null = null
-		if (MornyCoeur.trustedInstance isTrustedForDinnerRead req.from.id) {
+		if (MornyCoeur.trusted isTrusted_dinnerReader req.from.id) {
 			lastDinnerData = (MornyCoeur.extra exec GetChat(MornyCoeur.config.dinnerChatId)).chat.pinnedMessage
 			val sendResp = MornyCoeur.extra exec ForwardMessage(
 				req.from.id,

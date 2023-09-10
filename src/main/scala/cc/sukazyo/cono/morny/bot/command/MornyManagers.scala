@@ -24,7 +24,7 @@ object MornyManagers {
 			
 			val user = event.message.from
 			
-			if (MornyCoeur.trustedInstance isTrusted user.id) {
+			if (MornyCoeur.trusted isTrusted user.id) {
 				
 				MornyCoeur.extra exec SendSticker(
 					event.message.chat.id,
@@ -59,7 +59,7 @@ object MornyManagers {
 			
 			val user = event.message.from
 			
-			if (MornyCoeur.trustedInstance isTrusted user.id) {
+			if (MornyCoeur.trusted isTrusted user.id) {
 				
 				logger info s"call save from command by ${(TGToString as user) toStringLogTag}"
 				MornyCoeur.callSaveData()

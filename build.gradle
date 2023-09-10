@@ -52,7 +52,7 @@ final JavaVersion proj_java = JavaVersion.VERSION_17
 final Charset proj_file_encoding = StandardCharsets.UTF_8
 final proj_scala_api = 3
 //final proj_scala_lib = proj_scala_api+'.4.0-RC1-bin-20230901-89e8dba-NIGHTLY'
-final proj_scala_lib = proj_scala_api+'.3.1-RC7'
+final proj_scala_lib = proj_scala_api+'.3.1'
 String publish_local_url = null
 String publish_remote_url = null
 String publish_remote_username = null
@@ -89,35 +89,26 @@ dependencies {
 	
 }
 
-sourceSets {
-	main {
-		scala { srcDirs = ['src/main/scala', 'src/main/old'] }
-	}
+tasks.withType(JavaCompile).configureEach {
+	
+	sourceCompatibility proj_java.getMajorVersion()
+	targetCompatibility proj_java.getMajorVersion()
+	
+	options.encoding = proj_file_encoding.name()
+	
 }
 
-scala {
+tasks.withType(ScalaCompile).configureEach {
 	
-	compileJava {
-		
-		sourceCompatibility proj_java.getMajorVersion()
-		targetCompatibility proj_java.getMajorVersion()
-		
-		options.encoding = proj_file_encoding.name()
-		
-	}
+	sourceCompatibility proj_java.getMajorVersion()
+	targetCompatibility proj_java.getMajorVersion()
 	
-	compileScala {
-		
-		sourceCompatibility proj_java.getMajorVersion()
-		targetCompatibility proj_java.getMajorVersion()
-		
-		options.encoding = proj_file_encoding.name()
-		scalaCompileOptions.encoding = proj_file_encoding.name()
-		
-//		scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
-		
-	}
+	options.encoding = proj_file_encoding.name()
+	scalaCompileOptions.encoding = proj_file_encoding.name()
 	
+	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
+//	scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
+
 }
 
 test {

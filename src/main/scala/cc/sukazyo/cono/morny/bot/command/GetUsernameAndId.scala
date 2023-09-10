@@ -39,7 +39,7 @@ object GetUsernameAndId extends ITelegramCommand {
 			} else if (event.message.replyToMessage eq null) event.message.from.id
 			else event.message.replyToMessage.from.id
 		
-		val response = MornyCoeur.getAccount execute GetChatMember(event.message.chat.id, userId)
+		val response = MornyCoeur.account execute GetChatMember(event.message.chat.id, userId)
 		
 		if (response.chatMember eq null)
 			MornyCoeur.extra exec SendMessage(

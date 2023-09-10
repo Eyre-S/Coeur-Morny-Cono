@@ -46,6 +46,7 @@ object OnCallMsgSend extends EventListener {
 						if e.url ne null then _parsed.url(e.url)
 						if e.user ne null then _parsed.user(e.user)
 						if e.language ne null then _parsed.language(e.language)
+						if e.customEmojiId ne null then _parsed.language(e.language)
 						entities += _parsed
 					MessageToSend(_body, entities toArray, parseMode, target)
 				case _ => null
@@ -59,7 +60,7 @@ object OnCallMsgSend extends EventListener {
 		if message.text eq null then return false
 		if !(message.text startsWith "*msg") then return false
 		
-		if (!(MornyCoeur.trustedInstance isTrusted message.from.id))
+		if (!(MornyCoeur.trusted isTrusted message.from.id))
 			MornyCoeur.extra exec SendSticker(
 				message.chat.id,
 				TelegramStickers ID_403
@@ -71,7 +72,7 @@ object OnCallMsgSend extends EventListener {
 			if (message.replyToMessage eq null) return answer404
 			val messageToSend = MessageToSend from message.replyToMessage
 			if ((messageToSend eq null) || (messageToSend.message eq null)) return answer404
-			val sendResponse = MornyCoeur.getAccount execute messageToSend.toSendMessage()
+			val sendResponse = MornyCoeur.account execute messageToSend.toSendMessage()
 			
 			if (sendResponse isOk) {
 				MornyCoeur.extra exec SendSticker(
@@ -104,7 +105,7 @@ object OnCallMsgSend extends EventListener {
 			if _toSend eq null then return answer404
 			else _toSend
 		
-		val targetChatResponse = MornyCoeur.getAccount execute GetChat(messageToSend.targetId)
+		val targetChatResponse = MornyCoeur.account execute GetChat(messageToSend.targetId)
 		if (targetChatResponse isOk) {
 			def getChatDescriptionHTML (chat: Chat): String =
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
@@ -128,7 +129,7 @@ object OnCallMsgSend extends EventListener {
 		}
 		
 		if messageToSend.message eq null then return true
-		val testSendResponse = MornyCoeur.getAccount execute messageToSend.toSendMessage(update.message.chat.id)
+		val testSendResponse = MornyCoeur.account execute messageToSend.toSendMessage(update.message.chat.id)
 				.replyToMessageId(update.message.messageId)
 		if (!(testSendResponse isOk))
 			MornyCoeur.extra exec SendMessage(

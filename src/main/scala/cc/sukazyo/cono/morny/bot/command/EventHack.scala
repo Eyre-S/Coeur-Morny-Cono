@@ -40,7 +40,7 @@ object EventHack extends ITelegramCommand {
 			)
 		x_mode match
 			case "any" =>
-				if (MornyCoeur.trustedInstance isTrusted event.message.from.id)
+				if (MornyCoeur.trusted isTrusted event.message.from.id)
 					doRegister(HackType ANY)
 					done_ok
 				else done_forbiddenForAny

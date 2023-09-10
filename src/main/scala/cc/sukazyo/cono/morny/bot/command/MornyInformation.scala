@@ -1,10 +1,10 @@
 package cc.sukazyo.cono.morny.bot.command
 
+import cc.sukazyo.cono.morny.{BuildConfig, MornyAbout, MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.data.{TelegramImages, TelegramStickers}
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.{BuildConfig, MornyAbout, MornyCoeur, MornySystem}
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
@@ -38,7 +38,7 @@ object MornyInformation extends ITelegramCommand {
 		val action: String = command.getArgs()(0)
 		
 		action match {
-			case Subs.STICKERS => echoStickers
+			case s if s startsWith Subs.STICKERS => echoStickers
 			case Subs.RUNTIME => echoRuntime
 			case Subs.VERSION | Subs.VERSION_2 => echoVersion
 			case _ => echo404
@@ -93,24 +93,41 @@ object MornyInformation extends ITelegramCommand {
 	}
 	
 	private def echoStickers (using command: InputCommand, event: Update): Unit = {
-		val chat = event.message.chat.id
-		val replyTo = event.message.messageId
-		var sid: String|Null = null
-		if (command.getArgs()(0) == Subs.STICKERS) {
-			if (command.getArgs.length == 1) sid = ""
-			else if (command.getArgs.length == 2) sid = command.getArgs()(1)
-		} else if (command.getArgs.length == 1) {
-			if ((command.getArgs()(0) startsWith s"${Subs.STICKERS}.") || (command.getArgs()(0) startsWith s"${Subs.STICKERS}#")) {
-				sid = command.getArgs()(0) substring Subs.STICKERS.length+1
-			}
-		}
-		if (sid == null) echo404
-		else echoStickers(sid, chat, replyTo)
+		val mid: String|Null =
+			if (command.getArgs()(0) == Subs.STICKERS) {
+				if (command.getArgs.length == 1) ""
+				else if (command.getArgs.length == 2) command.getArgs()(1)
+				else null
+			} else if (command.getArgs.length == 1) {
+				if ((command.getArgs()(0) startsWith s"${Subs.STICKERS}.") || (command.getArgs()(0) startsWith s"${Subs.STICKERS}#")) {
+					command.getArgs()(0) substring Subs.STICKERS.length+1
+				} else null
+			} else null
+		if (mid == null) echo404
+		else echoStickers(mid)(using event.message.chat.id, event.message.messageId)
 	}
 	
-	private def echoStickers (sid: String, send_chat: Long, send_replyTo: Int): Unit = {
-		if (sid isEmpty) TelegramStickers echoAllStickers(MornyCoeur.extra, send_chat, send_replyTo)
-		else TelegramStickers echoStickerByID(sid, MornyCoeur.extra, send_chat, send_replyTo)
+	private def echoStickers (mid: String)(using send_chat: Long, send_replyTo: Int)(using Update): Unit = {
+		import scala.jdk.CollectionConverters.*
+		if (mid isEmpty) for ((_key, _file_id) <- TelegramStickers.map asScala)
+			echoSticker(_key, _file_id)
+		else {
+			try {
+				val sticker = TelegramStickers getById mid
+				echoSticker(sticker.getKey, sticker.getValue)
+			} catch case _: NoSuchFieldException => {
+				echo404
+			}
+		}
+	}
+	
+	private def echoSticker (mid: String, file_id: String)(using send_chat: Long, send_replyTo: Int): Unit = {
+		val send_mid = SendMessage(send_chat, mid)
+		val send_sticker = SendSticker(send_chat, file_id)
+		if (send_replyTo != -1) send_mid.replyToMessageId(send_replyTo)
+		val result_send_mid = MornyCoeur.extra exec send_mid
+		send_sticker.replyToMessageId(result_send_mid.message.messageId)
+		MornyCoeur.extra exec send_sticker
 	}
 	
 	private[command] def echoVersion (using event: Update): Unit = {
@@ -123,7 +140,7 @@ object MornyInformation extends ITelegramCommand {
 			   |- Morny <code>${h(MornySystem.CODENAME toUpperCase)}</code>
 			   |- <code>${h(MornySystem.VERSION_BASE)}</code>$versionDeltaHTML${if (MornySystem.isGitBuild) "\n- " + versionGitHTML else ""}
 			   |coeur md5_hash:
-			   |- <code>${h(MornySystem.getJarMd5)}</code>
+			   |- <code>${h(MornySystem.getJarMD5)}</code>
 			   |coding timestamp:
 			   |- <code>${BuildConfig.CODE_TIMESTAMP}</code>
 			   |- <code>${h(formatDate(BuildConfig.CODE_TIMESTAMP, 0))} [UTC]</code>
@@ -147,7 +164,7 @@ object MornyInformation extends ITelegramCommand {
 			   |- <code>${Runtime.getRuntime.availableProcessors}</code> cores
 			   |coeur version:
 			   |- $getVersionAllFullTagHTML
-			   |- <code>${h(MornySystem.getJarMd5)}</code>
+			   |- <code>${h(MornySystem.getJarMD5)}</code>
 			   |- <code>${h(formatDate(BuildConfig.CODE_TIMESTAMP, 0))} [UTC]</code>
 			   |- [<code>${BuildConfig.CODE_TIMESTAMP}</code>]
 			   |continuous:

@@ -3,20 +3,23 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.Log.logger
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
 import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
 
 import scala.collection.{mutable, SeqMap}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
-import cc.sukazyo.cono.morny.Log.logger
 
 object MornyCommands {
 	
 	private type CommandMap = SeqMap[String, ISimpleCommand]
 	private def CommandMap (commands: ISimpleCommand*): CommandMap =
-		val stash: mutable.SeqMap[String, ISimpleCommand] = mutable.SeqMap()
-		for (i <- commands) stash += ((i.name, i))
+		val stash = mutable.SeqMap.empty[String, ISimpleCommand]
+		for (i <- commands)
+			stash += (i.name -> i)
+			if (i.aliases ne null) for (alias <- i.aliases)
+				stash += (alias.name -> i)
 		stash
 	
 	private val commands: CommandMap = CommandMap(
@@ -41,12 +44,14 @@ object MornyCommands {
 		Testing,
 		DirectMsgClear,
 		
+		//noinspection NonAsciiCharacters
 		私わね,
+		//noinspection NonAsciiCharacters
 		喵呜.Progynova
 		
 	)
 	
-	@SuppressWarnings(Array("NonAsciiCharacters"))
+	//noinspection NonAsciiCharacters
 	val commands_uni: CommandMap = CommandMap(
 		喵呜.抱抱,
 		喵呜.揉揉,

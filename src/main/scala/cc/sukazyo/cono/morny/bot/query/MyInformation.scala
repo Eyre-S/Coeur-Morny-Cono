@@ -14,7 +14,7 @@ object MyInformation extends ITelegramQuery {
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
 		
-		if (event.inlineQuery.query == null || (event.inlineQuery.query isBlank)) return null
+		if ((event.inlineQuery.query ne null) || (event.inlineQuery.query nonEmpty)) return null
 		
 		List(
 			InlineQueryUnit(InlineQueryResultArticle(

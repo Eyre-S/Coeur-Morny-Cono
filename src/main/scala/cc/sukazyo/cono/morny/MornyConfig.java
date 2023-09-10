@@ -129,7 +129,7 @@ public class MornyConfig {
 	 *  End Configs | ConfigBuilder            *
 	 * ======================================= */
 	
-	public MornyConfig (@Nonnull Prototype prototype) throws CheckFailure {
+	private MornyConfig (@Nonnull Prototype prototype) throws CheckFailure {
 		this.telegramBotApiServer = prototype.telegramBotApiServer;
 		this.telegramBotApiServer4File = prototype.telegramBotApiServer4File;
 		if (prototype.telegramBotKey == null) throw new CheckFailure.NullTelegramBotKey();
@@ -158,6 +158,10 @@ public class MornyConfig {
 	}
 	
 	public static class Prototype {
+		
+		public MornyConfig build () {
+			return new MornyConfig(this);
+		}
 		
 		@Nullable public String telegramBotApiServer = null;
 		@Nullable public String telegramBotApiServer4File = null;

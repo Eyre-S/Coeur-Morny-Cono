@@ -8,6 +8,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
+import static cc.sukazyo.cono.morny.internal.ScalaJavaConv.jSetInteger2simm;
+
 public class TestMedicationTimer {
 	
 	@ParameterizedTest
@@ -21,12 +23,12 @@ public class TestMedicationTimer {
 			2125-11-18T23:45:27.062+00, +00, 2125-11-19T07:00:00+00
 			""")
 	void testCalcNextRoutineTimestamp (ZonedDateTime base, ZoneOffset zoneHour, ZonedDateTime expected)
-	throws MedicationTimer.NoNotifyTimeTag {
+	throws IllegalArgumentException {
 		final Set<Integer> at = Set.of(7, 19, 21);
 		System.out.println("base.toInstant().toEpochMilli() = " + base.toInstant().toEpochMilli());
 		Assertions.assertEquals(
 				expected.toInstant().toEpochMilli(),
-				MedicationTimer.calcNextRoutineTimestamp(base.toInstant().toEpochMilli(), zoneHour, at)
+				MedicationTimer.calcNextRoutineTimestamp(base.toInstant().toEpochMilli(), zoneHour, jSetInteger2simm(at))
 		);
 		System.out.println(" ok");
 	}

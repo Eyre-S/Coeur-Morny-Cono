@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable.ListBuffer
 
-class MornyQueries {
+object MornyQueries {
 	
 	private val queryInstances = Set[ITelegramQuery](
 		RawText,

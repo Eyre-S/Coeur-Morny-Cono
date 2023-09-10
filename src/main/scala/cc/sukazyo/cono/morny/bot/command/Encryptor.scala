@@ -57,7 +57,7 @@ object Encryptor extends ITelegramCommand {
 			val _r = event.message.replyToMessage
 			if ((_r ne null) && (_r.document ne null)) {
 				try {XFile(
-					MornyCoeur.getAccount getFileContent (MornyCoeur.extra exec GetFile(_r.document.fileId)).file,
+					MornyCoeur.account getFileContent (MornyCoeur.extra exec GetFile(_r.document.fileId)).file,
 					_r.document.fileName
 				)} catch case e: IOException =>
 					logger warn s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
@@ -74,7 +74,7 @@ object Encryptor extends ITelegramCommand {
 							_photo_size = _size
 					if (_photo_origin eq null) throw IllegalArgumentException("no photo from api.")
 					XFile(
-						MornyCoeur.getAccount getFileContent (MornyCoeur.extra exec GetFile(_photo_origin.fileId)).file,
+						MornyCoeur.account getFileContent (MornyCoeur.extra exec GetFile(_photo_origin.fileId)).file,
 						s"photo${byteArrayToHex(hashMd5(System.currentTimeMillis toString)) substring 32-12 toUpperCase}.png"
 					)
 				} catch

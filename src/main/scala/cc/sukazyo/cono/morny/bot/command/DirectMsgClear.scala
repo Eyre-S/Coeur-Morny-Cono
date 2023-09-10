@@ -19,12 +19,12 @@ object DirectMsgClear extends ISimpleCommand {
 		logger debug "executing command /r"
 		if (event.message.replyToMessage == null) return;
 		logger trace "message is a reply"
-		if (event.message.replyToMessage.from.id != MornyCoeur.getUserid) return;
+		if (event.message.replyToMessage.from.id != MornyCoeur.userid) return;
 		logger trace "message replied is from me"
 		if (System.currentTimeMillis/1000 - event.message.replyToMessage.date > 48*60*60) return;
 		logger trace "message is not outdated(48 hrs ago)"
 		
-		val isTrusted = MornyCoeur.trustedInstance isTrusted event.message.from.id
+		val isTrusted = MornyCoeur.trusted isTrusted event.message.from.id
 		def _isReplyTrusted: Boolean =
 			if (event.message.replyToMessage.replyToMessage == null) false
 			else if (event.message.replyToMessage.replyToMessage.from.id == event.message.from.id) true
