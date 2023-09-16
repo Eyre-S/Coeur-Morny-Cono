@@ -31,15 +31,15 @@ object IP186Query {
 	private def query (using event: Update, command: InputCommand): Unit = {
 		
 		val target: String|Null =
-			if (command.getArgs isEmpty)
+			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
-			else if (command.getArgs.length > 1)
+			else if (command.args.length > 1)
 				MornyCoeur.extra exec SendMessage(
 					event.message.chat.id,
 					"[Unavailable] Too much arguments."
 				).replyToMessageId(event.message.messageId)
 				return
-			else command.getArgs()(0)
+			else command.args(0)
 		
 		if (target eq null)
 			MornyCoeur.extra exec new SendMessage(
@@ -48,14 +48,15 @@ object IP186Query {
 			).replyToMessageId(event.message.messageId)
 			return;
 		
+		
+		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 		try {
 			
-			val response = command.getCommand match
+			val response = command.command match
 				case Subs.IP.cmd => IP186QueryHandler.query_ip(target)
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
-				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.getCommand}")
+				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
 			MornyCoeur.extra exec SendMessage(
 				event.message.chat.id,
 				s"""${h(response.url)}
@@ -64,7 +65,6 @@ object IP186Query {
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: Exception =>
-			import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
 			MornyCoeur.extra exec new SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:

@@ -3,9 +3,9 @@ package cc.sukazyo.cono.morny.bot.event
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString
-import com.pengrad.telegrambot.model.request.ParseMode
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import com.pengrad.telegrambot.model.{Chat, Message, Update, User}
+import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{ForwardMessage, GetChat, SendMessage, SendSticker}
 
 import scala.language.postfixOps
@@ -44,7 +44,7 @@ object OnCallMe extends EventListener {
 		MornyCoeur.extra exec SendMessage(
 			me,
 			s"""request $itemHTML
-			   |from ${(TGToString as user) fullnameRefHtml}${if extra == null then "" else "\n"+extra}"""
+			   |from ${user.fullnameRefHTML}${if extra == null then "" else "\n"+extra}"""
 			.stripMargin
 		).parseMode(ParseMode HTML)
 	
@@ -59,7 +59,7 @@ object OnCallMe extends EventListener {
 				lastDinnerData.forwardFromMessageId
 			)
 			import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
-			import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
+			import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 			def lastDinner_dateMillis: Long = lastDinnerData.forwardDate longValue;
 			MornyCoeur.extra exec SendMessage(
 				req.from.id,

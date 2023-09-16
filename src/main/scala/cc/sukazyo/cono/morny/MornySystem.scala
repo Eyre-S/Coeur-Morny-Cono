@@ -1,13 +1,13 @@
 package cc.sukazyo.cono.morny
 
 import cc.sukazyo.cono.morny.internal.BuildConfigField
+import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.daemon.MornyReport
 import cc.sukazyo.cono.morny.util.FileUtils
 
 import java.io.IOException
 import java.net.URISyntaxException
 import java.security.NoSuchAlgorithmException
-import Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.daemon.MornyReport
 
 object MornySystem {
 	

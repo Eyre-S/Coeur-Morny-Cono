@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds
+import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent, ParseMode}
@@ -18,9 +18,9 @@ object MyInformation extends ITelegramQuery {
 		
 		List(
 			InlineQueryUnit(InlineQueryResultArticle(
-				inlineIds(ID_PREFIX), TITLE,
+				inlineQueryId(ID_PREFIX), TITLE,
 				new InputTextMessageContent(
-					TelegramUserInformation informationOutputHTML event.inlineQuery.from
+					TelegramUserInformation getFormattedInformation event.inlineQuery.from
 				).parseMode(ParseMode HTML)
 			)).isPersonal(true).cacheTime(10)
 		)

@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.bot.command
-import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import com.pengrad.telegrambot.model.Update
 import cc.sukazyo.cono.morny.data.MornyJrrp
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 
@@ -24,11 +24,11 @@ object MornyOldJrrp extends ITelegramCommand {
 			case a if a > 30 => ";"
 			case _ => "..."
 		
-		import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
+		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 		MornyCoeur.extra exec SendMessage(
 			event.message.chat.id,
 			// language=html
-			f"${(TGToString as user) fullnameRefHtml} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code>${h(ending)}"
+			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code>${h(ending)}"
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 		
 	}

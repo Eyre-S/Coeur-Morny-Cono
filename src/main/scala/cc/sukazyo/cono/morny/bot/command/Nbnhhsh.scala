@@ -2,8 +2,8 @@ package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.{NbnhhshQuery, TelegramStickers}
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
@@ -25,11 +25,10 @@ object Nbnhhsh extends ITelegramCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val queryTarget: String|Null =
-			import cc.sukazyo.cono.morny.util.CommonConvert.stringsConnecting
 			if (event.message.replyToMessage != null && event.message.replyToMessage.text != null)
 				event.message.replyToMessage.text
-			else if command hasArgs then
-				stringsConnecting(command.getArgs, " ", 0, command.getArgs.length-1)
+			else if command.args nonEmpty then
+				command.args mkString " "
 			else null
 		
 		if (queryTarget == null)

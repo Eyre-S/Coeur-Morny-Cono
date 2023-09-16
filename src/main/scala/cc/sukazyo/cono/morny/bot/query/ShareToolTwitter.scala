@@ -1,9 +1,8 @@
 package cc.sukazyo.cono.morny.bot.query
 
+import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
-
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds
 
 import scala.language.postfixOps
 import scala.util.matching.Regex
@@ -25,11 +24,11 @@ object ShareToolTwitter extends ITelegramQuery {
 			case REGEX_TWEET_LINK(_1, _2, _) =>
 				List(
 					InlineQueryUnit(InlineQueryResultArticle(
-						inlineIds(ID_PREFIX_VX+event.inlineQuery.query), TITLE_VX,
+						inlineQueryId(ID_PREFIX_VX+event.inlineQuery.query), TITLE_VX,
 						s"https://vxtwitter.com/$_2"
 					)),
 					InlineQueryUnit(InlineQueryResultArticle(
-						inlineIds(ID_PREFIX_VX_COMBINED+event.inlineQuery.query), TITLE_VX_COMBINED,
+						inlineQueryId(ID_PREFIX_VX_COMBINED+event.inlineQuery.query), TITLE_VX_COMBINED,
 						s"https://c.vxtwitter.com/$_2"
 					))
 				)

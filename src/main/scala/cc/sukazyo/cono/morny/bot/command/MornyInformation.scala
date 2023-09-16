@@ -3,8 +3,8 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.{BuildConfig, MornyAbout, MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.data.{TelegramImages, TelegramStickers}
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
@@ -30,12 +30,12 @@ object MornyInformation extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		if (!command.hasArgs) {
+		if (command.args isEmpty) {
 			echoInfo(event.message.chat.id, event.message.messageId)
 			return
 		}
 		
-		val action: String = command.getArgs()(0)
+		val action: String = command.args(0)
 		
 		action match {
 			case s if s startsWith Subs.STICKERS => echoStickers
@@ -94,13 +94,13 @@ object MornyInformation extends ITelegramCommand {
 	
 	private def echoStickers (using command: InputCommand, event: Update): Unit = {
 		val mid: String|Null =
-			if (command.getArgs()(0) == Subs.STICKERS) {
-				if (command.getArgs.length == 1) ""
-				else if (command.getArgs.length == 2) command.getArgs()(1)
+			if (command.args(0) == Subs.STICKERS) {
+				if (command.args.length == 1) ""
+				else if (command.args.length == 2) command.args(1)
 				else null
-			} else if (command.getArgs.length == 1) {
-				if ((command.getArgs()(0) startsWith s"${Subs.STICKERS}.") || (command.getArgs()(0) startsWith s"${Subs.STICKERS}#")) {
-					command.getArgs()(0) substring Subs.STICKERS.length+1
+			} else if (command.args.length == 1) {
+				if ((command.args(0) startsWith s"${Subs.STICKERS}.") || (command.args(0) startsWith s"${Subs.STICKERS}#")) {
+					command.args(0) substring Subs.STICKERS.length+1
 				} else null
 			} else null
 		if (mid == null) echo404

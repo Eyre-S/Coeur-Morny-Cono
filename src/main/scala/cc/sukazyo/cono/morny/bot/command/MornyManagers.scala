@@ -1,15 +1,15 @@
 package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.bot.command.ICommandAlias.HiddenAlias
-import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString
+import cc.sukazyo.cono.morny.Log.logger
+import cc.sukazyo.cono.morny.daemon.MornyReport
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
-import cc.sukazyo.cono.morny.Log.logger
-import cc.sukazyo.cono.morny.daemon.MornyReport
 
 object MornyManagers {
 	
@@ -30,7 +30,7 @@ object MornyManagers {
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
-				logger info s"Morny exited by user ${(TGToString as user) toStringLogTag}"
+				logger info s"Morny exited by user ${user toLogTag}"
 				MornyCoeur.exit(0, user)
 				
 			} else {
@@ -39,7 +39,7 @@ object MornyManagers {
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger info s"403 exit caught from user ${(TGToString as user) toStringLogTag}"
+				logger info s"403 exit caught from user ${user toLogTag}"
 				MornyReport.unauthenticatedAction("/exit", user)
 				
 			}
@@ -61,7 +61,7 @@ object MornyManagers {
 			
 			if (MornyCoeur.trusted isTrusted user.id) {
 				
-				logger info s"call save from command by ${(TGToString as user) toStringLogTag}"
+				logger info s"call save from command by ${user toLogTag}"
 				MornyCoeur.callSaveData()
 				MornyCoeur.extra exec SendSticker(
 					event.message.chat.id,
@@ -74,7 +74,7 @@ object MornyManagers {
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger info s"403 save caught from user ${(TGToString as user) toStringLogTag}"
+				logger info s"403 save caught from user ${user toLogTag}"
 				MornyReport.unauthenticatedAction("/save", user)
 				
 			}

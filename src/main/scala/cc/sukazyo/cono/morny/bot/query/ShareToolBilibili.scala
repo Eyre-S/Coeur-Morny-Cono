@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.Log.logger
+import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import cc.sukazyo.cono.morny.util.BiliTool
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent, ParseMode}
 
@@ -60,11 +60,11 @@ object ShareToolBilibili extends ITelegramQuery {
 				
 				List(
 					InlineQueryUnit(InlineQueryResultArticle(
-						inlineIds(ID_PREFIX_BILI_AV+av), TITLE_BILI_AV+av,
+						inlineQueryId(ID_PREFIX_BILI_AV+av), TITLE_BILI_AV+av,
 						InputTextMessageContent(SHARE_FORMAT_HTML.format(link_av, id_av)).parseMode(ParseMode HTML)
 					)),
 					InlineQueryUnit(InlineQueryResultArticle(
-						inlineIds(ID_PREFIX_BILI_BV + bv), TITLE_BILI_BV + bv,
+						inlineQueryId(ID_PREFIX_BILI_BV + bv), TITLE_BILI_BV + bv,
 						InputTextMessageContent(SHARE_FORMAT_HTML.format(link_bv, id_bv)).parseMode(ParseMode HTML)
 					))
 				)

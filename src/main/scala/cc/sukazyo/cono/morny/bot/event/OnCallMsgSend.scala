@@ -3,7 +3,6 @@ package cc.sukazyo.cono.morny.bot.event
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TGToString
 import com.pengrad.telegrambot.model.{Chat, Message, MessageEntity, Update}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{GetChat, SendMessage, SendSticker}
@@ -108,11 +107,11 @@ object OnCallMsgSend extends EventListener {
 		val targetChatResponse = MornyCoeur.account execute GetChat(messageToSend.targetId)
 		if (targetChatResponse isOk) {
 			def getChatDescriptionHTML (chat: Chat): String =
-				import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
-				val _c = TGToString as chat
+				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
+				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 				// language=html
 				s"""<i><u>${h(chat.id toString)}</u>@${h(chat.`type`.name)}</i>${if (chat.`type` != Chat.Type.Private) ":::" else ""}
-				   |${_c getTypeTag} <b>${h(_c getSafeName)}</b> ${_c getSafeLinkHTML}"""
+				   |${chat.typeTag} <b>${h(chat.safe_name)}</b> ${chat.safe_linkHTML}"""
 				.stripMargin
 			MornyCoeur.extra exec SendMessage(
 				update.message.chat.id,

@@ -1,8 +1,6 @@
 package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.bot.api.EventListener
-
-import scala.collection.mutable
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import com.google.gson.GsonBuilder
@@ -10,6 +8,7 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 
+import scala.collection.mutable
 import scala.language.postfixOps
 
 object OnEventHackHandle extends EventListener {
@@ -39,7 +38,7 @@ object OnEventHackHandle extends EventListener {
 			else if hackers contains "[[]]" then (hackers remove "[[]]")get
 			else return false
 		logger debug s"hacked event by $x"
-		import cc.sukazyo.cono.morny.util.tgapi.formatting.MsgEscape.escapeHtml as h
+		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 		MornyCoeur.extra exec SendMessage(
 			x.from_chat,
 			// language=html

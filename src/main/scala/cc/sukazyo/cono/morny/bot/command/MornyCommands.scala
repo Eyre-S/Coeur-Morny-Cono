@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.bot.command
 
-import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.Log.logger
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
 import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
 
@@ -60,14 +60,14 @@ object MornyCommands {
 	)
 	
 	def execute (using command: InputCommand, event: Update): Boolean = {
-		if (commands contains command.getCommand)
-			commands(command.getCommand) execute;
+		if (commands contains command.command)
+			commands(command.command) execute;
 			true
 		else nonCommandExecutable
 	}
 	
 	private def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
-		if command.getTarget eq null then false
+		if command.target eq null then false
 		else
 			MornyCoeur.extra exec SendSticker(
 				event.message.chat.id,

@@ -15,8 +15,9 @@ object OnQuestionMarkReply extends EventListener {
 		
 		if event.message.text eq null then return false
 		
-		import cc.sukazyo.cono.morny.util.CommonRandom.probabilityTrue
-		if !probabilityTrue(8) then return false
+		import cc.sukazyo.cono.morny.util.UseMath.over
+		import cc.sukazyo.cono.morny.util.UseRandom.chance_is
+		if (1 over 8) chance_is false then return false
 		for (c <- event.message.text toCharArray)
 			if !(QUESTION_MARKS contains c) then return false
 		

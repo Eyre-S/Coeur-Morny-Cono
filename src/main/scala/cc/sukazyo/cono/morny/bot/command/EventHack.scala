@@ -1,10 +1,10 @@
 package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.event.OnEventHackHandle
+import cc.sukazyo.cono.morny.bot.event.OnEventHackHandle.{registerHack, HackType}
+import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.Update
-import OnEventHackHandle.{HackType, registerHack}
-import cc.sukazyo.cono.morny.data.TelegramStickers
 import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
@@ -18,7 +18,7 @@ object EventHack extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		val x_mode = if (command.hasArgs) command.getArgs()(0) else ""
+		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
 			MornyCoeur.extra exec SendSticker(

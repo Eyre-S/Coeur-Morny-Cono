@@ -17,13 +17,13 @@ object OnUserRandom extends EventListener {
 		if update.message.text == null then return false
 		if update.message.text startsWith "/" then return false
 		
-		import cc.sukazyo.cono.morny.util.CommonRandom.iif
+		import cc.sukazyo.cono.morny.util.UseRandom.rand_half
 		val query = update.message.text substring 1
 		val result: String|Null = query match
 			case USER_OR_QUERY(_con1, _con2) =>
-				if iif then _con1 else _con2
+				if rand_half then _con1 else _con2
 			case USER_IF_QUERY(_con) =>
-				(if iif then "不" else "") + _con
+				(if rand_half then "不" else "") + _con
 			case _ => null
 		
 		if result == null then return false

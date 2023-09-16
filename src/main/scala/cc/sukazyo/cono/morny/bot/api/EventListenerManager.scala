@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.bot.api
 
 import cc.sukazyo.cono.morny.Log
-import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.daemon.MornyReport
+import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
 
@@ -65,7 +65,7 @@ object EventListenerManager {
 						case actionFailed: EventRuntimeException.ActionFailed =>
 							errorMessage ++= "\ntg-api action: response track: "
 							errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
-								actionFailed.getResponse
+								actionFailed.response
 							) indent 4) ++= "\n"
 						case _ =>
 					logger error errorMessage.toString

@@ -1,5 +1,5 @@
 package cc.sukazyo.cono.morny.bot.query
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamedUtils.inlineIds
+import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent}
 
@@ -16,7 +16,7 @@ object RawText extends ITelegramQuery {
 		
 		List(
 			InlineQueryUnit(InlineQueryResultArticle(
-				inlineIds(ID_PREFIX, event.inlineQuery.query), TITLE,
+				inlineQueryId(ID_PREFIX, event.inlineQuery.query), TITLE,
 				InputTextMessageContent(event.inlineQuery.query)
 			))
 		)

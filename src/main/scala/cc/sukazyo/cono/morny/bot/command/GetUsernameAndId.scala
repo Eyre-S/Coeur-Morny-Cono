@@ -18,7 +18,7 @@ object GetUsernameAndId extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		val args = command.getArgs
+		val args = command.args
 		
 		if (args.length > 1)
 			MornyCoeur.extra exec SendMessage(
@@ -59,7 +59,7 @@ object GetUsernameAndId extends ITelegramCommand {
 		
 		MornyCoeur.extra exec SendMessage(
 			event.message.chat.id,
-			TelegramUserInformation informationOutputHTML user
+			TelegramUserInformation getFormattedInformation user
 		).replyToMessageId(event.message.messageId()).parseMode(ParseMode HTML)
 		
 	}

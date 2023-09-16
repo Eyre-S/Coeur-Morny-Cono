@@ -1,4 +1,5 @@
 package cc.sukazyo.cono.morny.bot.command
+
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.Update
 
