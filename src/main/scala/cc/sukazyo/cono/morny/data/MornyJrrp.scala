@@ -12,6 +12,6 @@ object MornyJrrp {
 	private def jrrp_v_xmomi (identifier: Long, dayStamp: Long): Double =
 		import cc.sukazyo.cono.morny.util.CommonEncrypt.MD5
 		import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
-		(java.lang.Long parseLong MD5(s"$identifier@$dayStamp").toHex.substring(0, 4)) / (0xffff toDouble)
+		java.lang.Long.parseLong(MD5(s"$identifier@$dayStamp").toHex.substring(0, 4), 16) / (0xffff toDouble)
 	
 }

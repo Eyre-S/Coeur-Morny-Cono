@@ -74,6 +74,7 @@ object MornyReport {
 		).parseMode(ParseMode HTML))
 	}
 	
+	//noinspection ScalaWeakerAccess
 	def sectionConfigFields (config: MornyConfig): String = {
 		val echo = StringBuilder()
 		for (field <- config.getClass.getFields) {

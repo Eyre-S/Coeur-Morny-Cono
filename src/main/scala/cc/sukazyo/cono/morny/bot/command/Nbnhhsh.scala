@@ -25,10 +25,10 @@ object Nbnhhsh extends ITelegramCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		val queryTarget: String|Null =
-			if (event.message.replyToMessage != null && event.message.replyToMessage.text != null)
-				event.message.replyToMessage.text
-			else if command.args nonEmpty then
+			if command.args nonEmpty then
 				command.args mkString " "
+			else if (event.message.replyToMessage != null && event.message.replyToMessage.text != null)
+				event.message.replyToMessage.text
 			else null
 		
 		if (queryTarget == null)

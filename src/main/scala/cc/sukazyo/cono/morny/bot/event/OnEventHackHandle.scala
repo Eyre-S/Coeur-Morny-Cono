@@ -52,9 +52,9 @@ object OnEventHackHandle extends EventListener {
 	override def onEditedMessage (using update: Update): Boolean =
 		onEventHacked(update.editedMessage.chat.id, update.editedMessage.from.id)
 	override def onChannelPost (using update: Update): Boolean =
-		onEventHacked(update.channelPost.chat.id, update.channelPost.from.id)
+		onEventHacked(update.channelPost.chat.id, 0)
 	override def onEditedChannelPost (using update: Update): Boolean =
-		onEventHacked(update.editedChannelPost.chat.id, update.editedChannelPost.from.id)
+		onEventHacked(update.editedChannelPost.chat.id, 0)
 	override def onInlineQuery (using update: Update): Boolean =
 		onEventHacked(0, update.inlineQuery.from.id)
 	override def onChosenInlineResult (using update: Update): Boolean =

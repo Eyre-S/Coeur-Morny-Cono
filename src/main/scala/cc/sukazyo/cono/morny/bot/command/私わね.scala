@@ -7,6 +7,7 @@ import cc.sukazyo.cono.morny.util.UseRandom.*
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 
+//noinspection NonAsciiCharacters
 object 私わね extends ISimpleCommand {
 	
 	override val name: String = "me"

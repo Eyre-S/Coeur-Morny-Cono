@@ -3,15 +3,15 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.model.{Message, Update}
+import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
 
 import javax.swing.text.html.HTML
 import scala.annotation.unused
 import scala.language.postfixOps
 
-@SuppressWarnings(Array("NonAsciiCharacters"))
+//noinspection NonAsciiCharacters
 object 喵呜 {
 	
 	object 抱抱 extends ISimpleCommand {
@@ -56,7 +56,7 @@ object 喵呜 {
 	}
 	
 	private def replyingSet (whileRec: String, whileNew: String)(using event: Update): Unit = {
-		val isNew = event.message.replyToMessage == null;
+		val isNew = event.message.replyToMessage == null
 		val target = if (isNew) event.message else event.message.replyToMessage
 		MornyCoeur.extra exec new SendMessage(
 			event.message.chat.id,

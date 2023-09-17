@@ -36,8 +36,7 @@ object UniversalCommand {
 				arg = arg.empty
 			} else if (input(i) isQuote) {
 				val _inside_tag = input(i)
-				var _inside = true
-				boundary { while (_inside) {
+				boundary { while (true) {
 					i=i+1
 					if (i >= input.length) throw IllegalArgumentException("UniversalCommand: unclosed quoted text")
 					if (input(i) == _inside_tag)

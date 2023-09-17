@@ -25,6 +25,10 @@ object DirectMsgClear extends ISimpleCommand {
 		logger trace "message is not outdated(48 hrs ago)"
 		
 		val isTrusted = MornyCoeur.trusted isTrusted event.message.from.id
+		// todo:
+		// it does not work. due to the Telegram Bot API doesn't provide
+		// nested replyToMessage, so currently the trusted check by
+		// replyToMessage.replyToMessage will not work!
 		def _isReplyTrusted: Boolean =
 			if (event.message.replyToMessage.replyToMessage == null) false
 			else if (event.message.replyToMessage.replyToMessage.from.id == event.message.from.id) true

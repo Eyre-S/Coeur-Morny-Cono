@@ -9,7 +9,14 @@ import scala.language.postfixOps
 
 object OnQuestionMarkReply extends EventListener {
 	
-	private def QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
+	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
+	
+	def isAllMessageMark (using text: String): Boolean = {
+		var isAll = true
+		for (c <- text)
+			if !(QUESTION_MARKS contains c) then isAll = false
+		isAll
+	}
 	
 	override def onMessage (using event: Update): Boolean = {
 		
@@ -18,8 +25,7 @@ object OnQuestionMarkReply extends EventListener {
 		import cc.sukazyo.cono.morny.util.UseMath.over
 		import cc.sukazyo.cono.morny.util.UseRandom.chance_is
 		if (1 over 8) chance_is false then return false
-		for (c <- event.message.text toCharArray)
-			if !(QUESTION_MARKS contains c) then return false
+		if !isAllMessageMark(using event.message.text) then return false
 		
 		MornyCoeur.extra exec SendMessage(
 			event.message.chat.id, event.message.text

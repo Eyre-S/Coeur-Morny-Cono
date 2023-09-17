@@ -32,7 +32,7 @@ public class ExtraAction {
 	public <T extends BaseRequest<T, R>, R extends BaseResponse> R exec (T req, String errorMessage) {
 		final R resp = bot.execute(req);
 		if (!resp.isOk()) throw new EventRuntimeException.ActionFailed(
-				(errorMessage.equals("") ? String.valueOf(resp.errorCode()) : errorMessage),
+				(errorMessage.isEmpty() ? String.valueOf(resp.errorCode()) : errorMessage),
 				resp
 		);
 		return resp;

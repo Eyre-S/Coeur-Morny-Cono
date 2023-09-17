@@ -28,7 +28,7 @@ object MornyOldJrrp extends ITelegramCommand {
 		MornyCoeur.extra exec SendMessage(
 			event.message.chat.id,
 			// language=html
-			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code>${h(ending)}"
+			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code> ${h(ending)}"
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 		
 	}

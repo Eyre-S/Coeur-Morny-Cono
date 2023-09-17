@@ -52,6 +52,8 @@ object OnCallMe extends EventListener {
 		var isAllowed = false
 		var lastDinnerData: Message|Null = null
 		if (MornyCoeur.trusted isTrusted_dinnerReader req.from.id) {
+			// todo: have issues
+			// i dont want to test it anymore... it might be deprecated soon
 			lastDinnerData = (MornyCoeur.extra exec GetChat(MornyCoeur.config.dinnerChatId)).chat.pinnedMessage
 			val sendResp = MornyCoeur.extra exec ForwardMessage(
 				req.from.id,

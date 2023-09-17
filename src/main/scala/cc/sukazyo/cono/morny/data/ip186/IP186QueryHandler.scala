@@ -19,6 +19,7 @@ object IP186QueryHandler {
 		commonQuery(SITE_URL + ip, QUERY_PARAM_IP)
 	
 	@throws[IOException]
+	//noinspection ScalaWeakerAccess
 	def query_whois (domain: String): IP186Response =
 		commonQuery(SITE_URL+"whois/"+domain, QUERY_PARAM_WHOIS)
 	

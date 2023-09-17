@@ -17,6 +17,7 @@ object MornySystem {
 	@BuildConfigField val VERSION_DELTA: String = BuildConfig.VERSION_DELTA
 	@BuildConfigField val CODENAME: String = BuildConfig.CODENAME
 	@BuildConfigField val CODE_STORE: String = BuildConfig.CODE_STORE
+	//noinspection ScalaWeakerAccess
 	@BuildConfigField val COMMIT_PATH: String = BuildConfig.COMMIT_PATH
 	
 	@BuildConfigField

@@ -14,6 +14,7 @@ import java.net.InetAddress
 import java.rmi.UnknownHostException
 import scala.language.postfixOps
 
+// todo: maybe move some utils method outside
 object MornyInformation extends ITelegramCommand {
 	
 	private case object Subs {
@@ -46,6 +47,7 @@ object MornyInformation extends ITelegramCommand {
 		
 	}
 	
+	//noinspection ScalaWeakerAccess
 	def getVersionGitTagHTML: String = {
 		if (!MornySystem.isGitBuild) return ""
 		val g = StringBuilder()
@@ -61,11 +63,12 @@ object MornyInformation extends ITelegramCommand {
 		val v = StringBuilder()
 		v ++= s"<code>${MornySystem VERSION_BASE}</code>"
 		if (MornySystem isUseDelta) v++=s"-δ<code>${MornySystem VERSION_DELTA}</code>"
-		if (MornySystem isGitBuild) v++="+"++=getVersionGitTagHTML
+		if (MornySystem isGitBuild) v++="+git."++=getVersionGitTagHTML
 		v ++= s"*<code>${MornySystem.CODENAME toUpperCase}</code>"
 		v toString
 	}
 	
+	//noinspection ScalaWeakerAccess
 	def getRuntimeHostname: String|Null = {
 		try InetAddress.getLocalHost.getHostName
 		catch case _:UnknownHostException => null
@@ -154,13 +157,13 @@ object MornyInformation extends ITelegramCommand {
 			event.message.chat.id,
 			/* language=html */
 			s"""system:
-			   |- Morny <code>${h(if (getRuntimeHostname == null) "<unknown-host>" else getRuntimeHostname)}</code>
+			   |- <code>${h(if (getRuntimeHostname == null) "<unknown-host>" else getRuntimeHostname)}</code>
 			   |- <code>${h(sysprop("os.name"))}</code> <code>${h(sysprop("os.arch"))}</code> <code>${h(sysprop("os.version"))}</code>
 			   |java runtime:
 			   |- <code>${h(sysprop("java.vm.vendor"))}.${h(sysprop("java.vm.name"))}</code>
 			   |- <code>${h(sysprop("java.vm.version"))}</code>
 			   |vm memory:
-			   |- <code>${Runtime.getRuntime.totalMemory/1024/1024}</code> / <code>${Runtime.getRuntime.maxMemory/1024/1024}</code>
+			   |- <code>${Runtime.getRuntime.totalMemory/1024/1024}</code> / <code>${Runtime.getRuntime.maxMemory/1024/1024}</code> MB
 			   |- <code>${Runtime.getRuntime.availableProcessors}</code> cores
 			   |coeur version:
 			   |- $getVersionAllFullTagHTML

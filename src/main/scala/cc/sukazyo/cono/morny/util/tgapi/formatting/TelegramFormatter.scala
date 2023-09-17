@@ -22,6 +22,7 @@ object TelegramFormatter {
 					case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>@[c/${chat.id}]</a>"
 			else s"@${h(chat.username)}"
 		
+		//noinspection ScalaWeakerAccess
 		def safe_firstnameRefHTML: String =
 			chat.`type` match
 				// language=html
@@ -29,6 +30,7 @@ object TelegramFormatter {
 				// language=html
 				case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>${h(chat.title)}</a>"
 		
+		//noinspection ScalaWeakerAccess
 		def id_tdLib: Long =
 			if chat.id < 0 then (chat.id - MASK_BOTAPI_ID)abs else chat.id
 		
@@ -42,12 +44,14 @@ object TelegramFormatter {
 	
 	extension (user: User) {
 		
+		//noinspection ScalaWeakerAccess
 		def fullname: String = _connectName(user.firstName, user.lastName)
 		
 		def fullnameRefHTML: String =
 			// language=html
 			s"<a href='${_link_user(user.id)}'>${h(user.fullname)}</a>"
 		
+		//noinspection ScalaWeakerAccess
 		def firstnameRefHTML: String =
 			// language=html
 			s"<a href='${_link_user(user.id)}'>${h(user.firstName)}</a>"

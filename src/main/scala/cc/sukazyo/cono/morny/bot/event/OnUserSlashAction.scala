@@ -22,14 +22,24 @@ object OnUserSlashAction extends EventListener {
 		
 		if (text startsWith "/") {
 			
+			// there has to be some special conditions for DP7
+			// due to I have left DP7, I closed those special
+			// conditions.
+			// that is 2022, May 28th
+			// when one year goes, These code have rewrite with
+			// scala, those commented code is removed permanently.
+			// these message, here to remember the old DP7.
+			
 			val actions = UniversalCommand(text)
 			actions(0) = actions(0) substring 1
 			
 			actions(0)
 			
 			actions(0) match
+				// ignore Telegram command like
 				case TG_FORMAT(_) =>
 					return false
+				// ignore Path link
 				case x if x contains "/" => return false
 				case _ =>
 			
@@ -55,7 +65,7 @@ object OnUserSlashAction extends EventListener {
 					h(v_verb), if hasObject then "" else "了",
 					if (origin == target)
 						s"<a href='tg://user?id=${origin.sender_id}'>自己</a>"
-					else origin.sender_firstnameRefHTML,
+					else target.sender_firstnameRefHTML,
 					if hasObject then h(v_object+" ") else ""
 				)
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)

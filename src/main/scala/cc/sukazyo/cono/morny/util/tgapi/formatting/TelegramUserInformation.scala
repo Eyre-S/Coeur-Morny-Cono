@@ -9,8 +9,8 @@ import scala.util.Using
 
 object TelegramUserInformation {
 	
-	val DC_QUERY_SOURCE_SITE = "https://t.me/"
-	val DC_QUERY_PROCESSOR_REGEX: Regex = "(cdn[1-9]).tele(sco.pe|gram-cdn.org)"r
+	private val DC_QUERY_SOURCE_SITE = "https://t.me/"
+	private val DC_QUERY_PROCESSOR_REGEX: Regex = "(cdn[1-9]).tele(sco.pe|gram-cdn.org)"r
 	
 	private val httpClient = OkHttpClient()
 	
