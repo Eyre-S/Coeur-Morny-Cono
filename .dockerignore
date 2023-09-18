@@ -4,12 +4,12 @@
 .vscode/
 .gradle/
 .settings/
-/src/test/java/test/*
-/src/test/resources/test/*
 
 #build
 /build/
 /bin/
+.metals/
+.bloop/
 .project
 lcoal.properties
 
