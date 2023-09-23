@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
 
@@ -21,12 +22,12 @@ class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_WAITING
 			).replyToMessageId(event.message.messageId)
 		def done_forbiddenForAny =
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(event.message.messageId)

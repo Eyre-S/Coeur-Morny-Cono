@@ -6,6 +6,7 @@ import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.daemon.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
 
@@ -26,7 +27,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			if (coeur.trusted isTrusted user.id) {
 				
-				coeur.extra exec SendSticker(
+				coeur.account exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
@@ -35,7 +36,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 				
 			} else {
 				
-				coeur.extra exec SendSticker(
+				coeur.account exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
@@ -63,14 +64,14 @@ class MornyManagers (using coeur: MornyCoeur) {
 				
 				logger info s"call save from command by ${user toLogTag}"
 				coeur.saveDataAll()
-				coeur.extra exec SendSticker(
+				coeur.account exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_SAVED
 				).replyToMessageId(event.message.messageId)
 				
 			} else {
 				
-				coeur.extra exec SendSticker(
+				coeur.account exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)

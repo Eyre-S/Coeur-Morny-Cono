@@ -1,9 +1,8 @@
 package cc.sukazyo.cono.morny.bot.api
 
-import cc.sukazyo.cono.morny.MornyCoeur
 import com.pengrad.telegrambot.model.Update
 
-trait EventListener (using MornyCoeur) {
+trait EventListener () {
 	
 	def onMessage (using Update): Boolean = false
 	def onEditedMessage (using Update): Boolean = false

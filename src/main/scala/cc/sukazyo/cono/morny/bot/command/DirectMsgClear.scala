@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{Chat, Update}
 import com.pengrad.telegrambot.request.{DeleteMessage, GetChatMember, SendSticker}
 
@@ -36,19 +37,19 @@ class DirectMsgClear (using coeur: MornyCoeur) extends ISimpleCommand {
 		
 		if (isTrusted || _isReplyTrusted) {
 		
-			coeur.extra exec DeleteMessage(
+			coeur.account exec DeleteMessage(
 				event.message.chat.id, event.message.replyToMessage.messageId
 			)
 			
 			def _isPrivate: Boolean = event.message.chat.`type` == Chat.Type.Private
 			def _isPermission: Boolean =
-				(coeur.extra exec GetChatMember(event.message.chat.id, event.message.from.id))
+				(coeur.account exec GetChatMember(event.message.chat.id, event.message.from.id))
 						.chatMember.canDeleteMessages
 			if (_isPrivate || _isPermission) {
-				coeur.extra exec DeleteMessage(event.message.chat.id, event.message.messageId)
+				coeur.account exec DeleteMessage(event.message.chat.id, event.message.messageId)
 			}
 		
-		} else coeur.extra exec SendSticker(
+		} else coeur.account exec SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_403
 		).replyToMessageId(event.message.messageId)

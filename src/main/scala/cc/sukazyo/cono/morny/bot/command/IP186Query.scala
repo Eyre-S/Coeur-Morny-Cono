@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
@@ -34,7 +35,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
 			else if (command.args.length > 1)
-				coeur.extra exec SendMessage(
+				coeur.account exec SendMessage(
 					event.message.chat.id,
 					"[Unavailable] Too much arguments."
 				).replyToMessageId(event.message.messageId)
@@ -42,7 +43,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			else command.args(0)
 		
 		if (target eq null)
-			coeur.extra exec new SendMessage(
+			coeur.account exec new SendMessage(
 				event.message.chat.id,
 				"[Unavailable] No ip defined."
 			).replyToMessageId(event.message.messageId)
@@ -57,7 +58,7 @@ class IP186Query (using coeur: MornyCoeur) {
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
 				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				event.message.chat.id,
 				s"""${h(response.url)}
 				   |<code>${h(response.body)}</code>"""
@@ -65,7 +66,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: Exception =>
-			coeur.extra exec new SendMessage(
+			coeur.account exec new SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""

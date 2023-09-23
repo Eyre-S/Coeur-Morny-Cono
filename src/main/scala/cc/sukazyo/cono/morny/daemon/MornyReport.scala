@@ -2,11 +2,11 @@ package cc.sukazyo.cono.morny.daemon
 
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.bot.command.MornyInformation
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.model.User
@@ -17,7 +17,7 @@ class MornyReport (using coeur: MornyCoeur) {
 	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
 		try {
-			coeur.extra exec report
+			coeur.account exec report
 		} catch case e: EventRuntimeException.ActionFailed => {
 			logger warn
 					s"""cannot execute report to telegram:
@@ -56,7 +56,7 @@ class MornyReport (using coeur: MornyCoeur) {
 		).parseMode(ParseMode HTML))
 	}
 	
-	def onMornyLogin(): Unit = {
+	def reportCoeurMornyLogin(): Unit = {
 		executeReport(SendMessage(
 			coeur.config.reportToChat,
 			// language=html
@@ -99,7 +99,7 @@ class MornyReport (using coeur: MornyCoeur) {
 		echo dropRight 1 toString
 	}
 	
-	def onMornyExit (): Unit = {
+	def reportCoeurExit (): Unit = {
 		val causedTag = coeur.exitReason match
 			case u: User => u.fullnameRefHTML
 			case n if n == null => "UNKNOWN reason"

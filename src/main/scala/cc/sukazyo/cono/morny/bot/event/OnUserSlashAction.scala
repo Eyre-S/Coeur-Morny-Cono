@@ -5,6 +5,7 @@ import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.UniversalCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
@@ -58,7 +59,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					origin
 				else update.message.replyToMessage
 			
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				update.message.chat.id,
 				"%s %s%s %s %s!".format(
 					origin.sender_firstnameRefHTML,

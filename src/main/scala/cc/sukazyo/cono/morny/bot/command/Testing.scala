@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
@@ -16,7 +17,7 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		coeur.extra exec new SendMessage(
+		coeur.account exec new SendMessage(
 			event.message.chat.id,
 			// language=html
 			"<b>Just</b> a TEST command."

@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.event
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{Chat, Message, MessageEntity, Update}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{GetChat, SendMessage, SendSticker}
@@ -60,7 +61,7 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 		if !(message.text startsWith "*msg") then return false
 		
 		if (!(coeur.trusted isTrusted message.from.id))
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(message.messageId)
@@ -74,12 +75,12 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 			val sendResponse = coeur.account execute messageToSend.toSendMessage()
 			
 			if (sendResponse isOk) {
-				coeur.extra exec SendSticker(
+				coeur.account exec SendSticker(
 					update.message.chat.id,
 					TelegramStickers ID_SENT
 				).replyToMessageId(update.message.messageId)
 			} else {
-				coeur.extra exec SendMessage(
+				coeur.account exec SendMessage(
 					update.message.chat.id,
 					// language=html
 					s"""<b><u>${sendResponse.errorCode} FAILED</u></b>
@@ -113,12 +114,12 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 				s"""<i><u>${h(chat.id toString)}</u>@${h(chat.`type`.name)}</i>${if (chat.`type` != Chat.Type.Private) ":::" else ""}
 				   |${chat.typeTag} <b>${h(chat.safe_name)}</b> ${chat.safe_linkHTML}"""
 				.stripMargin
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				update.message.chat.id,
 				getChatDescriptionHTML(targetChatResponse.chat)
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
 		} else {
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				update.message.chat.id,
 				// language=html
 				s"""<b><u>${targetChatResponse.errorCode} FAILED</u></b>
@@ -131,7 +132,7 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 		val testSendResponse = coeur.account execute messageToSend.toSendMessage(update.message.chat.id)
 				.replyToMessageId(update.message.messageId)
 		if (!(testSendResponse isOk))
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				update.message.chat.id,
 				// language=html
 				s"""<b><u>${testSendResponse.errorCode}</u> FAILED</b>
@@ -144,7 +145,7 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 	}
 	
 	private def answer404 (using update: Update): Boolean =
-		coeur.extra exec SendSticker(
+		coeur.account exec SendSticker(
 			update.message.chat.id,
 			TelegramStickers ID_404
 		).replyToMessageId(update.message.messageId)

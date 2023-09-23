@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
 import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
 
@@ -75,7 +76,7 @@ class MornyCommands (using coeur: MornyCoeur) {
 	private def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
 		if command.target eq null then false
 		else
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
@@ -85,14 +86,14 @@ class MornyCommands (using coeur: MornyCoeur) {
 	def automaticTGListUpdate (): Unit = {
 		val listing = commands_toTelegramList
 		automaticTGListRemove()
-		coeur.extra exec SetMyCommands(listing:_*)
+		coeur.account exec SetMyCommands(listing:_*)
 		logger info
 				s"""automatic updated telegram command list :
 				   |${commandsTelegramList_toString(listing)}""".stripMargin
 	}
 	
 	def automaticTGListRemove (): Unit = {
-		coeur.extra exec DeleteMyCommands()
+		coeur.account exec DeleteMyCommands()
 		logger info "cleaned up command list"
 	}
 	

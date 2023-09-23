@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
@@ -49,7 +50,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	}
 	
 	private def sendNotification(): Unit = {
-		val sendResponse: SendResponse = coeur.extra exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
+		val sendResponse: SendResponse = coeur.account exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
 		if sendResponse isOk then lastNotify_messageId = sendResponse.message.messageId
 		else lastNotify_messageId = null
 	}
@@ -66,7 +67,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 		val entities = ArrayBuffer.empty[MessageEntity]
 		if edited.entities ne null then entities ++= edited.entities
 		entities += MessageEntity(MessageEntity.Type.italic, edited.text.length + "\n-- ".length, editTime.length)
-		coeur.extra exec EditMessageText(
+		coeur.account exec EditMessageText(
 			notify_toChat,
 			edited.messageId,
 			edited.text + s"\n-- $editTime --"

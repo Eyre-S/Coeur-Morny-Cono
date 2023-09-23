@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.MornyInformation.{getAboutPic, getMornyAboutLinksHTML}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendPhoto
@@ -16,7 +17,7 @@ class MornyInfoOnStart (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		coeur.extra exec new SendPhoto(
+		coeur.account exec new SendPhoto(
 			event.message.chat.id,
 			getAboutPic
 		).caption(

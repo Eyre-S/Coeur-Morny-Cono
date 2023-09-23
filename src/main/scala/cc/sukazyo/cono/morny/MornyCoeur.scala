@@ -3,11 +3,10 @@ package cc.sukazyo.cono.morny
 import cc.sukazyo.cono.morny.bot.command.MornyCommands
 import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.MornyCoeur.THREAD_MORNY_EXIT
-import cc.sukazyo.cono.morny.bot.api.TelegramUpdatesListener
+import cc.sukazyo.cono.morny.MornyCoeur.THREAD_SERVER_EXIT
+import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
-import cc.sukazyo.cono.morny.util.tgapi.ExtraAction
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -16,7 +15,7 @@ import scala.util.boundary.break
 
 object MornyCoeur {
 	
-	val THREAD_MORNY_EXIT = "morny-exiting"
+	val THREAD_SERVER_EXIT = "system-exit"
 	
 }
 
@@ -50,18 +49,18 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
-	/** current Morny's [[ExtraAction]] toolset */
-	val extra: ExtraAction = ExtraAction as __loginResult.account
-	private val updatesListener: TelegramUpdatesListener = TelegramUpdatesListener()
 	
 	val daemons: MornyDaemons = MornyDaemons()
-	updatesListener.manager register MornyOnUpdateTimestampOffsetLock()
+	//noinspection ScalaWeakerAccess
+	val eventManager: EventListenerManager = EventListenerManager()
+	eventManager register MornyOnUpdateTimestampOffsetLock()
 	val commands: MornyCommands = MornyCommands()
 	//noinspection ScalaWeakerAccess
 	val queries: MornyQueries = MornyQueries()
-	updatesListener.manager register MornyOnTelegramCommand(using commands)
-	updatesListener.manager register MornyOnInlineQuery(using queries)
-	val events: MornyEventListeners = MornyEventListeners(using updatesListener.manager)
+	eventManager register MornyOnTelegramCommand(using commands)
+	eventManager register MornyOnInlineQuery(using queries)
+	//noinspection ScalaUnusedSymbol
+	val events: MornyEventListeners = MornyEventListeners(using eventManager)
 	
 	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
 	private var whileExit_reason: AnyRef|Null = _
@@ -72,11 +71,12 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	daemons.start()
 	logger info "start telegram event listening"
-	account setUpdatesListener updatesListener
+	account setUpdatesListener eventManager
 	if config.commandLoginRefresh then
 		logger info "resetting telegram command list"
 		commands.automaticTGListUpdate()
 	
+	daemons.reporter.reportCoeurMornyLogin()
 	logger info "Coeur start complete."
 	
 	///<<< BLOCK END instance configure & startup stage 2
@@ -87,13 +87,17 @@ class MornyCoeur (using val config: MornyConfig) {
 	}
 	
 	private def exitCleanup (): Unit = {
+		daemons.reporter.reportCoeurExit()
+		account.shutdown()
+		logger info "stopped bot account"
 		daemons.stop()
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
+		logger info "done exit cleanup"
 	}
 	
 	private def configure_exitCleanup (): Unit = {
-		Runtime.getRuntime.addShutdownHook(new Thread(() => exitCleanup(), THREAD_MORNY_EXIT))
+		Runtime.getRuntime.addShutdownHook(new Thread(() => exitCleanup(), THREAD_SERVER_EXIT))
 	}
 	
 	def exit (status: Int, reason: AnyRef): Unit =

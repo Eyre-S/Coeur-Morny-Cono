@@ -6,6 +6,7 @@ import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
@@ -47,7 +48,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echoInfo (chatId: Long, replyTo: Int): Unit = {
-		coeur.extra exec new SendPhoto(
+		coeur.account exec new SendPhoto(
 			chatId,
 			getAboutPic
 		).caption(
@@ -92,15 +93,15 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		val send_mid = SendMessage(send_chat, mid)
 		val send_sticker = SendSticker(send_chat, file_id)
 		if (send_replyTo != -1) send_mid.replyToMessageId(send_replyTo)
-		val result_send_mid = coeur.extra exec send_mid
+		val result_send_mid = coeur.account exec send_mid
 		send_sticker.replyToMessageId(result_send_mid.message.messageId)
-		coeur.extra exec send_sticker
+		coeur.account exec send_sticker
 	}
 	
 	private[command] def echoVersion (using event: Update): Unit = {
 		val versionDeltaHTML = if (MornySystem.isUseDelta) s"-δ<code>${h(MornySystem.VERSION_DELTA)}</code>" else ""
 		val versionGitHTML = if (MornySystem.isGitBuild) s"git $getVersionGitTagHTML" else ""
-		coeur.extra exec new SendMessage(
+		coeur.account exec new SendMessage(
 			event.message.chat.id,
 			// language=html
 			s"""version:
@@ -117,7 +118,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	private[command] def echoRuntime (using event: Update): Unit = {
 		def sysprop (p: String): String = System.getProperty(p)
-		coeur.extra exec new SendMessage(
+		coeur.account exec new SendMessage(
 			event.message.chat.id,
 			/* language=html */
 			s"""system:
@@ -144,7 +145,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echo404 (using event: Update): Unit =
-		coeur.extra exec new SendSticker(
+		coeur.account exec new SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_404
 		).replyToMessageId(event.message.messageId)

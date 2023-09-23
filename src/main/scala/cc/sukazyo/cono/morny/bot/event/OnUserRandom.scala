@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 
@@ -30,7 +31,7 @@ class OnUserRandom (using coeur: MornyCoeur) extends EventListener {
 		
 		if result == null then return false
 		
-		coeur.extra exec SendMessage(
+		coeur.account exec SendMessage(
 			update.message.chat.id, result
 		).replyToMessageId(update.message.messageId)
 		true

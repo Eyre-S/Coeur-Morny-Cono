@@ -5,11 +5,12 @@ import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
+import com.pengrad.telegrambot.UpdatesListener
 
 import scala.collection.mutable
 import scala.language.postfixOps
 
-class EventListenerManager (using coeur: MornyCoeur) {
+class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	
 	private val listeners = mutable.Queue.empty[EventListener]
 	
@@ -76,8 +77,13 @@ class EventListenerManager (using coeur: MornyCoeur) {
 		
 	}
 	
-	def publishUpdate (using Update): Unit = {
-		EventRunner().start()
+	import java.util
+	import scala.jdk.CollectionConverters.*
+	
+	override def process (updates: util.List[Update]): Int = {
+		for (update <- updates.asScala)
+			EventRunner(using update).start()
+		UpdatesListener.CONFIRMED_UPDATES_ALL
 	}
 	
 }

@@ -3,6 +3,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.command.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
 
@@ -18,7 +19,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 		override val description: String = "检查是否在线"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_ONLINE_STATUS_RETURN
 			).replyToMessageId(event.message.messageId)
@@ -33,7 +34,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 		override val description: String = "打招呼"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_HELLO
 			).replyToMessageId(event.message.messageId)

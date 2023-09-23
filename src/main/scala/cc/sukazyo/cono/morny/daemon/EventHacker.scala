@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.daemon
 
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
@@ -38,7 +39,7 @@ class EventHacker (using coeur: MornyCoeur) {
 			else return false
 		logger debug s"hacked event by $x"
 		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-		coeur.extra exec SendMessage(
+		coeur.account exec SendMessage(
 			x.from_chat,
 			// language=html
 			s"<code>${h(GsonBuilder().setPrettyPrinting().create.toJson(update))}</code>"

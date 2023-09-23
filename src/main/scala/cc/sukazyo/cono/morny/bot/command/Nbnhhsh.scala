@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.{NbnhhshQuery, TelegramStickers}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
@@ -32,7 +33,7 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 			else null
 		
 		if (queryTarget == null)
-			coeur.extra exec SendSticker(
+			coeur.account exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
@@ -67,13 +68,13 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 				logger debug s"**exec as ${_word.name}"
 			}
 			
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				event.message.chat.id,
 				message toString
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: IOException => {
-			coeur.extra exec SendMessage(
+			coeur.account exec SendMessage(
 				event.message.chat.id,
 				s"""[Exception] in query:
 				   |${h(e.getMessage)}

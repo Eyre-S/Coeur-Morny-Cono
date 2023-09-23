@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.event
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, MornyQueries}
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResult
 import com.pengrad.telegrambot.request.AnswerInlineQuery
@@ -28,7 +29,7 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 		
 		if (results isEmpty) return false
 		
-		coeur.extra exec AnswerInlineQuery(
+		coeur.account exec AnswerInlineQuery(
 			update.inlineQuery.id, resultAnswers toArray:_*
 		).cacheTime(cacheTime).isPersonal(isPersonal)
 		true
