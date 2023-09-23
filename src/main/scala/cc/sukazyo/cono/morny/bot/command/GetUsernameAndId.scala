@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.request.{GetChatMember, SendMessage}
 
 import scala.language.postfixOps
 
-object GetUsernameAndId extends ITelegramCommand {
+class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "user"
 	override val aliases: Array[ICommandAlias] | Null = null
@@ -21,7 +21,7 @@ object GetUsernameAndId extends ITelegramCommand {
 		val args = command.args
 		
 		if (args.length > 1)
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				"[Unavailable] Too much arguments."
 			).replyToMessageId(event.message.messageId)
@@ -31,7 +31,7 @@ object GetUsernameAndId extends ITelegramCommand {
 			if (args nonEmpty) {
 				try args(0) toLong
 				catch case e: NumberFormatException =>
-					MornyCoeur.extra exec SendMessage(
+					coeur.extra exec SendMessage(
 						event.message.chat.id,
 						s"[Unavailable] ${e.getMessage}"
 					).replyToMessageId(event.message.messageId)
@@ -39,10 +39,10 @@ object GetUsernameAndId extends ITelegramCommand {
 			} else if (event.message.replyToMessage eq null) event.message.from.id
 			else event.message.replyToMessage.from.id
 		
-		val response = MornyCoeur.account execute GetChatMember(event.message.chat.id, userId)
+		val response = coeur.account execute GetChatMember(event.message.chat.id, userId)
 		
 		if (response.chatMember eq null)
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				"[Unavailable] user not found."
 			).replyToMessageId(event.message.messageId)
@@ -51,13 +51,13 @@ object GetUsernameAndId extends ITelegramCommand {
 		val user = response.chatMember.user
 		
 		if (user.id == Standardize.CHANNEL_SPEAKER_MAGIC_ID)
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				"<code>$__channel_identify</code>"
 			).replyToMessageId(event.message.messageId)
 			return;
 		
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			event.message.chat.id,
 			TelegramUserInformation getFormattedInformation user
 		).replyToMessageId(event.message.messageId()).parseMode(ParseMode HTML)

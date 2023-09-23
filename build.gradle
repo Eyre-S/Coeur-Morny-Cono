@@ -110,8 +110,6 @@ tasks.withType(ScalaCompile).configureEach {
 	scalaCompileOptions.encoding = proj_file_encoding.name()
 	
 	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
-//	scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
-//	scalaCompileOptions.additionalParameters.add "-language:experimental.saferExceptions"
 	
 }
 
@@ -196,10 +194,15 @@ publishing {
 		}
 	}
 	publications {
+		//noinspection GroovyAssignabilityCheck
 		main (MavenPublication) {
+			//noinspection GroovyAssignabilityCheck
 			from components.java
+			//noinspection GroovyAssignabilityCheck
 			groupId = proj_group
+			//noinspection GroovyAssignabilityCheck
 			artifactId = proj_archive_name
+			//noinspection GroovyAssignabilityCheck
 			version = proj_version
 		}
 	}

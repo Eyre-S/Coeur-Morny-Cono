@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
 import java.io.IOException
 import scala.language.postfixOps
 
-object Nbnhhsh extends ITelegramCommand {
+class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	private val NBNHHSH_RESULT_HEAD_HTML =
 		// language=html
@@ -32,7 +32,7 @@ object Nbnhhsh extends ITelegramCommand {
 			else null
 		
 		if (queryTarget == null)
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
@@ -67,13 +67,13 @@ object Nbnhhsh extends ITelegramCommand {
 				logger debug s"**exec as ${_word.name}"
 			}
 			
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				message toString
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: IOException => {
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				s"""[Exception] in query:
 				   |${h(e.getMessage)}

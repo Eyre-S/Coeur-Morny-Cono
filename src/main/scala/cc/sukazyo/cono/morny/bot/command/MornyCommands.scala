@@ -11,7 +11,7 @@ import scala.collection.{mutable, SeqMap}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
-object MornyCommands {
+class MornyCommands (using coeur: MornyCoeur) {
 	
 	private type CommandMap = SeqMap[String, ISimpleCommand]
 	private def CommandMap (commands: ISimpleCommand*): CommandMap =
@@ -22,41 +22,47 @@ object MornyCommands {
 				stash += (alias.name -> i)
 		stash
 	
+	private val $MornyHellos = MornyHellos()
+	private val $IP186Query = IP186Query()
+	private val $MornyInformation = MornyInformation()
+	private val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)
+	private val $MornyManagers = MornyManagers()
+	//noinspection NonAsciiCharacters
+	private val $喵呜 = 喵呜()
 	private val commands: CommandMap = CommandMap(
 		
-		MornyHellos.On,
-		MornyHellos.On,
-		MornyHellos.Hello,
-		MornyInfoOnStart,
-		GetUsernameAndId,
-		EventHack,
-		Nbnhhsh,
-		IP186Query.IP,
-		IP186Query.Whois,
-		Encryptor,
-		MornyManagers.SaveData,
-		MornyInformation,
-		MornyInformationOlds.Version,
-		MornyInformationOlds.Runtime,
-		MornyOldJrrp,
-		MornyManagers.Exit,
+		$MornyHellos.On,
+		$MornyHellos.Hello,
+		MornyInfoOnStart(),
+		GetUsernameAndId(),
+		EventHack(),
+		Nbnhhsh(),
+		$IP186Query.IP,
+		$IP186Query.Whois,
+		Encryptor(),
+		$MornyManagers.SaveData,
+		$MornyInformation,
+		$MornyInformationOlds.Version,
+		$MornyInformationOlds.Runtime,
+		MornyOldJrrp(),
+		$MornyManagers.Exit,
 		
-		Testing,
-		DirectMsgClear,
+		Testing(),
+		DirectMsgClear(),
 		
 		//noinspection NonAsciiCharacters
-		私わね,
+		私わね(),
 		//noinspection NonAsciiCharacters
-		喵呜.Progynova
+		$喵呜.Progynova
 		
 	)
 	
 	//noinspection NonAsciiCharacters
 	val commands_uni: CommandMap = CommandMap(
-		喵呜.抱抱,
-		喵呜.揉揉,
-		喵呜.贴贴,
-		喵呜.蹭蹭
+		$喵呜.抱抱,
+		$喵呜.揉揉,
+		$喵呜.贴贴,
+		$喵呜.蹭蹭
 	)
 	
 	def execute (using command: InputCommand, event: Update): Boolean = {
@@ -69,7 +75,7 @@ object MornyCommands {
 	private def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
 		if command.target eq null then false
 		else
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
@@ -79,14 +85,14 @@ object MornyCommands {
 	def automaticTGListUpdate (): Unit = {
 		val listing = commands_toTelegramList
 		automaticTGListRemove()
-		MornyCoeur.extra exec SetMyCommands(listing:_*)
+		coeur.extra exec SetMyCommands(listing:_*)
 		logger info
 				s"""automatic updated telegram command list :
 				   |${commandsTelegramList_toString(listing)}""".stripMargin
 	}
 	
 	def automaticTGListRemove (): Unit = {
-		MornyCoeur.extra exec DeleteMyCommands()
+		coeur.extra exec DeleteMyCommands()
 		logger info "cleaned up command list"
 	}
 	

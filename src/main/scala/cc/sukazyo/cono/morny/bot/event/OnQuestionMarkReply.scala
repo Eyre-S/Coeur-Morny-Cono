@@ -2,21 +2,13 @@ package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply.isAllMessageMark
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
 
-object OnQuestionMarkReply extends EventListener {
-	
-	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
-	
-	def isAllMessageMark (using text: String): Boolean = {
-		var isAll = true
-		for (c <- text)
-			if !(QUESTION_MARKS contains c) then isAll = false
-		isAll
-	}
+class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onMessage (using event: Update): Boolean = {
 		
@@ -27,11 +19,24 @@ object OnQuestionMarkReply extends EventListener {
 		if (1 over 8) chance_is false then return false
 		if !isAllMessageMark(using event.message.text) then return false
 		
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			event.message.chat.id, event.message.text
 		).replyToMessageId(event.message.messageId)
 		true
 		
+	}
+	
+}
+
+object OnQuestionMarkReply {
+	
+	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
+	
+	def isAllMessageMark (using text: String): Boolean = {
+		var isAll = true
+		for (c <- text)
+			if !(QUESTION_MARKS contains c) then isAll = false
+		isAll
 	}
 	
 }

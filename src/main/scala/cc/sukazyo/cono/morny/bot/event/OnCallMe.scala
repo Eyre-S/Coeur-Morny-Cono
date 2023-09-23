@@ -10,9 +10,9 @@ import com.pengrad.telegrambot.request.{ForwardMessage, GetChat, SendMessage, Se
 
 import scala.language.postfixOps
 
-object OnCallMe extends EventListener {
+class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 	
-	private val me = MornyCoeur.config.trustedMaster
+	private val me = coeur.config.trustedMaster
 	
 	override def onMessage (using update: Update): Boolean = {
 		
@@ -32,7 +32,7 @@ object OnCallMe extends EventListener {
 			case _ =>
 				return false
 		
-		MornyCoeur.extra exec SendSticker(
+		coeur.extra exec SendSticker(
 			update.message.chat.id,
 			TelegramStickers ID_SENT
 		).replyToMessageId(update.message.messageId)
@@ -41,7 +41,7 @@ object OnCallMe extends EventListener {
 	}
 	
 	private def requestItem (user: User, itemHTML: String, extra: String|Null = null): Unit =
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			me,
 			s"""request $itemHTML
 			   |from ${user.fullnameRefHTML}${if extra == null then "" else "\n"+extra}"""
@@ -51,11 +51,11 @@ object OnCallMe extends EventListener {
 	private def requestLastDinner (req: Message): Unit = {
 		var isAllowed = false
 		var lastDinnerData: Message|Null = null
-		if (MornyCoeur.trusted isTrusted_dinnerReader req.from.id) {
+		if (coeur.trusted isTrusted_dinnerReader req.from.id) {
 			// todo: have issues
-			// i dont want to test it anymore... it might be deprecated soon
-			lastDinnerData = (MornyCoeur.extra exec GetChat(MornyCoeur.config.dinnerChatId)).chat.pinnedMessage
-			val sendResp = MornyCoeur.extra exec ForwardMessage(
+			//  i dont want to test it anymore... it might be deprecated soon
+			lastDinnerData = (coeur.extra exec GetChat(coeur.config.dinnerChatId)).chat.pinnedMessage
+			val sendResp = coeur.extra exec ForwardMessage(
 				req.from.id,
 				lastDinnerData.forwardFromChat.id,
 				lastDinnerData.forwardFromMessageId
@@ -63,7 +63,7 @@ object OnCallMe extends EventListener {
 			import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 			import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 			def lastDinner_dateMillis: Long = lastDinnerData.forwardDate longValue;
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				req.from.id,
 				"<i>on</i> <code>%s [UTC+8]</code>\n- <code>%s</code> <i>before</i>".formatted(
 					h(formatDate(lastDinner_dateMillis, 8)),
@@ -72,7 +72,7 @@ object OnCallMe extends EventListener {
 			).parseMode(ParseMode HTML).replyToMessageId(sendResp.message.messageId)
 			isAllowed = true
 		} else {
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				req.from.id,
 				TelegramStickers ID_403
 			).replyToMessageId(req.messageId)
@@ -87,6 +87,6 @@ object OnCallMe extends EventListener {
 	
 	private def requestCustom (message: Message): Unit =
 		requestItem(message.from, "<u>[???]</u>")
-		MornyCoeur.extra exec ForwardMessage(me, message.chat.id, message.messageId)
+		coeur.extra exec ForwardMessage(me, message.chat.id, message.messageId)
 	
 }

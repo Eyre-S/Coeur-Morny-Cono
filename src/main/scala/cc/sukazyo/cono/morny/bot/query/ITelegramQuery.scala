@@ -1,7 +1,9 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import javax.annotation.Nullable
+import cc.sukazyo.cono.morny.MornyCoeur
 import com.pengrad.telegrambot.model.Update
+
+import javax.annotation.Nullable
 
 trait ITelegramQuery {
 	

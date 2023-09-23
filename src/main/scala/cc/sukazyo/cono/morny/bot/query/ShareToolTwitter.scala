@@ -7,7 +7,7 @@ import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
 import scala.language.postfixOps
 import scala.util.matching.Regex
 
-object ShareToolTwitter extends ITelegramQuery {
+class ShareToolTwitter extends ITelegramQuery {
 	
 	private val TITLE_VX = "[tweet] Share as VxTwitter"
 	private val TITLE_VX_COMBINED = "[tweet] Share as VxTwitter(combination)"

@@ -7,7 +7,7 @@ import cc.sukazyo.cono.morny.bot.command.MornyCommands
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.{Message, Update}
 
-object OnTelegramCommand extends EventListener {
+class MornyOnTelegramCommand (using commandManager: MornyCommands) (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onMessage (using update: Update): Boolean = {
 		
@@ -22,12 +22,12 @@ object OnTelegramCommand extends EventListener {
 		if (!(inputCommand.command matches "^\\w+$"))
 			logger debug "not command"
 			false
-		else if ((inputCommand.target ne null) && (inputCommand.target != MornyCoeur.username))
+		else if ((inputCommand.target ne null) && (inputCommand.target != coeur.username))
 			logger debug "not morny command"
 			false
 		else
 			logger debug "is command"
-			MornyCommands.execute(using inputCommand)
+			commandManager.execute(using inputCommand)
 		
 	}
 	

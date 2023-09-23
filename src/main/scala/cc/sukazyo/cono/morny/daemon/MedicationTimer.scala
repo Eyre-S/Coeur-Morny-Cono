@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.daemon
 
-import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
@@ -10,15 +11,15 @@ import java.time.{LocalDateTime, ZoneOffset}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 
-object MedicationTimer extends Thread {
+class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	
 	private val NOTIFY_MESSAGE = "🍥⏲"
 	private val DAEMON_THREAD_NAME_DEF = "MedicationTimer"
 	
-	private val use_timeZone = MornyCoeur.config.medicationTimerUseTimezone
+	private val use_timeZone = coeur.config.medicationTimerUseTimezone
 	import scala.jdk.CollectionConverters.SetHasAsScala
-	private val notify_atHour: Set[Int] = MornyCoeur.config.medicationNotifyAt.asScala.toSet.map(_.intValue)
-	private val notify_toChat = MornyCoeur.config.medicationNotifyToChat
+	private val notify_atHour: Set[Int] = coeur.config.medicationNotifyAt.asScala.toSet.map(_.intValue)
+	private val notify_toChat = coeur.config.medicationNotifyToChat
 	
 	this.setName(DAEMON_THREAD_NAME_DEF)
 	
@@ -42,15 +43,20 @@ object MedicationTimer extends Thread {
 							s"""unexpected error occurred on NotificationTimer
 							   |${exceptionLog(e)}"""
 							.stripMargin
-					MornyReport.exception(e)
+					coeur.daemons.reporter.exception(e)
 		}
 		logger info "Medication Timer stopped."
 	}
 	
 	private def sendNotification(): Unit = {
-		val sendResponse: SendResponse = MornyCoeur.extra exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
+		val sendResponse: SendResponse = coeur.extra exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
 		if sendResponse isOk then lastNotify_messageId = sendResponse.message.messageId
 		else lastNotify_messageId = null
+	}
+	
+	@throws[InterruptedException | IllegalArgumentException]
+	private def waitToNextRoutine (): Unit = {
+		Thread sleep calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
 	}
 	
 	def refreshNotificationWrite (edited: Message): Unit = {
@@ -60,7 +66,7 @@ object MedicationTimer extends Thread {
 		val entities = ArrayBuffer.empty[MessageEntity]
 		if edited.entities ne null then entities ++= edited.entities
 		entities += MessageEntity(MessageEntity.Type.italic, edited.text.length + "\n-- ".length, editTime.length)
-		MornyCoeur.extra exec EditMessageText(
+		coeur.extra exec EditMessageText(
 			notify_toChat,
 			edited.messageId,
 			edited.text + s"\n-- $editTime --"
@@ -68,23 +74,22 @@ object MedicationTimer extends Thread {
 		lastNotify_messageId = null
 	}
 	
+}
+
+object MedicationTimer {
+	
 	@throws[IllegalArgumentException]
 	private[daemon] def calcNextRoutineTimestamp (baseTimeMillis: Long, zone: ZoneOffset, notifyAt: Set[Int]): Long = {
 		if (notifyAt isEmpty) throw new IllegalArgumentException("notify time is not set")
 		var time = LocalDateTime.ofEpochSecond(
-			baseTimeMillis/1000, ((baseTimeMillis%1000)*1000*1000) toInt,
+			baseTimeMillis / 1000, ((baseTimeMillis % 1000) * 1000 * 1000) toInt,
 			zone
 		).withMinute(0).withSecond(0).withNano(0)
 		time = time plusHours 1
-		while (!(notifyAt contains (time getHour))) {
+		while (!(notifyAt contains(time getHour))) {
 			time = time plusHours 1
 		}
 		(time toInstant zone) toEpochMilli
-	}
-	
-	@throws[InterruptedException | IllegalArgumentException]
-	private def waitToNextRoutine (): Unit = {
-		Thread sleep calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
 	}
 	
 }

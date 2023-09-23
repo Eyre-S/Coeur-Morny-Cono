@@ -5,7 +5,8 @@ import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur.THREAD_MORNY_EXIT
 import cc.sukazyo.cono.morny.bot.api.TelegramUpdatesListener
-import cc.sukazyo.cono.morny.bot.event.MornyEventListeners
+import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
+import cc.sukazyo.cono.morny.bot.query.MornyQueries
 import cc.sukazyo.cono.morny.util.tgapi.ExtraAction
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
@@ -17,53 +18,15 @@ object MornyCoeur {
 	
 	val THREAD_MORNY_EXIT = "morny-exiting"
 	
-	private var INSTANCE: MornyCoeur|Null = _
-	
-	val coeurStartTimestamp: Long = ServerMain.systemStartupTime
-	
-	def account: TelegramBot = INSTANCE.account
-	def username: String = INSTANCE.username
-	def userid: Long = INSTANCE.userid
-	def config: MornyConfig = INSTANCE.my_config
-	def trusted: MornyTrusted = INSTANCE.trusted
-	def extra: ExtraAction = INSTANCE.extra
-	
-	def available: Boolean = INSTANCE != null
-	def callSaveData(): Unit = INSTANCE.saveDataAll()
-	
-	def exitReason: AnyRef|Null = INSTANCE.whileExit_reason
-	
-	def exit (status: Int, reason: AnyRef): Unit =
-		INSTANCE.whileExit_reason = reason
-		System exit status
-	
-	def init (using config: MornyConfig): Unit = {
-		
-		if (INSTANCE ne null)
-			logger error "Coeur already started!!!"
-			return;
-		
-		logger info "Coeur starting..."
-		INSTANCE = MornyCoeur()
-		
-		MornyDaemons.start()
-		
-		logger info "start telegram event listening"
-		MornyEventListeners.registerAllEvents()
-		INSTANCE.account.setUpdatesListener(TelegramUpdatesListener)
-		
-		if config.commandLoginRefresh then
-			logger info "resetting telegram command list"
-			MornyCommands.automaticTGListUpdate()
-		
-		logger info "Coeur start complete."
-		
-	}
-	
 }
 
-class MornyCoeur (using config: MornyConfig) {
-	def my_config: MornyConfig = config
+class MornyCoeur (using val config: MornyConfig) {
+	
+	given MornyCoeur = this
+	
+	///>>> BLOCK START instance configure & startup stage 1
+	
+	logger info "Coeur starting..."
 	
 	logger info s"args key:\n  ${config.telegramBotKey}"
 	if config.telegramBotUsername ne null then
@@ -76,13 +39,47 @@ class MornyCoeur (using config: MornyConfig) {
 	
 	configure_exitCleanup()
 	
+	///<<< BLOCK END instance configure & startup stage 1
+	
+	/** [[TelegramBot]] account of this Morny */
 	val account: TelegramBot = __loginResult.account
+	/** [[account]]'s telegram username */
 	val username: String = __loginResult.username
+	/** [[account]]'s telegram user id */
 	val userid: Long = __loginResult.userid
 	
-	val trusted: MornyTrusted = MornyTrusted(using this)
+	/** current Morny's [[MornyTrusted]] instance */
+	val trusted: MornyTrusted = MornyTrusted()
+	/** current Morny's [[ExtraAction]] toolset */
 	val extra: ExtraAction = ExtraAction as __loginResult.account
-	var whileExit_reason: AnyRef|Null = _
+	private val updatesListener: TelegramUpdatesListener = TelegramUpdatesListener()
+	
+	val daemons: MornyDaemons = MornyDaemons()
+	updatesListener.manager register MornyOnUpdateTimestampOffsetLock()
+	val commands: MornyCommands = MornyCommands()
+	//noinspection ScalaWeakerAccess
+	val queries: MornyQueries = MornyQueries()
+	updatesListener.manager register MornyOnTelegramCommand(using commands)
+	updatesListener.manager register MornyOnInlineQuery(using queries)
+	val events: MornyEventListeners = MornyEventListeners(using updatesListener.manager)
+	
+	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
+	private var whileExit_reason: AnyRef|Null = _
+	def exitReason: AnyRef|Null = whileExit_reason
+	val coeurStartTimestamp: Long = ServerMain.systemStartupTime
+	
+	///>>> BLOCK START instance configure & startup stage 2
+	
+	daemons.start()
+	logger info "start telegram event listening"
+	account setUpdatesListener updatesListener
+	if config.commandLoginRefresh then
+		logger info "resetting telegram command list"
+		commands.automaticTGListUpdate()
+	
+	logger info "Coeur start complete."
+	
+	///<<< BLOCK END instance configure & startup stage 2
 	
 	def saveDataAll(): Unit = {
 		// nothing to do
@@ -90,14 +87,18 @@ class MornyCoeur (using config: MornyConfig) {
 	}
 	
 	private def exitCleanup (): Unit = {
-		MornyDaemons.stop()
+		daemons.stop()
 		if config.commandLogoutClear then
-			MornyCommands.automaticTGListRemove()
+			commands.automaticTGListRemove()
 	}
 	
 	private def configure_exitCleanup (): Unit = {
 		Runtime.getRuntime.addShutdownHook(new Thread(() => exitCleanup(), THREAD_MORNY_EXIT))
 	}
+	
+	def exit (status: Int, reason: AnyRef): Unit =
+		whileExit_reason = reason
+		System exit status
 	
 	private case class LoginResult(account: TelegramBot, username: String, userid: Long)
 	

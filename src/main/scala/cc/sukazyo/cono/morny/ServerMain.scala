@@ -143,7 +143,7 @@ object ServerMain {
 		Thread.currentThread setName THREAD_MORNY_INIT
 		
 		try
-			MornyCoeur.init(using config build)
+			MornyCoeur(using config build)
 		catch {
 			case _: CheckFailure.NullTelegramBotKey =>
 				logger.info("Parameter required has no value:\n --token.")

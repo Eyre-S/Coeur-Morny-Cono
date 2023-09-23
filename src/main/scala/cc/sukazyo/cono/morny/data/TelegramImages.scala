@@ -1,12 +1,13 @@
 package cc.sukazyo.cono.morny.data
 
+import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyAssets
+import cc.sukazyo.cono.morny.daemon.MornyReport
+import cc.sukazyo.cono.morny.MornyAssets.AssetsException
 
+import java.io.IOException
 import scala.language.postfixOps
 import scala.util.Using
-import java.io.IOException
-import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.daemon.MornyReport
 
 object TelegramImages {
 	
@@ -14,19 +15,17 @@ object TelegramImages {
 		
 		private var cache: Array[Byte]|Null = _
 		
+		@throws[AssetsException]
 		def get:Array[Byte] =
 			if cache eq null then read()
-			if cache eq null then throw IllegalStateException("Failed to get assets file image.")
 			cache
 		
+		@throws[AssetsException]
 		private def read (): Unit = {
 			Using ((MornyAssets.pack getResource assetsPath)read) { stream =>
 				try { this.cache = stream.readAllBytes() }
 				catch case e: IOException => {
-					logger error
-							s"""Cannot read resource file:
-							   |${exceptionLog(e)}""".stripMargin
-					MornyReport.exception(e, "Cannot read resource file.")
+					throw AssetsException(e)
 				}
 			}
 		}

@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.request.{DeleteMessage, GetChatMember, SendSticke
 
 import scala.language.postfixOps
 
-object DirectMsgClear extends ISimpleCommand {
+class DirectMsgClear (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override val name: String = "r"
 	override val aliases: Array[ICommandAlias] | Null = null
@@ -19,16 +19,16 @@ object DirectMsgClear extends ISimpleCommand {
 		logger debug "executing command /r"
 		if (event.message.replyToMessage == null) return;
 		logger trace "message is a reply"
-		if (event.message.replyToMessage.from.id != MornyCoeur.userid) return;
+		if (event.message.replyToMessage.from.id != coeur.userid) return;
 		logger trace "message replied is from me"
 		if (System.currentTimeMillis/1000 - event.message.replyToMessage.date > 48*60*60) return;
 		logger trace "message is not outdated(48 hrs ago)"
 		
-		val isTrusted = MornyCoeur.trusted isTrusted event.message.from.id
+		val isTrusted = coeur.trusted isTrusted event.message.from.id
 		// todo:
-		// it does not work. due to the Telegram Bot API doesn't provide
-		// nested replyToMessage, so currently the trusted check by
-		// replyToMessage.replyToMessage will not work!
+		//  it does not work. due to the Telegram Bot API doesn't provide
+		//  nested replyToMessage, so currently the trusted check by
+		//  replyToMessage.replyToMessage will not work!
 		def _isReplyTrusted: Boolean =
 			if (event.message.replyToMessage.replyToMessage == null) false
 			else if (event.message.replyToMessage.replyToMessage.from.id == event.message.from.id) true
@@ -36,19 +36,19 @@ object DirectMsgClear extends ISimpleCommand {
 		
 		if (isTrusted || _isReplyTrusted) {
 		
-			MornyCoeur.extra exec DeleteMessage(
+			coeur.extra exec DeleteMessage(
 				event.message.chat.id, event.message.replyToMessage.messageId
 			)
 			
 			def _isPrivate: Boolean = event.message.chat.`type` == Chat.Type.Private
 			def _isPermission: Boolean =
-				(MornyCoeur.extra exec GetChatMember(event.message.chat.id, event.message.from.id))
+				(coeur.extra exec GetChatMember(event.message.chat.id, event.message.from.id))
 						.chatMember.canDeleteMessages
 			if (_isPrivate || _isPermission) {
-				MornyCoeur.extra exec DeleteMessage(event.message.chat.id, event.message.messageId)
+				coeur.extra exec DeleteMessage(event.message.chat.id, event.message.messageId)
 			}
 		
-		} else MornyCoeur.extra exec SendSticker(
+		} else coeur.extra exec SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_403
 		).replyToMessageId(event.message.messageId)

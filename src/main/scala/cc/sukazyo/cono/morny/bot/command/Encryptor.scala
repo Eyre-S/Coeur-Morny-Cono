@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.daemon.MornyReport
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.CommonEncrypt
@@ -17,7 +16,7 @@ import java.util.Base64
 import scala.language.postfixOps
 
 /** Provides Telegram Command __`/encrypt`__. */
-object Encryptor extends ITelegramCommand {
+class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "encrypt"
 	override val aliases: Array[ICommandAlias] | Null = null
@@ -48,7 +47,7 @@ object Encryptor extends ITelegramCommand {
 		val mod_uppercase = if (args.length > 1) {
 			if (args.length < 3 && _is_mod_u(args(1))) true
 			else
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_404
 				).replyToMessageId(event.message.messageId)
@@ -74,11 +73,11 @@ object Encryptor extends ITelegramCommand {
 			val _r = event.message.replyToMessage
 			if ((_r ne null) && (_r.document ne null)) {
 				try {XFile(
-					MornyCoeur.account getFileContent (MornyCoeur.extra exec GetFile(_r.document.fileId)).file,
+					coeur.account getFileContent (coeur.extra exec GetFile(_r.document.fileId)).file,
 					_r.document.fileName
 				)} catch case e: IOException =>
 					logger warn s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-					MornyReport.exception(e, "NetworkRequest error: TelegramFileAPI")
+					coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
 					return
 			} else if ((_r ne null) && (_r.photo ne null)) {
 				try {
@@ -92,22 +91,23 @@ object Encryptor extends ITelegramCommand {
 					if (_photo_origin eq null) throw IllegalArgumentException("no photo from api.")
 					import cc.sukazyo.cono.morny.util.UseRandom.rand_id
 					XFile(
-						MornyCoeur.account getFileContent (MornyCoeur.extra exec GetFile(_photo_origin.fileId)).file,
+						coeur.account getFileContent (coeur.extra exec GetFile(_photo_origin.fileId)).file,
 						s"photo$rand_id.png"
 					)
 				} catch
 					case e: IOException =>
+						//noinspection DuplicatedCode
 						logger warn s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-						MornyReport.exception(e, "NetworkRequest error: TelegramFileAPI")
+						coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
 						return
 					case e: IllegalArgumentException =>
 						logger warn s"FileProcess error: PhotoSize:\n\t${e.getMessage}"
-						MornyReport.exception(e, "FileProcess error: PhotoSize")
+						coeur.daemons.reporter.exception(e, "FileProcess error: PhotoSize")
 						return
 			} else if ((_r ne null) && (_r.text ne null)) {
 				XText(_r.text)
 			} else {
-				MornyCoeur.extra exec SendMessage(
+				coeur.extra exec SendMessage(
 					event.message.chat.id,
 					"<i><u>null</u></i>"
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
@@ -153,7 +153,7 @@ object Encryptor extends ITelegramCommand {
 					_tool_b64d.decode,
 					CommonEncrypt.lint_base64FileName
 				) } catch case _: IllegalArgumentException =>
-					MornyCoeur.extra exec SendSticker(
+					coeur.extra exec SendSticker(
 						event.message.chat.id,
 						TelegramStickers ID_404 // todo: is here better erro notify?
 					).replyToMessageId(event.message.messageId)
@@ -163,7 +163,7 @@ object Encryptor extends ITelegramCommand {
 			case "sha256" => genResult_hash(input, SHA256)
 			case "sha512" => genResult_hash(input, SHA512)
 			case _ =>
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_404
 				).replyToMessageId(event.message.messageId)
@@ -173,13 +173,13 @@ object Encryptor extends ITelegramCommand {
 		// output
 		result match
 			case _file: EXFile =>
-				MornyCoeur.extra exec SendDocument(
+				coeur.extra exec SendDocument(
 					event.message.chat.id,
 					_file.result
 				).fileName(_file.resultName).replyToMessageId(event.message.messageId)
 			case _text: EXTextLike =>
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-				MornyCoeur.extra exec SendMessage(
+				coeur.extra exec SendMessage(
 					event.message.chat.id,
 					s"<pre><code>${h(_text.text)}</code></pre>"
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
@@ -211,7 +211,7 @@ object Encryptor extends ITelegramCommand {
 	  * </blockquote>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			chat,
 			s"""<b><u>base64</u></b>, b64
 			   |<b><u>base64url</u></b>, base64u, b64u

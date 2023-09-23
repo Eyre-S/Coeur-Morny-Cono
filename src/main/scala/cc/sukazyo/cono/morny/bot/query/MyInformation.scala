@@ -7,7 +7,7 @@ import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTex
 
 import scala.language.postfixOps
 
-object MyInformation extends ITelegramQuery {
+class MyInformation extends ITelegramQuery {
 	
 	private val ID_PREFIX = "[morny/info/me]"
 	private val TITLE = "My Account Information"

@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
 
-object OnUserSlashAction extends EventListener {
+class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 	
 	private val TG_FORMAT = "^\\w+(@\\w+)?$"r
 	
@@ -58,7 +58,7 @@ object OnUserSlashAction extends EventListener {
 					origin
 				else update.message.replyToMessage
 			
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				update.message.chat.id,
 				"%s %s%s %s %s!".format(
 					origin.sender_firstnameRefHTML,

@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny
 
 import cc.sukazyo.cono.morny.internal.BuildConfigField
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.daemon.MornyReport
 import cc.sukazyo.cono.morny.util.FileUtils
 
 import java.io.IOException
@@ -42,7 +41,7 @@ object MornySystem {
 				"<non-jar-runtime>"
 			case n: NoSuchAlgorithmException =>
 				logger error exceptionLog(n)
-				MornyReport.exception(n, "<coeur-md5/calculation-error>")
+//				MornyReport.exception(n, "<coeur-md5/calculation-error>") // todo: will not implemented
 				"<calculation-error>"
 	}
 	

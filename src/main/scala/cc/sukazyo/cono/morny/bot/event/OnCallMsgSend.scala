@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 import scala.util.matching.Regex
 
-object OnCallMsgSend extends EventListener {
+class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 	
 	private val REGEX_MSG_SENDREQ_DATA_HEAD: Regex = "^\\*msg(-?\\d+)(\\*\\S+)?(?:\\n([\\s\\S]+))?$"r
 	
@@ -59,8 +59,8 @@ object OnCallMsgSend extends EventListener {
 		if message.text eq null then return false
 		if !(message.text startsWith "*msg") then return false
 		
-		if (!(MornyCoeur.trusted isTrusted message.from.id))
-			MornyCoeur.extra exec SendSticker(
+		if (!(coeur.trusted isTrusted message.from.id))
+			coeur.extra exec SendSticker(
 				message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(message.messageId)
@@ -71,15 +71,15 @@ object OnCallMsgSend extends EventListener {
 			if (message.replyToMessage eq null) return answer404
 			val messageToSend = MessageToSend from message.replyToMessage
 			if ((messageToSend eq null) || (messageToSend.message eq null)) return answer404
-			val sendResponse = MornyCoeur.account execute messageToSend.toSendMessage()
+			val sendResponse = coeur.account execute messageToSend.toSendMessage()
 			
 			if (sendResponse isOk) {
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					update.message.chat.id,
 					TelegramStickers ID_SENT
 				).replyToMessageId(update.message.messageId)
 			} else {
-				MornyCoeur.extra exec SendMessage(
+				coeur.extra exec SendMessage(
 					update.message.chat.id,
 					// language=html
 					s"""<b><u>${sendResponse.errorCode} FAILED</u></b>
@@ -104,7 +104,7 @@ object OnCallMsgSend extends EventListener {
 			if _toSend eq null then return answer404
 			else _toSend
 		
-		val targetChatResponse = MornyCoeur.account execute GetChat(messageToSend.targetId)
+		val targetChatResponse = coeur.account execute GetChat(messageToSend.targetId)
 		if (targetChatResponse isOk) {
 			def getChatDescriptionHTML (chat: Chat): String =
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
@@ -113,12 +113,12 @@ object OnCallMsgSend extends EventListener {
 				s"""<i><u>${h(chat.id toString)}</u>@${h(chat.`type`.name)}</i>${if (chat.`type` != Chat.Type.Private) ":::" else ""}
 				   |${chat.typeTag} <b>${h(chat.safe_name)}</b> ${chat.safe_linkHTML}"""
 				.stripMargin
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				update.message.chat.id,
 				getChatDescriptionHTML(targetChatResponse.chat)
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
 		} else {
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				update.message.chat.id,
 				// language=html
 				s"""<b><u>${targetChatResponse.errorCode} FAILED</u></b>
@@ -128,10 +128,10 @@ object OnCallMsgSend extends EventListener {
 		}
 		
 		if messageToSend.message eq null then return true
-		val testSendResponse = MornyCoeur.account execute messageToSend.toSendMessage(update.message.chat.id)
+		val testSendResponse = coeur.account execute messageToSend.toSendMessage(update.message.chat.id)
 				.replyToMessageId(update.message.messageId)
 		if (!(testSendResponse isOk))
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				update.message.chat.id,
 				// language=html
 				s"""<b><u>${testSendResponse.errorCode}</u> FAILED</b>
@@ -144,7 +144,7 @@ object OnCallMsgSend extends EventListener {
 	}
 	
 	private def answer404 (using update: Update): Boolean =
-		MornyCoeur.extra exec SendSticker(
+		coeur.extra exec SendSticker(
 			update.message.chat.id,
 			TelegramStickers ID_404
 		).replyToMessageId(update.message.messageId)

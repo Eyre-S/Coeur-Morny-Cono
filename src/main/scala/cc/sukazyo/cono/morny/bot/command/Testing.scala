@@ -6,18 +6,17 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 
-import javax.annotation.Nonnull
-import javax.annotation.Nullable
+import javax.annotation.{Nonnull, Nullable}
 import scala.language.postfixOps
 
-object Testing extends ISimpleCommand {
+class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override val name: String = "test"
 	override val aliases: Array[ICommandAlias] | Null = null
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		MornyCoeur.extra exec new SendMessage(
+		coeur.extra exec new SendMessage(
 			event.message.chat.id,
 			// language=html
 			"<b>Just</b> a TEST command."

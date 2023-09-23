@@ -1,7 +1,5 @@
 package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.event.OnEventHackHandle
-import cc.sukazyo.cono.morny.bot.event.OnEventHackHandle.{registerHack, HackType}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.Update
@@ -9,7 +7,7 @@ import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
 
-object EventHack extends ITelegramCommand {
+class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "event_hack"
 	override val aliases: Array[ICommandAlias] | Null = null
@@ -18,15 +16,17 @@ object EventHack extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
+		import coeur.daemons.eventHack.{registerHack, HackType}
+		
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_WAITING
 			).replyToMessageId(event.message.messageId)
 		def done_forbiddenForAny =
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(event.message.messageId)
@@ -40,7 +40,7 @@ object EventHack extends ITelegramCommand {
 			)
 		x_mode match
 			case "any" =>
-				if (MornyCoeur.trusted isTrusted event.message.from.id)
+				if (coeur.trusted isTrusted event.message.from.id)
 					doRegister(HackType ANY)
 					done_ok
 				else done_forbiddenForAny

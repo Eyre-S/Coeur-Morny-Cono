@@ -1,8 +1,7 @@
 package cc.sukazyo.cono.morny.bot.api
 
-import cc.sukazyo.cono.morny.Log
+import cc.sukazyo.cono.morny.{Log, MornyCoeur}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.daemon.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
@@ -10,7 +9,7 @@ import com.pengrad.telegrambot.model.Update
 import scala.collection.mutable
 import scala.language.postfixOps
 
-object EventListenerManager {
+class EventListenerManager (using coeur: MornyCoeur) {
 	
 	private val listeners = mutable.Queue.empty[EventListener]
 	
@@ -69,7 +68,7 @@ object EventListenerManager {
 							) indent 4) ++= "\n"
 						case _ =>
 					logger error errorMessage.toString
-					MornyReport.exception(e, "on event running")
+					coeur.daemons.reporter.exception(e, "on event running")
 				}
 				if (status isOk) return
 			}

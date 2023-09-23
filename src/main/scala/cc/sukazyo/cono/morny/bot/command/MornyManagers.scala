@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
 
-object MornyManagers {
+class MornyManagers (using coeur: MornyCoeur) {
 	
 	object Exit extends ITelegramCommand {
 		
@@ -24,23 +24,23 @@ object MornyManagers {
 			
 			val user = event.message.from
 			
-			if (MornyCoeur.trusted isTrusted user.id) {
+			if (coeur.trusted isTrusted user.id) {
 				
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
 				logger info s"Morny exited by user ${user toLogTag}"
-				MornyCoeur.exit(0, user)
+				coeur.exit(0, user)
 				
 			} else {
 				
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
 				logger info s"403 exit caught from user ${user toLogTag}"
-				MornyReport.unauthenticatedAction("/exit", user)
+				coeur.daemons.reporter.unauthenticatedAction("/exit", user)
 				
 			}
 			
@@ -59,23 +59,23 @@ object MornyManagers {
 			
 			val user = event.message.from
 			
-			if (MornyCoeur.trusted isTrusted user.id) {
+			if (coeur.trusted isTrusted user.id) {
 				
 				logger info s"call save from command by ${user toLogTag}"
-				MornyCoeur.callSaveData()
-				MornyCoeur.extra exec SendSticker(
+				coeur.saveDataAll()
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_SAVED
 				).replyToMessageId(event.message.messageId)
 				
 			} else {
 				
-				MornyCoeur.extra exec SendSticker(
+				coeur.extra exec SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
 				logger info s"403 save caught from user ${user toLogTag}"
-				MornyReport.unauthenticatedAction("/save", user)
+				coeur.daemons.reporter.unauthenticatedAction("/save", user)
 				
 			}
 			

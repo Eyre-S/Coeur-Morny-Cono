@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.bot.command.MornyInformation
+import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
@@ -12,14 +13,11 @@ import com.pengrad.telegrambot.model.User
 import com.pengrad.telegrambot.request.{BaseRequest, SendMessage}
 import com.pengrad.telegrambot.response.BaseResponse
 
-object MornyReport {
-	
-	private def unsupported: Boolean = (!MornyCoeur.available) || (MornyCoeur.config.reportToChat == -1)
+class MornyReport (using coeur: MornyCoeur) {
 	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
-		if unsupported then return
 		try {
-			MornyCoeur.extra exec report
+			coeur.extra exec report
 		} catch case e: EventRuntimeException.ActionFailed => {
 			logger warn
 					s"""cannot execute report to telegram:
@@ -31,7 +29,6 @@ object MornyReport {
 	}
 	
 	def exception (e: Throwable, description: String|Null = null): Unit = {
-		if unsupported then return
 		def _tgErrFormat: String = e match
 			case api: EventRuntimeException.ActionFailed =>
 				// language=html
@@ -39,7 +36,7 @@ object MornyReport {
 						.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))
 			case _ => ""
 		executeReport(SendMessage(
-			MornyCoeur.config.reportToChat,
+			coeur.config.reportToChat,
 			// language=html
 			s"""<b>▌Coeur Unexpected Exception </b>
 			   |${if description ne null then h(description)+"\n" else ""}
@@ -49,9 +46,8 @@ object MornyReport {
 	}
 	
 	def unauthenticatedAction (action: String, user: User): Unit = {
-		if unsupported then return
 		executeReport(SendMessage(
-			MornyCoeur.config.reportToChat,
+			coeur.config.reportToChat,
 			// language=html
 			s"""<b>▌User unauthenticated action</b>
 			   |action: ${h(action)}
@@ -62,14 +58,14 @@ object MornyReport {
 	
 	def onMornyLogin(): Unit = {
 		executeReport(SendMessage(
-			MornyCoeur.config.reportToChat,
+			coeur.config.reportToChat,
 			// language=html
 			s"""<b>▌Morny Logged in</b>
-			   |-v ${MornyInformation.getVersionAllFullTagHTML}
-			   |as user ${MornyCoeur.username}
+			   |-v $getVersionAllFullTagHTML
+			   |as user ${coeur.username}
 			   |
 			   |as config fields:
-			   |${sectionConfigFields(MornyCoeur.config)}"""
+			   |${sectionConfigFields(coeur.config)}"""
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}
@@ -103,17 +99,16 @@ object MornyReport {
 		echo dropRight 1 toString
 	}
 	
-	def onMornyExit (causedBy: AnyRef|Null): Unit = {
-		if unsupported then return
-		val causedTag = causedBy match
+	def onMornyExit (): Unit = {
+		val causedTag = coeur.exitReason match
 			case u: User => u.fullnameRefHTML
 			case n if n == null => "UNKNOWN reason"
 			case a: AnyRef => /*language=html*/ s"<code>${h(a.toString)}</code>"
 		executeReport(SendMessage(
-			MornyCoeur.config.reportToChat,
+			coeur.config.reportToChat,
 			// language=html
 			s"""<b>▌Morny Exited</b>
-			   |from user @${MornyCoeur.username}
+			   |from user @${coeur.username}
 			   |
 			   |by: $causedTag"""
 			.stripMargin

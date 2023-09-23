@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTex
 import scala.language.postfixOps
 import scala.util.matching.Regex
 
-object ShareToolBilibili extends ITelegramQuery {
+class ShareToolBilibili extends ITelegramQuery {
 	
 	private val TITLE_BILI_AV = "[bilibili] Share video / av"
 	private val TITLE_BILI_BV = "[bilibili] Share video / BV"

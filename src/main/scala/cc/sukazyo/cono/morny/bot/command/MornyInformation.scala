@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.bot.command
 
-import cc.sukazyo.cono.morny.{BuildConfig, MornyAbout, MornyCoeur, MornySystem}
-import cc.sukazyo.cono.morny.data.{TelegramImages, TelegramStickers}
+import cc.sukazyo.cono.morny.{BuildConfig, MornyCoeur, MornySystem}
+import cc.sukazyo.cono.morny.data.MornyInformation.*
+import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
@@ -10,12 +11,10 @@ import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
 
 import java.lang.System
-import java.net.InetAddress
-import java.rmi.UnknownHostException
 import scala.language.postfixOps
 
 // todo: maybe move some utils method outside
-object MornyInformation extends ITelegramCommand {
+class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	private case object Subs {
 		val STICKERS = "stickers"
@@ -47,43 +46,8 @@ object MornyInformation extends ITelegramCommand {
 		
 	}
 	
-	//noinspection ScalaWeakerAccess
-	def getVersionGitTagHTML: String = {
-		if (!MornySystem.isGitBuild) return ""
-		val g = StringBuilder()
-		val cm = BuildConfig.COMMIT substring(0, 8)
-		val cp = MornySystem.currentCodePath
-		if (cp == null) g++= s"<code>$cm</code>"
-		else g++= s"<a href='$cp'>$cm</a>"
-		if (!MornySystem.isCleanBuild) g++= ".<code>δ</code>"
-		g toString
-	}
-	
-	def getVersionAllFullTagHTML: String = {
-		val v = StringBuilder()
-		v ++= s"<code>${MornySystem VERSION_BASE}</code>"
-		if (MornySystem isUseDelta) v++=s"-δ<code>${MornySystem VERSION_DELTA}</code>"
-		if (MornySystem isGitBuild) v++="+git."++=getVersionGitTagHTML
-		v ++= s"*<code>${MornySystem.CODENAME toUpperCase}</code>"
-		v toString
-	}
-	
-	//noinspection ScalaWeakerAccess
-	def getRuntimeHostname: String|Null = {
-		try InetAddress.getLocalHost.getHostName
-		catch case _:UnknownHostException => null
-	}
-	
-	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT get
-	
-	def getMornyAboutLinksHTML: String =
-		s"""<a href='${MornyAbout MORNY_SOURCECODE_LINK}'>source code</a> | <a href='${MornyAbout MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
-		   |<a href='${MornyAbout MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
-		   |<a href='${MornyAbout MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>"""
-		.stripMargin
-	
 	private def echoInfo (chatId: Long, replyTo: Int): Unit = {
-		MornyCoeur.extra exec new SendPhoto(
+		coeur.extra exec new SendPhoto(
 			chatId,
 			getAboutPic
 		).caption(
@@ -128,15 +92,15 @@ object MornyInformation extends ITelegramCommand {
 		val send_mid = SendMessage(send_chat, mid)
 		val send_sticker = SendSticker(send_chat, file_id)
 		if (send_replyTo != -1) send_mid.replyToMessageId(send_replyTo)
-		val result_send_mid = MornyCoeur.extra exec send_mid
+		val result_send_mid = coeur.extra exec send_mid
 		send_sticker.replyToMessageId(result_send_mid.message.messageId)
-		MornyCoeur.extra exec send_sticker
+		coeur.extra exec send_sticker
 	}
 	
 	private[command] def echoVersion (using event: Update): Unit = {
 		val versionDeltaHTML = if (MornySystem.isUseDelta) s"-δ<code>${h(MornySystem.VERSION_DELTA)}</code>" else ""
 		val versionGitHTML = if (MornySystem.isGitBuild) s"git $getVersionGitTagHTML" else ""
-		MornyCoeur.extra exec new SendMessage(
+		coeur.extra exec new SendMessage(
 			event.message.chat.id,
 			// language=html
 			s"""version:
@@ -153,7 +117,7 @@ object MornyInformation extends ITelegramCommand {
 	
 	private[command] def echoRuntime (using event: Update): Unit = {
 		def sysprop (p: String): String = System.getProperty(p)
-		MornyCoeur.extra exec new SendMessage(
+		coeur.extra exec new SendMessage(
 			event.message.chat.id,
 			/* language=html */
 			s"""system:
@@ -171,16 +135,16 @@ object MornyInformation extends ITelegramCommand {
 			   |- <code>${h(formatDate(BuildConfig.CODE_TIMESTAMP, 0))} [UTC]</code>
 			   |- [<code>${BuildConfig.CODE_TIMESTAMP}</code>]
 			   |continuous:
-			   |- <code>${h(formatDuration(System.currentTimeMillis - MornyCoeur.coeurStartTimestamp))}</code>
-			   |- [<code>${System.currentTimeMillis - MornyCoeur.coeurStartTimestamp}</code>]
-			   |- <code>${h(formatDate(MornyCoeur.coeurStartTimestamp, 0))}</code>
-			   |- [<code>${MornyCoeur.coeurStartTimestamp}</code>]"""
+			   |- <code>${h(formatDuration(System.currentTimeMillis - coeur.coeurStartTimestamp))}</code>
+			   |- [<code>${System.currentTimeMillis - coeur.coeurStartTimestamp}</code>]
+			   |- <code>${h(formatDate(coeur.coeurStartTimestamp, 0))}</code>
+			   |- [<code>${coeur.coeurStartTimestamp}</code>]"""
 			.stripMargin
 		).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 	}
 	
 	private def echo404 (using event: Update): Unit =
-		MornyCoeur.extra exec new SendSticker(
+		coeur.extra exec new SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_404
 		).replyToMessageId(event.message.messageId)

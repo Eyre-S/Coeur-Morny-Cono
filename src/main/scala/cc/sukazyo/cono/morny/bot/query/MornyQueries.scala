@@ -1,17 +1,18 @@
 package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.bot.query
+import cc.sukazyo.cono.morny.MornyCoeur
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable.ListBuffer
 
-object MornyQueries {
+class MornyQueries (using MornyCoeur) {
 	
 	private val queryInstances = Set[ITelegramQuery](
-		RawText,
-		MyInformation,
-		ShareToolTwitter,
-		ShareToolBilibili
+		RawText(),
+		MyInformation(),
+		ShareToolTwitter(),
+		ShareToolBilibili()
 	)
 	
 	def query (event: Update): List[InlineQueryUnit[_]] = {

@@ -7,7 +7,7 @@ import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
 
-object OnUserRandom extends EventListener {
+class OnUserRandom (using coeur: MornyCoeur) extends EventListener {
 
 	private val USER_OR_QUERY = "^(.+)(?:还是|or)(.+)$"r
 	private val USER_IF_QUERY = "^(.+)(?:吗\\?|？|\\?|吗？)$"r
@@ -30,7 +30,7 @@ object OnUserRandom extends EventListener {
 		
 		if result == null then return false
 		
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			update.message.chat.id, result
 		).replyToMessageId(update.message.messageId)
 		true

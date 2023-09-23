@@ -7,8 +7,7 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 
-import scala.language.postfixOps
-object MornyOldJrrp extends ITelegramCommand {
+class MornyOldJrrp (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "jrrp"
 	override val aliases: Array[ICommandAlias] | Null = null
@@ -25,7 +24,7 @@ object MornyOldJrrp extends ITelegramCommand {
 			case _ => "..."
 		
 		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-		MornyCoeur.extra exec SendMessage(
+		coeur.extra exec SendMessage(
 			event.message.chat.id,
 			// language=html
 			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code> ${h(ending)}"

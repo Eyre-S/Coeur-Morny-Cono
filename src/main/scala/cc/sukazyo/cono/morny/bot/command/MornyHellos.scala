@@ -8,7 +8,7 @@ import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
 
-object MornyHellos {
+class MornyHellos (using coeur: MornyCoeur) {
 	
 	object On extends ITelegramCommand {
 		
@@ -18,7 +18,7 @@ object MornyHellos {
 		override val description: String = "检查是否在线"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_ONLINE_STATUS_RETURN
 			).replyToMessageId(event.message.messageId)
@@ -33,7 +33,7 @@ object MornyHellos {
 		override val description: String = "打招呼"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			MornyCoeur.extra exec SendSticker(
+			coeur.extra exec SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_HELLO
 			).replyToMessageId(event.message.messageId)

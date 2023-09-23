@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
 
-object IP186Query {
+class IP186Query (using coeur: MornyCoeur) {
 	
 	private enum Subs (val cmd: String):
 		case IP extends Subs("ip")
@@ -34,7 +34,7 @@ object IP186Query {
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
 			else if (command.args.length > 1)
-				MornyCoeur.extra exec SendMessage(
+				coeur.extra exec SendMessage(
 					event.message.chat.id,
 					"[Unavailable] Too much arguments."
 				).replyToMessageId(event.message.messageId)
@@ -42,7 +42,7 @@ object IP186Query {
 			else command.args(0)
 		
 		if (target eq null)
-			MornyCoeur.extra exec new SendMessage(
+			coeur.extra exec new SendMessage(
 				event.message.chat.id,
 				"[Unavailable] No ip defined."
 			).replyToMessageId(event.message.messageId)
@@ -57,7 +57,7 @@ object IP186Query {
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
 				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			MornyCoeur.extra exec SendMessage(
+			coeur.extra exec SendMessage(
 				event.message.chat.id,
 				s"""${h(response.url)}
 				   |<code>${h(response.body)}</code>"""
@@ -65,7 +65,7 @@ object IP186Query {
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: Exception =>
-			MornyCoeur.extra exec new SendMessage(
+			coeur.extra exec new SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""

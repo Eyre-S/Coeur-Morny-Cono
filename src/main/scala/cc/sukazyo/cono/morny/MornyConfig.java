@@ -86,7 +86,7 @@ public class MornyConfig {
 	/**
 	 * morny 的事件忽略前缀时间<br>
 	 * <br>
-	 * {@link cc.sukazyo.cono.morny.bot.event.OnUpdateTimestampOffsetLock}
+	 * {@link cc.sukazyo.cono.morny.bot.event.MornyOnUpdateTimestampOffsetLock}
 	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
 	 */
 	public final long eventOutdatedTimestamp;

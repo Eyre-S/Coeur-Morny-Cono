@@ -11,11 +11,11 @@ import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
-object OnInlineQuery extends EventListener {
+class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onInlineQuery (using update: Update): Boolean = {
 		
-		val results: List[InlineQueryUnit[_]] = MornyQueries query update
+		val results: List[InlineQueryUnit[_]] = queryManager query update
 		
 		var cacheTime = Int.MaxValue
 		var isPersonal = InlineQueryUnit.defaults.IS_PERSONAL
@@ -28,7 +28,7 @@ object OnInlineQuery extends EventListener {
 		
 		if (results isEmpty) return false
 		
-		MornyCoeur.extra exec AnswerInlineQuery(
+		coeur.extra exec AnswerInlineQuery(
 			update.inlineQuery.id, resultAnswers toArray:_*
 		).cacheTime(cacheTime).isPersonal(isPersonal)
 		true
