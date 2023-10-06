@@ -92,6 +92,10 @@ dependencies {
 	
 }
 
+java {
+	withSourcesJar()
+}
+
 tasks.withType(JavaCompile).configureEach {
 	
 	sourceCompatibility proj_java.getMajorVersion()
@@ -144,9 +148,12 @@ buildConfig {
 	
 }
 
+tasks.withType(Jar).configureEach {
+	archiveBaseName.set proj_archive_name
+}
+
 shadowJar {
 	
-	archiveBaseName.set proj_archive_name
 	archiveClassifier.set "fat"
 	
 	if (project.hasProperty("dockerBuild")) {
