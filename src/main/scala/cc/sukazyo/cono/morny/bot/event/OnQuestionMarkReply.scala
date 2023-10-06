@@ -8,6 +8,7 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
+import scala.util.boundary
 
 class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 	
@@ -34,10 +35,10 @@ object OnQuestionMarkReply {
 	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
 	
 	def isAllMessageMark (using text: String): Boolean = {
-		var isAll = true
-		for (c <- text)
-			if !(QUESTION_MARKS contains c) then isAll = false
-		isAll
+		boundary[Boolean] {
+			for (c <- text) if QUESTION_MARKS contains c then boundary.break(false)
+			true
+		}
 	}
 	
 }

@@ -17,11 +17,11 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 	private val REGEX_MSG_SENDREQ_DATA_HEAD: Regex = "^\\*msg(-?\\d+)(\\*\\S+)?(?:\\n([\\s\\S]+))?$"r
 	
 	case class MessageToSend (
-							 message: String|Null,
-							 entities: Array[MessageEntity]|Null,
-							 parseMode: ParseMode|Null,
-							 targetId: Long
-							 ) {
+		message: String|Null,
+		entities: Array[MessageEntity]|Null,
+		parseMode: ParseMode|Null,
+		targetId: Long
+	) {
 		def toSendMessage (target_override: Long|Null = null): SendMessage =
 			val useTarget = if target_override == null then targetId else target_override
 			val sendMessage = SendMessage(useTarget, message)
@@ -129,8 +129,8 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 		}
 		
 		if messageToSend.message eq null then return true
-		val testSendResponse = coeur.account execute messageToSend.toSendMessage(update.message.chat.id)
-				.replyToMessageId(update.message.messageId)
+		val testSendResponse = coeur.account execute
+			messageToSend.toSendMessage(update.message.chat.id).replyToMessageId(update.message.messageId)
 		if (!(testSendResponse isOk))
 			coeur.account exec SendMessage(
 				update.message.chat.id,

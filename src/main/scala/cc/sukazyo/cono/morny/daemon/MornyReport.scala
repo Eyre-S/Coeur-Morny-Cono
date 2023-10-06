@@ -101,9 +101,9 @@ class MornyReport (using coeur: MornyCoeur) {
 	
 	def reportCoeurExit (): Unit = {
 		val causedTag = coeur.exitReason match
-			case u: User => u.fullnameRefHTML
-			case n if n == null => "UNKNOWN reason"
-			case a: AnyRef => /*language=html*/ s"<code>${h(a.toString)}</code>"
+			case None => "UNKNOWN reason"
+			case u: Some[User] => u.get.fullnameRefHTML
+			case a: Some[_] => /*language=html*/ s"<code>${h(a.get.toString)}</code>"
 		executeReport(SendMessage(
 			coeur.config.reportToChat,
 			// language=html

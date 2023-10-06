@@ -10,6 +10,12 @@ import com.pengrad.telegrambot.UpdatesListener
 import scala.collection.mutable
 import scala.language.postfixOps
 
+/** Contains a [[mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
+  *
+  * Implemented [[process]] in [[UpdatesListener]] so it can directly used in [[com.pengrad.telegrambot.TelegramBot.setupListener]].
+  *
+  * @param coeur the [[MornyCoeur]] context.
+  */
 class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	
 	private val listeners = mutable.Queue.empty[EventListener]
@@ -77,9 +83,19 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 	}
 	
+	
 	import java.util
 	import scala.jdk.CollectionConverters.*
-	
+	/** Delivery the telegram [[Update]]s.
+	  *
+	  * The implementation of [[UpdatesListener]].
+	  *
+	  * For each [[Update]], create an [[EventRunner]] for it, and
+	  * start the it.
+	  *
+	  * @return [[UpdatesListener.CONFIRMED_UPDATES_ALL]], for all Updates
+	  *         should be processed in [[EventRunner]] created for it.
+	  */
 	override def process (updates: util.List[Update]): Int = {
 		for (update <- updates.asScala)
 			EventRunner(using update).start()

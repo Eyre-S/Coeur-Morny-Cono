@@ -24,7 +24,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	
 	this.setName(DAEMON_THREAD_NAME_DEF)
 	
-	private var lastNotify_messageId: Int|Null = _
+	private var lastNotify_messageId: Option[Int] = None
 	
 	override def run (): Unit = {
 		logger info "Medication Timer started."
@@ -51,8 +51,8 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	
 	private def sendNotification(): Unit = {
 		val sendResponse: SendResponse = coeur.account exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
-		if sendResponse isOk then lastNotify_messageId = sendResponse.message.messageId
-		else lastNotify_messageId = null
+		if sendResponse isOk then lastNotify_messageId = Some(sendResponse.message.messageId)
+		else lastNotify_messageId = None
 	}
 	
 	@throws[InterruptedException | IllegalArgumentException]
@@ -61,7 +61,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	}
 	
 	def refreshNotificationWrite (edited: Message): Unit = {
-		if lastNotify_messageId != (edited.messageId toInt) then return
+		if (lastNotify_messageId isEmpty) || (lastNotify_messageId.get != (edited.messageId toInt)) then return
 		import cc.sukazyo.cono.morny.util.CommonFormat.formatDate
 		val editTime = formatDate(edited.editDate*1000, use_timeZone.getTotalSeconds/60/60)
 		val entities = ArrayBuffer.empty[MessageEntity]
@@ -72,7 +72,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 			edited.messageId,
 			edited.text + s"\n-- $editTime --"
 		).entities(entities toArray:_*)
-		lastNotify_messageId = null
+		lastNotify_messageId = None
 	}
 	
 }

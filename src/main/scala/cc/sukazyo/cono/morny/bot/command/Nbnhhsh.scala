@@ -25,19 +25,17 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		val queryTarget: String|Null =
+		val queryTarget: String =
 			if command.args nonEmpty then
 				command.args mkString " "
 			else if (event.message.replyToMessage != null && event.message.replyToMessage.text != null)
 				event.message.replyToMessage.text
-			else null
-		
-		if (queryTarget == null)
-			coeur.account exec SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_404
-			).replyToMessageId(event.message.messageId)
-			return;
+			else
+				coeur.account exec SendSticker(
+					event.message.chat.id,
+					TelegramStickers ID_404
+				).replyToMessageId(event.message.messageId)
+				return;
 		
 		try {
 			

@@ -31,10 +31,12 @@ class MornyCoeur (using val config: MornyConfig) {
 	if config.telegramBotUsername ne null then
 		logger info s"login as:\n  ${config.telegramBotUsername}"
 	
-	private val __loginResult = login()
-	if (__loginResult eq null)
-		logger error "Login to bot failed."
-		System exit -1
+	private val __loginResult: LoginResult = login() match
+		case some: Some[LoginResult] => some.get
+		case None =>
+			logger error "Login to bot failed."
+			System exit -1
+			throw RuntimeException()
 	
 	configure_exitCleanup()
 	
@@ -63,8 +65,8 @@ class MornyCoeur (using val config: MornyConfig) {
 	val events: MornyEventListeners = MornyEventListeners(using eventManager)
 	
 	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
-	private var whileExit_reason: AnyRef|Null = _
-	def exitReason: AnyRef|Null = whileExit_reason
+	private var whileExit_reason: Option[AnyRef] = None
+	def exitReason: Option[AnyRef] = whileExit_reason
 	val coeurStartTimestamp: Long = ServerMain.systemStartupTime
 	
 	///>>> BLOCK START instance configure & startup stage 2
@@ -101,12 +103,12 @@ class MornyCoeur (using val config: MornyConfig) {
 	}
 	
 	def exit (status: Int, reason: AnyRef): Unit =
-		whileExit_reason = reason
+		whileExit_reason = Some(reason)
 		System exit status
 	
 	private case class LoginResult(account: TelegramBot, username: String, userid: Long)
 	
-	private def login (): LoginResult|Null = {
+	private def login (): Option[LoginResult] = {
 		
 		val builder = TelegramBot.Builder(config.telegramBotKey)
 		var api_bot = config.telegramBotApiServer
@@ -129,7 +131,7 @@ class MornyCoeur (using val config: MornyConfig) {
 		val account = builder build
 		
 		logger info "Trying to login..."
-		boundary[LoginResult|Null] {
+		boundary[Option[LoginResult]] {
 			for (i <- 0 to 3) {
 				if i > 0 then logger info "retrying..."
 				try {
@@ -137,16 +139,16 @@ class MornyCoeur (using val config: MornyConfig) {
 					if ((config.telegramBotUsername ne null) && config.telegramBotUsername != remote.username)
 						throw RuntimeException(s"Required the bot @${config.telegramBotUsername} but @${remote.username} logged in")
 					logger info s"Succeed logged in to @${remote.username}"
-					break(LoginResult(account, remote.username, remote.id))
+					break(Some(LoginResult(account, remote.username, remote.id)))
 				} catch
-					case r: boundary.Break[LoginResult|Null] => throw r
+					case r: boundary.Break[Option[LoginResult]] => throw r
 					case e =>
 						logger error
 							s"""${exceptionLog(e)}
 							   |login failed"""
 								.stripMargin
 			}
-			null
+			None
 		}
 		
 	}

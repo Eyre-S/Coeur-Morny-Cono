@@ -21,15 +21,15 @@ class ShareToolTwitter extends ITelegramQuery {
 		
 		event.inlineQuery.query match
 			
-			case REGEX_TWEET_LINK(_, _2, _, _, _, _) =>
+			case REGEX_TWEET_LINK(_, _path_data, _, _, _, _) =>
 				List(
 					InlineQueryUnit(InlineQueryResultArticle(
 						inlineQueryId(ID_PREFIX_VX+event.inlineQuery.query), TITLE_VX,
-						s"https://vxtwitter.com/$_2"
+						s"https://vxtwitter.com/$_path_data"
 					)),
 					InlineQueryUnit(InlineQueryResultArticle(
 						inlineQueryId(ID_PREFIX_VX_COMBINED+event.inlineQuery.query), TITLE_VX_COMBINED,
-						s"https://c.vxtwitter.com/$_2"
+						s"https://c.vxtwitter.com/$_path_data"
 					))
 				)
 			

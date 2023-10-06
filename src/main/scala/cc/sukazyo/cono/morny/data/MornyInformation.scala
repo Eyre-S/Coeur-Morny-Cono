@@ -29,9 +29,9 @@ object MornyInformation {
 	}
 	
 	//noinspection ScalaWeakerAccess
-	def getRuntimeHostname: String | Null = {
-		try InetAddress.getLocalHost.getHostName
-		catch case _: UnknownHostException => null
+	def getRuntimeHostname: Option[String] = {
+		try Some(InetAddress.getLocalHost.getHostName)
+		catch case _: UnknownHostException => None
 	}
 	
 	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT get

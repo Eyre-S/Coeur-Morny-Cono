@@ -13,17 +13,17 @@ object TelegramImages {
 	
 	class AssetsFileImage (assetsPath: String) {
 		
-		private var cache: Array[Byte]|Null = _
+		private var cache: Option[Array[Byte]] = None
 		
 		@throws[AssetsException]
 		def get:Array[Byte] =
-			if cache eq null then read()
-			cache
+			if cache isEmpty then read()
+			cache.get
 		
 		@throws[AssetsException]
 		private def read (): Unit = {
 			Using ((MornyAssets.pack getResource assetsPath)read) { stream =>
-				try { this.cache = stream.readAllBytes() }
+				try { this.cache = Some(stream.readAllBytes()) }
 				catch case e: IOException => {
 					throw AssetsException(e)
 				}

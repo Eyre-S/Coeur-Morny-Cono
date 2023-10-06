@@ -122,7 +122,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			event.message.chat.id,
 			/* language=html */
 			s"""system:
-			   |- <code>${h(if (getRuntimeHostname == null) "<unknown-host>" else getRuntimeHostname)}</code>
+			   |- <code>${h(if getRuntimeHostname nonEmpty then getRuntimeHostname.get else "<unknown-host>")}</code>
 			   |- <code>${h(sysprop("os.name"))}</code> <code>${h(sysprop("os.arch"))}</code> <code>${h(sysprop("os.version"))}</code>
 			   |java runtime:
 			   |- <code>${h(sysprop("java.vm.vendor"))}.${h(sysprop("java.vm.name"))}</code>
