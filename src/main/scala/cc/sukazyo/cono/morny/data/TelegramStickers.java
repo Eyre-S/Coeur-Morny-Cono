@@ -21,6 +21,7 @@ public class TelegramStickers {
 	public static final String ID_SAVED = "CAACAgEAAx0CSQh32gABBExuYdB_G0srfhQldRWkBYxWzCOv4-IAApooAAJ4_MYFcjuNZszfQcQjBA";
 	public static final String ID_PROGYNOVA = "CAACAgUAAxkBAAICm2KEuL7UQqNP7vSPCg2DHJIND6UsAAKLAwACH4WSBszIo722aQ3jJAQ";
 	public static final String ID_NETWORK_ERR = "CAACAgEAAxkBAAID0WNJgNEkD726KW4vZeFlw0FlVVyNAAIXJgACePzGBb50o7O1RbxoKgQ";
+	public static final String ID_501 = "CAACAgEAAxkBAAIHbGUhJ8zm2Sb_c0YU-DYQ6xb-ZDtaAAKdJwACePzGBTOftDZL6X7vMAQ";
 	
 	@Nonnull
 	public static Map<String, String> map () {

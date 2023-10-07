@@ -2,10 +2,14 @@ package cc.sukazyo.cono.morny
 
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.{LimboChat, LimboUser}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Chat.*
+import cc.sukazyo.cono.morny.Log.logger
 import com.pengrad.telegrambot.model.ChatMember.Status
 import com.pengrad.telegrambot.TelegramBot
 
 class MornyTrusted (using coeur: MornyCoeur)(using config: MornyConfig) {
+	
+	if config.trustedMaster == -1 then
+		logger warn "You have not set your Morny's master.\n  it may have some issues on controlling your bot."
 	
 	def isTrusted (userId: Long): Boolean =
 		given TelegramBot = coeur.account

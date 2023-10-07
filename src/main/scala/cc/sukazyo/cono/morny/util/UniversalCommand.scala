@@ -7,9 +7,15 @@ import scala.util.boundary
   * @todo docs
   * @todo maybe there can have some encapsulation
   */
-object UniversalCommand {
+object UniversalCommand  {
 	
-	def apply (input: String): Array[String] = {
+	opaque type StrictMode = Boolean
+	//noinspection ScalaWeakerAccess
+	val strict: StrictMode = true
+	//noinspection ScalaWeakerAccess
+	val lossy: StrictMode = false
+	
+	def apply (using strict: StrictMode = strict)(input: String): Array[String] = {
 		
 		val builder = ArrayBuffer.empty[String]
 		
@@ -38,26 +44,29 @@ object UniversalCommand {
 				val _inside_tag = input(i)
 				boundary { while (true) {
 					i=i+1
-					if (i >= input.length) throw IllegalArgumentException("UniversalCommand: unclosed quoted text")
+					if (i >= input.length)
+						if strict then throw IllegalArgumentException("UniversalCommand: unclosed quoted text")
+						else boundary.break()
 					if (input(i) == _inside_tag)
 						boundary.break()
-					else if (input(i) isUnsupported)
+					else if (input(i) isUnsupported) && strict then
 						throw IllegalArgumentException("UniversalCommand: unsupported new-line")
-					else if (input(i) isQuote)
+					else if (input(i) isQuote) && strict then
 						throw IllegalArgumentException("UniversalCommand: mixed \" and ' used")
 					else if (input(i) isEscapeChar)
-						if (i+1 >= input.length) throw IllegalArgumentException("UniversalCommand: \\ in the end")
-						if (input(i+1) escapableInQuote)
+						if (i+1 >= input.length) && strict then
+							throw IllegalArgumentException("UniversalCommand: \\ in the end")
+						if ((i+1 < input.length) && (input(i+1) escapableInQuote))
 							i=i+1
 						arg += input(i)
 					else
 						arg += input(i)
 				}}
-			} else if (input(i) isUnsupported) {
+			} else if ((input(i) isUnsupported) && strict) {
 				throw IllegalArgumentException("UniversalCommand: unsupported new-line")
 			} else if (input(i) isEscapeChar) {
-				if (i + 1 >= input.length) throw IllegalArgumentException("UniversalCommand: \\ in the end")
-				if (input(i+1) escapable)
+				if (i + 1 >= input.length) && strict then throw IllegalArgumentException("UniversalCommand: \\ in the end")
+				if ((i+1 < input.length) && (input(i+1) escapable))
 					i=i+1
 				arg += input(i)
 			} else {
@@ -70,5 +79,8 @@ object UniversalCommand {
 		builder toArray
 		
 	}
+	
+	object Lossy:
+		def apply (input: String): Array[String] = UniversalCommand(using lossy)(input)
 	
 }

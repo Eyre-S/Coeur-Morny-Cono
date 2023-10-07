@@ -27,6 +27,12 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	private var lastNotify_messageId: Option[Int] = None
 	
 	override def run (): Unit = {
+		
+		if ((notify_toChat == -1) || (notify_atHour isEmpty)) {
+			logger info "Medication Timer disabled : related param is not complete set"
+			return
+		}
+		
 		logger info "Medication Timer started."
 		while (!this.isInterrupted) {
 			try {
@@ -47,6 +53,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 					coeur.daemons.reporter.exception(e)
 		}
 		logger info "Medication Timer stopped."
+		
 	}
 	
 	private def sendNotification(): Unit = {

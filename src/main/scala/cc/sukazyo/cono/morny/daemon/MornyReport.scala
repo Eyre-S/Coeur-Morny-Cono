@@ -15,7 +15,12 @@ import com.pengrad.telegrambot.response.BaseResponse
 
 class MornyReport (using coeur: MornyCoeur) {
 	
+	private val enabled = coeur.config.reportToChat != -1
+	if !enabled then
+		logger info "Morny Report is disabled : report chat is set to -1"
+	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
+		if !enabled then return;
 		try {
 			coeur.account exec report
 		} catch case e: EventRuntimeException.ActionFailed => {
@@ -70,8 +75,7 @@ class MornyReport (using coeur: MornyCoeur) {
 		).parseMode(ParseMode HTML))
 	}
 	
-	//noinspection ScalaWeakerAccess
-	def sectionConfigFields (config: MornyConfig): String = {
+	private def sectionConfigFields (config: MornyConfig): String = {
 		val echo = StringBuilder()
 		for (field <- config.getClass.getFields) {
 			// language=html
@@ -100,17 +104,18 @@ class MornyReport (using coeur: MornyCoeur) {
 	}
 	
 	def reportCoeurExit (): Unit = {
-		val causedTag = coeur.exitReason match
+		def _causedTag = coeur.exitReason match
+			case Some(_exitReason) => _exitReason match
+				case u: User => u.fullnameRefHTML
+				case a => /*language=html*/ s"<code>${h(a.toString)}</code>"
 			case None => "UNKNOWN reason"
-			case u: Some[User] => u.get.fullnameRefHTML
-			case a: Some[_] => /*language=html*/ s"<code>${h(a.get.toString)}</code>"
 		executeReport(SendMessage(
 			coeur.config.reportToChat,
 			// language=html
 			s"""<b>▌Morny Exited</b>
 			   |from user @${coeur.username}
 			   |
-			   |by: $causedTag"""
+			   |by: $_causedTag"""
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}

@@ -31,7 +31,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 			// scala, those commented code is removed permanently.
 			// these message, here to remember the old DP7.
 			
-			val actions = UniversalCommand(text)
+			val actions = UniversalCommand.Lossy(text)
 			actions(0) = actions(0) substring 1
 			
 			actions(0)

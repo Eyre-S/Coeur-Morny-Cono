@@ -167,16 +167,16 @@ public class MornyConfig {
 		@Nullable public String telegramBotApiServer4File = null;
 		@Nullable public String telegramBotKey = null;
 		@Nullable public String telegramBotUsername = null;
-		public long trustedMaster = 793274677L;
-		public long trustedChat = -1001541451710L;
+		public long trustedMaster = -1L;
+		public long trustedChat = -1L;
 		public boolean eventIgnoreOutdated = false;
 		public long eventOutdatedTimestamp = -1;
 		public boolean commandLoginRefresh = false;
 		public boolean commandLogoutClear = false;
 		@Nonnull public final Set<Long> dinnerTrustedReaders = new HashSet<>();
-		public long dinnerChatId = -1001707106392L;
-		public long reportToChat = -1001650050443L;
-		public long medicationNotifyToChat = -1001729016815L;
+		public long dinnerChatId = -1L;
+		public long reportToChat = -1L;
+		public long medicationNotifyToChat = -1L;
 		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
 		@Nonnull public final Set<Integer> medicationNotifyAt = new HashSet<>();
 		

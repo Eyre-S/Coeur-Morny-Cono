@@ -25,7 +25,8 @@ object InputCommand {
 		)
 	}
 	
+	//noinspection NoTailRecursionAnnotation
 	def apply (input: String): InputCommand =
-		InputCommand(UniversalCommand(input))
+		InputCommand(UniversalCommand.Lossy(input))
 	
 }

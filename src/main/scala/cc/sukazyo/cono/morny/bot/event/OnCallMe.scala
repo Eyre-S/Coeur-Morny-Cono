@@ -21,35 +21,45 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 		if update.message.chat.`type` != (Chat.Type Private) then return false
 		
 		//noinspection ScalaUnnecessaryParentheses
-		(update.message.text toLowerCase) match
-			case "steam" | "sbeam" | "sdeam" =>
-				requestItem(update.message.from, "<b>STEAM LIBRARY</b>")
-			case "hana paresu" | "花宫" | "内群" =>
-				requestItem(update.message.from, "<b>Hana Paresu</b>")
-			case "dinner" | "lunch" | "breakfast" | "meal" | "eating" | "安妮今天吃什么" =>
-				requestLastDinner(update.message)
-			case cc if cc startsWith "cc::" =>
-				requestCustom(update.message)
-			case _ =>
-				return false
+		val success = if me == -1 then false else
+			(update.message.text toLowerCase) match
+				case "steam" | "sbeam" | "sdeam" =>
+					requestItem(update.message.from, "<b>STEAM LIBRARY</b>")
+				case "hana paresu" | "花宫" | "内群" =>
+					requestItem(update.message.from, "<b>Hana Paresu</b>")
+				case "dinner" | "lunch" | "breakfast" | "meal" | "eating" | "安妮今天吃什么" =>
+					requestLastDinner(update.message)
+				case cc if cc startsWith "cc::" =>
+					requestCustom(update.message)
+				case _ =>
+					return false
 		
-		coeur.account exec SendSticker(
-			update.message.chat.id,
-			TelegramStickers ID_SENT
-		).replyToMessageId(update.message.messageId)
+		if success then
+			coeur.account exec SendSticker(
+				update.message.chat.id,
+				TelegramStickers ID_SENT
+			).replyToMessageId(update.message.messageId)
+		else
+			coeur.account exec SendSticker(
+				update.message.chat.id,
+				TelegramStickers ID_501
+			).replyToMessageId(update.message.messageId)
+		
 		true
 		
 	}
 	
-	private def requestItem (user: User, itemHTML: String, extra: String|Null = null): Unit =
+	private def requestItem (user: User, itemHTML: String, extra: String|Null = null): Boolean =
 		coeur.account exec SendMessage(
 			me,
 			s"""request $itemHTML
 			   |from ${user.fullnameRefHTML}${if extra == null then "" else "\n"+extra}"""
 			.stripMargin
 		).parseMode(ParseMode HTML)
+		true
 	
-	private def requestLastDinner (req: Message): Unit = {
+	private def requestLastDinner (req: Message): Boolean = {
+		if coeur.config.dinnerChatId == -1 then return false
 		var isAllowed = false
 		var lastDinnerData: Message|Null = null
 		if (coeur.trusted isTrusted_dinnerReader req.from.id) {
@@ -86,8 +96,9 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 		)
 	}
 	
-	private def requestCustom (message: Message): Unit =
+	private def requestCustom (message: Message): Boolean =
 		requestItem(message.from, "<u>[???]</u>")
 		coeur.account exec ForwardMessage(me, message.chat.id, message.messageId)
+		true
 	
 }
