@@ -23,10 +23,7 @@ class 创 (using coeur: MornyCoeur) {
 				else if ((event.message.replyToMessage ne null) && (event.message.replyToMessage.text ne null))
 					event.message.replyToMessage.text
 				else
-					coeur.account exec SendSticker(
-						event.message.chat.id,
-						TelegramStickers ID_404
-					).replyToMessageId(event.message.messageId)
+					// this will directly return for not conflict with @autoziyaobot
 					return;
 			
 			val chuangText = 创.chuangText(text)
