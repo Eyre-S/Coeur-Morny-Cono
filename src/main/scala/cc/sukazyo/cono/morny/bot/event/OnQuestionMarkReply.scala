@@ -36,7 +36,9 @@ object OnQuestionMarkReply {
 	
 	def isAllMessageMark (using text: String): Boolean = {
 		boundary[Boolean] {
-			for (c <- text) if QUESTION_MARKS contains c then boundary.break(false)
+			for (c <- text)
+				if !(QUESTION_MARKS contains c) then
+					boundary break false
 			true
 		}
 	}

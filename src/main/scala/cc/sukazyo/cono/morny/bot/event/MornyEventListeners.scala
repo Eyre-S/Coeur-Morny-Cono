@@ -5,11 +5,14 @@ import cc.sukazyo.cono.morny.MornyCoeur
 
 class MornyEventListeners (using manager: EventListenerManager) (using coeur: MornyCoeur)  {
 	
+	private val $OnUserRandom = OnUserRandom()
 	manager.register(
 		// ACTIVITY_RECORDER
 		// KUOHUANHUAN_NEED_SLEEP
 		OnUniMeowTrigger(using coeur.commands),
-		OnUserRandom(),
+		$OnUserRandom.RandomSelect,
+		//noinspection NonAsciiCharacters
+		$OnUserRandom.尊嘟假嘟,
 		OnQuestionMarkReply(),
 		OnUserSlashAction(),
 		OnCallMe(),
