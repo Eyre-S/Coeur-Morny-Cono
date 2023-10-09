@@ -30,6 +30,8 @@ class MornyCommands (using coeur: MornyCoeur) {
 	private val $MornyManagers = MornyManagers()
 	//noinspection NonAsciiCharacters
 	private val $喵呜 = 喵呜()
+	//noinspection NonAsciiCharacters
+	private val $创 = 创()
 	private val commands: CommandMap = CommandMap(
 		
 		$MornyHellos.On,
@@ -54,7 +56,9 @@ class MornyCommands (using coeur: MornyCoeur) {
 		//noinspection NonAsciiCharacters
 		私わね(),
 		//noinspection NonAsciiCharacters
-		$喵呜.Progynova
+		$喵呜.Progynova,
+		//noinspection NonAsciiCharacters
+		$创.Chuang
 		
 	)
 	
