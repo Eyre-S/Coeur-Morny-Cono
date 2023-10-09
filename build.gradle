@@ -1,16 +1,72 @@
 plugins {
-	id 'java'
+	id 'scala'
 	id 'java-library'
-	id 'maven-publish'
 	id 'application'
-	id 'com.github.johnrengelman.shadow' version '7.1.0'
+	id 'maven-publish'
+	id "io.github.ysohda.scalatest" version "0.32.1"
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	id 'com.github.gmazzo.buildconfig' version '4.1.2'
+	id 'org.ajoberstar.grgit' version '5.2.0'
 }
 
-group 'cc.sukazyo'
-version VERSION
-project.ext.archiveBaseName = 'Coeur_Morny_Cono'
-project.ext.artifactId = 'morny-coeur'
-mainClassName = 'cc.sukazyo.cono.morny.ServerMain'
+import org.ajoberstar.grgit.Status
+
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+
+final boolean proj_git = grgit!=null
+final String proj_store = MORNY_CODE_STORE
+final String proj_commit = proj_git ? grgit.head().id : null
+final String proj_commit_path = MORNY_COMMIT_PATH
+final boolean proj_clean = isCleanBuild()
+if (!proj_git)
+	println "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
+else if (isCleanBuild()) {
+	println "git: clean build at ${grgit.head().id}"
+} else {
+	final Status status = grgit.status()
+	println "git: non-clean-build"
+	if (!status.unstaged.allChanges.empty) {
+		println "git: unstaged changes"
+		listChanges(status.unstaged)
+	}
+	if (!status.staged.allChanges.empty) {
+		println "git: staged changes"
+		listChanges(status.staged)
+	}
+}
+
+final String proj_group = 'cc.sukazyo'
+final String proj_package = "${proj_group}.cono.morny"
+final String proj_archive_name = MORNY_ARCHIVE_NAME
+final String proj_application_main = "${proj_package}.ServerMain"
+
+final String proj_version_base = VERSION
+final String proj_version_delta = VERSION_DELTA
+final boolean proj_version_use_delta = Boolean.parseBoolean(USE_DELTA)
+final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
+final String proj_version_full = proj_version + (proj_git ? "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ") : "")
+final String proj_version_codename = CODENAME
+final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
+
+final JavaVersion proj_java = JavaVersion.VERSION_17
+final Charset proj_file_encoding = StandardCharsets.UTF_8
+final proj_scala_api = 3
+//final proj_scala_lib = proj_scala_api+'.4.0-RC1-bin-20230901-89e8dba-NIGHTLY'
+final proj_scala_lib = proj_scala_api+'.3.1'
+String publish_local_url = null
+String publish_remote_url = null
+String publish_remote_username = null
+String publish_remote_password = null
+if (project.hasProperty("publishLocalArchiveRepoUrl")) publish_local_url = publishLocalArchiveRepoUrl
+if (project.hasProperty("publishMvnRepoUrl")) {
+	publish_remote_url = publishMvnRepoUrl
+	publish_remote_username = publishMvnRepoUsername
+	publish_remote_password = publishMvnRepoPassword
+}
+
+group proj_group
+version proj_version_full
 
 repositories {
 	mavenCentral()
@@ -19,86 +75,142 @@ repositories {
 
 dependencies {
 	
-	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${libSpotbugsVersion}"
+	api "org.scala-lang:scala3-library_3:${proj_scala_lib}"
+	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${lib_spotbugs_v}"
 	
-	api "cc.sukazyo:messiva:${libMessivaVersion}"
+	implementation "cc.sukazyo:messiva:${lib_messiva_v}"
+	implementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
 	
-	implementation "com.github.pengrad:java-telegram-bot-api:${libJavaTelegramBotApiVersion}"
+	implementation "com.github.pengrad:java-telegram-bot-api:${lib_javatelegramapi_v}"
+	implementation "com.squareup.okhttp3:okhttp:${lib_okhttp_v}"
+	implementation "com.google.code.gson:gson:${lib_gson_v}"
 	
-	testImplementation "org.junit.jupiter:junit-jupiter-api:${libJunitVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:${libJunitVersion}"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${libJunitVersion}"
+	testImplementation "org.scalatest:scalatest_$proj_scala_api:${lib_scalatest_v}"
+	testImplementation "org.scalatest:scalatest-freespec_$proj_scala_api:${lib_scalatest_v}"
+	testRuntimeOnly "org.scala-lang.modules:scala-xml_$proj_scala_api:${lib_scalamodule_xml_v}"
+	testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.6' // for generating HTML report // required by gradle-scalatest plugin
 	
-}
-
-task updateVersionCode {
-	ant.replaceregexp(match:'VERSION = ["a-zA-Z0-9.\\-_+@]+;', replace:"VERSION = \"$project.version\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'CODENAME = ["a-zA-Z0-9]+;', replace:"CODENAME = \"${CODENAME}\";", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-	ant.replaceregexp(match:'COMPILE_TIMESTAMP = [0-9]+L;', replace:"COMPILE_TIMESTAMP = ${System.currentTimeMillis()}L;", flags:'g', byline:true) {
-		fileset(dir: 'src/main/java/cc/sukazyo/cono/morny', includes: 'GradleProjectConfigures.java')
-	}
-}
-
-compileJava.dependsOn updateVersionCode
-
-test {
-	useJUnitPlatform()
 }
 
 java {
-	
-	sourceCompatibility JavaVersion.VERSION_17
-	targetCompatibility JavaVersion.VERSION_17
-	
 	withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	
+	sourceCompatibility proj_java.getMajorVersion()
+	targetCompatibility proj_java.getMajorVersion()
+	
+	options.encoding = proj_file_encoding.name()
 	
 }
 
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+tasks.withType(ScalaCompile).configureEach {
+	
+	sourceCompatibility proj_java.getMajorVersion()
+	targetCompatibility proj_java.getMajorVersion()
+	
+	options.encoding = proj_file_encoding.name()
+	scalaCompileOptions.encoding = proj_file_encoding.name()
+	
+	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
+	
 }
 
-tasks.withType(Javadoc) {
-	options.encoding = 'UTF-8'
-	options.docEncoding = 'UTF-8'
-	options.charSet = 'UTF-8'
+tasks.withType(Javadoc).configureEach {
+	options.encoding = proj_file_encoding.name()
 }
 
-tasks.test {
-	useJUnitPlatform()
+//tasks.withType(ScalaDoc).configureEach {
+//}
+
+test {
+}
+
+application {
+	mainClass = proj_application_main
+}
+
+buildConfig {
+	
+	packageName(proj_package)
+	
+	buildConfigField('String', 'VERSION', "\"${proj_version}\"")
+	buildConfigField('String', 'VERSION_FULL', "\"${proj_version_full}\"")
+	buildConfigField('String', 'VERSION_BASE', "\"${proj_version_base}\"")
+	buildConfigField('String', 'VERSION_DELTA', proj_version_use_delta ? "\"${proj_version_delta}\"" : "null")
+	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")
+	buildConfigField('long', 'CODE_TIMESTAMP', "${proj_code_time}L")
+	buildConfigField('String',  'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
+	buildConfigField('boolean', 'CLEAN_BUILD', "${proj_clean}")
+	buildConfigField('String', 'CODE_STORE', proj_store==""?"null":"\"${proj_store}\"")
+	buildConfigField('String', 'COMMIT_PATH', proj_commit_path==""?"null":"\"${proj_commit_path}\"")
+	
+}
+
+tasks.withType(Jar).configureEach {
+	archiveBaseName.set proj_archive_name
 }
 
 shadowJar {
-	archiveBaseName.set("${project.ext.archiveBaseName}")
-	archiveVersion.set("${project.version}")
-	archiveClassifier.set("fat")
+	
+	archiveClassifier.set "fat"
+	
+	if (project.hasProperty("dockerBuild")) {
+		println "shadow-jar: using docker build name"
+		archiveVersion.set ""
+		archiveClassifier.set "docker-build"
+	}
+	
+}
+
+@SuppressWarnings('GrMethodMayBeStatic')
+boolean isCleanBuild () {
+	if (grgit == null) return false
+	Set<String> changes = grgit.status().unstaged.allChanges + grgit.status().staged.allChanges
+	for (String file in changes) {
+		if (file.startsWith("src/")) return false
+		if (file == "build.gradle") return false
+		if (file == "gradle.properties") return false
+	}
+	return true
+}
+
+void listChanges (Status.Changes listing) {
+	for (String file in listing.added)
+		println "    add: ${file}"
+	for (String file in listing.modified)
+		println "    mod: ${file}"
+	for (String file in listing.removed)
+		println "    del: ${file}"
 }
 
 publishing {
 	repositories{
-		maven {
-			name 'builds'
-			url publishLocalArchiveRepoUrl
+		if (publish_local_url != null) maven {
+			name 'archives'
+			url publish_local_url
 		}
-		maven {
+		if (publish_remote_url != null) maven {
 			name '-ws-'
-			url publishMvnRepoUrl
+			url publish_remote_url
 			credentials {
-				username publishMvnRepoUsername
-				password publishMvnRepoPassword
+				username publish_remote_username
+				password publish_remote_password
 			}
 		}
 	}
 	publications {
+		//noinspection GroovyAssignabilityCheck
 		main (MavenPublication) {
+			//noinspection GroovyAssignabilityCheck
 			from components.java
-			groupId = project.group
-			artifactId = project.ext.artifactId
-			version = project.version
+			//noinspection GroovyAssignabilityCheck
+			groupId = proj_group
+			//noinspection GroovyAssignabilityCheck
+			artifactId = proj_archive_name
+			//noinspection GroovyAssignabilityCheck
+			version = proj_version
 		}
 	}
 }

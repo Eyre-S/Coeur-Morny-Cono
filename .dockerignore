@@ -1,0 +1,17 @@
+
+# IDE
+.idea/
+.vscode/
+.gradle/
+.settings/
+
+#build
+/build/
+/bin/
+.metals/
+.bloop/
+.project
+lcoal.properties
+
+# debug dir
+/run/
