@@ -12,8 +12,6 @@ object ServerMain {
 	
 	private val THREAD_MORNY_INIT: String = "morny-init"
 	
-	val systemStartupTime: Long = System.currentTimeMillis()
-	
 	def main (args: Array[String]): Unit = {
 		
 		val config = new MornyConfig.Prototype()
@@ -21,9 +19,8 @@ object ServerMain {
 		var mode_echoHello = false
 		var showHello = true
 		
-		config.eventOutdatedTimestamp = systemStartupTime
-		
 		val unknownArgs = ArrayBuffer[String]()
+		val deprecatedArgs = ArrayBuffer[(String, String)]()
 		
 		var i = 0
 		while (i < args.length) {
@@ -35,7 +32,11 @@ object ServerMain {
 				case "--only-hello" | "-ho" | "-o" | "-hi" => mode_echoHello = true
 				case "--version" | "-v" => mode_echoVersion = true
 				
-				case "--outdated-block" | "-ob" => config.eventIgnoreOutdated = true
+				// deprecated: use --outdated-ignore instead
+				case "--outdated-block" | "-ob" =>
+					config.eventIgnoreOutdated = true
+					deprecatedArgs += "--outdated-block" -> "--outdated-ignore"
+				case "--outdated-ignore" | "-oig" => config.eventIgnoreOutdated = true
 				
 				case "--api" | "-a" => i+=1 ; config.telegramBotApiServer = args(i)
 				case "--api-files" | "files-api" | "-af" => i+=1; config.telegramBotApiServer4File = args(i)
@@ -94,6 +95,10 @@ object ServerMain {
 				s"""Can't understand arg to some meaning
 				   |  ${unknownArgs mkString "\n  "}"""
 				.stripMargin
+		if (deprecatedArgs.nonEmpty) logger warn
+			s"""Those arguments have been deprecated:
+			   |  ${deprecatedArgs map ((d, n) => s"$d : use $n instead") mkString "\n  "}
+			   |""".stripMargin
 		
 		if (Log debug)
 			logger warn

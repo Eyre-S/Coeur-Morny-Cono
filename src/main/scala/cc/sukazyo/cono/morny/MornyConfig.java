@@ -82,14 +82,15 @@ public class MornyConfig {
 	 *  system: event ignore                   *
 	 * ======================================= */
 	
-	public final boolean eventIgnoreOutdated;
 	/**
-	 * morny 的事件忽略前缀时间<br>
+	 * Morny 是否忽略过期事件.
 	 * <br>
-	 * {@link cc.sukazyo.cono.morny.bot.event.MornyOnUpdateTimestampOffsetLock}
-	 * 会根据这里定义的时间戳取消掉比此时间更早的事件链
+	 * 过期事件即发生时间比 {@link MornyCoeur#coeurStartTimestamp()} 早的事件。
+	 * <br>
+	 * 如果此项设置为 true, 则 {@link cc.sukazyo.cono.morny.bot.event.MornyOnUpdateTimestampOffsetLock}
+	 * 会使事件时间比 {@link MornyCoeur#coeurStartTimestamp()} 早的事件跳过处理
 	 */
-	public final long eventOutdatedTimestamp;
+	public final boolean eventIgnoreOutdated;
 	
 	/* ======================================= *
 	 *  system: command list automation        *
@@ -138,8 +139,6 @@ public class MornyConfig {
 		this.trustedMaster = prototype.trustedMaster;
 		this.trustedChat = prototype.trustedChat;
 		this.eventIgnoreOutdated = prototype.eventIgnoreOutdated;
-		if (prototype.eventOutdatedTimestamp < 1) throw new CheckFailure.UnsetEventOutdatedTimestamp();
-		this.eventOutdatedTimestamp = prototype.eventOutdatedTimestamp;
 		this.commandLoginRefresh = prototype.commandLoginRefresh;
 		this.commandLogoutClear = prototype.commandLogoutClear;
 		this.dinnerTrustedReaders = prototype.dinnerTrustedReaders;
@@ -153,7 +152,6 @@ public class MornyConfig {
 	
 	public static class CheckFailure extends RuntimeException {
 		public static class NullTelegramBotKey extends CheckFailure {}
-		public static class UnsetEventOutdatedTimestamp extends CheckFailure {}
 		public static class UnavailableTimeInMedicationNotifyAt extends CheckFailure {}
 	}
 	
@@ -170,7 +168,6 @@ public class MornyConfig {
 		public long trustedMaster = -1L;
 		public long trustedChat = -1L;
 		public boolean eventIgnoreOutdated = false;
-		public long eventOutdatedTimestamp = -1;
 		public boolean commandLoginRefresh = false;
 		public boolean commandLogoutClear = false;
 		@Nonnull public final Set<Long> dinnerTrustedReaders = new HashSet<>();

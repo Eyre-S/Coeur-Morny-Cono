@@ -42,6 +42,18 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	///<<< BLOCK END instance configure & startup stage 1
 	
+	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
+	private var whileExit_reason: Option[AnyRef] = None
+	/** About why morny exits. */
+	def exitReason: Option[AnyRef] = whileExit_reason
+	/** Stores when current Morny Coeur instance starts to initialize.
+	  * 
+	  * The time is older than login but earlier than Coeur's daemons initialize.
+	  * 
+	  * in milliseconds.
+	  */
+	val coeurStartTimestamp: Long = System.currentTimeMillis
+	
 	/** [[TelegramBot]] account of this Morny */
 	val account: TelegramBot = __loginResult.account
 	/** [[account]]'s telegram username */
@@ -63,11 +75,6 @@ class MornyCoeur (using val config: MornyConfig) {
 	eventManager register MornyOnInlineQuery(using queries)
 	//noinspection ScalaUnusedSymbol
 	val events: MornyEventListeners = MornyEventListeners(using eventManager)
-	
-	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
-	private var whileExit_reason: Option[AnyRef] = None
-	def exitReason: Option[AnyRef] = whileExit_reason
-	val coeurStartTimestamp: Long = ServerMain.systemStartupTime
 	
 	///>>> BLOCK START instance configure & startup stage 2
 	

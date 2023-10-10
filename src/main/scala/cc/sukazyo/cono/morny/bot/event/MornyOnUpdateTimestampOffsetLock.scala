@@ -7,7 +7,7 @@ import com.pengrad.telegrambot.model.Update
 class MornyOnUpdateTimestampOffsetLock (using coeur: MornyCoeur) extends EventListener {
 	
 	private def isOutdated (timestamp: Int): Boolean =
-		timestamp < (coeur.config.eventOutdatedTimestamp/1000)
+		coeur.config.eventIgnoreOutdated && (timestamp < (coeur.coeurStartTimestamp/1000))
 	
 	override def onMessage (using update: Update): Boolean = isOutdated(update.message.date)
 	override def onEditedMessage (using update: Update): Boolean = isOutdated(update.editedMessage.date)
