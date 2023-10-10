@@ -87,7 +87,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 object MedicationTimer {
 	
 	@throws[IllegalArgumentException]
-	private[daemon] def calcNextRoutineTimestamp (baseTimeMillis: Long, zone: ZoneOffset, notifyAt: Set[Int]): Long = {
+	def calcNextRoutineTimestamp (baseTimeMillis: Long, zone: ZoneOffset, notifyAt: Set[Int]): Long = {
 		if (notifyAt isEmpty) throw new IllegalArgumentException("notify time is not set")
 		var time = LocalDateTime.ofEpochSecond(
 			baseTimeMillis / 1000, ((baseTimeMillis % 1000) * 1000 * 1000) toInt,
