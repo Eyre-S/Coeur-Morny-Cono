@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny.util
 
+import cc.sukazyo.cono.morny.util.EpochDateTime.{DurationMillis, EpochMillis}
+
 import java.time.{Instant, LocalDateTime, ZoneId, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
@@ -40,11 +42,24 @@ object CommonFormat {
 	  *
 	  * @return the time-zone local date-time-millis [[String]] describes the timestamp.
 	  */
-	def formatDate (timestamp: Long, utcOffset: Int): String =
+	def formatDate (timestamp: EpochMillis, utcOffset: Int): String =
+		formatDate(timestamp, ZoneOffset.ofHours(utcOffset))
+	
+	/** the formatted date-time-millis [[String]].
+	  *
+	  * time is formatted by pattern [[DATE_TIME_PATTERN_FULL_MILLIS]].
+	  *
+	  * @param timestamp millis timestamp. timestamp should be UTC alignment.
+	  *
+	  * @param tz the time-zone controls which local time describe will use.
+	  *
+	  * @return the time-zone local date-time-millis [[String]] describes the timestamp.
+	  */
+	def formatDate (timestamp: EpochMillis, tz: ZoneOffset): String =
 		DateTimeFormatter.ofPattern(DATE_TIME_PATTERN_FULL_MILLIS).format(
 			LocalDateTime.ofInstant(
 				Instant.ofEpochMilli(timestamp),
-				ZoneId.ofOffset("UTC", ZoneOffset.ofHours(utcOffset))
+				ZoneId.ofOffset("UTC", tz)
 			)
 		)
 	
@@ -64,7 +79,7 @@ object CommonFormat {
 	  * @param duration time duration, in milliseconds
 	  * @return time duration, human readable
 	  */
-	def formatDuration (duration: Long): String =
+	def formatDuration (duration: DurationMillis): String =
 		val sb = new StringBuilder()
 		if (duration > 1000 * 60 * 60 * 24) sb ++= (duration / (1000 * 60 * 60 * 24)).toString ++= "d "
 		if (duration > 1000 * 60 * 60) sb ++= (duration / (1000 * 60 * 60) % 24).toString ++= "h "

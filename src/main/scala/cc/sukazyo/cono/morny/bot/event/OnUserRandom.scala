@@ -33,6 +33,7 @@ class OnUserRandom (using coeur: MornyCoeur) {
 					(if rand_half then "不" else "") + _con
 				case _ => null
 			
+			//noinspection DuplicatedCode
 			if result == null then return false
 			
 			coeur.account exec SendMessage(
@@ -48,18 +49,23 @@ class OnUserRandom (using coeur: MornyCoeur) {
 	object 尊嘟假嘟 extends EventListener {
 		
 		private val word_pattern = "^([\\w\\W]*)?(?:尊嘟假嘟|(?:O\\.o|o\\.O))$"r
+		private val keywords = Array("尊嘟假嘟", "O.o", "o.O")
 		
 		override def onMessage (using event: Update): Boolean = {
 			
 			if event.message.text == null then return false
 			
-			if word_pattern matches event.message.text then {}
-			else return false
-			
+			var result: String|Null = null
 			import cc.sukazyo.cono.morny.util.UseRandom.rand_half
+			for (k <- keywords)
+				if event.message.text endsWith k then
+					result = if rand_half then "尊嘟" else "假嘟"
+			//noinspection DuplicatedCode
+			if result == null then return false
+			
 			coeur.account exec SendMessage(
 				event.message.chat.id,
-				if rand_half then "尊嘟" else "假嘟"
+				result
 			).replyToMessageId(event.message.messageId)
 			true
 			

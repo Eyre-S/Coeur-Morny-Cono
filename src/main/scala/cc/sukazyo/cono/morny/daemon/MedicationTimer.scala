@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.CommonFormat
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
@@ -36,8 +37,13 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 		logger info "Medication Timer started."
 		while (!this.isInterrupted) {
 			try {
-				waitToNextRoutine()
+				val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
+				logger info s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds/60/60)} with $use_timeZone [$next_time]"
+				val sleep_millis = next_time - System.currentTimeMillis
+				logger debug s"medication timer will sleep ${CommonFormat.formatDuration(sleep_millis)} [$sleep_millis]"
+				Thread sleep sleep_millis
 				sendNotification()
+				logger info "medication notify sent."
 			} catch
 				case _: InterruptedException =>
 					interrupt()
@@ -60,11 +66,6 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 		val sendResponse: SendResponse = coeur.account exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
 		if sendResponse isOk then lastNotify_messageId = Some(sendResponse.message.messageId)
 		else lastNotify_messageId = None
-	}
-	
-	@throws[InterruptedException | IllegalArgumentException]
-	private def waitToNextRoutine (): Unit = {
-		Thread sleep calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
 	}
 	
 	def refreshNotificationWrite (edited: Message): Unit = {

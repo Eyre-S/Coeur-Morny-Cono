@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter
 object EpochDateTime {
 	
 	type EpochMillis = Long
+	type DurationMillis = Long
 	
 	object EpochMillis:
 		/** convert a localtime with timezone to epoch milliseconds
