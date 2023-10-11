@@ -4,7 +4,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.EventListener
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
+import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.response.SendResponse
 
 import scala.language.postfixOps
@@ -47,13 +47,14 @@ class OnUserRandom (using coeur: MornyCoeur) {
 	//noinspection NonAsciiCharacters
 	object 尊嘟假嘟 extends EventListener {
 		
-		private val keywords = Array("尊嘟假嘟", "O.o", "o.O")
+		private val word_pattern = "^([\\w\\W]*)?(?:尊嘟假嘟|(?:O\\.o|o\\.O))$"r
 		
 		override def onMessage (using event: Update): Boolean = {
 			
 			if event.message.text == null then return false
 			
-			if !(keywords contains event.message.text) then return false
+			if word_pattern matches event.message.text then {}
+			else return false
 			
 			import cc.sukazyo.cono.morny.util.UseRandom.rand_half
 			coeur.account exec SendMessage(
