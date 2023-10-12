@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.api.EventListener
+import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.UniversalCommand
@@ -16,10 +16,11 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 	
 	private val TG_FORMAT = "^\\w+(@\\w+)?$"r
 	
-	override def onMessage (using update: Update): Boolean = {
+	override def onMessage (using event: EventEnv): Unit = {
 		
+		import event.update
 		val text = update.message.text
-		if text == null then return false
+		if text == null then return;
 		
 		if (text startsWith "/") {
 			
@@ -39,14 +40,14 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 			actions(0) match
 				// ignore Telegram command like
 				case TG_FORMAT(_) =>
-					return false
+					return;
 				// ignore Path link
-				case x if x contains "/" => return false
+				case x if x contains "/" => return;
 				case _ =>
 			
 			val isHardParse = actions(0) isBlank
 			def hp_len(i: Int) = if isHardParse then i+1 else i
-			if isHardParse && actions.length < 2 then return false
+			if isHardParse && actions.length < 2 then return
 			val v_verb = actions(hp_len(0))
 			val hasObject = actions.length != hp_len(1)
 			val v_object =
@@ -70,9 +71,9 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					if hasObject then h(v_object+" ") else ""
 				)
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
-			true
+			event.setEventOk
 			
-		} else false
+		}
 		
 	}
 	

@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.bot.event
 
-import cc.sukazyo.cono.morny.bot.api.EventListener
+import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
@@ -52,26 +52,28 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 				case _ => null
 		}
 	
-	override def onMessage (using update: Update): Boolean = {
+	override def onMessage (using event: EventEnv): Unit = {
+		import event.update
 		
 		val message = update.message
 		
-		if message.chat.`type` != Chat.Type.Private then return false
-		if message.text eq null then return false
-		if !(message.text startsWith "*msg") then return false
+		if message.chat.`type` != Chat.Type.Private then return;
+		if message.text eq null then return;
+		if !(message.text startsWith "*msg") then return;
 		
 		if (!(coeur.trusted isTrusted message.from.id))
 			coeur.account exec SendSticker(
 				message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(message.messageId)
-			return true
+			event.setEventOk
+			return;
 		
 		if (message.text == "*msgsend") {
 			
-			if (message.replyToMessage eq null) return answer404
+			if (message.replyToMessage eq null) { answer404; return }
 			val messageToSend = MessageToSend from message.replyToMessage
-			if ((messageToSend eq null) || (messageToSend.message eq null)) return answer404
+			if ((messageToSend eq null) || (messageToSend.message eq null)) { answer404; return }
 			val sendResponse = coeur.account execute messageToSend.toSendMessage()
 			
 			if (sendResponse isOk) {
@@ -89,20 +91,21 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 				).replyToMessageId(update.message.messageId).parseMode(ParseMode HTML)
 			}
 			
-			return true
+			event.setEventOk
+			return
 			
 		}
 		
 		val messageToSend: MessageToSend =
 			val raw: Message =
 				if (message.text == "*msg")
-					if message.replyToMessage eq null then return answer404
+					if message.replyToMessage eq null then { answer404; return }
 					else message.replyToMessage
 				else if (message.text startsWith "*msg")
 					message
-				else return answer404
+				else { answer404; return }
 			val _toSend = MessageToSend from raw
-			if _toSend eq null then return answer404
+			if _toSend eq null then { answer404; return }
 			else _toSend
 		
 		val targetChatResponse = coeur.account execute GetChat(messageToSend.targetId)
@@ -128,7 +131,7 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
 		}
 		
-		if messageToSend.message eq null then return true
+		if messageToSend.message eq null then { answer404; return }
 		val testSendResponse = coeur.account execute
 			messageToSend.toSendMessage(update.message.chat.id).replyToMessageId(update.message.messageId)
 		if (!(testSendResponse isOk))
@@ -140,15 +143,15 @@ class OnCallMsgSend (using coeur: MornyCoeur) extends EventListener {
 				.stripMargin
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
 		
-		true
+		event.setEventOk
 		
 	}
 	
-	private def answer404 (using update: Update): Boolean =
+	private def answer404 (using event: EventEnv): Unit =
 		coeur.account exec SendSticker(
-			update.message.chat.id,
+			event.update.message.chat.id,
 			TelegramStickers ID_404
-		).replyToMessageId(update.message.messageId)
-		true
+		).replyToMessageId(event.update.message.messageId)
+		event.setEventOk
 	
 }
