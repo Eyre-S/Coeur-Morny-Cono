@@ -96,6 +96,20 @@ java {
 	withSourcesJar()
 }
 
+sourceSets {
+	
+	main {
+		java { destinationDirectory.set file("build/classes/main") }
+		scala { destinationDirectory.set file("build/classes/main") }
+	}
+	
+	test {
+		java { destinationDirectory.set file("build/classes/test") }
+		scala { destinationDirectory.set file("build/classes/test") }
+	}
+	
+}
+
 tasks.withType(JavaCompile).configureEach {
 	
 	sourceCompatibility proj_java.getMajorVersion()
@@ -110,10 +124,10 @@ tasks.withType(ScalaCompile).configureEach {
 	sourceCompatibility proj_java.getMajorVersion()
 	targetCompatibility proj_java.getMajorVersion()
 	
-	options.encoding = proj_file_encoding.name()
-	scalaCompileOptions.encoding = proj_file_encoding.name()
-	
 	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
+	
+	scalaCompileOptions.encoding = proj_file_encoding.name()
+	options.encoding = proj_file_encoding.name()
 	
 }
 
