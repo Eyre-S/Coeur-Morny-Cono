@@ -12,6 +12,9 @@ object StringEnsure {
 			} else str
 		}
 		
+		def deSensitive (keepStart: Int = 2, keepEnd: Int = 4, sensitive_cover: Char = '*'): String =
+			(str take keepStart) + (sensitive_cover.toString*(str.length-keepStart-keepEnd)) + (str takeRight keepEnd)
+		
 	}
 	
 }

@@ -11,18 +11,18 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 	
 	def start (): Unit = {
 		
-		logger info "ALL Morny Daemons starting..."
+		logger notice "ALL Morny Daemons starting..."
 		
 		//		TrackerDataManager.init();
 		medicationTimer.start()
 		
-		logger info "Morny Daemons started."
+		logger notice "Morny Daemons started."
 		
 	}
 	
 	def stop (): Unit = {
 		
-		logger.info("stopping All Morny Daemons...")
+		logger notice "stopping All Morny Daemons..."
 		
 		//		TrackerDataManager.DAEMON.interrupt();
 		medicationTimer.interrupt()
@@ -31,7 +31,7 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 		catch case e: InterruptedException =>
 			e.printStackTrace(System.out)
 		
-		logger.info("stopped ALL Morny Daemons.")
+		logger notice "stopped ALL Morny Daemons."
 	}
 	
 }

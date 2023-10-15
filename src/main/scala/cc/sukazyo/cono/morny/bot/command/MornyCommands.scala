@@ -91,14 +91,14 @@ class MornyCommands (using coeur: MornyCoeur) {
 		val listing = commands_toTelegramList
 		automaticTGListRemove()
 		coeur.account exec SetMyCommands(listing:_*)
-		logger info
+		logger notice
 				s"""automatic updated telegram command list :
 				   |${commandsTelegramList_toString(listing)}""".stripMargin
 	}
 	
 	def automaticTGListRemove (): Unit = {
 		coeur.account exec DeleteMyCommands()
-		logger info "cleaned up command list"
+		logger notice "cleaned up command list"
 	}
 	
 	private def commandsTelegramList_toString (list: Array[BotCommand]): String =

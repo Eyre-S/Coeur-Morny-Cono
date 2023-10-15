@@ -31,7 +31,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
-				logger info s"Morny exited by user ${user toLogTag}"
+				logger attention s"Morny exited by user ${user toLogTag}"
 				coeur.exit(0, user)
 				
 			} else {
@@ -40,7 +40,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger info s"403 exit caught from user ${user toLogTag}"
+				logger attention s"403 exit caught from user ${user toLogTag}"
 				coeur.daemons.reporter.unauthenticatedAction("/exit", user)
 				
 			}
@@ -62,7 +62,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			if (coeur.trusted isTrusted user.id) {
 				
-				logger info s"call save from command by ${user toLogTag}"
+				logger attention s"call save from command by ${user toLogTag}"
 				coeur.saveDataAll()
 				coeur.account exec SendSticker(
 					event.message.chat.id,
@@ -75,7 +75,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger info s"403 save caught from user ${user toLogTag}"
+				logger attention s"403 save caught from user ${user toLogTag}"
 				coeur.daemons.reporter.unauthenticatedAction("/save", user)
 				
 			}

@@ -3,8 +3,6 @@ package cc.sukazyo.cono.morny.bot.api
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable
-import scala.reflect.ClassTag
-import scala.util.boundary
 
 class EventEnv (
 	
@@ -24,14 +22,10 @@ class EventEnv (
 	def provide (i: Any): Unit =
 		variables += (i.getClass -> i)
 	
-	def use [T] (t: Class[T]): ConsumeProvider[T] = ConsumeProvider(t)
-	
-	class ConsumeProvider[T] (t: Class[T]) {
-		def consume (consumer: T => Unit): ConsumeResult = {
-			variables get t match
-				case Some(i) => consumer(i.asInstanceOf[T]); ConsumeResult(true)
-				case None => ConsumeResult(false)
-		}
+	def consume [T] (t: Class[T]) (consumer: T => Unit): ConsumeResult = {
+		variables get t match
+			case Some(i) => consumer(i.asInstanceOf[T]); ConsumeResult(true)
+			case None => ConsumeResult(false)
 	}
 	
 	class ConsumeResult (success: Boolean) {
