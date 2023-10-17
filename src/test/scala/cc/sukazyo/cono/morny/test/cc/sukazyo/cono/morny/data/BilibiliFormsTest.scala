@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.test.cc.sukazyo.cono.morny.data
 import cc.sukazyo.cono.morny.data.BilibiliForms.*
 import cc.sukazyo.cono.morny.test.MornyTests
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.tagobjects.{Network, Slow}
 
 class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 	
@@ -54,9 +55,8 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 				BiliVideoId(455017605L, "1Q541167Qg", 1)
 			parse_videoUrl("https://www.bilibili.com/video/av455017605?p=1&vd_source=123456") shouldEqual
 				BiliVideoId(455017605L, "1Q541167Qg", 1)
-			// todo: implement it
-//			parse_videoUrl("bilibili.com/video/AV455017605?mid=12hdowhAI&p=5&x=D82EQ&289EHD8AHDOIWU8=r2aur9%3Bi0%3AJ%7BRQJH%28QJ.%5BropWG%3AKR%24%28O%7BGR") shouldEqual
-//				BiliVideoId(455017605L, "1Q541167Qg", 5)
+			parse_videoUrl("bilibili.com/video/AV455017605?mid=12hdowhAI&p=5&x=D82EQ&289EHD8AHDOIWU8=r2aur9%3Bi0%3AJ%7BRQJH%28QJ.%5BropWG%3AKR%24%28O%7BGR") shouldEqual
+				BiliVideoId(455017605L, "1Q541167Qg", 5)
 		
 		"av id with more than 12 digits should not be parsed" in :
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av4550176087554")
@@ -77,8 +77,15 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://bilibili.cc/video/av123456")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://vxbilibili.com/video/av123456")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://bilibiliexc.com/video/av123456")
-			an[IllegalArgumentException] should be thrownBy parse_videoUrl("b23.tv/av123456") // todo: support it
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("C# does not have type erasure. C# has actual generic types deeply baked into the runtime.\n\n好文明")
+		
+		"url which is a b23 video link should be parsed" in:
+			parse_videoUrl("https://b23.tv/av688730800") shouldEqual BiliVideoId(688730800L, "1T24y197V2")
+			parse_videoUrl("http://b23.tv/BV1T24y197V2") shouldEqual BiliVideoId(688730800L, "1T24y197V2")
+			parse_videoUrl("b23.tv/BV1T24y197V2") shouldEqual BiliVideoId(688730800L, "1T24y197V2")
+		"b23 video link should not take www. or /video prefix" in:
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://www.b23.tv/av123456")
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://b23.tv/video/av123456")
 		
 	}
 	
@@ -101,7 +108,7 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 			an[IllegalArgumentException] should be thrownBy destructB23Url("https://b23.tv/BV1Q541167Qg")
 		
 		forAll (examples) { (origin, result) =>
-			s"b23 link $origin should be destructed to $result" in:
+			s"b23 link $origin should be destructed to $result" taggedAs (Slow, Network) in:
 				destructB23Url(origin) shouldEqual result
 		}
 		
