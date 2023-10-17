@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.command.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.CommonEncrypt
@@ -13,6 +14,7 @@ import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{GetFile, SendDocument, SendMessage, SendSticker}
 
 import java.io.IOException
+import java.net.{URLDecoder, URLEncoder}
 import java.util.Base64
 import scala.language.postfixOps
 
@@ -20,7 +22,7 @@ import scala.language.postfixOps
 class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "encrypt"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: Array[ICommandAlias] | Null = Array(ListedAlias("enc"))
 	override val paramRule: String = "[algorithm|(l)] [(uppercase)]"
 	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
 	
@@ -135,6 +137,12 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		def genResult_hash (source: XEncryptable, processor: Array[Byte]=>Array[Byte]): EXHash =
 			val hashed = processor(source asByteArray) toHex;
 			EXHash(if mod_uppercase then hashed toUpperCase else hashed)
+		//noinspection UnitMethodIsParameterless
+		def echo_unsupported: Unit =
+			coeur.account exec SendSticker(
+				event.message.chat.id,
+				TelegramStickers ID_404
+			).replyToMessageId(event.message.messageId)
 		val result: EXHash|EXFile|EXText = args(0) match
 			case "base64" | "b64" | "base64url" | "base64u" | "b64u" =>
 				val _tool_b64 =
@@ -154,21 +162,27 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					_tool_b64d.decode,
 					CommonEncrypt.lint_base64FileName
 				) } catch case _: IllegalArgumentException =>
-					coeur.account exec SendSticker(
-						event.message.chat.id,
-						TelegramStickers ID_404 // todo: is here better erro notify?
-					).replyToMessageId(event.message.messageId)
+					echo_unsupported
 					return
+			case "urlencoder" | "urlencode" | "urlenc" | "url" =>
+				input match
+					case x: XText =>
+						EXText(URLEncoder.encode(x.data, ENCRYPT_STANDARD_CHARSET))
+					case _: XFile => echo_unsupported; return;
+			case "urldecoder" | "urldecode" | "urldec" | "urld" =>
+				input match
+					case _: XFile => echo_unsupported; return;
+					case x: XText =>
+						try { EXText(URLDecoder.decode(x.data, ENCRYPT_STANDARD_CHARSET)) }
+						catch case _: IllegalArgumentException =>
+								echo_unsupported
+								return
 			case "md5" => genResult_hash(input, MD5)
 			case "sha1" => genResult_hash(input, SHA1)
 			case "sha256" => genResult_hash(input, SHA256)
 			case "sha512" => genResult_hash(input, SHA512)
 			case _ =>
-				coeur.account exec SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_404
-				).replyToMessageId(event.message.messageId)
-				return;
+				echo_unsupported; return;
 		// END BLOCK: encrypt
 		
 		// output
@@ -203,6 +217,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * 	'''__base64url__''', base64u, b64u<br>
 	  * 	'''__base64decode__''', base64d, b64d<br>
 	  * 	'''__base64url-decode__''', base64ud, b64ud<br>
+	  *     '''urlencode''', urlencode, urlenc, url<br>
+	  *     '''__urldecoder__''', urldecode, urldec, urld<br>
 	  * 	'''__sha1__'''<br>
 	  * 	'''__sha256__'''<br>
 	  * 	'''__sha512__'''<br>
@@ -218,6 +234,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |<b><u>base64url</u></b>, base64u, b64u
 			   |<b><u>base64decode</u></b>, base64d, b64d
 			   |<b><u>base64url-decode</u></b>, base64ud, b64ud
+			   |<b><u>urlencoder</u></b>, urlencode, urlenc, url
+			   |<b><u>urldecoder</u></b>, urldecode, urldec, urld
 			   |<b><u>sha1</u></b>
 			   |<b><u>sha256</u></b>
 			   |<b><u>sha512</u></b>
