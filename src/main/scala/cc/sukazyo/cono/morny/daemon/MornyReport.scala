@@ -67,7 +67,7 @@ class MornyReport (using coeur: MornyCoeur) {
 			// language=html
 			s"""<b>▌Morny Logged in</b>
 			   |-v $getVersionAllFullTagHTML
-			   |as user ${coeur.username}
+			   |as user @${coeur.username}
 			   |
 			   |as config fields:
 			   |${sectionConfigFields(coeur.config)}"""
