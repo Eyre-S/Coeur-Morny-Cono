@@ -27,7 +27,8 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	logger info "Coeur starting..."
 	
-	logger info s"args key:\n  ${config.telegramBotKey}"
+	import cc.sukazyo.cono.morny.util.StringEnsure.deSensitive
+	logger info s"args key:\n  ${config.telegramBotKey deSensitive 4}"
 	if config.telegramBotUsername ne null then
 		logger info s"login as:\n  ${config.telegramBotUsername}"
 	
@@ -92,7 +93,7 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	def saveDataAll(): Unit = {
 		// nothing to do
-		logger info "done all save action."
+		logger notice "done all save action."
 	}
 	
 	private def exitCleanup (): Unit = {

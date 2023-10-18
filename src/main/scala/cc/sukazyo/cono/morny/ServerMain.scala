@@ -5,10 +5,14 @@ import cc.sukazyo.cono.morny.MornyConfig.CheckFailure
 import cc.sukazyo.cono.morny.util.CommonFormat
 
 import java.time.ZoneOffset
+import java.util.TimeZone
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
 object ServerMain {
+	
+	val tz: TimeZone = TimeZone getDefault
+	val tz_offset: ZoneOffset = ZoneOffset ofTotalSeconds (tz.getRawOffset/1000)
 	
 	private val THREAD_MORNY_INIT: String = "morny-init"
 	
@@ -134,6 +138,9 @@ object ServerMain {
 				   |- version ${MornySystem.VERSION_FULL}
 				   |- Morny ${MornySystem.CODENAME toUpperCase}
 				   |- <${MornySystem.getJarMD5}> [${BuildConfig.CODE_TIMESTAMP}]""".stripMargin
+		
+		// due to [[MornyFormatterConsole]] will use a localized time, it will output to the log
+		logger info s"logging time will use time-zone ${tz.getID} ($tz_offset)"
 		
 		///
 		/// Check Coeur arguments

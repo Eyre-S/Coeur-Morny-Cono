@@ -7,7 +7,6 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 
-import javax.annotation.{Nonnull, Nullable}
 import scala.language.postfixOps
 
 class Testing (using coeur: MornyCoeur) extends ISimpleCommand {

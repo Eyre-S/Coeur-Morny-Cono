@@ -30,11 +30,11 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	override def run (): Unit = {
 		
 		if ((notify_toChat == -1) || (notify_atHour isEmpty)) {
-			logger info "Medication Timer disabled : related param is not complete set"
+			logger notice "Medication Timer disabled : related param is not complete set"
 			return
 		}
 		
-		logger info "Medication Timer started."
+		logger notice "Medication Timer started."
 		while (!this.isInterrupted) {
 			try {
 				val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
@@ -47,7 +47,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 			} catch
 				case _: InterruptedException =>
 					interrupt()
-					logger info "MedicationTimer was interrupted, will be exit now"
+					logger notice "MedicationTimer was interrupted, will be exit now"
 				case ill: IllegalArgumentException =>
 					logger warn "MedicationTimer will not work due to: " + ill.getMessage
 					interrupt()
@@ -58,7 +58,7 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 							.stripMargin
 					coeur.daemons.reporter.exception(e)
 		}
-		logger info "Medication Timer stopped."
+		logger notice "Medication Timer stopped."
 		
 	}
 	

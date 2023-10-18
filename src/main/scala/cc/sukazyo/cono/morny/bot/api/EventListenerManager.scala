@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.UpdatesListener
 
 import scala.collection.mutable
 import scala.language.postfixOps
+import scala.util.boundary
 
 /** Contains a [[mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
   *
@@ -23,46 +24,43 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	def register (listeners: EventListener*): Unit =
 		this.listeners ++= listeners
 	
-	private class EventRunner (using event: Update) extends Thread {
-		this setName s"evt-${event.updateId()}-nn"
+	private class EventRunner (using update: Update) extends Thread {
+		this setName s"upd-${update.updateId()}-nn"
 		private def updateThreadName (t: String): Unit =
-			this setName s"evt-${event.updateId()}-$t"
+			this setName s"upd-${update.updateId()}-$t"
 		
 		override def run (): Unit = {
-			for (i <- listeners) {
-				object status:
-					var _status = 0
-					def isOk: Boolean = _status > 0
-					def check (u: Boolean): Unit = if u then _status = _status + 1
+			given env: EventEnv = EventEnv(update)
+			boundary { for (i <- listeners) {
 				try {
 					updateThreadName("message")
-					if event.message ne null then status check i.onMessage
+					if update.message ne null then i.onMessage
 					updateThreadName("edited-message")
-					if event.editedMessage ne null then status check i.onEditedMessage
+					if update.editedMessage ne null then i.onEditedMessage
 					updateThreadName("channel-post")
-					if event.channelPost ne null then status check i.onChannelPost
+					if update.channelPost ne null then i.onChannelPost
 					updateThreadName("edited-channel-post")
-					if event.editedChannelPost ne null then status check i.onEditedChannelPost
+					if update.editedChannelPost ne null then i.onEditedChannelPost
 					updateThreadName("inline-query")
-					if event.inlineQuery ne null then status check i.onInlineQuery
+					if update.inlineQuery ne null then i.onInlineQuery
 					updateThreadName("chosen-inline-result")
-					if event.chosenInlineResult ne null then status check i.onChosenInlineResult
+					if update.chosenInlineResult ne null then i.onChosenInlineResult
 					updateThreadName("callback-query")
-					if event.callbackQuery ne null then status check i.onCallbackQuery
+					if update.callbackQuery ne null then i.onCallbackQuery
 					updateThreadName("shipping-query")
-					if event.shippingQuery ne null then status check i.onShippingQuery
+					if update.shippingQuery ne null then i.onShippingQuery
 					updateThreadName("pre-checkout-query")
-					if event.preCheckoutQuery ne null then status check i.onPreCheckoutQuery
+					if update.preCheckoutQuery ne null then i.onPreCheckoutQuery
 					updateThreadName("poll")
-					if event.poll ne null then status check i.onPoll
+					if update.poll ne null then i.onPoll
 					updateThreadName("poll-answer")
-					if event.pollAnswer ne null then status check i.onPollAnswer
+					if update.pollAnswer ne null then i.onPollAnswer
 					updateThreadName("my-chat-member")
-					if event.myChatMember ne null then status check i.onMyChatMemberUpdated
+					if update.myChatMember ne null then i.onMyChatMemberUpdated
 					updateThreadName("chat-member")
-					if event.chatMember ne null then status check i.onChatMemberUpdated
+					if update.chatMember ne null then i.onChatMemberUpdated
 					updateThreadName("chat-join-request")
-					if event.chatJoinRequest ne null then status check i.onChatJoinRequest
+					if update.chatJoinRequest ne null then i.onChatJoinRequest
 				} catch case e => {
 					val errorMessage = StringBuilder()
 					errorMessage ++= "Event throws unexpected exception:\n"
@@ -77,8 +75,8 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 					logger error errorMessage.toString
 					coeur.daemons.reporter.exception(e, "on event running")
 				}
-				if (status isOk) return
-			}
+				if env.isEventOk then boundary.break()
+			}}
 		}
 		
 	}

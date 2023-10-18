@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.api.EventListener
+import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
@@ -15,10 +15,11 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 	
 	private val me = coeur.config.trustedMaster
 	
-	override def onMessage (using update: Update): Boolean = {
+	override def onMessage (using event: EventEnv): Unit = {
+		import event.update
 		
-		if update.message.text == null then return false
-		if update.message.chat.`type` != (Chat.Type Private) then return false
+		if update.message.text == null then return;
+		if update.message.chat.`type` != (Chat.Type Private) then return
 		
 		//noinspection ScalaUnnecessaryParentheses
 		val success = if me == -1 then false else
@@ -32,7 +33,7 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 				case cc if cc startsWith "cc::" =>
 					requestCustom(update.message)
 				case _ =>
-					return false
+					return;
 		
 		if success then
 			coeur.account exec SendSticker(
@@ -45,7 +46,7 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 				TelegramStickers ID_501
 			).replyToMessageId(update.message.messageId)
 		
-		true
+		event.setEventOk
 		
 	}
 	
