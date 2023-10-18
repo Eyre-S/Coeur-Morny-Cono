@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.test.cc.sukazyo.cono.morny.bot.event
+package cc.sukazyo.cono.morny.test.bot.event
 
 import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply
 import cc.sukazyo.cono.morny.test.MornyTests

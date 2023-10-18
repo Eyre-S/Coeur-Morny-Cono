@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.test.cc.sukazyo.cono.morny.data
+package cc.sukazyo.cono.morny.test.data
 
 import cc.sukazyo.cono.morny.data.BilibiliForms.*
 import cc.sukazyo.cono.morny.test.MornyTests

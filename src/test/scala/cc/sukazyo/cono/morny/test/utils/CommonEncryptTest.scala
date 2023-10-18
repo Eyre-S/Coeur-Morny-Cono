@@ -67,13 +67,23 @@ class CommonEncryptTest extends MornyTests with TableDrivenPropertyChecks {
 				"da39a3ee5e6b4b0d3255bfef95601890afd80709",
 				"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 				"cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
-			)
-			)
+			)),
+			(
+				"md5.gif", ExampleHashValue(
+				"f5ca4f935d44b85c431a8bf788c0eaca",
+				"784cefac7a3699d704756d1a04189d6157405906",
+				"c0aa75d5345efae1019ca7a56eabc8673499dcee8ab8a8d657fb69f1f929b909",
+				"2d3123c543aa1745eeae57d2e6c31b6ea07dd2bb14cef2b5939116f9cf705953fb43cf6162c87ee1c7175d1de4af6d9de6f2bc817065cc854b912877848f937b"
+			))
 		)
 		
 		forAll(examples_binary) { (file, hashes) =>
 			val _name = if file == null then "empty file" else s"file $file"
-			val _data = if file == null then Array.empty[Byte] else throw NotImplementedError("does not applied file get yet")
+			val _data =
+				if file == null then
+					Array.empty[Byte]
+				else
+					assets.getResource(file).read.readAllBytes
 			
 			s"while hashing binary $_name :" - {
 				

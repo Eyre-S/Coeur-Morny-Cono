@@ -14,7 +14,7 @@ import org.ajoberstar.grgit.Status
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-final boolean proj_git = grgit!=null
+final boolean proj_git = grgit != null
 final String proj_store = MORNY_CODE_STORE
 final String proj_commit = proj_git ? grgit.head().id : null
 final String proj_commit_path = MORNY_COMMIT_PATH
@@ -23,7 +23,8 @@ if (!proj_git)
 	println "[MornyBuild] git repository not available for current working space! git version tag will be disabled."
 else if (isCleanBuild()) {
 	println "git: clean build at ${grgit.head().id}"
-} else {
+}
+else {
 	final Status status = grgit.status()
 	println "git: non-clean-build"
 	if (!status.unstaged.allChanges.empty) {
@@ -45,7 +46,8 @@ final String proj_version_base = VERSION
 final String proj_version_delta = VERSION_DELTA
 final boolean proj_version_use_delta = Boolean.parseBoolean(USE_DELTA)
 final String proj_version = proj_version_base + (proj_version_use_delta ? "-δ${proj_version_delta}" : "")
-final String proj_version_full = proj_version + (proj_git ? "+git.${proj_commit.substring(0, 8)}" + (proj_clean?"":".δ") : "")
+final String proj_version_full = proj_version + (proj_git ?
+		"+git.${proj_commit.substring(0, 8)}" + (proj_clean ? "" : ".δ") : "")
 final String proj_version_codename = CODENAME
 final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
 
@@ -53,7 +55,7 @@ final JavaVersion proj_java = JavaVersion.VERSION_17
 final Charset proj_file_encoding = StandardCharsets.UTF_8
 final proj_scala_api = 3
 //final proj_scala_lib = proj_scala_api+'.4.0-RC1-bin-20230901-89e8dba-NIGHTLY'
-final proj_scala_lib = proj_scala_api+'.3.1'
+final proj_scala_lib = proj_scala_api + '.3.1'
 String publish_local_url = null
 String publish_remote_url = null
 String publish_remote_username = null
@@ -80,6 +82,7 @@ dependencies {
 	
 	implementation "cc.sukazyo:messiva:${lib_messiva_v}"
 	implementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
+	testImplementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
 	
 	implementation "com.github.pengrad:java-telegram-bot-api:${lib_javatelegramapi_v}"
 	implementation "com.squareup.okhttp3:okhttp:${lib_okhttp_v}"
@@ -88,7 +91,8 @@ dependencies {
 	testImplementation "org.scalatest:scalatest_$proj_scala_api:${lib_scalatest_v}"
 	testImplementation "org.scalatest:scalatest-freespec_$proj_scala_api:${lib_scalatest_v}"
 	testRuntimeOnly "org.scala-lang.modules:scala-xml_$proj_scala_api:${lib_scalamodule_xml_v}"
-	testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.6' // for generating HTML report // required by gradle-scalatest plugin
+	testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.6'
+	// for generating HTML report // required by gradle-scalatest plugin
 	
 }
 
@@ -155,10 +159,10 @@ buildConfig {
 	buildConfigField('String', 'VERSION_DELTA', proj_version_use_delta ? "\"${proj_version_delta}\"" : "null")
 	buildConfigField('String', 'CODENAME', "\"${proj_version_codename}\"")
 	buildConfigField('long', 'CODE_TIMESTAMP', "${proj_code_time}L")
-	buildConfigField('String',  'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
+	buildConfigField('String', 'COMMIT', proj_git ? "\"${proj_commit}\"" : "null")
 	buildConfigField('boolean', 'CLEAN_BUILD', "${proj_clean}")
-	buildConfigField('String', 'CODE_STORE', proj_store==""?"null":"\"${proj_store}\"")
-	buildConfigField('String', 'COMMIT_PATH', proj_commit_path==""?"null":"\"${proj_commit_path}\"")
+	buildConfigField('String', 'CODE_STORE', proj_store == "" ? "null" : "\"${proj_store}\"")
+	buildConfigField('String', 'COMMIT_PATH', proj_commit_path == "" ? "null" : "\"${proj_commit_path}\"")
 	
 }
 
@@ -200,7 +204,7 @@ void listChanges (Status.Changes listing) {
 }
 
 publishing {
-	repositories{
+	repositories {
 		if (publish_local_url != null) maven {
 			name 'archives'
 			url publish_local_url
@@ -216,7 +220,7 @@ publishing {
 	}
 	publications {
 		//noinspection GroovyAssignabilityCheck
-		main (MavenPublication) {
+		main(MavenPublication) {
 			//noinspection GroovyAssignabilityCheck
 			from components.java
 			//noinspection GroovyAssignabilityCheck

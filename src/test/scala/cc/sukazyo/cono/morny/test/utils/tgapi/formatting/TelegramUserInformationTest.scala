@@ -9,6 +9,7 @@ class TelegramUserInformationTest extends MornyTests with TableDrivenPropertyChe
 	private val examples_telegram_cdn = Table(
 		("username", "cdn"),
 		("Eyre_S", "cdn5"),
+		("ankarinnie", "cdn1")
 	)
 	
 	forAll(examples_telegram_cdn) ((username, cdn) => s"while user is @$username :" - {
