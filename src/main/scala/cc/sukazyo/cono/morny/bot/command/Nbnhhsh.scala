@@ -8,6 +8,7 @@ import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
+import sttp.client3.{HttpError, SttpClientException}
 
 import java.io.IOException
 import scala.language.postfixOps
@@ -71,7 +72,7 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 				message toString
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
-		} catch case e: IOException => {
+		} catch case e: (HttpError[_] | SttpClientException) => {
 			coeur.account exec SendMessage(
 				event.message.chat.id,
 				s"""[Exception] in query:

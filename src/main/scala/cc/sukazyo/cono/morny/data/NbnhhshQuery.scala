@@ -1,11 +1,9 @@
 package cc.sukazyo.cono.morny.data
 
-import cc.sukazyo.cono.morny.util.OkHttpPublic.MediaTypes
 import com.google.gson.Gson
-import okhttp3.{OkHttpClient, Request, RequestBody, ResponseBody}
-
-import java.io.IOException
-import scala.util.Using
+import sttp.client3.{asString, basicRequest, HttpError, SttpClientException, UriContext}
+import sttp.client3.okhttp.OkHttpSyncBackend
+import sttp.model.MediaType
 
 object NbnhhshQuery {
 	
@@ -14,24 +12,19 @@ object NbnhhshQuery {
 	
 	private case class GuessRequest (text: String)
 	
-	private val API_URL = "https://lab.magiconch.com/api/nbnhhsh/"
-	private val API_GUESS_METHOD = "guess/"
+	private val API_URL = uri"https://lab.magiconch.com/api/nbnhhsh/"
+	private val API_GUESS_METHOD = uri"$API_URL/guess/"
 	
-	private val httpClient = OkHttpClient()
+	private val httpClient = OkHttpSyncBackend()
 	
-	@throws[IOException]
+	@throws[HttpError[_]|SttpClientException]
 	def sendGuess (text: String): GuessResult = {
-		val requestJsonText = Gson().toJson(GuessRequest(text))
-		val request = Request.Builder()
-				.url(API_URL + API_GUESS_METHOD)
-				.post(RequestBody.create(requestJsonText, MediaTypes.JSON))
-				.build
-		Using (httpClient.newCall(request).execute) { response =>
-			val body = response.body
-			if body eq null then throw IOException("Nbnhhsh Request: body is null.")
-			val x = s"{ 'words': ${body.string} }"
-			Gson().fromJson(x, classOf[GuessResult])
-		}.get
+		val http = basicRequest
+			.body(Gson().toJson(GuessRequest(text))).contentType(MediaType.ApplicationJson)
+			.post(API_GUESS_METHOD)
+			.response(asString.getRight)
+			.send(httpClient)
+		Gson().fromJson(s"{ 'words': ${http.body} }", classOf[GuessResult])
 	}
 	
 }

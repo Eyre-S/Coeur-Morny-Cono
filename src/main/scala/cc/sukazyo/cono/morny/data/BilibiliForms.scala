@@ -1,12 +1,13 @@
 package cc.sukazyo.cono.morny.data
 
 import cc.sukazyo.cono.morny.util.BiliTool
+import cc.sukazyo.cono.morny.util.SttpPublic.Schemes
 import cc.sukazyo.cono.morny.util.UseSelect.select
-import okhttp3.{HttpUrl, OkHttpClient, Request}
+import sttp.client3.{basicRequest, ignore, HttpError, SttpClientException}
+import sttp.client3.okhttp.OkHttpSyncBackend
+import sttp.model.Uri
 
-import java.io.IOException
 import scala.util.matching.Regex
-import scala.util.Using
 
 object BilibiliForms {
 	
@@ -51,11 +52,7 @@ object BilibiliForms {
 				
 			case _ => throw IllegalArgumentException(s"not a valid Bilibili video link: $url")
 	
-	private val httpClient = OkHttpClient
-		.Builder()
-		.followSslRedirects(true)
-		.followRedirects(false)
-		.build()
+	private val httpClient = OkHttpSyncBackend()
 	
 	/** get the bilibili video url from b23.tv share url.
 	  *
@@ -68,28 +65,32 @@ object BilibiliForms {
 	  * @return bilibili video url with tracking params
 	  */
 	@throws[IllegalStateException|IllegalArgumentException]
-	def destructB23Url (url: String): String =
-		val _url: HttpUrl = HttpUrl.parse(
-			if url startsWith "http://" then url.replaceFirst("http://", "https://") else url
-		)
-		if _url == null then throw IllegalArgumentException("not a valid url: " + url)
-		if _url.host != "b23.tv" then throw IllegalArgumentException(s"not a b23 share link: $url")
-		if (!_url.pathSegments.isEmpty) && _url.pathSegments.get(0).matches(REGEX_BILI_ID.regex) then
-			throw IllegalArgumentException(s"is a b23 video link: $url ; (use parse_videoUrl directly)")
-		val result: Option[String] =
-			try {
-				Using(httpClient.newCall(Request.Builder().url(_url).build).execute()) { response =>
-					if response.isRedirect then
-						val _u = response header "Location"
-						if _u != null then
-							Some(_u)
-						else throw IllegalStateException("unable to get b23.tv redir location from: " + response)
-					else throw IllegalStateException("unable to get b23.tv redir location from: " + response)
-				}.get
-			} catch case e: IOException =>
-				throw IllegalStateException("get b23.tv failed.", e)
-		result match
-			case Some(_result) => _result
-			case None => throw IllegalStateException("unable to parse from b23.tv .")
+	def destructB23Url (url: String): String = {
+		
+		val uri = try Uri.unsafeParse(url).scheme(Schemes.HTTPS) catch
+			case e: IllegalArgumentException => throw IllegalArgumentException("not a b23.tv url", e)
+		if uri.host.orNull != "b23.tv" then throw
+			IllegalArgumentException(s"not a b23.tv url: $uri")
+		else if uri.pathSegments.segments.size < 1 then
+			throw IllegalArgumentException(s"empty b23.tv url: $uri")
+		else if uri.pathSegments.segments.head.v matches REGEX_BILI_ID.regex then
+			throw IllegalArgumentException(s"is a b23 video link: $uri . (use parse_videoUrl instead)")
+		
+		try {
+			val response = basicRequest
+				.get(uri)
+				.followRedirects(false)
+				.response(ignore)
+				.send(httpClient)
+			try response.header("Location").get
+			catch case _: NoSuchElementException =>
+				throw IllegalStateException("unable to get b23.tv redir location from: " + response)
+		} catch
+			case e: HttpError[_] =>
+				throw IllegalStateException("failed parse b23.tv response.", e)
+			case e: SttpClientException =>
+				throw IllegalStateException("failed request from b23.tv: ", e)
+		
+	}
 	
 }

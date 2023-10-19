@@ -77,22 +77,26 @@ repositories {
 
 dependencies {
 	
-	api "org.scala-lang:scala3-library_3:${proj_scala_lib}"
-	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:${lib_spotbugs_v}"
+	api group: 'org.scala-lang', name: 'scala3-library_3', version: proj_scala_lib
+	final scala = (String name) -> "${name}_$proj_scala_api"
+	compileOnlyApi group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: lib_spotbugs_v
 	
-	implementation "cc.sukazyo:messiva:${lib_messiva_v}"
-	implementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
-	testImplementation "cc.sukazyo:resource-tools:${lib_resourcetools_v}"
+	implementation group: 'cc.sukazyo', name: 'messiva', version: lib_messiva_v
+	implementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
+	testImplementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
 	
-	implementation "com.github.pengrad:java-telegram-bot-api:${lib_javatelegramapi_v}"
-	implementation "com.squareup.okhttp3:okhttp:${lib_okhttp_v}"
-	implementation "com.google.code.gson:gson:${lib_gson_v}"
+	implementation group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: lib_javatelegramapi_v
+	implementation group: 'com.softwaremill.sttp.client3', name: scala('core'), version: lib_sttp_v
+	implementation group: 'com.softwaremill.sttp.client3', name: scala('okhttp-backend'), version: lib_sttp_v
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: lib_okhttp_v
+	implementation group: 'com.google.code.gson', name: 'gson', version: lib_gson_v
 	
-	testImplementation "org.scalatest:scalatest_$proj_scala_api:${lib_scalatest_v}"
-	testImplementation "org.scalatest:scalatest-freespec_$proj_scala_api:${lib_scalatest_v}"
-	testRuntimeOnly "org.scala-lang.modules:scala-xml_$proj_scala_api:${lib_scalamodule_xml_v}"
-	testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.6'
+	testImplementation group: 'org.scalatest', name: scala('scalatest'), version: lib_scalatest_v
+	testImplementation group: 'org.scalatest', name: scala('scalatest-freespec'), version: lib_scalatest_v
+	testRuntimeOnly group: 'org.scala-lang.modules', name: scala('scala-xml'), version: lib_scalamodule_xml_v
+	
 	// for generating HTML report // required by gradle-scalatest plugin
+	testRuntimeOnly group: 'com.vladsch.flexmark', name: 'flexmark-all', version: '0.64.6'
 	
 }
 

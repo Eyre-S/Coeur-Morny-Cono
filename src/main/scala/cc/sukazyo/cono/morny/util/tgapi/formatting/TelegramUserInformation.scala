@@ -1,29 +1,35 @@
 package cc.sukazyo.cono.morny.util.tgapi.formatting
 
 import com.pengrad.telegrambot.model.User
-import okhttp3.{OkHttpClient, Request}
+import sttp.client3.{asString, basicRequest, HttpError, SttpClientException, UriContext}
+import sttp.client3.okhttp.OkHttpSyncBackend
 
 import java.io.IOException
 import scala.util.matching.Regex
-import scala.util.Using
 
 object TelegramUserInformation {
 	
-	private val DC_QUERY_SOURCE_SITE = "https://t.me/"
 	private val DC_QUERY_PROCESSOR_REGEX: Regex = "(cdn[1-9]).tele(sco.pe|gram-cdn.org)"r
 	
-	private val httpClient = OkHttpClient()
+	private val httpClient = OkHttpSyncBackend()
 	
 	@throws[IllegalArgumentException|IOException]
 	def getDataCenterFromUser (username: String): String = {
-		val request = Request.Builder().url(DC_QUERY_SOURCE_SITE + username).build
-		Using (httpClient.newCall(request) execute) { response =>
-			val body = response.body
-			if body eq null then "<empty-upstream-response>"
-			else DC_QUERY_PROCESSOR_REGEX.findFirstMatchIn(body.string) match
+		
+		try
+			val body = basicRequest
+				.get(uri"https://t.me/$username")
+				.response(asString.getRight)
+				.send(httpClient)
+				.body
+			DC_QUERY_PROCESSOR_REGEX.findFirstMatchIn(body) match
 				case Some(res) => res.group(1)
 				case None => "<no-cdn-information>"
-		} get
+		catch
+			case _: SttpClientException =>
+				"<error-http-request>"
+			case _: HttpError[_] =>
+				"<error-parse-response>"
 	}
 	
 	def getFormattedInformation (user: User): String = {
