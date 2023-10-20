@@ -45,26 +45,26 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 			val message = StringBuilder(NBNHHSH_RESULT_HEAD_HTML)
 			
 			import cc.sukazyo.cono.morny.Log.logger
-			logger debug s"**xx len=${queryResp.words.length}"
+			logger trace s"**nbnhhsh got len=${queryResp.words.length}"
 			for (_word <- queryResp.words) {
-				logger debug "**exec"
+				logger trace s"**start for ${_word.name}"
 				val _use_trans = (_word.trans ne null) && (_word.trans nonEmpty)
 				val _use_inputting = (_word.inputting ne null) && (_word.inputting nonEmpty)
 				if (_use_trans || _use_inputting)
 					message ++= s"\n\n<b>[[ ${h(_word.name)} ]]</b>"
-					logger debug s"**used [${_word.name}]"
+					logger trace s"**used [${_word.name}]"
 					if (_use_trans) for (_trans <- _word.trans)
 						message ++= s"\n* <i>${h(_trans)}</i>"
-						logger debug s"**used [${_word.name}] used `${_trans}``"
+						logger trace s"**used [${_word.name}] used `${_trans}``"
 					if (_use_inputting)
-						logger debug s"**used [${_word.name}] inputting"
+						logger trace s"**used [${_word.name}] inputting"
 						if (_use_trans)
 							message += '\n'
 						message ++= " maybe:"
 						for (_inputting <- _word.inputting)
-							logger debug s"**used [${_word.name}] used-i ${_inputting}"
+							logger trace s"**used [${_word.name}] used-i ${_inputting}"
 							message ++= s"\n` <i>${h(_inputting)}</i>"
-				logger debug s"**exec as ${_word.name}"
+				logger trace s"**done"
 			}
 			
 			coeur.account exec SendMessage(

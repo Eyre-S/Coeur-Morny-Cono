@@ -7,10 +7,12 @@ import sttp.model.MediaType
 
 object NbnhhshQuery {
 	
-	case class Word (name: String, trans: Array[String], inputting: Array[String])
+	case class Word (
+		name: String,
+		trans: Array[String] = Array.empty,
+		inputting: Array[String] = Array.empty
+	)
 	case class GuessResult (words: Array[Word])
-	
-	private case class GuessRequest (text: String)
 	
 	private val API_URL = uri"https://lab.magiconch.com/api/nbnhhsh/"
 	private val API_GUESS_METHOD = uri"$API_URL/guess/"
@@ -19,12 +21,13 @@ object NbnhhshQuery {
 	
 	@throws[HttpError[_]|SttpClientException]
 	def sendGuess (text: String): GuessResult = {
+		case class GuessRequest (text: String)
 		val http = basicRequest
 			.body(Gson().toJson(GuessRequest(text))).contentType(MediaType.ApplicationJson)
 			.post(API_GUESS_METHOD)
 			.response(asString.getRight)
 			.send(httpClient)
-		Gson().fromJson(s"{ 'words': ${http.body} }", classOf[GuessResult])
+		GuessResult(Gson().fromJson(http.body, classOf[Array[Word]]))
 	}
 	
 }
