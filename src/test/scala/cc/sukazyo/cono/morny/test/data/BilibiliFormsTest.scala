@@ -94,7 +94,10 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 		val examples = Table(
 			("b23_link", "bilibili_video_link"),
 			("https://b23.tv/iiCldvZ", "https://www.bilibili.com/video/BV1Gh411P7Sh?buvid=XY6F25B69BE9CF469FF5B917D012C93E95E72&is_story_h5=false&mid=wD6DQnYivIG5pfA3sAGL6A%3D%3D&p=1&plat_id=114&share_from=ugc&share_medium=android&share_plat=android&share_session_id=8081015b-1210-4dea-a665-6746b4850fcd&share_source=COPY&share_tag=s_i&timestamp=1689605644&unique_k=iiCldvZ&up_id=19977489"),
-			("http://b23.tv/3ymowwx", "https://www.bilibili.com/video/BV15Y411n754?p=1&share_medium=android_i&share_plat=android&share_source=COPY&share_tag=s_i&timestamp=1650293889&unique_k=3ymowwx")
+			("https://b23.tv/xWiWFl9", "https://www.bilibili.com/video/BV1N54y1c7us?buvid=XY705C970C2ADBB710C1801E1F45BDC3B9210&is_story_h5=false&mid=w%2B1u1wpibjYsW4pP%2FIo7Ww%3D%3D&p=1&plat_id=116&share_from=ugc&share_medium=android&share_plat=android&share_session_id=6da09711-d601-4da4-bba1-46a4edbb1c60&share_source=COPY&share_tag=s_i&timestamp=1680280016&unique_k=xWiWFl9&up_id=275354674"),
+			("http://b23.tv/uJPIvhv", "https://www.bilibili.com/video/BV1E84y1C7in?is_story_h5=false&p=1&share_from=ugc&share_medium=android&share_plat=android&share_session_id=4a077fa1-5ee2-40d4-ac37-bf9a2bf567e3&share_source=COPY&share_tag=s_i&timestamp=1669044671&unique_k=uJPIvhv")
+			// this link have been expired
+//			("http://b23.tv/3ymowwx", "https://www.bilibili.com/video/BV15Y411n754?p=1&share_medium=android_i&share_plat=android&share_source=COPY&share_tag=s_i&timestamp=1650293889&unique_k=3ymowwx")
 		)
 		
 		"not b23.tv link is not supported" in:

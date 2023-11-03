@@ -7,6 +7,7 @@ import cc.sukazyo.cono.morny.MornyCoeur.THREAD_SERVER_EXIT
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
+import cc.sukazyo.cono.morny.internal.schedule.Scheduler
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -64,6 +65,8 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
+	/** Morny's task [[Scheduler]] */
+	val tasks: Scheduler = Scheduler()
 	
 	val daemons: MornyDaemons = MornyDaemons()
 	//noinspection ScalaWeakerAccess
@@ -101,6 +104,8 @@ class MornyCoeur (using val config: MornyConfig) {
 		account.shutdown()
 		logger info "stopped bot account"
 		daemons.stop()
+		tasks.waitForStop()
+		logger info s"morny tasks stopped: remains ${tasks.amount} tasks not be executed"
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
 		logger info "done exit cleanup"
@@ -160,5 +165,5 @@ class MornyCoeur (using val config: MornyConfig) {
 		}
 		
 	}
- 
+	
 }

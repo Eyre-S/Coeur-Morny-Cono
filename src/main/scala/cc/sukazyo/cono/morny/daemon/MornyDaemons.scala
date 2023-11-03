@@ -25,11 +25,8 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 		logger notice "stopping All Morny Daemons..."
 		
 		//		TrackerDataManager.DAEMON.interrupt();
-		medicationTimer.interrupt()
+		medicationTimer.stop()
 		//		TrackerDataManager.trackingLock.lock();
-		try { medicationTimer.join() }
-		catch case e: InterruptedException =>
-			e.printStackTrace(System.out)
 		
 		logger notice "stopped ALL Morny Daemons."
 	}

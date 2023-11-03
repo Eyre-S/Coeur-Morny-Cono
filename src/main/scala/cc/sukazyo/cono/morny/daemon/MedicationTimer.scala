@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
+import cc.sukazyo.cono.morny.internal.schedule.RoutineTask
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.CommonFormat
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
@@ -13,7 +14,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 
-class MedicationTimer (using coeur: MornyCoeur) extends Thread {
+class MedicationTimer (using coeur: MornyCoeur) {
 	
 	private val NOTIFY_MESSAGE = "🍥⏲"
 	private val DAEMON_THREAD_NAME_DEF = "MedicationTimer"
@@ -23,44 +24,40 @@ class MedicationTimer (using coeur: MornyCoeur) extends Thread {
 	private val notify_atHour: Set[Int] = coeur.config.medicationNotifyAt.asScala.toSet.map(_.intValue)
 	private val notify_toChat = coeur.config.medicationNotifyToChat
 	
-	this.setName(DAEMON_THREAD_NAME_DEF)
-	
 	private var lastNotify_messageId: Option[Int] = None
 	
-	override def run (): Unit = {
+	private val scheduleTask: RoutineTask = new RoutineTask {
 		
-		if ((notify_toChat == -1) || (notify_atHour isEmpty)) {
-			logger notice "Medication Timer disabled : related param is not complete set"
-			return
-		}
+		override def name: String = DAEMON_THREAD_NAME_DEF
 		
-		logger notice "Medication Timer started."
-		while (!this.isInterrupted) {
-			try {
-				val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
-				logger info s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds/60/60)} with $use_timeZone [$next_time]"
-				val sleep_millis = next_time - System.currentTimeMillis
-				logger debug s"medication timer will sleep ${CommonFormat.formatDuration(sleep_millis)} [$sleep_millis]"
-				Thread sleep sleep_millis
-				sendNotification()
-				logger info "medication notify sent."
-			} catch
-				case _: InterruptedException =>
-					interrupt()
-					logger notice "MedicationTimer was interrupted, will be exit now"
-				case ill: IllegalArgumentException =>
-					logger warn "MedicationTimer will not work due to: " + ill.getMessage
-					interrupt()
-				case e =>
-					logger error
-							s"""unexpected error occurred on NotificationTimer
-							   |${exceptionLog(e)}"""
-							.stripMargin
-					coeur.daemons.reporter.exception(e)
+		def calcNextSendTime: Long =
+			val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
+			logger info s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds / 60 / 60)} with $use_timeZone [$next_time]"
+			next_time
+		
+		override def firstRoutineTimeMillis: Long =
+			calcNextSendTime
+		
+		override def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: Long): Long | Null =
+			calcNextSendTime
+		
+		override def main: Unit = {
+			sendNotification()
+			logger info "medication notify sent."
 		}
-		logger notice "Medication Timer stopped."
 		
 	}
+	
+	def start(): Unit =
+		if ((notify_toChat == -1) || (notify_atHour isEmpty))
+			logger notice "Medication Timer disabled : related param is not complete set"
+			return;
+		coeur.tasks ++ scheduleTask
+		logger notice "Medication Timer started."
+	
+	def stop(): Unit =
+		coeur.tasks % scheduleTask
+		logger notice "Medication Timer stopped."
 	
 	private def sendNotification(): Unit = {
 		val sendResponse: SendResponse = coeur.account exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
