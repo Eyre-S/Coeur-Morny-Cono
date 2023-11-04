@@ -153,7 +153,8 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			// language=html
 			s"""<b>Coeur Task Scheduler:</b>
 			   | - <i>scheduled tasks</i>: <code>${coeur.tasks.amount}</code>
-			   | - <i>current runner status</i>: <code>${coeur.tasks.state}</code>
+			   | - <i>scheduler status</i>: <code>${coeur.tasks.state}</code>
+			   | - <i>current runner status</i>: <code>${coeur.tasks.runnerState}</code>
 			   |""".stripMargin
 		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
 	}

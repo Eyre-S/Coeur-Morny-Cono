@@ -5,7 +5,12 @@ import java.time.format.DateTimeFormatter
 
 object EpochDateTime {
 	
+	/** The UNIX Epoch Time in milliseconds.
+	  *
+	  * aka. Milliseconds since 00:00:00 UTC on Thursday, 1 January 1970.
+	  */
 	type EpochMillis = Long
+	/** Time duration/interval in milliseconds. */
 	type DurationMillis = Long
 	
 	object EpochMillis:

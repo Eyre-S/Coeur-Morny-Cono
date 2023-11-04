@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.daemon
 
-import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
-import cc.sukazyo.cono.morny.internal.schedule.RoutineTask
+import cc.sukazyo.cono.morny.util.schedule.RoutineTask
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.CommonFormat
 import com.pengrad.telegrambot.model.{Message, MessageEntity}

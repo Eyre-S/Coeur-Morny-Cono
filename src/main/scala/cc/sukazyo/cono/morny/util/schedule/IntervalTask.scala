@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.internal.schedule
+package cc.sukazyo.cono.morny.util.schedule
 
 trait IntervalTask extends RoutineTask {
 	
