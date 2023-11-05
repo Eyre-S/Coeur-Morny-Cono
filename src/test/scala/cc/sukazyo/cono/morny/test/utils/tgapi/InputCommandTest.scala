@@ -16,35 +16,41 @@ class InputCommandTest extends MornyTests with TableDrivenPropertyChecks {
 				"args"
 			),
 			(
-				"/exit@sukazyo_deving_bot",
-				"/exit",
+				"exit@sukazyo_deving_bot",
+				"exit",
 				"sukazyo_deving_bot",
 				Array.empty[String]
 			),
 			(
-				"/test@a@b",
-				"/test",
+				"test@a@b",
+				"test",
 				"a@b",
 				Array.empty[String]
 			),
 			(
-				"/test-data@random#user",
-				"/test-data",
+				"test-data@random#user",
+				"test-data",
 				"random#user",
 				Array.empty[String]
 			),
 			(
-				"/info@sukazyo_deving_bot stickers.ID_403",
-				"/info",
+				"info@sukazyo_deving_bot stickers.ID_403",
+				"info",
 				"sukazyo_deving_bot",
 				Array("stickers.ID_403")
 			),
 			(
-				"/info some extra info",
-				"/info",
+				"info some extra info",
+				"info",
 				null,
 				Array("some", "extra", "info")
 			),
+			(
+				"",
+				"",
+				null,
+				Array.empty[String]
+			)
 		)
 		
 		examples forEvery { (source, command, target, args) =>
