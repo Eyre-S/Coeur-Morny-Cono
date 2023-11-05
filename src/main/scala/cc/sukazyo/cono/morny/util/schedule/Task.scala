@@ -55,3 +55,13 @@ trait Task extends Ordered[Task] {
 		s"""${super.toString}{"$name": $scheduledTimeMillis}"""
 	
 }
+
+object Task {
+	
+	def apply (_name: String, _scheduledTime: EpochMillis, _main: =>Unit): Task =
+		new Task:
+			override def name: String = _name
+			override def scheduledTimeMillis: EpochMillis = _scheduledTime
+			override def main: Unit = _main
+	
+}

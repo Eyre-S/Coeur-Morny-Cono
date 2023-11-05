@@ -1,24 +1,26 @@
 package cc.sukazyo.cono.morny.util.schedule
 
+import cc.sukazyo.cono.morny.util.EpochDateTime.{DurationMillis, EpochMillis}
+
 trait IntervalTask extends RoutineTask {
 	
-	def intervalMillis: Long
+	def intervalMillis: DurationMillis
 	
-	override def firstRoutineTimeMillis: Long =
+	override def firstRoutineTimeMillis: EpochMillis =
 		System.currentTimeMillis() + intervalMillis
 	
 	override def nextRoutineTimeMillis (
-		previousScheduledRoutineTimeMillis: Long
-	): Long|Null =
+		previousScheduledRoutineTimeMillis: EpochMillis
+	): EpochMillis|Null =
 		previousScheduledRoutineTimeMillis + intervalMillis
 	
 }
 
 object IntervalTask {
 	
-	def apply (_name: String, _intervalMillis: Long, task: =>Unit): IntervalTask =
+	def apply (_name: String, _intervalMillis: DurationMillis, task: =>Unit): IntervalTask =
 		new IntervalTask:
-			override def intervalMillis: Long = _intervalMillis
+			override def intervalMillis: DurationMillis = _intervalMillis
 			override def name: String = _name
 			override def main: Unit = task
 	

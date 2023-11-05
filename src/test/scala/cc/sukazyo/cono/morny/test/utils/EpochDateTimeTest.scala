@@ -1,10 +1,54 @@
 package cc.sukazyo.cono.morny.test.utils
 
 import cc.sukazyo.cono.morny.test.MornyTests
-import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+import cc.sukazyo.cono.morny.util.EpochDateTime.{EpochDays, EpochMillis, EpochSeconds}
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 class EpochDateTimeTest extends MornyTests with TableDrivenPropertyChecks {
+	
+	"while converting to EpochMillis :" - {
+		
+		"from EpochSeconds :" - {
+			
+			val examples = Table[EpochSeconds, EpochMillis](
+				("EpochSeconds", "EpochMillis"),
+				(1699176068, 1699176068000L),
+				(1699176000, 1699176000000L),
+				(1, 1000L),
+			)
+			
+			forAll(examples) { (epochSeconds, epochMillis) =>
+				s"EpochSeconds($epochSeconds) should be converted to EpochMillis($epochMillis)" in {
+					(EpochMillis fromEpochSeconds epochSeconds) shouldEqual epochMillis
+				}
+			}
+			
+		}
+		
+	}
+	
+	"while converting to EpochDays :" - {
+		
+		"from EpochMillis :" - {
+			
+			val examples = Table(
+				("EpochMillis", "EpochDays"),
+				(0L, 0),
+				(1000L, 0),
+				(80000000L, 0),
+				(90000000L, 1),
+				(1699176549059L, 19666)
+			)
+			
+			forAll(examples) { (epochMillis, epochDays) =>
+				s"EpochMillis($epochMillis) should be converted to EpochDays($epochDays)" in {
+					(EpochDays fromEpochMillis epochMillis) shouldEqual epochDays
+				}
+			}
+			
+		}
+		
+	}
 	
 	"while converting date-time string to time-millis : " - {
 		

@@ -8,6 +8,7 @@ import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -54,7 +55,7 @@ class MornyCoeur (using val config: MornyConfig) {
 	  * 
 	  * in milliseconds.
 	  */
-	val coeurStartTimestamp: Long = System.currentTimeMillis
+	val coeurStartTimestamp: EpochMillis = System.currentTimeMillis
 	
 	/** [[TelegramBot]] account of this Morny */
 	val account: TelegramBot = __loginResult.account

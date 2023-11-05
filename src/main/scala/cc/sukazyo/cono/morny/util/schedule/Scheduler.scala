@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny.util.schedule
 
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+
 import scala.annotation.targetName
 import scala.collection.mutable
 
@@ -78,7 +80,7 @@ class Scheduler {
 				
 				runtimeStatus = State.PREPARE_RUN
 				
-				val nextMove: Task|Long|"None" = taskList.synchronized {
+				val nextMove: Task|EpochMillis|"None" = taskList.synchronized {
 					taskList.headOption match
 						case Some(_readyToRun) if System.currentTimeMillis >= _readyToRun.scheduledTimeMillis =>
 							taskList -= _readyToRun
@@ -107,7 +109,7 @@ class Scheduler {
 							currentRunning match
 								case routine: RoutineTask =>
 									routine.nextRoutineTimeMillis(routine.currentScheduledTimeMillis) match
-										case next: Long =>
+										case next: EpochMillis =>
 											routine.currentScheduledTimeMillis = next
 											if (!currentRunning_isScheduledCancel) schedule(routine)
 										case _ =>
@@ -117,7 +119,7 @@ class Scheduler {
 						currentRunning = null
 						this setName runnerName
 						
-					case needToWaitMillis: Long =>
+					case needToWaitMillis: EpochMillis =>
 						runtimeStatus = State.WAITING
 						try Thread.sleep(needToWaitMillis)
 						catch case _: InterruptedException => {}

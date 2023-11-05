@@ -6,6 +6,7 @@ import cc.sukazyo.cono.morny.daemon.MedicationTimer.calcNextRoutineTimestamp
 import cc.sukazyo.cono.morny.util.schedule.RoutineTask
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.CommonFormat
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
@@ -30,15 +31,15 @@ class MedicationTimer (using coeur: MornyCoeur) {
 		
 		override def name: String = DAEMON_THREAD_NAME_DEF
 		
-		def calcNextSendTime: Long =
+		def calcNextSendTime: EpochMillis =
 			val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
 			logger info s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds / 60 / 60)} with $use_timeZone [$next_time]"
 			next_time
 		
-		override def firstRoutineTimeMillis: Long =
+		override def firstRoutineTimeMillis: EpochMillis =
 			calcNextSendTime
 		
-		override def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: Long): Long | Null =
+		override def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: EpochMillis): EpochMillis | Null =
 			calcNextSendTime
 		
 		override def main: Unit = {
@@ -85,7 +86,7 @@ class MedicationTimer (using coeur: MornyCoeur) {
 object MedicationTimer {
 	
 	@throws[IllegalArgumentException]
-	def calcNextRoutineTimestamp (baseTimeMillis: Long, zone: ZoneOffset, notifyAt: Set[Int]): Long = {
+	def calcNextRoutineTimestamp (baseTimeMillis: EpochMillis, zone: ZoneOffset, notifyAt: Set[Int]): EpochMillis = {
 		if (notifyAt isEmpty) throw new IllegalArgumentException("notify time is not set")
 		var time = LocalDateTime.ofEpochSecond(
 			baseTimeMillis / 1000, ((baseTimeMillis % 1000) * 1000 * 1000) toInt,

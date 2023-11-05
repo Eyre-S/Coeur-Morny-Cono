@@ -1,12 +1,45 @@
 package cc.sukazyo.cono.morny.util.schedule
 
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+
+/** The task that can execute multiple times with custom routine function.
+  *
+  * When creating a Routine Task, the task's [[firstRoutineTimeMillis]] function
+  * will be called and the result value will be the first task scheduled time.
+  *
+  * After every execution complete and enter the post effect, the [[nextRoutineTimeMillis]]
+  * function will be called, then its value will be stored as the new task's
+  * scheduled time and re-scheduled by its scheduler.
+  */
 trait RoutineTask extends Task {
 	
-	private[schedule] var currentScheduledTimeMillis: Long = firstRoutineTimeMillis
-	override def scheduledTimeMillis: Long = currentScheduledTimeMillis
+	private[schedule] var currentScheduledTimeMillis: EpochMillis = firstRoutineTimeMillis
 	
-	def firstRoutineTimeMillis: Long
+	/** Next running time of this task.
+	  *
+	  * Should be auto generated from [[firstRoutineTimeMillis]] and
+	  * [[nextRoutineTimeMillis]].
+	  */
+	override def scheduledTimeMillis: EpochMillis = currentScheduledTimeMillis
 	
-	def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: Long): Long|Null
+	/** The task scheduled time at initial.
+	  *
+	  * In the default environment, this function will only be called once
+	  * when the task object is just created.
+	  */
+	def firstRoutineTimeMillis: EpochMillis
+	
+	/** The function to calculate the next scheduled time after previous task
+	  * routine complete.
+	  *
+	  * This function will be called every time the task is done once, in the
+	  * task runner thread and the post effect scope.
+	  *
+	  * @param previousRoutineScheduledTimeMillis The previous task routine's
+	  *                                           scheduled time.
+	  * @return The next task routine's scheduled time, or [[null]] means end
+	  *         of the task.
+	  */
+	def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: EpochMillis): EpochMillis|Null
 	
 }

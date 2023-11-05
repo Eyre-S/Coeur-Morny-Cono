@@ -73,13 +73,14 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 				lastDinnerData.forwardFromMessageId
 			)
 			import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
+			import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 			import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-			def lastDinner_dateMillis: Long = lastDinnerData.forwardDate longValue;
+			def lastDinner_dateMillis: EpochMillis = EpochMillis fromEpochSeconds lastDinnerData.forwardDate
 			coeur.account exec SendMessage(
 				req.from.id,
 				"<i>on</i> <code>%s [UTC+8]</code>\n- <code>%s</code> <i>before</i>".formatted(
 					h(formatDate(lastDinner_dateMillis, 8)),
-					h(formatDuration(lastDinner_dateMillis))
+					h(formatDuration(System.currentTimeMillis - lastDinner_dateMillis))
 				)
 			).parseMode(ParseMode HTML).replyToMessageId(sendResp.message.messageId)
 			isAllowed = true
