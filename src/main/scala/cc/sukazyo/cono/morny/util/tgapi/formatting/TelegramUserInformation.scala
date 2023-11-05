@@ -9,7 +9,7 @@ import scala.util.matching.Regex
 
 object TelegramUserInformation {
 	
-	private val DC_QUERY_PROCESSOR_REGEX: Regex = "(cdn[1-9]).tele(sco.pe|gram-cdn.org)"r
+	private val DC_QUERY_PROCESSOR_REGEX: Regex = "(cdn[1-9]).(telesco\\.pe|telegram-cdn\\.org|cdn-telegram\\.org)"r
 	
 	private val httpClient = OkHttpSyncBackend()
 	
