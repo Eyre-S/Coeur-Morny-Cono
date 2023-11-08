@@ -16,11 +16,11 @@ class InputCommand private (
 object InputCommand {
 	
 	def apply (input: Array[String]): InputCommand = {
-		val _ex = input(0) split ("@", 2)
+		val _ex = if input.nonEmpty then input(0) split ("@", 2) else Array.empty[String]
 		val _args = input drop 1
 		new InputCommand(
-			if _ex.length == 1 then null else _ex(1),
-			_ex(0),
+			if _ex.length > 1 then _ex(1) else null,
+			if _ex.nonEmpty then _ex(0) else "",
 			_args
 		)
 	}

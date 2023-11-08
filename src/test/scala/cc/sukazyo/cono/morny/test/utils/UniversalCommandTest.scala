@@ -88,7 +88,6 @@ class UniversalCommandTest extends MornyTests with Matchers with TableDrivenProp
 				Lmd("something error!\\") shouldEqual Array("something", "error!\\")
 		}
 		
-		
 		"with multi-line input" - {
 			whileStrict("should throws IllegalArgumentException") in:
 				an [IllegalArgumentException] should be thrownBy Cmd("something will\nhave a new line")
@@ -96,6 +95,10 @@ class UniversalCommandTest extends MornyTests with Matchers with TableDrivenProp
 				Lmd("something will\nhave a new line") shouldEqual Array("something", "will\nhave", "a", "new", "line")
 		}
 		
+		"empty string input should return empty array" in {
+			Cmd("") shouldEqual Array.empty[String]
+			Lmd("") shouldEqual Array.empty[String]
+		}
 		
 		val example_special_character = Table(
 			"char",
