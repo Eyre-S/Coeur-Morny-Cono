@@ -16,10 +16,19 @@ class OnQuestionMarkReplyTest extends MornyTests with TableDrivenPropertyChecks 
 				("为什么？", false),
 				("？这不合理", false),
 				("??尊嘟假嘟", false),
+				(":¿", false),
 				("?????", true),
+				("¿", true),
+				("⁈??", true),
+				("?!??", false),
+				("⁇", true),
+				("‽", true),
+				("?⸘?", true),
 				("?", true),
-				("？", true),
-				("？？❔", true),
+				("？?", true),
+				("❔", true),
+				("❓❓❓", true),
+//				("⁉️", true)
 			)
 			forAll(examples) { (text, is) =>
 				

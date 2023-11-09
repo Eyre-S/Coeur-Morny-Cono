@@ -12,13 +12,15 @@ class SchedulerTest extends MornyTests {
 		
 		"Task with scheduleTime smaller than current time should be executed immediately" in {
 			val scheduler = Scheduler()
-			var time = System.currentTimeMillis
+			val time = System.currentTimeMillis
+			var doneTime: Option[Long] = None
 			scheduler ++ Task("task", 0, {
-				time = System.currentTimeMillis - time
+				doneTime = Some(System.currentTimeMillis)
 			})
-			scheduler.waitForStopAtAllDone()
-			time should be <= 10L
-			info(s"Immediately Task done with time $time")
+			Thread.sleep(10)
+			scheduler.stop()
+			doneTime shouldBe defined
+			info(s"Immediately Task done in ${doneTime.get - time}ms")
 		}
 		
 		"Task's running thread name should be task name" in {

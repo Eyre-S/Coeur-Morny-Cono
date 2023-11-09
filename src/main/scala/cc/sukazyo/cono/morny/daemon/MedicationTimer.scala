@@ -7,11 +7,14 @@ import cc.sukazyo.cono.morny.util.schedule.RoutineTask
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.CommonFormat
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+import com.cronutils.builder.CronBuilder
+import com.cronutils.model.definition.{CronDefinition, CronDefinitionBuilder}
+import com.cronutils.model.time.ExecutionTime
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.{Instant, ZonedDateTime, ZoneOffset}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 
@@ -85,18 +88,24 @@ class MedicationTimer (using coeur: MornyCoeur) {
 
 object MedicationTimer {
 	
+	//noinspection ScalaWeakerAccess
+	val cronDef: CronDefinition = CronDefinitionBuilder.defineCron
+		.withHours.and
+		.instance
+	
 	@throws[IllegalArgumentException]
 	def calcNextRoutineTimestamp (baseTimeMillis: EpochMillis, zone: ZoneOffset, notifyAt: Set[Int]): EpochMillis = {
 		if (notifyAt isEmpty) throw new IllegalArgumentException("notify time is not set")
-		var time = LocalDateTime.ofEpochSecond(
-			baseTimeMillis / 1000, ((baseTimeMillis % 1000) * 1000 * 1000) toInt,
-			zone
-		).withMinute(0).withSecond(0).withNano(0)
-		time = time plusHours 1
-		while (!(notifyAt contains(time getHour))) {
-			time = time plusHours 1
-		}
-		(time toInstant zone) toEpochMilli
+		import com.cronutils.model.field.expression.FieldExpressionFactory.*
+		ExecutionTime.forCron(CronBuilder.cron(cronDef)
+			.withHour(and({
+				import scala.jdk.CollectionConverters.*
+				(for (i <- notifyAt) yield on(i)).toList.asJava
+			}))
+			.instance
+		).nextExecution(
+			ZonedDateTime ofInstant (Instant ofEpochMilli baseTimeMillis, zone.normalized)
+		).get.toInstant.toEpochMilli
 	}
 	
 }

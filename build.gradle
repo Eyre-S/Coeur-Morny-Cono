@@ -90,6 +90,7 @@ dependencies {
 	implementation group: 'com.softwaremill.sttp.client3', name: scala('okhttp-backend'), version: lib_sttp_v
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: lib_okhttp_v
 	implementation group: 'com.google.code.gson', name: 'gson', version: lib_gson_v
+	implementation group: 'com.cronutils', name: 'cron-utils', version: lib_cron_utils_v
 	
 	testImplementation group: 'org.scalatest', name: scala('scalatest'), version: lib_scalatest_v
 	testImplementation group: 'org.scalatest', name: scala('scalatest-freespec'), version: lib_scalatest_v

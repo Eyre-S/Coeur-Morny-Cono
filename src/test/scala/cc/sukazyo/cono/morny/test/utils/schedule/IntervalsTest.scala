@@ -17,7 +17,7 @@ class IntervalsTest extends MornyTests {
 		val timeUsed = System.currentTimeMillis() - startTime
 		times shouldEqual 10
 		timeUsed should (be <= 2100L and be >= 1900L)
-		info(s"interval 200ms for 10 times used time ${timeUsed}ms")
+		info(s"Interval Task with interval 200ms for 10 times used time ${timeUsed}ms")
 	}
 	
 }
