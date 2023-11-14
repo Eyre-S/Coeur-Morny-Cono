@@ -32,7 +32,9 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		override def run (): Unit = {
 			given env: EventEnv = EventEnv(update)
 			boundary { for (i <- listeners) {
-				try {
+				
+				if (i.executeFilter) try {
+					
 					updateThreadName("message")
 					if update.message ne null then i.onMessage
 					updateThreadName("edited-message")
@@ -61,6 +63,10 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 					if update.chatMember ne null then i.onChatMemberUpdated
 					updateThreadName("chat-join-request")
 					if update.chatJoinRequest ne null then i.onChatJoinRequest
+					
+					updateThreadName("#post")
+					i.atEventPost
+					
 				} catch case e => {
 					val errorMessage = StringBuilder()
 					errorMessage ++= "Event throws unexpected exception:\n"
@@ -75,7 +81,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 					logger error errorMessage.toString
 					coeur.daemons.reporter.exception(e, "on event running")
 				}
-				if env.isEventOk then boundary.break()
+				
 			}}
 		}
 		

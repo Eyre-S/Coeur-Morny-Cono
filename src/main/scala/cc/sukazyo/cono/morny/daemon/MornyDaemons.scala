@@ -13,8 +13,8 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 		
 		logger notice "ALL Morny Daemons starting..."
 		
-		//		TrackerDataManager.init();
 		medicationTimer.start()
+		reporter.start()
 		
 		logger notice "Morny Daemons started."
 		
@@ -24,9 +24,8 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 		
 		logger notice "stopping All Morny Daemons..."
 		
-		//		TrackerDataManager.DAEMON.interrupt();
 		medicationTimer.stop()
-		//		TrackerDataManager.trackingLock.lock();
+		reporter.stop()
 		
 		logger notice "stopped ALL Morny Daemons."
 	}

@@ -9,9 +9,11 @@ import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery,
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+import cc.sukazyo.cono.morny.util.time.WatchDog
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
+import scala.annotation.unused
 import scala.util.boundary
 import scala.util.boundary.break
 
@@ -64,10 +66,10 @@ class MornyCoeur (using val config: MornyConfig) {
 	/** [[account]]'s telegram user id */
 	val userid: Long = __loginResult.userid
 	
-	/** current Morny's [[MornyTrusted]] instance */
-	val trusted: MornyTrusted = MornyTrusted()
 	/** Morny's task [[Scheduler]] */
 	val tasks: Scheduler = Scheduler()
+	/** current Morny's [[MornyTrusted]] instance */
+	val trusted: MornyTrusted = MornyTrusted()
 	
 	val daemons: MornyDaemons = MornyDaemons()
 	//noinspection ScalaWeakerAccess
@@ -80,6 +82,15 @@ class MornyCoeur (using val config: MornyConfig) {
 	eventManager register MornyOnInlineQuery(using queries)
 	//noinspection ScalaUnusedSymbol
 	val events: MornyEventListeners = MornyEventListeners(using eventManager)
+	eventManager register daemons.reporter.EventStatistics.EventInfoCatcher
+	@unused
+	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
+		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
+		logger warn
+			s"""Can't keep up! is the server overloaded or host machine fall asleep?
+			   |  current tick takes ${f(consumed)} to complete.""".stripMargin
+		tasks.notifyIt()
+	})
 	
 	///>>> BLOCK START instance configure & startup stage 2
 	

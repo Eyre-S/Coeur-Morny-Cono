@@ -9,7 +9,7 @@ import scala.jdk.OptionConverters.*
 
 trait CronTask extends RoutineTask {
 	
-	private transparent inline def cronCalc = ExecutionTime.forCron(cron)
+	private lazy val cronCalc = ExecutionTime.forCron(cron)
 	
 	def cron: Cron
 	

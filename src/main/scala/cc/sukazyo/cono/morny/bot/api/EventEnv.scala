@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.bot.api
 
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable
@@ -12,6 +13,7 @@ class EventEnv (
 	
 	private var _isOk: Int = 0
 	private val variables: mutable.HashMap[Class[?], Any] = mutable.HashMap.empty
+	val timeStartup: EpochMillis = System.currentTimeMillis
 	
 	def isEventOk: Boolean = _isOk > 0
 	

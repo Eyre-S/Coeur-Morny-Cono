@@ -63,8 +63,7 @@ class Scheduler {
 	private val taskList: mutable.TreeSet[Task] = mutable.TreeSet.empty
 	private var exitAtNextRoutine = false
 	private var waitForDone = false
-	private var currentRunning: Task|Null = _
-	private var currentRunning_isScheduledCancel = false
+//	private var currentRunning: Task|Null = _
 	private var runtimeStatus = State.INIT
 	private val runtime: Thread = new Thread {
 		
@@ -76,20 +75,19 @@ class Scheduler {
 						if taskList.isEmpty then true
 						else false
 				else false
-			while (!willExit) {
+			taskList.synchronized { while (!willExit) {
 				
 				runtimeStatus = State.PREPARE_RUN
 				
-				val nextMove: Task|EpochMillis|"None" = taskList.synchronized {
+				val nextMove: Task|EpochMillis|"None" =
 					taskList.headOption match
 						case Some(_readyToRun) if System.currentTimeMillis >= _readyToRun.scheduledTimeMillis =>
 							taskList -= _readyToRun
-							currentRunning = _readyToRun
+//							currentRunning = _readyToRun
 							_readyToRun
 						case Some(_notReady) =>
 							_notReady.scheduledTimeMillis - System.currentTimeMillis
 						case None => "None"
-				}
 				
 				nextMove match
 					case readyToRun: Task =>
@@ -104,31 +102,33 @@ class Scheduler {
 						runtimeStatus = State.RUNNING_POST
 						this setName s"${readyToRun.name}#post"
 						
-						if currentRunning_isScheduledCancel then {}
+						// this if is used for check if post effect need to be
+						//  run. It is useless since the wait/notify changes.
+						if false then {}
 						else {
-							currentRunning match
+							readyToRun match
 								case routine: RoutineTask =>
-									routine.nextRoutineTimeMillis(routine.currentScheduledTimeMillis) match
+									routine.nextRoutineTimeMillis(routine.currentScheduledTimeMillis.get) match
 										case next: EpochMillis =>
-											routine.currentScheduledTimeMillis = next
-											if (!currentRunning_isScheduledCancel) schedule(routine)
+											routine.currentScheduledTimeMillis = Some(next)
+											schedule(routine)
 										case _ =>
 								case _ =>
 						}
 						
-						currentRunning = null
+//						currentRunning = null
 						this setName runnerName
 						
 					case needToWaitMillis: EpochMillis =>
 						runtimeStatus = State.WAITING
-						try Thread.sleep(needToWaitMillis)
-						catch case _: InterruptedException => {}
+						try taskList.wait(needToWaitMillis)
+						catch case _: (InterruptedException|IllegalArgumentException) => {}
 					case _: "None" =>
 						runtimeStatus = State.WAITING_EMPTY
-						try Thread.sleep(Long.MaxValue)
+						try taskList.wait()
 						catch case _: InterruptedException => {}
 				
-			}
+			}}
 			runtimeStatus = State.END
 		}
 		
@@ -154,9 +154,9 @@ class Scheduler {
 	  * @return [[true]] if the task is added.
 	  */
 	def schedule (task: Task): Boolean =
-		try taskList.synchronized:
-			taskList add task
-		finally runtime.interrupt()
+		taskList.synchronized:
+			try taskList add task
+			finally taskList.notifyAll()
 	
 	/** Remove the task from scheduler task queue.
 	  *
@@ -172,23 +172,16 @@ class Scheduler {
 		this
 	/** Remove the task from scheduler task queue.
 	  *
-	  * If the removal task is running, the current run will be done, but will
-	  * not do the post effect of the task (like schedule the next routine
-	  * of [[RoutineTask]]).
+	  * If the removal task is running, the method will wait for the current run
+	  * complete (and current run post effect complete), then do remove.
 	  *
 	  * @return [[true]] if the task is in task queue or is running, and have been
 	  *         succeed removed from task queue.
 	  */
 	def cancel (task: Task): Boolean =
-		try {
-			val succeed = taskList.synchronized { taskList remove task }
-			if succeed then succeed
-			else if task == currentRunning then
-				currentRunning_isScheduledCancel = true
-				true
-			else false
-		}
-		finally runtime.interrupt()
+		taskList synchronized:
+			try taskList remove task
+			finally taskList.notifyAll()
 	
 	/** Count of tasks in the task queue.
 	  *
@@ -205,6 +198,19 @@ class Scheduler {
 	def runnerState: Thread.State =
 		runtime.getState
 	
+	/** Manually update the task scheduler.
+	  * 
+	  * If the inner state of the scheduler somehow changed and cannot automatically
+	  * update schedule states to schedule the new state, you can call this method
+	  * to manually let the task scheduler reschedule it.
+	  * 
+	  * You can also use it with some tick-guard like [[cc.sukazyo.cono.morny.util.time.WatchDog]]
+	  * to make the scheduler avoid fails when machine fall asleep or some else conditions.
+	  */
+	def notifyIt(): Unit =
+		taskList synchronized:
+			taskList.notifyAll()
+	
 	/** Stop the scheduler's runner, no matter how much task is not run yet.
 	  * 
 	  * After call this, it will immediately give a signal to the runner for
@@ -217,8 +223,9 @@ class Scheduler {
 	  * runner is stopped. If you want a sync version, see [[waitForStop]].
 	  */
 	def stop (): Unit =
-		exitAtNextRoutine = true
-		runtime.interrupt()
+		taskList synchronized:
+			exitAtNextRoutine = true
+			taskList.notifyAll()
 	
 	/** Stop the scheduler's runner, no matter how much task is not run yet,
 	  * and wait for the runner stopped.
@@ -251,8 +258,9 @@ class Scheduler {
 	  */
 	//noinspection ScalaWeakerAccess
 	def tagStopAtAllDone (): Unit =
-		waitForDone = true
-		runtime.interrupt()
+		taskList synchronized:
+			waitForDone = true
+			taskList.notifyAll()
 	
 	/** Tag this scheduler runner stop when all of the scheduler's task in task
 	  * queue have been stopped, and wait for the runner stopped.
@@ -264,6 +272,7 @@ class Scheduler {
 	  *                              thread. The interrupted status of the current
 	  *                              thread is cleared when this exception is thrown.
 	  */
+	@throws[InterruptedException]
 	def waitForStopAtAllDone(): Unit =
 		tagStopAtAllDone()
 		runtime.join()

@@ -6,6 +6,7 @@ import java.lang.annotation.*;
 import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class MornyConfig {
 	
@@ -109,6 +110,18 @@ public class MornyConfig {
 	 */
 	public final long reportToChat;
 	
+	/**
+	 * 控制 Morny Coeur 系统的报告的基准时间.
+	 * <p> 
+	 * 仅会用于 {@link cc.sukazyo.cono.morny.daemon.MornyReport} 内的时间敏感的报告，
+	 * 不会用于 {@code /info} 命令等位置。
+	 * <p>
+	 * 默认使用 {@link TimeZone#getDefault()}.
+	 * 
+	 * @since 1.3.0
+	 */
+	@Nonnull public final TimeZone reportZone;
+	
 	/* ======================================= *
 	 *  function: dinner query tool            *
 	 * ======================================= */
@@ -144,6 +157,7 @@ public class MornyConfig {
 		this.dinnerTrustedReaders = prototype.dinnerTrustedReaders;
 		this.dinnerChatId = prototype.dinnerChatId;
 		this.reportToChat = prototype.reportToChat;
+		this.reportZone = prototype.reportZone;
 		this.medicationNotifyToChat = prototype.medicationNotifyToChat;
 		this.medicationTimerUseTimezone = prototype.medicationTimerUseTimezone;
 		prototype.medicationNotifyAt.forEach(i -> { if (i < 0 || i > 23) throw new CheckFailure.UnavailableTimeInMedicationNotifyAt(); });
@@ -173,6 +187,7 @@ public class MornyConfig {
 		@Nonnull public final Set<Long> dinnerTrustedReaders = new HashSet<>();
 		public long dinnerChatId = -1L;
 		public long reportToChat = -1L;
+		@Nonnull public TimeZone reportZone = TimeZone.getDefault();
 		public long medicationNotifyToChat = -1L;
 		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
 		@Nonnull public final Set<Integer> medicationNotifyAt = new HashSet<>();

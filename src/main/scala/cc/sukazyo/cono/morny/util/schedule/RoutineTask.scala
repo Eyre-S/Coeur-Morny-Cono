@@ -13,14 +13,20 @@ import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
   */
 trait RoutineTask extends Task {
 	
-	private[schedule] var currentScheduledTimeMillis: EpochMillis = firstRoutineTimeMillis
+	private[schedule] var currentScheduledTimeMillis: Option[EpochMillis] = None
 	
 	/** Next running time of this task.
 	  *
-	  * Should be auto generated from [[firstRoutineTimeMillis]] and
-	  * [[nextRoutineTimeMillis]].
+	  * Should be auto generated from [[firstRoutineTimeMillis]] when this method
+	  * is called at first time, and then from [[nextRoutineTimeMillis]] for following
+	  * routines controlled by [[Scheduler]].
 	  */
-	override def scheduledTimeMillis: EpochMillis = currentScheduledTimeMillis
+	override def scheduledTimeMillis: EpochMillis =
+		currentScheduledTimeMillis match
+			case Some(time) => time
+			case None =>
+				currentScheduledTimeMillis = Some(firstRoutineTimeMillis)
+				currentScheduledTimeMillis.get
 	
 	/** The task scheduled time at initial.
 	  *

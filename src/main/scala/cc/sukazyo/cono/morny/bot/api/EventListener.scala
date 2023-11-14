@@ -2,6 +2,25 @@ package cc.sukazyo.cono.morny.bot.api
 
 trait EventListener () {
 	
+	/** Determine if this event listener should be processed.
+	  *
+	  * Default implementation is it only be [[true]] when the event
+	  * is not ok yet (when [[EventEnv.isEventOk]] is false).
+	  *
+	  * Notice that: You should not override this method to filter some
+	  * affair level conditions (such as if this update contains a text
+	  * message), you should write them to the listener function! This
+	  * method is just for event low-level controls.
+	  *
+	  * @param env The [[EventEnv event variable]].
+	  * @return [[true]] if this event listener should run; [[false]]
+	  *         if it should not run.
+	  */
+	def executeFilter (using env: EventEnv): Boolean =
+		if env.isEventOk then false else true
+	
+	def atEventPost (using EventEnv): Unit = {}
+	
 	def onMessage (using EventEnv): Unit = {}
 	def onEditedMessage (using EventEnv): Unit = {}
 	def onChannelPost (using EventEnv): Unit = {}

@@ -2,16 +2,25 @@ package cc.sukazyo.cono.morny.daemon
 
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
+import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
+import cc.sukazyo.cono.morny.util.schedule.CronTask
+import com.cronutils.builder.CronBuilder
+import com.cronutils.model.Cron
+import com.cronutils.model.definition.CronDefinitionBuilder
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.model.User
 import com.pengrad.telegrambot.request.{BaseRequest, SendMessage}
 import com.pengrad.telegrambot.response.BaseResponse
+
+import java.time.ZoneId
 
 class MornyReport (using coeur: MornyCoeur) {
 	
@@ -67,10 +76,12 @@ class MornyReport (using coeur: MornyCoeur) {
 			// language=html
 			s"""<b>▌Morny Logged in</b>
 			   |-v $getVersionAllFullTagHTML
-			   |as user @${coeur.username}
+			   |Logged into user: @${coeur.username}
 			   |
 			   |as config fields:
-			   |${sectionConfigFields(coeur.config)}"""
+			   |${sectionConfigFields(coeur.config)}
+			   |
+			   |Report Daemon will use TimeZone <code>${coeur.config.reportZone.getDisplayName}</code> for following report."""
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}
@@ -118,6 +129,93 @@ class MornyReport (using coeur: MornyCoeur) {
 			   |by: $_causedTag"""
 			.stripMargin
 		).parseMode(ParseMode HTML))
+	}
+	
+	object EventStatistics {
+		
+		private var eventTotal = 0
+		private val runningTime: NumericStatistics[DurationMillis] = NumericStatistics()
+		
+		def reset (): Unit = {
+			eventTotal = 0; runningTime.reset()
+		}
+		
+		private def runningTimeStatisticsHTML: String =
+			runningTime.value match
+				// language=html
+				case None => "<i><u>&lt;no-statistics&gt;</u></i>"
+				case Some(value) =>
+					import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
+					s""" - <i>average</i>: <code>${f(value.total / value.count)}</code>
+					   | - <i>max time</i>: <code>${f(value.max)}</code>
+					   | - <i>min time</i>: <code>${f(value.min)}</code>
+					   | - <i>total</i>: <code>${f(value.total)}</code>""".stripMargin
+		
+		def eventStatisticsHTML: String =
+			import cc.sukazyo.cono.morny.util.UseMath.percentageOf as p
+			val processed = runningTime.count
+			val ignored = eventTotal - processed
+			// language=html
+			s""" - <i>total event received</i>: <code>$eventTotal</code>
+			   | - <i>event processed</i>: (<code>${eventTotal p processed}%</code>) <code>$processed</code>
+			   | - <i>event ignored</i>: (<code>${eventTotal p ignored}%</code>) <code>$ignored</code>
+			   | - <i>processed time usage</i>:
+			   |${runningTimeStatisticsHTML.indent(3)}""".stripMargin
+		
+		object EventInfoCatcher extends EventListener {
+			override def executeFilter (using EventEnv): Boolean = true
+			//noinspection ScalaWeakerAccess
+			case class EventTimeUsed (it: DurationMillis)
+			override def atEventPost (using event: EventEnv): Unit = {
+				eventTotal += 1
+				if event.isEventOk then {
+					val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
+					event provide timeUsed
+					logger debug s"event consumed ${timeUsed.it}ms"
+					runningTime ++ timeUsed.it
+				}
+			}
+		}
+		
+	}
+	
+	private object DailyReportTask extends CronTask {
+		
+		import com.cronutils.model.field.expression.FieldExpressionFactory.*
+		
+		override val name: String = "reporter#event"
+		override val cron: Cron = CronBuilder.cron(
+			CronDefinitionBuilder.defineCron
+				.withHours.and
+				.instance
+		).withHour(on(0)).instance
+		override val zone: ZoneId = coeur.config.reportZone.toZoneId
+		
+		//noinspection TypeAnnotation
+		override def main = {
+			
+			executeReport(SendMessage(
+				coeur.config.reportToChat,
+				// language=html
+				s"""▌Morny Daily Report
+				   |
+				   |<b>Event Statistics :</b>
+				   |${EventStatistics.eventStatisticsHTML}""".stripMargin
+			).parseMode(ParseMode.HTML))
+			
+			// daily reset
+			EventStatistics.reset()
+			
+		}
+		
+	}
+	
+	def start (): Unit = {
+		coeur.tasks ++ DailyReportTask
+	}
+	
+	def stop (): Unit = {
+		coeur.tasks % DailyReportTask
 	}
 	
 }
