@@ -196,6 +196,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 				coeur.account exec SendMessage(
 					event.message.chat.id,
+					// language=html
 					s"<pre><code>${h(_text.text)}</code></pre>"
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 		

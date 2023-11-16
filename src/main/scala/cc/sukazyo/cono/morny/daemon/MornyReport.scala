@@ -46,7 +46,7 @@ class MornyReport (using coeur: MornyCoeur) {
 		def _tgErrFormat: String = e match
 			case api: EventRuntimeException.ActionFailed =>
 				// language=html
-				"\n\ntg-api error:\n<pre><code>%s</code></pre>"
+				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
 						.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))
 			case _ => ""
 		executeReport(SendMessage(
@@ -54,7 +54,7 @@ class MornyReport (using coeur: MornyCoeur) {
 			// language=html
 			s"""<b>▌Coeur Unexpected Exception </b>
 			   |${if description ne null then h(description)+"\n" else ""}
-			   |<pre><code>${h(exceptionLog(e))}</code></pre>$_tgErrFormat"""
+			   |<pre><code class="language-log">${h(exceptionLog(e))}</code></pre>$_tgErrFormat"""
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}
