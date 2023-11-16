@@ -96,7 +96,42 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	daemons.start()
 	logger info "start telegram event listening"
-	account setUpdatesListener eventManager
+	import com.pengrad.telegrambot.TelegramException
+	account.setUpdatesListener(eventManager, (e: TelegramException) => {
+		
+		if (e.response != null) {
+			import com.google.gson.GsonBuilder
+			logger error
+				s"""Failed get updates: ${e.getMessage}
+				   |  server responses:
+				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response) indent 4}
+				   |""".stripMargin
+		}
+		
+		if (e.getCause != null) {
+			import java.net.{SocketException, SocketTimeoutException}
+			import javax.net.ssl.SSLHandshakeException
+			val caused = e.getCause
+			caused match
+				case e_timeout: (SSLHandshakeException|SocketException|SocketTimeoutException) =>
+					import cc.sukazyo.messiva.log.Message
+
+					import scala.collection.mutable
+					val log = mutable.ArrayBuffer(s"Failed get updates: Network Error")
+					var current: Throwable = e_timeout
+					log += s"  due to: ${current.getMessage}"
+					while (current.getCause != null) {
+						current = current.getCause
+						log += s"  caused by: ${current.getClass.getSimpleName}: ${current.getMessage}"
+					}
+					logger error Message(log mkString "\n")
+				case e_other =>
+					logger error exceptionLog(e_other)
+					this.daemons.reporter exception e_other
+		}
+		
+	})
+	
 	if config.commandLoginRefresh then
 		logger info "resetting telegram command list"
 		commands.automaticTGListUpdate()

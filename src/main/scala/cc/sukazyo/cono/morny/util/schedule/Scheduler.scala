@@ -141,7 +141,7 @@ class Scheduler {
 	  */
 	//noinspection ScalaWeakerAccess
 	def runnerName: String =
-		this.toString
+		s"${this.getClass.getSimpleName}@${this.hashCode.toHexString}"
 	
 	/** Add one task to scheduler task queue.
 	  * @return this scheduler for chained call.
@@ -199,11 +199,11 @@ class Scheduler {
 		runtime.getState
 	
 	/** Manually update the task scheduler.
-	  * 
+	  *
 	  * If the inner state of the scheduler somehow changed and cannot automatically
 	  * update schedule states to schedule the new state, you can call this method
 	  * to manually let the task scheduler reschedule it.
-	  * 
+	  *
 	  * You can also use it with some tick-guard like [[cc.sukazyo.cono.morny.util.time.WatchDog]]
 	  * to make the scheduler avoid fails when machine fall asleep or some else conditions.
 	  */
