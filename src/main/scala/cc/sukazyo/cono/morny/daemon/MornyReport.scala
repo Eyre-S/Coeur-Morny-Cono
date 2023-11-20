@@ -134,10 +134,13 @@ class MornyReport (using coeur: MornyCoeur) {
 	object EventStatistics {
 		
 		private var eventTotal = 0
+		private var eventCanceled = 0
 		private val runningTime: NumericStatistics[DurationMillis] = NumericStatistics()
 		
 		def reset (): Unit = {
-			eventTotal = 0; runningTime.reset()
+			eventTotal = 0
+			eventCanceled = 0
+			runningTime.reset()
 		}
 		
 		private def runningTimeStatisticsHTML: String =
@@ -154,11 +157,13 @@ class MornyReport (using coeur: MornyCoeur) {
 		def eventStatisticsHTML: String =
 			import cc.sukazyo.cono.morny.util.UseMath.percentageOf as p
 			val processed = runningTime.count
-			val ignored = eventTotal - processed
+			val canceled = eventCanceled
+			val ignored = eventTotal - processed - canceled
 			// language=html
 			s""" - <i>total event received</i>: <code>$eventTotal</code>
-			   | - <i>event processed</i>: (<code>${eventTotal p processed}%</code>) <code>$processed</code>
 			   | - <i>event ignored</i>: (<code>${eventTotal p ignored}%</code>) <code>$ignored</code>
+			   | - <i>event canceled</i>: (<code>${eventTotal p canceled}%</code>) <code>$canceled</code>
+			   | - <i>event processed</i>: (<code>${eventTotal p processed}%</code>) <code>$processed</code>
 			   | - <i>processed time usage</i>:
 			   |${runningTimeStatisticsHTML.indent(3)}""".stripMargin
 		
@@ -167,13 +172,23 @@ class MornyReport (using coeur: MornyCoeur) {
 			//noinspection ScalaWeakerAccess
 			case class EventTimeUsed (it: DurationMillis)
 			override def atEventPost (using event: EventEnv): Unit = {
+				import event.State
 				eventTotal += 1
-				if event.isEventOk then {
-					val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
-					event provide timeUsed
-					logger debug s"event consumed ${timeUsed.it}ms"
-					runningTime ++ timeUsed.it
-				}
+				event.state match
+					case State.OK(from) =>
+						val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
+						event provide timeUsed
+						logger debug
+							s"""event done with OK
+							   |  with time consumed ${timeUsed.it}ms
+							   |  by $from""".stripMargin
+						runningTime ++ timeUsed.it
+					case State.CANCELED(from) =>
+						eventCanceled += 1
+						logger debug
+							s"""event done with CANCELED"
+							   |  by $from""".stripMargin
+					case null =>
 			}
 		}
 		

@@ -17,8 +17,15 @@ trait EventListener () {
 	  *         if it should not run.
 	  */
 	def executeFilter (using env: EventEnv): Boolean =
-		if env.isEventOk then false else true
+		if env.state == null then true else false
 	
+	/** Run at all event listeners' listen methods done.
+	  *
+	  * Listen methods is the methods defined in [[EventListener this]]
+	  * trait starts with `on`.
+	  *
+	  * This method will always run no matter the result of [[executeFilter]]
+	  */
 	def atEventPost (using EventEnv): Unit = {}
 	
 	def onMessage (using EventEnv): Unit = {}

@@ -69,8 +69,8 @@ class MedicationTimer (using coeur: MornyCoeur) {
 		else lastNotify_messageId = None
 	}
 	
-	def refreshNotificationWrite (edited: Message): Unit = {
-		if (lastNotify_messageId isEmpty) || (lastNotify_messageId.get != (edited.messageId toInt)) then return
+	def refreshNotificationWrite (edited: Message): Boolean = {
+		if (lastNotify_messageId isEmpty) || (lastNotify_messageId.get != (edited.messageId toInt)) then return false
 		import cc.sukazyo.cono.morny.util.CommonFormat.formatDate
 		val editTime = formatDate(edited.editDate*1000, use_timeZone.getTotalSeconds/60/60)
 		val entities = ArrayBuffer.empty[MessageEntity]
@@ -82,6 +82,7 @@ class MedicationTimer (using coeur: MornyCoeur) {
 			edited.text + s"\n-- $editTime --"
 		).entities(entities toArray:_*)
 		lastNotify_messageId = None
+		true
 	}
 	
 }

@@ -5,7 +5,7 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import com.pengrad.telegrambot.model.{Chat, Message, Update, User}
+import com.pengrad.telegrambot.model.{Chat, Message, User}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{ForwardMessage, GetChat, SendMessage, SendSticker}
 
