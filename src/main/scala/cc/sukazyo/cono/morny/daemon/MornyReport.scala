@@ -19,6 +19,7 @@ import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.model.User
 import com.pengrad.telegrambot.request.{BaseRequest, SendMessage}
 import com.pengrad.telegrambot.response.BaseResponse
+import com.pengrad.telegrambot.TelegramException
 
 import java.time.ZoneId
 
@@ -32,13 +33,20 @@ class MornyReport (using coeur: MornyCoeur) {
 		if !enabled then return;
 		try {
 			coeur.account exec report
-		} catch case e: EventRuntimeException.ActionFailed => {
-			logger warn
-					s"""cannot execute report to telegram:
-					   |${exceptionLog(e) indent 4}
-					   |  tg-api response:
-					   |${(e.response toString) indent 4}"""
-					.stripMargin
+		} catch case e: EventRuntimeException => {
+			import EventRuntimeException.*
+			e match
+				case e: ActionFailed =>
+					logger warn
+						s"""cannot execute report to telegram:
+						   |${exceptionLog(e) indent 4}
+						   |  tg-api response:
+						   |${(e.response toString) indent 4}""".stripMargin
+				case e: ClientFailed =>
+					logger error
+						s"""failed when report to telegram:
+						   |${exceptionLog(e.getCause) indent 4}
+						   |""".stripMargin
 		}
 	}
 	
@@ -48,6 +56,10 @@ class MornyReport (using coeur: MornyCoeur) {
 				// language=html
 				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
 						.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))
+			case tgErr: TelegramException if tgErr.response != null =>
+				// language=html
+				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
+					.formatted(GsonBuilder().setPrettyPrinting().create.toJson(tgErr.response))
 			case _ => ""
 		executeReport(SendMessage(
 			coeur.config.reportToChat,

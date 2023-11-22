@@ -99,6 +99,14 @@ class MornyCoeur (using val config: MornyConfig) {
 	import com.pengrad.telegrambot.TelegramException
 	account.setUpdatesListener(eventManager, (e: TelegramException) => {
 		
+		// This function intended to catch exceptions on update
+		//   fetching controlled by Telegram API Client. So that
+		//   it won't be directly printed to STDOUT without Morny's
+		//   logger. And it can be reported when needed.
+		// TelegramException can either contains a caused that infers
+		//   a lower level client exception (network err or others);
+		//   nor contains a response that means API request failed.
+		
 		if (e.response != null) {
 			import com.google.gson.GsonBuilder
 			logger error
@@ -106,6 +114,7 @@ class MornyCoeur (using val config: MornyConfig) {
 				   |  server responses:
 				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response) indent 4}
 				   |""".stripMargin
+			this.daemons.reporter.exception(e, "Failed get updates.")
 		}
 		
 		if (e.getCause != null) {
@@ -119,15 +128,17 @@ class MornyCoeur (using val config: MornyConfig) {
 					import scala.collection.mutable
 					val log = mutable.ArrayBuffer(s"Failed get updates: Network Error")
 					var current: Throwable = e_timeout
-					log += s"  due to: ${current.getMessage}"
+					log += s"  due to: ${current.getClass.getSimpleName}: ${current.getMessage}"
 					while (current.getCause != null) {
 						current = current.getCause
 						log += s"  caused by: ${current.getClass.getSimpleName}: ${current.getMessage}"
 					}
 					logger error Message(log mkString "\n")
 				case e_other =>
-					logger error exceptionLog(e_other)
-					this.daemons.reporter exception e_other
+					logger error
+						s"""Failed get updates:
+						   |${exceptionLog(e_other) indent 3}""".stripMargin
+					this.daemons.reporter.exception(e_other, "Failed get updates.")
 		}
 		
 	})
