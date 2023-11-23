@@ -16,7 +16,7 @@ import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
   * @param replying_to_status Tweet ID snowflake being replied to, or null
   * @param twitter_card Corresponds to proper embed container for Tweet, which is used by
   *                     FixTweet for our official embeds.<br>
-  *                     Notice that this should be of type [[]]
+  *                     Notice that this should be of type [["tweet"|"summary"|"summary_large_image"|"player"]]
   *                     but due to circe parser does not support it well so alternative
   *                     [[String]] type is used.
   * @param author Author of the tweet
@@ -48,7 +48,7 @@ case class FXTweet (
 	replying_to: Option[String],
 	replying_to_status: Option[String],
 //	twitter_card: "tweet"|"summary"|"summary_large_image"|"player",
-	twitter_card: String,
+	twitter_card: Option[String],
 	author: FXAuthor,
 	source: String,
 	

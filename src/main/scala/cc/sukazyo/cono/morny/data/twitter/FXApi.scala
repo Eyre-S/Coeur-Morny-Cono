@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.data.twitter
 
 import cc.sukazyo.cono.morny.util.SttpPublic
+import cc.sukazyo.cono.morny.util.SttpPublic.mornyBasicRequest
 import io.circe.{DecodingFailure, ParsingFailure}
 
 /** The struct of FixTweet Status-Fetch-API response.
@@ -89,7 +90,7 @@ object FXApi {
 		  */
 		@throws[SttpClientException|ParsingFailure|DecodingFailure]
 		def status (screen_name: Option[String], id: String, translate_to: Option[String] = None): FXApi =
-			val get = basicRequest
+			val get = mornyBasicRequest
 				.header(SttpPublic.Headers.UserAgent.MORNY_CURRENT)
 				.get(uri_status(screen_name, id, translate_to))
 				.response(asString)

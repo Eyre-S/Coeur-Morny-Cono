@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.data
 
+import cc.sukazyo.cono.morny.util.SttpPublic.mornyBasicRequest
 import com.google.gson.Gson
-import sttp.client3.{asString, basicRequest, HttpError, SttpClientException, UriContext}
+import sttp.client3.{asString, HttpError, SttpClientException, UriContext}
 import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.model.MediaType
 
@@ -22,7 +23,7 @@ object NbnhhshQuery {
 	@throws[HttpError[_]|SttpClientException]
 	def sendGuess (text: String): GuessResult = {
 		case class GuessRequest (text: String)
-		val http = basicRequest
+		val http = mornyBasicRequest
 			.body(Gson().toJson(GuessRequest(text))).contentType(MediaType.ApplicationJson)
 			.post(API_GUESS_METHOD)
 			.response(asString.getRight)
