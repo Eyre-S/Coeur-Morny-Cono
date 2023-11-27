@@ -21,8 +21,10 @@ object TelegramExtensions {
 					if onError_message isEmpty then response.errorCode toString else onError_message,
 					response
 				)
-			} catch case e: RuntimeException =>
-				throw EventRuntimeException.ClientFailed(e)
+			} catch
+				case e: EventRuntimeException.ActionFailed => throw e
+				case e: RuntimeException =>
+					throw EventRuntimeException.ClientFailed(e)
 		}
 		
 	}}

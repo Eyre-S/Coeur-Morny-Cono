@@ -91,18 +91,16 @@ object FXApi {
 		@throws[SttpClientException|ParsingFailure|DecodingFailure]
 		def status (screen_name: Option[String], id: String, translate_to: Option[String] = None): FXApi =
 			val get = mornyBasicRequest
-				.header(SttpPublic.Headers.UserAgent.MORNY_CURRENT)
 				.get(uri_status(screen_name, id, translate_to))
 				.response(asString)
 				.send(httpClient)
 			val body = get.body match
 				case Left(error) => error
 				case Right(success) => success
-			parser.parse(body) match
-				case Left(error) => throw error
-				case Right(value) => value.as[FXApi] match
-					case Left(error) => throw error
-					case Right(value) => value
+			parser.parse(body)
+				.toTry.get
+				.as[FXApi]
+				.toTry.get
 		
 	}
 	

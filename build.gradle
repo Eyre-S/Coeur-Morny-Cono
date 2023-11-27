@@ -92,6 +92,7 @@ dependencies {
 	implementation group: 'io.circe', name: scala('circe-core'), version: lib_circe_v
 	implementation group: 'io.circe', name: scala('circe-generic'), version: lib_circe_v
 	implementation group: 'io.circe', name: scala('circe-parser'), version: lib_circe_v
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.16.2'
 	implementation group: 'com.cronutils', name: 'cron-utils', version: lib_cron_utils_v
 	
 	// used for disable slf4j

@@ -44,7 +44,7 @@ class MornyCommands (using coeur: MornyCoeur) {
 		$IP186Query.Whois,
 		Encryptor(),
 		MornyOldJrrp(),
-		Tweet(),
+		GetSocial(),
 		
 		$MornyManagers.SaveData,
 		$MornyInformation,
