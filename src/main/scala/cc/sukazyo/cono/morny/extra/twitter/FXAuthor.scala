@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.twitter
+package cc.sukazyo.cono.morny.extra.twitter
 
 /** Information about the author of a tweet.
   *

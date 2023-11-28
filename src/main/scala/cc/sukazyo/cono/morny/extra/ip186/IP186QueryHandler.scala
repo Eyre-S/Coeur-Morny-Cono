@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.ip186
+package cc.sukazyo.cono.morny.extra.ip186
 
 import cc.sukazyo.cono.morny.util.SttpPublic.{mornyBasicRequest, Schemes}
 import sttp.client3.{asString, HttpError, SttpClientException, UriContext}

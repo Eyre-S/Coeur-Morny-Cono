@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data
+package cc.sukazyo.cono.morny.extra
 
 import cc.sukazyo.cono.morny.util.SttpPublic.mornyBasicRequest
 import com.google.gson.Gson

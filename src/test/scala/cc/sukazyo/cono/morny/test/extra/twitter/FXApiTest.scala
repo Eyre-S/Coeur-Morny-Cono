@@ -1,7 +1,7 @@
-package cc.sukazyo.cono.morny.test.data.twitter
+package cc.sukazyo.cono.morny.test.extra.twitter
 
-import cc.sukazyo.cono.morny.data.twitter.FXApi
-import cc.sukazyo.cono.morny.data.twitter.FXApi.Fetch
+import cc.sukazyo.cono.morny.extra.twitter.FXApi
+import cc.sukazyo.cono.morny.extra.twitter.FXApi.Fetch
 import cc.sukazyo.cono.morny.test.MornyTests
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.tagobjects.{Network, Slow}

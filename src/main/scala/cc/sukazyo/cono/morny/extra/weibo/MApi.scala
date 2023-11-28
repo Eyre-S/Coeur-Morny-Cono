@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.weibo
+package cc.sukazyo.cono.morny.extra.weibo
 
 case class MApi [D] (
 	ok: Int,

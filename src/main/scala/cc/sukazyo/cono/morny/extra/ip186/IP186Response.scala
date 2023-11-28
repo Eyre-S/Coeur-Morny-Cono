@@ -1,3 +1,3 @@
-package cc.sukazyo.cono.morny.data.ip186
+package cc.sukazyo.cono.morny.extra.ip186
 
 case class IP186Response (url: String, body: String)

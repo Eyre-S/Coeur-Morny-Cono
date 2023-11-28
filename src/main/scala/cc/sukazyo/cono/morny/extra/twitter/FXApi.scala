@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.twitter
+package cc.sukazyo.cono.morny.extra.twitter
 
 import cc.sukazyo.cono.morny.util.SttpPublic
 import cc.sukazyo.cono.morny.util.SttpPublic.mornyBasicRequest

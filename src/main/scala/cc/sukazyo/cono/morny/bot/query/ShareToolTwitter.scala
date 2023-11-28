@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.data.twitter
-import cc.sukazyo.cono.morny.data.twitter.TweetUrlInformation
+import cc.sukazyo.cono.morny.extra.twitter
+import cc.sukazyo.cono.morny.extra.twitter.TweetUrlInformation
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle

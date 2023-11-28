@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data.twitter
+package cc.sukazyo.cono.morny.extra.twitter
 
 /** This can help compare items in a pool of media
   *

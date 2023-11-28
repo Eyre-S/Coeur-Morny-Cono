@@ -1,6 +1,6 @@
-package cc.sukazyo.cono.morny.data.twitter
+package cc.sukazyo.cono.morny.extra.twitter
 
-import cc.sukazyo.cono.morny.data.twitter.FXMosaicPhoto.formatsType
+import cc.sukazyo.cono.morny.extra.twitter.FXMosaicPhoto.formatsType
 
 /** Data for the mosaic service, which stitches photos together
   *

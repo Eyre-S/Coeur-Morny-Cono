@@ -1,6 +1,6 @@
-package cc.sukazyo.cono.morny.data.twitter
+package cc.sukazyo.cono.morny.extra.twitter
 
-import cc.sukazyo.cono.morny.data.twitter.FXTweet.mediaType
+import cc.sukazyo.cono.morny.extra.twitter.FXTweet.mediaType
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
 
 /** The container of all the information for a Tweet.

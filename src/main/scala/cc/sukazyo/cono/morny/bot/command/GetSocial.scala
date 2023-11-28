@@ -1,11 +1,12 @@
 package cc.sukazyo.cono.morny.bot.command
-import cc.sukazyo.cono.morny.data.{twitter, weibo, TelegramStickers}
+import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.data.twitter.{FXApi, TweetUrlInformation}
+import cc.sukazyo.cono.morny.extra.{twitter, weibo}
+import cc.sukazyo.cono.morny.extra.twitter.{FXApi, TweetUrlInformation}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.data.weibo.StatusUrlInfo
+import cc.sukazyo.cono.morny.extra.weibo.StatusUrlInfo
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InputMedia, InputMediaPhoto, InputMediaVideo, ParseMode}
 import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage, SendSticker}

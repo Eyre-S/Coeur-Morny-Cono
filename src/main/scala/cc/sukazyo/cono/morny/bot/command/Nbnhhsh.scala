@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.data.{NbnhhshQuery, TelegramStickers}
+import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.extra.NbnhhshQuery
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec

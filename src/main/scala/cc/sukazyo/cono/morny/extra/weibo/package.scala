@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.data
+package cc.sukazyo.cono.morny.extra
 
 package object weibo {
 	

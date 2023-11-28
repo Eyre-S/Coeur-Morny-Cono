@@ -1,6 +1,6 @@
-package cc.sukazyo.cono.morny.test.data
+package cc.sukazyo.cono.morny.test.extra
 
-import cc.sukazyo.cono.morny.data.BilibiliForms.*
+import cc.sukazyo.cono.morny.extra.BilibiliForms.*
 import cc.sukazyo.cono.morny.test.MornyTests
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.tagobjects.{Network, Slow}
