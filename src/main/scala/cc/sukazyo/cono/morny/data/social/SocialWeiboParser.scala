@@ -11,12 +11,23 @@ object SocialWeiboParser {
 	
 	@throws[HttpError[?] | SttpClientException | ParsingFailure | DecodingFailure]
 	def parseMStatus (api: MApi[MStatus]): SocialContent = {
+		def retweetedMessage (retweetedStatus: Option[MStatus]): String =
+			retweetedStatus match
+				case Some(status) =>
+					val pic_preview = if status.pic_ids.isEmpty then "" else
+						"\n" + (for (pic <- status.pic_ids) yield "🖼️").mkString(" ")
+					// language=html
+					s"""
+					   |<i>//<a href="https://weibo.com/${status.user.id}/${status.id}">${h(status.user.screen_name)}</a>:</i>
+					   |${ch(status.text)}$pic_preview
+					   |""".stripMargin
+				case None => ""
 		val content =
 		// language=html
 			s"""🔸<b><a href="${api.data.user.profile_url}">${h(api.data.user.screen_name)}</a></b>
 			   |
 			   |${ch(api.data.text)}
-			   |
+			   |${retweetedMessage(api.data.retweeted_status)}
 			   |<i><a href="${genWeiboStatusUrl(StatusUrlInfo(api.data.user.id.toString, api.data.id))}">${h(api.data.created_at)}</a></i>""".stripMargin
 		api.data.pics match
 			case None =>
