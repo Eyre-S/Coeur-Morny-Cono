@@ -2,20 +2,26 @@ package cc.sukazyo.cono.morny.data.social
 
 import cc.sukazyo.cono.morny.data.social.SocialContent.{SocialMedia, SocialMediaWithUrl}
 import cc.sukazyo.cono.morny.data.social.SocialContent.SocialMediaType.{Photo, Video}
-import cc.sukazyo.cono.morny.extra.twitter.FXApi
+import cc.sukazyo.cono.morny.extra.twitter.{FXApi, FXTweet}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 
 object SocialTwitterParser {
 	
+	def parseFXTweet_forMediaPlaceholderInContent (tweet: FXTweet): String =
+		tweet.media match
+			case None => ""
+			case Some(media) =>
+				"\n" + (media.photos.getOrElse(Nil).map(* => "🖼️") ::: media.videos.getOrElse(Nil).map(* => "🎞️"))
+					.mkString(" ")
+	
 	def parseFXTweet (api: FXApi): SocialContent = {
 		api.tweet match
 			case None =>
-				SocialContent(
+				val content =
 					// language=html
 					s"""❌ Fix-Tweet <code>${api.code}</code>
-					   |<i>${h(api.message)}</i>""".stripMargin,
-					Nil
-				)
+					   |<i>${h(api.message)}</i>""".stripMargin
+				SocialContent(content, content, Nil)
 			case Some(tweet) =>
 				val content: String =
 				// language=html
@@ -25,9 +31,17 @@ object SocialTwitterParser {
 					   |
 					   |<i>💬${tweet.replies}   🔗${tweet.retweets}   ❤️${tweet.likes}</i>
 					   |<i><a href="${tweet.url}">${h(tweet.created_at)}</a></i>""".stripMargin
+				val content_withMediasPlaceholder: String =
+				// language=html
+					s"""⚪️ <b>${h(tweet.author.name)} <a href="${tweet.author.url}">@${h(tweet.author.screen_name)}</a></b>
+					   |
+					   |${h(tweet.text)}${parseFXTweet_forMediaPlaceholderInContent(tweet)}
+					   |
+					   |<i>💬${tweet.replies}   🔗${tweet.retweets}   ❤️${tweet.likes}</i>
+					   |<i><a href="${tweet.url}">${h(tweet.created_at)}</a></i>""".stripMargin
 				tweet.media match
 					case None =>
-						SocialContent(content, Nil)
+						SocialContent(content, content_withMediasPlaceholder, Nil)
 					case Some(media) =>
 						val mediaGroup: List[SocialMedia] =
 							(
@@ -46,7 +60,7 @@ object SocialTwitterParser {
 						val mediaMosaic = media.mosaic match
 							case Some(mosaic) => Some(SocialMediaWithUrl(mosaic.formats.jpeg)(Photo))
 							case None => None
-						SocialContent(content, mediaGroup, mediaMosaic, thumbnail)
+						SocialContent(content, content_withMediasPlaceholder, mediaGroup, mediaMosaic, thumbnail)
 	}
 	
 }

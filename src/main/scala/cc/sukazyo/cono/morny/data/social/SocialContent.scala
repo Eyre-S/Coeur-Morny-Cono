@@ -17,6 +17,9 @@ import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
   * @param text_html Formatted HTML output of the status that can be output
   *                  directly to Telegram. Normally will contains metadata
   *                  like status' author or like count etc.
+  * @param text_withPicPlaceholder same with [[text_html]], but contains more
+  *                                placeholder texts of medias. can be used
+  *                                when medias cannot be output.
   * @param medias Status attachment medias.
   * @param medias_mosaic Mosaic version of status medias. Will be used when
   *                      the output API doesn't support multiple medias like
@@ -28,6 +31,7 @@ import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
   */
 case class SocialContent (
 	text_html: String,
+	text_withPicPlaceholder: String,
 	medias: List[SocialMedia],
 	medias_mosaic: Option[SocialMedia] = None,
 	thumbnail: Option[SocialMedia] = None
@@ -56,22 +60,30 @@ case class SocialContent (
 	
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[InlineQueryUnit[?]] = {
 		(
-			if (this.medias.length == 1) && (this.medias.head.t == Photo) && this.medias.head.isInstanceOf[SocialMediaWithUrl] then
-				InlineQueryUnit(InlineQueryResultPhoto(
-					inlineQueryId(s"[$id_head/photo/0]$id_param"),
-					this.medias.head.asInstanceOf[SocialMediaWithUrl].url,
-					thumbnailOrElse(this.medias.head.asInstanceOf[SocialMediaWithUrl].url)
-				).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
-			else if (this.medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
+			if (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
 				InlineQueryUnit(InlineQueryResultPhoto(
 					inlineQueryId(s"[$id_head/photo/mosaic]$id_param"),
 					medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url,
 					thumbnailOrElse(medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url)
 				).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
+			else if (medias nonEmpty) && (medias.head.t == Photo) then
+				val media = medias.head
+				media match
+					case media_url: SocialMediaWithUrl =>
+						InlineQueryUnit(InlineQueryResultPhoto(
+							inlineQueryId(s"[$id_head/photo/0]$id_param"),
+							media_url.url,
+							thumbnailOrElse(media_url.url)
+						).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
+					case _ =>
+						InlineQueryUnit(InlineQueryResultArticle(
+							inlineQueryId(s"[$id_head/text_only]$id_param"), s"$name (text only)",
+							InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
+						)) :: Nil
 			else
 				InlineQueryUnit(InlineQueryResultArticle(
 					inlineQueryId(s"[$id_head/text]$id_param"), s"$name",
-					InputTextMessageContent(this.text_html).parseMode(ParseMode.HTML)
+					InputTextMessageContent(text_html).parseMode(ParseMode.HTML)
 				)) :: Nil
 		) ::: Nil
 	}
