@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.util.tgapi
 
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.{Chat, ChatMember, User}
+import com.pengrad.telegrambot.model.*
 import com.pengrad.telegrambot.request.{BaseRequest, GetChatMember}
 import com.pengrad.telegrambot.response.BaseResponse
 
@@ -63,6 +63,14 @@ object TelegramExtensions {
 			else UserPermissionLevel(chatMember) >= UserPermissionLevel(permission)
 			
 		}
+		
+	}}
+	
+	object Message { extension (self: Message) {
+		
+		def entitiesSafe: List[MessageEntity] =
+			if self.entities == null then Nil else
+				self.entities.toList
 		
 	}}
 	

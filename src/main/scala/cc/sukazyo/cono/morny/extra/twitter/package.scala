@@ -4,7 +4,7 @@ import scala.util.matching.Regex
 
 package object twitter {
 	
-	private val REGEX_TWEET_URL: Regex = "^(?:https?://)?((?:(?:(?:c\\.)?vx|fx|www\\.)?twitter|(?:www\\.|fixup|fixv)?x)\\.com)/((\\w+)/status/(\\d+)(?:/photo/(\\d+))?)/?(?:\\?([\\w&=-]+))?$"r
+	private val REGEX_TWEET_URL: Regex = "(?:https?://)?((?:(?:(?:c\\.)?vx|fx|www\\.)?twitter|(?:www\\.|fixup|fixv)?x)\\.com)/((\\w+)/status/(\\d+)(?:/photo/(\\d+))?)/?(?:\\?(\\S+))?"r
 	
 	/** Messages that can contains on a tweet url.
 	  *
@@ -68,5 +68,14 @@ package object twitter {
 					Option(_6)
 				))
 			case _ => None
+	
+	def guessTweetUrl (text: String): List[TweetUrlInformation] =
+		REGEX_TWEET_URL.findAllMatchIn(text).map(f => {
+			TweetUrlInformation(
+				f.group(1), f.group(2), f.group(3), f.group(4),
+				Option(f.group(5)),
+				Option(f.group(6))
+			)
+		}).toList
 	
 }

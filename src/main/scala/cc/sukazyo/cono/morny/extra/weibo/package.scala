@@ -23,12 +23,17 @@ package object weibo {
 //			s"https://$cdn.singimg.cn/$mode/$pid.jpg"
 //	}
 	
-	private val REGEX_WEIBO_STATUS_URL = "^(?:https?://)?((?:www\\.|m.)?weibo\\.(?:com|cn))/(\\d+)/([0-9a-zA-Z]+)/?(?:\\?([\\w&=-]+))?$"r
+	private val REGEX_WEIBO_STATUS_URL = "(?:https?://)?((?:www\\.|m.)?weibo\\.(?:com|cn))/(\\d+)/([0-9a-zA-Z]+)/?(?:\\?(\\S+))?"r
 	
 	def parseWeiboStatusUrl (url: String): Option[StatusUrlInfo] =
 		url match
 			case REGEX_WEIBO_STATUS_URL(_, uid, id, _) => Some(StatusUrlInfo(uid, id))
 			case _ => None
+	
+	def guessWeiboStatusUrl (text: String): List[StatusUrlInfo] =
+		REGEX_WEIBO_STATUS_URL.findAllMatchIn(text).map(matches => {
+			StatusUrlInfo(matches.group(2), matches.group(3))
+		}).toList
 	
 	def genWeiboStatusUrl (url: StatusUrlInfo): String =
 		s"https://weibo.com/${url.uid}/${url.id}"

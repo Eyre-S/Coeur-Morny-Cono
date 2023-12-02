@@ -24,7 +24,7 @@ class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 		
 		if command.args.length < 1 then { do404(); return }
 		
-		if !OnGetSocial.tryFetchSocial(command.args(0))(using event.message.chat.id, event.message.messageId) then
+		if !OnGetSocial.tryFetchSocial(Right(command.args(0)))(using event.message.chat.id, event.message.messageId) then
 			do404()
 		
 	}
