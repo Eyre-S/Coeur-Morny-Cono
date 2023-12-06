@@ -22,11 +22,13 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		val RUNTIME = "runtime"
 		val VERSION = "version"
 		val VERSION_2 = "v"
+		val TASKS = "tasks"
+		val EVENTS = "event"
 	}
 	
 	override val name: String = "info"
 	override val aliases: Array[ICommandAlias]|Null = null
-	override val paramRule: String = "[(version|runtime|stickers[.IDs])]"
+	override val paramRule: String = "[(version|runtime|stickers[.IDs]|tasks|event)]"
 	override val description: String = "输出当前 Morny 的各种信息"
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
@@ -42,6 +44,8 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			case s if s startsWith Subs.STICKERS => echoStickers
 			case Subs.RUNTIME => echoRuntime
 			case Subs.VERSION | Subs.VERSION_2 => echoVersion
+			case Subs.TASKS => echoTasksStatus
+			case Subs.EVENTS => echoEventStatistics
 			case _ => echo404
 		}
 		
@@ -142,6 +146,29 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |- [<code>${coeur.coeurStartTimestamp}</code>]"""
 			.stripMargin
 		).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
+	}
+	
+	private def echoTasksStatus (using update: Update): Unit = {
+//		if !coeur.trusted.isTrusted(update.message.from.id) then return;
+		coeur.account exec SendMessage(
+			update.message.chat.id,
+			// language=html
+			s"""<b>Coeur Task Scheduler:</b>
+			   | - <i>scheduled tasks</i>: <code>${coeur.tasks.amount}</code>
+			   | - <i>scheduler status</i>: <code>${coeur.tasks.state}</code>
+			   | - <i>current runner status</i>: <code>${coeur.tasks.runnerState}</code>
+			   |""".stripMargin
+		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
+	}
+	
+	private def echoEventStatistics (using update: Update): Unit = {
+		coeur.account exec SendMessage(
+			update.message.chat.id,
+			// language=html
+			s"""<b>Event Statistics :</b>
+			   |in today
+			   |${coeur.daemons.reporter.EventStatistics.eventStatisticsHTML}""".stripMargin
+		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
 	}
 	
 	private def echo404 (using event: Update): Unit =

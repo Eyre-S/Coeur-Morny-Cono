@@ -12,7 +12,8 @@ class MornyQueries (using MornyCoeur) {
 		RawText(),
 		MyInformation(),
 		ShareToolTwitter(),
-		ShareToolBilibili()
+		ShareToolBilibili(),
+		ShareToolSocialContent()
 	)
 	
 	def query (event: Update): List[InlineQueryUnit[_]] = {

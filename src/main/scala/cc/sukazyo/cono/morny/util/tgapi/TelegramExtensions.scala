@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.util.tgapi
 
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.{Chat, ChatMember, User}
+import com.pengrad.telegrambot.model.*
 import com.pengrad.telegrambot.request.{BaseRequest, GetChatMember}
 import com.pengrad.telegrambot.response.BaseResponse
 
@@ -12,13 +12,19 @@ object TelegramExtensions {
 	
 	object Bot { extension (bot: TelegramBot) {
 		
+		@throws[EventRuntimeException]
 		def exec [T <: BaseRequest[T, R], R <: BaseResponse] (request: T, onError_message: String = ""): R = {
-			val response = bot execute request
-			if response isOk then return response
-			throw EventRuntimeException.ActionFailed(
-				if onError_message isEmpty then response.errorCode toString else onError_message,
-				response
-			)
+			try {
+				val response = bot execute request
+				if response isOk then return response
+				throw EventRuntimeException.ActionFailed(
+					if onError_message isEmpty then response.errorCode toString else onError_message,
+					response
+				)
+			} catch
+				case e: EventRuntimeException.ActionFailed => throw e
+				case e: RuntimeException =>
+					throw EventRuntimeException.ClientFailed(e)
 		}
 		
 	}}
@@ -57,6 +63,14 @@ object TelegramExtensions {
 			else UserPermissionLevel(chatMember) >= UserPermissionLevel(permission)
 			
 		}
+		
+	}}
+	
+	object Message { extension (self: Message) {
+		
+		def entitiesSafe: List[MessageEntity] =
+			if self.entities == null then Nil else
+				self.entities.toList
 		
 	}}
 	

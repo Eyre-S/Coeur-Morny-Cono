@@ -83,19 +83,29 @@ dependencies {
 	
 	implementation group: 'cc.sukazyo', name: 'messiva', version: lib_messiva_v
 	implementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
-	testImplementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
 	
 	implementation group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: lib_javatelegramapi_v
 	implementation group: 'com.softwaremill.sttp.client3', name: scala('core'), version: lib_sttp_v
 	implementation group: 'com.softwaremill.sttp.client3', name: scala('okhttp-backend'), version: lib_sttp_v
-	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: lib_okhttp_v
+	runtimeOnly group: 'com.squareup.okhttp3', name: 'okhttp', version: lib_okhttp_v
 	implementation group: 'com.google.code.gson', name: 'gson', version: lib_gson_v
+	implementation group: 'io.circe', name: scala('circe-core'), version: lib_circe_v
+	implementation group: 'io.circe', name: scala('circe-generic'), version: lib_circe_v
+	implementation group: 'io.circe', name: scala('circe-parser'), version: lib_circe_v
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.16.2'
+	implementation group: 'com.cronutils', name: 'cron-utils', version: lib_cron_utils_v
 	
+	// used for disable slf4j
+	// due to the slf4j api have been used in the following libraries:
+	//  - cron-utils
+	runtimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: lib_slf4j_v
+	testRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: lib_slf4j_v
+	
+	testImplementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
 	testImplementation group: 'org.scalatest', name: scala('scalatest'), version: lib_scalatest_v
 	testImplementation group: 'org.scalatest', name: scala('scalatest-freespec'), version: lib_scalatest_v
 	testRuntimeOnly group: 'org.scala-lang.modules', name: scala('scala-xml'), version: lib_scalamodule_xml_v
-	
-	// for generating HTML report // required by gradle-scalatest plugin
+	// for generating HTML report: required by gradle-scalatest plugin
 	testRuntimeOnly group: 'com.vladsch.flexmark', name: 'flexmark-all', version: '0.64.6'
 	
 }
@@ -133,6 +143,7 @@ tasks.withType(ScalaCompile).configureEach {
 	targetCompatibility proj_java.getMajorVersion()
 	
 	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
+	scalaCompileOptions.additionalParameters.addAll ("-Xmax-inlines", "256")
 	
 	scalaCompileOptions.encoding = proj_file_encoding.name()
 	options.encoding = proj_file_encoding.name()

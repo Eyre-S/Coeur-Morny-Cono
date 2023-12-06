@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.data.ip186.IP186QueryHandler
+import cc.sukazyo.cono.morny.extra.ip186.IP186QueryHandler
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update

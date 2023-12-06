@@ -1,9 +1,9 @@
-package cc.sukazyo.cono.morny.data
+package cc.sukazyo.cono.morny.extra
 
 import cc.sukazyo.cono.morny.util.BiliTool
-import cc.sukazyo.cono.morny.util.SttpPublic.Schemes
+import cc.sukazyo.cono.morny.util.SttpPublic.{mornyBasicRequest, Schemes}
 import cc.sukazyo.cono.morny.util.UseSelect.select
-import sttp.client3.{basicRequest, ignore, HttpError, SttpClientException}
+import sttp.client3.{HttpError, SttpClientException}
 import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.model.Uri
 
@@ -77,7 +77,8 @@ object BilibiliForms {
 			throw IllegalArgumentException(s"is a b23 video link: $uri . (use parse_videoUrl instead)")
 		
 		try {
-			val response = basicRequest
+			import sttp.client3.ignore
+			val response = mornyBasicRequest
 				.get(uri)
 				.followRedirects(false)
 				.response(ignore)

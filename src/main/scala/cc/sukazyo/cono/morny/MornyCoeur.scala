@@ -7,9 +7,13 @@ import cc.sukazyo.cono.morny.MornyCoeur.THREAD_SERVER_EXIT
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
+import cc.sukazyo.cono.morny.util.schedule.Scheduler
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+import cc.sukazyo.cono.morny.util.time.WatchDog
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
+import scala.annotation.unused
 import scala.util.boundary
 import scala.util.boundary.break
 
@@ -53,7 +57,7 @@ class MornyCoeur (using val config: MornyConfig) {
 	  * 
 	  * in milliseconds.
 	  */
-	val coeurStartTimestamp: Long = System.currentTimeMillis
+	val coeurStartTimestamp: EpochMillis = System.currentTimeMillis
 	
 	/** [[TelegramBot]] account of this Morny */
 	val account: TelegramBot = __loginResult.account
@@ -62,6 +66,8 @@ class MornyCoeur (using val config: MornyConfig) {
 	/** [[account]]'s telegram user id */
 	val userid: Long = __loginResult.userid
 	
+	/** Morny's task [[Scheduler]] */
+	val tasks: Scheduler = Scheduler()
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
 	
@@ -76,12 +82,67 @@ class MornyCoeur (using val config: MornyConfig) {
 	eventManager register MornyOnInlineQuery(using queries)
 	//noinspection ScalaUnusedSymbol
 	val events: MornyEventListeners = MornyEventListeners(using eventManager)
+	eventManager register daemons.reporter.EventStatistics.EventInfoCatcher
+	@unused
+	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
+		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
+		logger warn
+			s"""Can't keep up! is the server overloaded or host machine fall asleep?
+			   |  current tick takes ${f(consumed)} to complete.""".stripMargin
+		tasks.notifyIt()
+	})
 	
 	///>>> BLOCK START instance configure & startup stage 2
 	
 	daemons.start()
 	logger info "start telegram event listening"
-	account setUpdatesListener eventManager
+	import com.pengrad.telegrambot.TelegramException
+	account.setUpdatesListener(eventManager, (e: TelegramException) => {
+		
+		// This function intended to catch exceptions on update
+		//   fetching controlled by Telegram API Client. So that
+		//   it won't be directly printed to STDOUT without Morny's
+		//   logger. And it can be reported when needed.
+		// TelegramException can either contains a caused that infers
+		//   a lower level client exception (network err or others);
+		//   nor contains a response that means API request failed.
+		
+		if (e.response != null) {
+			import com.google.gson.GsonBuilder
+			logger error
+				s"""Failed get updates: ${e.getMessage}
+				   |  server responses:
+				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response) indent 4}
+				   |""".stripMargin
+			this.daemons.reporter.exception(e, "Failed get updates.")
+		}
+		
+		if (e.getCause != null) {
+			import java.net.{SocketException, SocketTimeoutException}
+			import javax.net.ssl.SSLHandshakeException
+			val caused = e.getCause
+			caused match
+				case e_timeout: (SSLHandshakeException|SocketException|SocketTimeoutException) =>
+					import cc.sukazyo.messiva.log.Message
+
+					import scala.collection.mutable
+					val log = mutable.ArrayBuffer(s"Failed get updates: Network Error")
+					var current: Throwable = e_timeout
+					log += s"  due to: ${current.getClass.getSimpleName}: ${current.getMessage}"
+					while (current.getCause != null) {
+						current = current.getCause
+						log += s"  caused by: ${current.getClass.getSimpleName}: ${current.getMessage}"
+					}
+					logger error Message(log mkString "\n")
+				case e_other =>
+					logger error
+						s"""Failed get updates:
+						   |${exceptionLog(e_other) indent 3}""".stripMargin
+					this.daemons.reporter.exception(e_other, "Failed get updates.")
+		}
+		
+	})
+	
 	if config.commandLoginRefresh then
 		logger info "resetting telegram command list"
 		commands.automaticTGListUpdate()
@@ -101,6 +162,8 @@ class MornyCoeur (using val config: MornyConfig) {
 		account.shutdown()
 		logger info "stopped bot account"
 		daemons.stop()
+		tasks.waitForStop()
+		logger info s"morny tasks stopped: remains ${tasks.amount} tasks not be executed"
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
 		logger info "done exit cleanup"
@@ -160,5 +223,5 @@ class MornyCoeur (using val config: MornyConfig) {
 		}
 		
 	}
- 
+	
 }

@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.util.tgapi.formatting
 
+import cc.sukazyo.cono.morny.util.SttpPublic.mornyBasicRequest
 import com.pengrad.telegrambot.model.User
-import sttp.client3.{asString, basicRequest, HttpError, SttpClientException, UriContext}
+import sttp.client3.{asString, HttpError, SttpClientException, UriContext}
 import sttp.client3.okhttp.OkHttpSyncBackend
 
 import java.io.IOException
@@ -17,7 +18,7 @@ object TelegramUserInformation {
 	def getDataCenterFromUser (username: String): String = {
 		
 		try
-			val body = basicRequest
+			val body = mornyBasicRequest
 				.get(uri"https://t.me/$username")
 				.response(asString.getRight)
 				.send(httpClient)

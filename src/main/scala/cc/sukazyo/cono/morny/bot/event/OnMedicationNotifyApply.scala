@@ -2,8 +2,7 @@ package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.daemon.{MedicationTimer, MornyDaemons}
-import com.pengrad.telegrambot.model.{Message, Update}
+import com.pengrad.telegrambot.model.Message
 
 class OnMedicationNotifyApply (using coeur: MornyCoeur) extends EventListener {
 	
@@ -14,8 +13,8 @@ class OnMedicationNotifyApply (using coeur: MornyCoeur) extends EventListener {
 	
 	private def editedMessageProcess (edited: Message)(using event: EventEnv): Unit = {
 		if edited.chat.id != coeur.config.medicationNotifyToChat then return;
-		coeur.daemons.medicationTimer.refreshNotificationWrite(edited)
-		event.setEventOk
+		if coeur.daemons.medicationTimer.refreshNotificationWrite(edited) then
+			event.setEventOk
 	}
 	
 }

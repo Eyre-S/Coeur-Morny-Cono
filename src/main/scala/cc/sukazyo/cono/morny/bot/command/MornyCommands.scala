@@ -43,11 +43,13 @@ class MornyCommands (using coeur: MornyCoeur) {
 		$IP186Query.IP,
 		$IP186Query.Whois,
 		Encryptor(),
+		MornyOldJrrp(),
+		GetSocial(),
+		
 		$MornyManagers.SaveData,
 		$MornyInformation,
 		$MornyInformationOlds.Version,
 		$MornyInformationOlds.Runtime,
-		MornyOldJrrp(),
 		$MornyManagers.Exit,
 		
 		Testing(),

@@ -16,4 +16,9 @@ object UseMath {
 		def ** (other: Int): Double = Math.pow(self, other)
 	}
 	
+	extension (base: Int) {
+		def percentageOf (another: Int): Int =
+			Math.round((another.toDouble/base)*100).toInt
+	}
+	
 }

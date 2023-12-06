@@ -1,7 +1,7 @@
-package cc.sukazyo.cono.morny.data.ip186
+package cc.sukazyo.cono.morny.extra.ip186
 
-import cc.sukazyo.cono.morny.util.SttpPublic.Schemes
-import sttp.client3.{asString, basicRequest, HttpError, SttpClientException, UriContext}
+import cc.sukazyo.cono.morny.util.SttpPublic.{mornyBasicRequest, Schemes}
+import sttp.client3.{asString, HttpError, SttpClientException, UriContext}
 import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.model.Uri
 
@@ -36,7 +36,7 @@ object IP186QueryHandler {
 			val uri = requestPath.scheme(Schemes.HTTPS).host(SITE_HOST)
 			IP186Response(
 				uri.toString,
-				basicRequest
+				mornyBasicRequest
 					.get(uri)
 					.response(asString.getRight)
 					.send(httpClient)

@@ -42,7 +42,7 @@ class EventHacker (using coeur: MornyCoeur) {
 		coeur.account exec SendMessage(
 			x.from_chat,
 			// language=html
-			s"<code>${h(GsonBuilder().setPrettyPrinting().create.toJson(update))}</code>"
+			s"<pre><code class='language-json'>${h(GsonBuilder().setPrettyPrinting().create.toJson(update))}</code></pre>"
 		).parseMode(ParseMode HTML).replyToMessageId(x.from_message toInt)
 		true
 	}

@@ -17,6 +17,7 @@ class MornyEventListeners (using manager: EventListenerManager) (using coeur: Mo
 		OnUserSlashAction(),
 		OnCallMe(),
 		OnCallMsgSend(),
+		OnGetSocial(),
 		OnMedicationNotifyApply(),
 		OnEventHackHandle()
 	)

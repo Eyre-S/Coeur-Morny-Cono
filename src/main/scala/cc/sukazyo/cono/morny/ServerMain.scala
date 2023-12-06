@@ -51,6 +51,7 @@ object ServerMain {
 				case "--master" | "-mm" => i+=1 ; config.trustedMaster = args(i)toLong
 				case "--trusted-chat" | "-trs" => i+=1 ; config.trustedChat = args(i)toLong
 				case "--report-to" => i+=1; config.reportToChat = args(i)toLong
+				case "--report-zone" => i+=1; config.reportZone = TimeZone.getTimeZone(args(i))
 				
 				case "--trusted-reader-dinner" | "-trsd" => i+=1 ; config.dinnerTrustedReaders add (args(i)toLong)
 				case "--dinner-chat" | "-chd" => i+=1 ; config.dinnerChatId = args(i)toLong

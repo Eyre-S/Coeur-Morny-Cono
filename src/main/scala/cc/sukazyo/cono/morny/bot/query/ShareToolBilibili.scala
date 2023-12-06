@@ -24,7 +24,7 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 		if (event.inlineQuery.query == null) return null
 		if (event.inlineQuery.query isBlank) return null
 		
-		import cc.sukazyo.cono.morny.data.BilibiliForms.*
+		import cc.sukazyo.cono.morny.extra.BilibiliForms.*
 		val result: BiliVideoId =
 			try
 				parse_videoUrl(event.inlineQuery.query)

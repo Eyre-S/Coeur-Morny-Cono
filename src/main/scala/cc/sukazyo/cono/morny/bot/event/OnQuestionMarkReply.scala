@@ -4,7 +4,6 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply.isAllMessageMark
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 
 import scala.language.postfixOps
@@ -33,7 +32,9 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 
 object OnQuestionMarkReply {
 	
-	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '❔', '❓')
+	// todo: due to the limitation of Java char, the ⁉️ character (actually not a
+	//  single character) is not supported yet.
+	private val QUESTION_MARKS = Set('?', '？', '¿', '⁈', '⁇', '‽', '⸘', '❔', '❓')
 	
 	def isAllMessageMark (using text: String): Boolean = {
 		boundary[Boolean] {
