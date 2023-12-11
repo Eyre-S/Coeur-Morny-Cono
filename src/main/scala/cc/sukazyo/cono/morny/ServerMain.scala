@@ -94,7 +94,7 @@ object ServerMain {
 		///
 		
 		if (showHello) logger info MornyAbout.MORNY_PREVIEW_IMAGE_ASCII
-		if (mode_echoHello) return;
+		if (mode_echoHello) return
 		
 		if (unknownArgs.nonEmpty) logger warn
 				s"""Can't understand arg to some meaning
@@ -117,18 +117,18 @@ object ServerMain {
 					s"""Morny Cono Version
 					   |- version :
 					   |    Morny ${MornySystem.CODENAME toUpperCase}
-					   |    ${MornySystem.VERSION_BASE}${if (MornySystem.isUseDelta) "-δ"+MornySystem.VERSION_DELTA else ""}
+					   |    ${MornySystem.VERSION_BASE}${MornySystem.VERSION_DELTA match{case Some(d) => "-δ" + d case None => ""}}
 					   |- md5hash :
 					   |    ${MornySystem.getJarMD5}
 					   |- gitstat :
-					   |${ if (MornySystem.isGitBuild) {
+					   |${ MornySystem.GIT_COMMIT match { case Some(commit) =>
 							s"""    on commit ${if (MornySystem.isCleanBuild) "- clean-build" else "<δ/non-clean-build>"}
-							   |    ${BuildConfig.COMMIT}"""
+							   |    $commit"""
 							.stripMargin
-						} else "    <non-git-build>"}
+						case None => "    <non-git-build>" }}
 					   |- buildtd :
-					   |    ${BuildConfig.CODE_TIMESTAMP}
-					   |    ${CommonFormat.formatDate(BuildConfig.CODE_TIMESTAMP, 0)} [UTC]"""
+					   |    ${MornySystem.CODE_TIMESTAMP}
+					   |    ${CommonFormat.formatDate(MornySystem.CODE_TIMESTAMP, 0)} [UTC]"""
 				.stripMargin
 			return
 			
@@ -138,7 +138,7 @@ object ServerMain {
 				s"""ServerMain.java Loaded >>>
 				   |- version ${MornySystem.VERSION_FULL}
 				   |- Morny ${MornySystem.CODENAME toUpperCase}
-				   |- <${MornySystem.getJarMD5}> [${BuildConfig.CODE_TIMESTAMP}]""".stripMargin
+				   |- <${MornySystem.getJarMD5}> [${MornySystem.CODE_TIMESTAMP}]""".stripMargin
 		
 		// due to [[MornyFormatterConsole]] will use a localized time, it will output to the log
 		logger info s"logging time will use time-zone ${tz.getID} ($tz_offset)"

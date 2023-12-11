@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.data
 
-import cc.sukazyo.cono.morny.{BuildConfig, MornyAbout, MornySystem}
+import cc.sukazyo.cono.morny.{MornyAbout, MornySystem}
 
 import java.net.InetAddress
 import java.rmi.UnknownHostException
@@ -9,21 +9,23 @@ object MornyInformation {
 	
 	//noinspection ScalaWeakerAccess
 	def getVersionGitTagHTML: String = {
-		if (!MornySystem.isGitBuild) return ""
-		val g = StringBuilder()
-		val cm = BuildConfig.COMMIT substring(0, 8)
-		val cp = MornySystem.currentCodePath
-		if (cp == null) g ++= s"<code>$cm</code>"
-		else g ++= s"<a href='$cp'>$cm</a>"
-		if (!MornySystem.isCleanBuild) g ++= ".<code>δ</code>"
-		g toString
+		MornySystem.GIT_COMMIT match
+			case None => ""
+			case Some(commit) =>
+				val g = StringBuilder()
+				val cm = commit substring(0, 8)
+				val cp = MornySystem.currentCodePath
+				if (cp == null) g ++= s"<code>$cm</code>"
+				else g ++= s"<a href='$cp'>$cm</a>"
+				if (!MornySystem.isCleanBuild) g ++= ".<code>δ</code>"
+				g toString
 	}
 	
 	def getVersionAllFullTagHTML: String = {
 		val v = StringBuilder()
 		v ++= s"<code>${MornySystem VERSION_BASE}</code>"
-		if (MornySystem isUseDelta) v ++= s"-δ<code>${MornySystem VERSION_DELTA}</code>"
-		if (MornySystem isGitBuild) v ++= "+git." ++= getVersionGitTagHTML
+		if (MornySystem.VERSION_DELTA nonEmpty) v ++= s"-δ<code>${MornySystem.VERSION_DELTA.get}</code>"
+		if (MornySystem.GIT_COMMIT nonEmpty) v ++= "+git." ++= getVersionGitTagHTML
 		v ++= s"*<code>${MornySystem.CODENAME toUpperCase}</code>"
 		v toString
 	}

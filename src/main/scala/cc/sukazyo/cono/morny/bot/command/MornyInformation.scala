@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.bot.command
 
-import cc.sukazyo.cono.morny.{BuildConfig, MornyCoeur, MornySystem}
+import cc.sukazyo.cono.morny.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
@@ -103,19 +103,19 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private[command] def echoVersion (using event: Update): Unit = {
-		val versionDeltaHTML = if (MornySystem.isUseDelta) s"-δ<code>${h(MornySystem.VERSION_DELTA)}</code>" else ""
-		val versionGitHTML = if (MornySystem.isGitBuild) s"git $getVersionGitTagHTML" else ""
+		val versionDeltaHTML = MornySystem.VERSION_DELTA match {case Some(d) => s"-δ<code>${h(d)}</code>" case None => ""}
+		val versionGitHTML = if (MornySystem.GIT_COMMIT nonEmpty) s"git $getVersionGitTagHTML" else ""
 		coeur.account exec new SendMessage(
 			event.message.chat.id,
 			// language=html
 			s"""version:
 			   |- Morny <code>${h(MornySystem.CODENAME toUpperCase)}</code>
-			   |- <code>${h(MornySystem.VERSION_BASE)}</code>$versionDeltaHTML${if (MornySystem.isGitBuild) "\n- " + versionGitHTML else ""}
+			   |- <code>${h(MornySystem.VERSION_BASE)}</code>$versionDeltaHTML${if (MornySystem.GIT_COMMIT nonEmpty) "\n- " + versionGitHTML else ""}
 			   |coeur md5_hash:
 			   |- <code>${h(MornySystem.getJarMD5)}</code>
 			   |coding timestamp:
-			   |- <code>${BuildConfig.CODE_TIMESTAMP}</code>
-			   |- <code>${h(formatDate(BuildConfig.CODE_TIMESTAMP, 0))} [UTC]</code>
+			   |- <code>${MornySystem.CODE_TIMESTAMP}</code>
+			   |- <code>${h(formatDate(MornySystem.CODE_TIMESTAMP, 0))} [UTC]</code>
 			   |""".stripMargin
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 	}
@@ -137,8 +137,8 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |coeur version:
 			   |- $getVersionAllFullTagHTML
 			   |- <code>${h(MornySystem.getJarMD5)}</code>
-			   |- <code>${h(formatDate(BuildConfig.CODE_TIMESTAMP, 0))} [UTC]</code>
-			   |- [<code>${BuildConfig.CODE_TIMESTAMP}</code>]
+			   |- <code>${h(formatDate(MornySystem.CODE_TIMESTAMP, 0))} [UTC]</code>
+			   |- [<code>${MornySystem.CODE_TIMESTAMP}</code>]
 			   |continuous:
 			   |- <code>${h(formatDuration(System.currentTimeMillis - coeur.coeurStartTimestamp))}</code>
 			   |- [<code>${System.currentTimeMillis - coeur.coeurStartTimestamp}</code>]

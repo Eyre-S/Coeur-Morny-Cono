@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny
 
 import cc.sukazyo.cono.morny.internal.BuildConfigField
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.FileUtils
 
 import java.io.IOException
@@ -13,24 +14,20 @@ object MornySystem {
 	@BuildConfigField val VERSION: String = BuildConfig.VERSION
 	@BuildConfigField val VERSION_FULL: String = BuildConfig.VERSION_FULL
 	@BuildConfigField val VERSION_BASE: String = BuildConfig.VERSION_BASE
-	@BuildConfigField val VERSION_DELTA: String = BuildConfig.VERSION_DELTA
+	@BuildConfigField val VERSION_DELTA: Option[String] = BuildConfig.VERSION_DELTA
+	@BuildConfigField val GIT_COMMIT: Option[String] = Some(BuildConfig.COMMIT)
+	@BuildConfigField val CODE_TIMESTAMP: EpochMillis = BuildConfig.CODE_TIMESTAMP
 	@BuildConfigField val CODENAME: String = BuildConfig.CODENAME
 	@BuildConfigField val CODE_STORE: String = BuildConfig.CODE_STORE
 	//noinspection ScalaWeakerAccess
 	@BuildConfigField val COMMIT_PATH: String = BuildConfig.COMMIT_PATH
 	
 	@BuildConfigField
-	def isUseDelta: Boolean = VERSION_DELTA ne null
-	
-	@BuildConfigField
-	def isGitBuild: Boolean = BuildConfig.COMMIT ne null
-	
-	@BuildConfigField
 	def isCleanBuild: Boolean = BuildConfig.CLEAN_BUILD
 	
 	def currentCodePath: String|Null =
-		if ((COMMIT_PATH eq null) || (!isGitBuild)) null
-		else COMMIT_PATH.formatted(BuildConfig.COMMIT)
+		if ((COMMIT_PATH eq null) || (GIT_COMMIT isEmpty)) null
+		else COMMIT_PATH.formatted(GIT_COMMIT get)
 	
 	def getJarMD5: String = {
 		try {
