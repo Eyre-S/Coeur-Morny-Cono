@@ -1,3 +1,5 @@
+aether.AetherKeys.aetherOldVersionMethod := true
+
 ThisBuild / organization := "cc.sukazyo"
 ThisBuild / organizationName := "A.C. Sukazyo Eyre"
 

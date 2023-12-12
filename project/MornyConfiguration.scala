@@ -8,7 +8,7 @@ object MornyConfiguration {
 	val MORNY_CODE_STORE = "https://github.com/Eyre-S/Coeur-Morny-Cono"
 	val MORNY_COMMIT_PATH = "https://github.com/Eyre-S/Coeur-Morny-Cono/commit/%s"
 	
-	val VERSION = "2.0.0-alpha1"
+	val VERSION = "2.0.0-alpha1.1"
 	val VERSION_DELTA: Option[String] = None
 	val CODENAME = "guanggu"
 	
@@ -51,7 +51,7 @@ object MornyConfiguration {
 			case true => Some("-ws-snapshots" at "https://mvn.sukazyo.cc/snapshots")
 			case false => Some("-ws-releases" at "https://mvn.sukazyo.cc/releases")
 		}
-//		Some(Resolver.file("build", file("./target/artifacts")))
+//		Some(Resolver.file("build", file("S:/__tests/artifacts")))
 //		None
 	}
 	val publishCredentials: Seq[Credentials] = {
