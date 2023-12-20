@@ -11,7 +11,7 @@ import scala.language.postfixOps
 class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "event_hack"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = "[(user|group|any)]"
 	override val description: String = "输出 bot 下一个获取到的事件序列化数据"
 	

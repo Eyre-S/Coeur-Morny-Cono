@@ -21,7 +21,7 @@ class Nbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 		"<a href=\"https://lab.magiconch.com/nbnhhsh/\">## Result of nbnhhsh query :</a>"
 	
 	override val name: String = "nbnhhsh"
-	override val aliases: Array[ICommandAlias]|Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = "[text]"
 	override val description: String = "检索文本内 nbnhhsh 词条"
 	

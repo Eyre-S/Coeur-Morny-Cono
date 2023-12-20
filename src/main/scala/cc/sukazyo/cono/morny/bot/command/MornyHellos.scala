@@ -14,7 +14,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 	object On extends ITelegramCommand {
 		
 		override val name: String = "on"
-		override val aliases: Array[ICommandAlias] | Null = null
+		override val aliases: List[ICommandAlias] = Nil
 		override val paramRule: String = ""
 		override val description: String = "检查是否在线"
 		
@@ -29,7 +29,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 	object Hello extends ITelegramCommand {
 		
 		override val name: String = "hello"
-		override val aliases: Array[ICommandAlias] | Null = Array(ListedAlias("hi"))
+		override val aliases: List[ICommandAlias] = ListedAlias("hi") :: Nil
 		override val paramRule: String = ""
 		override val description: String = "打招呼"
 		

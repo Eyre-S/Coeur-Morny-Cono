@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.request.SendMessage
 class MornyOldJrrp (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "jrrp"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = ""
 	override val description: String = "获取 (假的) jrrp"
 	

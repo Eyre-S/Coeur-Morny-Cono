@@ -13,7 +13,7 @@ import scala.language.postfixOps
 class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "user"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = "[userid]"
 	override val description: String = "获取指定或回复的用户相关信息"
 	

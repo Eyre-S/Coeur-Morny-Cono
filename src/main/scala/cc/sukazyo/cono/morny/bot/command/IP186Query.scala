@@ -18,13 +18,13 @@ class IP186Query (using coeur: MornyCoeur) {
 	
 	object IP extends ITelegramCommand:
 		override val name: String = "ip"
-		override val aliases: Array[ICommandAlias]|Null = null
+		override val aliases: List[ICommandAlias] = Nil
 		override val paramRule: String = "[ip]"
 		override val description: String = "通过 https://ip.186526.xyz 查询 ip 资料"
 		override def execute (using command: InputCommand, event: Update): Unit = query
 	object Whois extends ITelegramCommand:
 		override val name: String = "whois"
-		override val aliases: Array[ICommandAlias]|Null = null
+		override val aliases: List[ICommandAlias] = Nil
 		override val paramRule: String = "[domain]"
 		override val description: String = "通过 https://ip.186526.xyz 查询域名资料"
 		override def execute (using command: InputCommand, event: Update): Unit = query

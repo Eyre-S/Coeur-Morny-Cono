@@ -8,7 +8,7 @@ object MornyConfiguration {
 	val MORNY_CODE_STORE = "https://github.com/Eyre-S/Coeur-Morny-Cono"
 	val MORNY_COMMIT_PATH = "https://github.com/Eyre-S/Coeur-Morny-Cono/commit/%s"
 	
-	val VERSION = "2.0.0-alpha1.1"
+	val VERSION = "2.0.0-alpha2"
 	val VERSION_DELTA: Option[String] = None
 	val CODENAME = "guanggu"
 	
@@ -42,6 +42,9 @@ object MornyConfiguration {
 		
 		"org.scalatest" %% "scalatest" % "3.2.17" % Test,
 		"org.scalatest" %% "scalatest-freespec" % "3.2.17" % Test,
+		// for test report
+		"com.vladsch.flexmark" % "flexmark" % "0.64.0" % Test,
+		"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.0" % Test
 		
 	)
 	

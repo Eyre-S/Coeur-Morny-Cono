@@ -12,7 +12,7 @@ import com.pengrad.telegrambot.request.SendMessage
 class 私わね (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override val name: String = "me"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		

@@ -13,7 +13,7 @@ import scala.language.postfixOps
 class DirectMsgClear (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override val name: String = "r"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		

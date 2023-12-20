@@ -55,6 +55,7 @@ lazy val root = (project in file("."))
 				"-source", "17",
 				"-target", "17"
 			),
+			autoAPIMappings := true,
 			
 			assemblyMergeStrategy := {
 				case module if module endsWith "module-info.class" => MergeStrategy.concat

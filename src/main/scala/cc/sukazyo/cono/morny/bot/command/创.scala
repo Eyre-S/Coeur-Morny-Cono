@@ -1,11 +1,10 @@
 package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.*
 import com.pengrad.telegrambot.model.{MessageEntity, Update}
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
+import com.pengrad.telegrambot.request.SendMessage
 
 //noinspection NonAsciiCharacters
 class 创 (using coeur: MornyCoeur) {
@@ -13,7 +12,7 @@ class 创 (using coeur: MornyCoeur) {
 	object Chuang extends ISimpleCommand {
 		
 		override val name: String = "chuang"
-		override val aliases: Array[ICommandAlias] | Null = null
+		override val aliases: List[ICommandAlias] = Nil
 		
 		override def execute (using command: InputCommand, event: Update): Unit = {
 			

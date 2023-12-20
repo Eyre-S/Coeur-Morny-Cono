@@ -25,9 +25,9 @@ trait ISimpleCommand {
 	  * the unique identifier, it uses the same namespace with [[name]], means
 	  * it also cannot be duplicate with other [[name]] or [[aliases]].
 	  *
-	  * It can be [[Null]], means no aliases.
+	  * It should not be [[Null]], using [[Nil]] instead for no aliases.
 	  */
-	val aliases: Array[ICommandAlias]|Null
+	val aliases: List[ICommandAlias]
 	
 	/** The work code of this command.
 	  *

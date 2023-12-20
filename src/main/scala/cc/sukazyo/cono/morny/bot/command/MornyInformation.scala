@@ -27,7 +27,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	override val name: String = "info"
-	override val aliases: Array[ICommandAlias]|Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = "[(version|runtime|stickers[.IDs]|tasks|event)]"
 	override val description: String = "输出当前 Morny 的各种信息"
 	

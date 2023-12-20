@@ -10,7 +10,7 @@ import com.pengrad.telegrambot.request.SendSticker
 class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "get"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	override val paramRule: String = "<tweet-url|weibo-status-url>"
 	override val description: String = "从社交媒体分享链接获取其内容"
 	

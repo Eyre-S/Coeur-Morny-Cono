@@ -12,7 +12,7 @@ import scala.language.postfixOps
 class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override val name: String = "test"
-	override val aliases: Array[ICommandAlias] | Null = null
+	override val aliases: List[ICommandAlias] = Nil
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		

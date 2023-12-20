@@ -17,7 +17,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 	object Exit extends ITelegramCommand {
 		
 		override val name: String = "exit"
-		override val aliases: Array[ICommandAlias] | Null = Array(HiddenAlias("stop"), HiddenAlias("quit"))
+		override val aliases: List[ICommandAlias] = HiddenAlias("stop") :: HiddenAlias("quit") :: Nil
 		override val paramRule: String = "exit"
 		override val description: String = "关闭 Bot （仅可信成员）"
 		
@@ -52,7 +52,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 	object SaveData extends ITelegramCommand {
 		
 		override val name: String = "save"
-		override val aliases: Array[ICommandAlias] | Null = null
+		override val aliases: List[ICommandAlias] = Nil
 		override val paramRule: String = ""
 		override val description: String = "保存缓存数据到文件（仅可信成员）"
 		

@@ -19,7 +19,7 @@ class MornyCommands (using coeur: MornyCoeur) {
 		val stash = mutable.SeqMap.empty[String, ISimpleCommand]
 		for (i <- commands)
 			stash += (i.name -> i)
-			if (i.aliases ne null) for (alias <- i.aliases)
+			for (alias <- i.aliases)
 				stash += (alias.name -> i)
 		stash
 	
@@ -122,7 +122,7 @@ class MornyCommands (using coeur: MornyCoeur) {
 			BotCommand(name, if paramRule isBlank then intro else s"$paramRule - $intro")
 		val list = mutable.ArrayBuffer[BotCommand](
 			buildOne(command.name, command.paramRule, command.description))
-		if (command.aliases ne null) for (alias <- command.aliases)
+		for (alias <- command.aliases)
 			if (alias.listed) list += buildOne(alias.name, "", "↑")
 		list toArray
 	

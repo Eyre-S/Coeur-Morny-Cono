@@ -22,7 +22,7 @@ import scala.language.postfixOps
 class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "encrypt"
-	override val aliases: Array[ICommandAlias] | Null = Array(ListedAlias("enc"))
+	override val aliases: List[ICommandAlias] = ListedAlias("enc") :: Nil
 	override val paramRule: String = "[algorithm|(l)] [(uppercase)]"
 	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
 	
