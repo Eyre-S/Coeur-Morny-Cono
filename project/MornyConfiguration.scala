@@ -8,7 +8,7 @@ object MornyConfiguration {
 	val MORNY_CODE_STORE = "https://github.com/Eyre-S/Coeur-Morny-Cono"
 	val MORNY_COMMIT_PATH = "https://github.com/Eyre-S/Coeur-Morny-Cono/commit/%s"
 	
-	val VERSION = "2.0.0-alpha2"
+	val VERSION = "2.0.0-alpha3"
 	val VERSION_DELTA: Option[String] = None
 	val CODENAME = "guanggu"
 	

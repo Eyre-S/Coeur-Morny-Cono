@@ -3,7 +3,7 @@ package cc.sukazyo.cono.morny
 import cc.sukazyo.cono.morny.bot.command.MornyCommands
 import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.MornyCoeur.THREAD_SERVER_EXIT
+import cc.sukazyo.cono.morny.MornyCoeur.{TestRun, THREAD_SERVER_EXIT}
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
@@ -21,9 +21,11 @@ object MornyCoeur {
 	
 	val THREAD_SERVER_EXIT = "system-exit"
 	
+	object TestRun
+	
 }
 
-class MornyCoeur (using val config: MornyConfig) {
+class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 	
 	given MornyCoeur = this
 	
@@ -42,8 +44,6 @@ class MornyCoeur (using val config: MornyConfig) {
 			logger error "Login to bot failed."
 			System exit -1
 			throw RuntimeException()
-	
-	configure_exitCleanup()
 	
 	///<<< BLOCK END instance configure & startup stage 1
 	
@@ -94,6 +94,14 @@ class MornyCoeur (using val config: MornyConfig) {
 	
 	///>>> BLOCK START instance configure & startup stage 2
 	
+	logger info "done initialize."
+	if testRun then
+		logger info "done test run, exiting."
+		this.exit(0, TestRun)
+	
+	configure_exitCleanup()
+	// put things that need to cleanup when exit below
+	//  so that it will be correctly cleanup when normal run and will not execute in testRun.
 	daemons.start()
 	logger info "start telegram event listening"
 	import com.pengrad.telegrambot.TelegramException

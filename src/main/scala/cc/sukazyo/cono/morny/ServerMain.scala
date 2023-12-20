@@ -21,6 +21,7 @@ object ServerMain {
 		val config = new MornyConfig.Prototype()
 		var mode_echoVersion = false
 		var mode_echoHello = false
+		var mode_testRun = false
 		var showHello = true
 		
 		val unknownArgs = ArrayBuffer[String]()
@@ -31,6 +32,7 @@ object ServerMain {
 			args(i) match {
 				
 				case "-d" | "--dbg" | "--debug" => Log.debug(true)
+				case "-t" | "--test" => mode_testRun = true
 				
 				case "--no-hello" | "-hf" | "--quiet" | "-q" => showHello = false
 				case "--only-hello" | "-ho" | "-o" | "-hi" => mode_echoHello = true
@@ -156,7 +158,9 @@ object ServerMain {
 		Thread.currentThread setName THREAD_MORNY_INIT
 		
 		try
-			MornyCoeur(using config build)
+			MornyCoeur(using config build)(
+				testRun = mode_testRun
+			)
 		catch {
 			case _: CheckFailure.NullTelegramBotKey =>
 				logger.info("Parameter required has no value:\n --token.")
