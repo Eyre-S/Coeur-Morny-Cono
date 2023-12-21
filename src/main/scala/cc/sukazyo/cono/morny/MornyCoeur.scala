@@ -1,19 +1,19 @@
 package cc.sukazyo.cono.morny
 
-import cc.sukazyo.cono.morny.bot.command.MornyCommands
+import cc.sukazyo.cono.morny.bot.command.MornyCommandManager
 import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.MornyCoeur.{TestRun, THREAD_SERVER_EXIT}
+import cc.sukazyo.cono.morny.MornyCoeur.*
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
-import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
-import cc.sukazyo.cono.morny.bot.query.MornyQueries
+import cc.sukazyo.cono.morny.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
+import cc.sukazyo.cono.morny.bot.query.MornyQueryManager
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.time.WatchDog
+import cc.sukazyo.cono.morny.util.GivenContext
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
-import scala.annotation.unused
 import scala.util.boundary
 import scala.util.boundary.break
 
@@ -23,15 +23,65 @@ object MornyCoeur {
 	
 	object TestRun
 	
+	case class OnInitializingPreContext (
+		externalContext: GivenContext,
+		coeurStartupTimes: EpochMillis,
+		account: TelegramBot,
+		username: String,
+		userid: Long,
+		tasks: Scheduler,
+		trusted: MornyTrusted,
+		givenCxt: GivenContext
+	)
+	
+	case class OnInitializingContext (
+		externalContext: GivenContext,
+		coeurStartupTimes: EpochMillis,
+		account: TelegramBot,
+		username: String,
+		userid: Long,
+		tasks: Scheduler,
+		trusted: MornyTrusted,
+		eventManager: EventListenerManager,
+		commandManager: MornyCommandManager,
+		queryManager: MornyQueryManager,
+		givenCxt: GivenContext
+	)
+	
+	case class OnInitializingPostContext (
+		externalContext: GivenContext,
+		coeurStartupTimes: EpochMillis,
+		account: TelegramBot,
+		username: String,
+		userid: Long,
+		tasks: Scheduler,
+		trusted: MornyTrusted,
+		eventManager: EventListenerManager,
+		commandManager: MornyCommandManager,
+		queryManager: MornyQueryManager,
+		givenCxt: GivenContext
+	)
+	
+	case class OnStartingContext (
+		givenCxt: GivenContext
+	)
+	
+	case class OnStartingPostContext (
+		givenCxt: GivenContext
+	)
+	
 }
 
-class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
+class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(testRun: Boolean = false) {
 	
 	given MornyCoeur = this
+	
+	val externalContext: GivenContext = GivenContext()
 	
 	///>>> BLOCK START instance configure & startup stage 1
 	
 	logger info "Coeur starting..."
+	private var initializeContext = GivenContext()
 	
 	import cc.sukazyo.cono.morny.util.StringEnsure.deSensitive
 	logger info s"args key:\n  ${config.telegramBotKey deSensitive 4}"
@@ -44,6 +94,7 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 			logger error "Login to bot failed."
 			System exit -1
 			throw RuntimeException()
+	initializeContext << __loginResult
 	
 	///<<< BLOCK END instance configure & startup stage 1
 	
@@ -71,19 +122,29 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
 	
+	modules.foreach(it => it.onInitializingPre(OnInitializingPreContext(
+		externalContext,
+		coeurStartTimestamp, account, username, userid, tasks, trusted,
+		initializeContext)))
+	
 	val daemons: MornyDaemons = MornyDaemons()
-	//noinspection ScalaWeakerAccess
+	initializeContext << daemons
 	val eventManager: EventListenerManager = EventListenerManager()
 	eventManager register MornyOnUpdateTimestampOffsetLock()
-	val commands: MornyCommands = MornyCommands()
-	//noinspection ScalaWeakerAccess
-	val queries: MornyQueries = MornyQueries()
+	val commands: MornyCommandManager = MornyCommandManager()
+	val queries: MornyQueryManager = MornyQueryManager()
 	eventManager register MornyOnTelegramCommand(using commands)
 	eventManager register MornyOnInlineQuery(using queries)
-	//noinspection ScalaUnusedSymbol
-	val events: MornyEventListeners = MornyEventListeners(using eventManager)
+	
+	// Coeur Initializing Event
+	modules.foreach(it => it.onInitializing(OnInitializingContext(
+		externalContext,
+		coeurStartTimestamp, account, username, userid, tasks, trusted,
+		eventManager, commands, queries,
+		initializeContext)))
+	
 	eventManager register daemons.reporter.EventStatistics.EventInfoCatcher
-	@unused
+	
 	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
 		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
 		logger warn
@@ -91,6 +152,12 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 			   |  current tick takes ${f(consumed)} to complete.""".stripMargin
 		tasks.notifyIt()
 	})
+	initializeContext / this << watchDog
+	modules.foreach(it => it.onInitializingPost(OnInitializingPostContext(
+		externalContext,
+		coeurStartTimestamp, account, username, userid, tasks, trusted,
+		eventManager, commands, queries,
+		initializeContext)))
 	
 	///>>> BLOCK START instance configure & startup stage 2
 	
@@ -102,6 +169,8 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 	configure_exitCleanup()
 	// put things that need to cleanup when exit below
 	//  so that it will be correctly cleanup when normal run and will not execute in testRun.
+	modules.foreach(it => it.onStarting(OnStartingContext(
+		initializeContext)))
 	daemons.start()
 	logger info "start telegram event listening"
 	import com.pengrad.telegrambot.TelegramException
@@ -150,18 +219,21 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 		}
 		
 	})
+	modules.foreach(it => it.onStartingPost(OnStartingPostContext(
+		initializeContext)))
 	
 	if config.commandLoginRefresh then
 		logger info "resetting telegram command list"
 		commands.automaticTGListUpdate()
 	
 	daemons.reporter.reportCoeurMornyLogin()
+	initializeContext = null
 	logger info "Coeur start complete."
 	
 	///<<< BLOCK END instance configure & startup stage 2
 	
 	def saveDataAll(): Unit = {
-		// nothing to do
+		modules.foreach(it => it.onRoutineSavingData)
 		logger notice "done all save action."
 	}
 	
@@ -169,6 +241,7 @@ class MornyCoeur (using val config: MornyConfig)(testRun: Boolean = false) {
 		daemons.reporter.reportCoeurExit()
 		account.shutdown()
 		logger info "stopped bot account"
+		modules.foreach(it => it.onExit)
 		daemons.stop()
 		tasks.waitForStop()
 		logger info s"morny tasks stopped: remains ${tasks.amount} tasks not be executed"

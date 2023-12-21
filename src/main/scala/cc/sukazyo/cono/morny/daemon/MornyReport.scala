@@ -184,12 +184,12 @@ class MornyReport (using coeur: MornyCoeur) {
 			//noinspection ScalaWeakerAccess
 			case class EventTimeUsed (it: DurationMillis)
 			override def atEventPost (using event: EventEnv): Unit = {
-				import event.State
+				import event.*
 				eventTotal += 1
 				event.state match
 					case State.OK(from) =>
 						val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
-						event provide timeUsed
+						givenCxt << timeUsed
 						logger debug
 							s"""event done with OK
 							   |  with time consumed ${timeUsed.it}ms

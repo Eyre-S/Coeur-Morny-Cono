@@ -8,69 +8,26 @@ import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
 import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
 
-import scala.collection.{mutable, SeqMap}
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
-class MornyCommands (using coeur: MornyCoeur) {
+class MornyCommandManager (using coeur: MornyCoeur) {
 	
-	private type CommandMap = SeqMap[String, ISimpleCommand]
-	private def CommandMap (commands: ISimpleCommand*): CommandMap =
-		val stash = mutable.SeqMap.empty[String, ISimpleCommand]
+	private type CommandMap = mutable.SeqMap[String, ISimpleCommand]
+	private val commands: CommandMap = mutable.SeqMap.empty
+	def register [T <: ISimpleCommand] (commands: T*): Unit =
 		for (i <- commands)
-			stash += (i.name -> i)
+			this.commands += (i.name -> i)
 			for (alias <- i.aliases)
-				stash += (alias.name -> i)
-		stash
+				this.commands += (alias.name -> i)
 	
-	private val $MornyHellos = MornyHellos()
-	private val $IP186Query = IP186Query()
-	private val $MornyInformation = MornyInformation()
-	private val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)
-	private val $MornyManagers = MornyManagers()
-	//noinspection NonAsciiCharacters
-	private val $喵呜 = 喵呜()
-	//noinspection NonAsciiCharacters
-	private val $创 = 创()
-	private val commands: CommandMap = CommandMap(
-		
-		$MornyHellos.On,
-		$MornyHellos.Hello,
-		MornyInfoOnStart(),
-		GetUsernameAndId(),
-		EventHack(),
-		Nbnhhsh(),
-		$IP186Query.IP,
-		$IP186Query.Whois,
-		Encryptor(),
-		MornyOldJrrp(),
-		GetSocial(),
-		
-		$MornyManagers.SaveData,
-		$MornyInformation,
-		$MornyInformationOlds.Version,
-		$MornyInformationOlds.Runtime,
-		$MornyManagers.Exit,
-		
-		Testing(),
-		DirectMsgClear(),
-		
-		//noinspection NonAsciiCharacters
-		私わね(),
-		//noinspection NonAsciiCharacters
-		$喵呜.Progynova,
-		//noinspection NonAsciiCharacters
-		$创.Chuang
-		
-	)
-	
-	//noinspection NonAsciiCharacters
-	val commands_uni: CommandMap = CommandMap(
-		$喵呜.抱抱,
-		$喵呜.揉揉,
-		$喵呜.贴贴,
-		$喵呜.蹭蹭
-	)
+	private[bot] val commands_uni: CommandMap = mutable.SeqMap.empty
+	def registerForUni [T <: ISimpleCommand] (commands: T*): Unit =
+		for (i <- commands)
+			this.commands_uni += (i.name -> i)
+			for (alias <- i.aliases)
+				this.commands_uni += (alias.name -> i)
 	
 	def execute (using command: InputCommand, event: Update): Boolean = {
 		if (commands contains command.command)

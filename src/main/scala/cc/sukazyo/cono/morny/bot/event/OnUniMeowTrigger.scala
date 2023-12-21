@@ -1,15 +1,16 @@
 package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.bot.command.MornyCommands
+import cc.sukazyo.cono.morny.bot.command.MornyCommandManager
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.Log.logger
 
-class OnUniMeowTrigger (using commands: MornyCommands) extends EventListener {
+class OnUniMeowTrigger (using commands: MornyCommandManager) extends EventListener {
 	
 	override def onMessage (using event: EventEnv): Unit = {
+		import event.*
 		
-		event.consume[InputCommand] { input =>
+		givenCxt >> { (input: InputCommand) =>
 			logger trace s"got input command {$input} from event-context"
 			
 			for ((name, command_instance) <- commands.commands_uni) {
@@ -20,7 +21,7 @@ class OnUniMeowTrigger (using commands: MornyCommands) extends EventListener {
 					event.setEventOk
 			}
 			
-		} onfail { logger trace "not command (for uni-meow)" }
+		} || { logger trace "not command (for uni-meow)" }
 		
 	}
 	

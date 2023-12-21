@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.bot.api
 
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
+import cc.sukazyo.cono.morny.util.GivenContext
 import cc.sukazyo.messiva.utils.StackUtils
 import com.pengrad.telegrambot.model.Update
 
@@ -19,7 +20,7 @@ class EventEnv (
 		case CANCELED (_from: StackTraceElement) extends State with StateSource(_from)
 	
 	private val _status: mutable.ListBuffer[State] = mutable.ListBuffer.empty
-	private val variables: mutable.HashMap[Class[?], Any] = mutable.HashMap.empty
+	val givenCxt: GivenContext = GivenContext()
 	val timeStartup: EpochMillis = System.currentTimeMillis
 	
 	def isEventOk: Boolean = _status.lastOption match
@@ -41,25 +42,5 @@ class EventEnv (
 	
 	def status: List[State] =
 		_status.toList
-	
-	def provide (i: Any): Unit =
-		variables += (i.getClass -> i)
-	
-	def consume [T] (t: Class[T]) (consumer: T => Unit): ConsumeResult = {
-		variables get t match
-			case Some(i) => consumer(i.asInstanceOf[T]); ConsumeResult(true)
-			case None => ConsumeResult(false)
-	}
-	
-	def consume [T: ClassTag] (consumer: T => Unit): ConsumeResult =
-		variables get classTag[T].runtimeClass match
-			case Some(i) => consumer(i.asInstanceOf[T]); ConsumeResult(true)
-			case None => ConsumeResult(false)
-	
-	class ConsumeResult (success: Boolean) {
-		def onfail (processor: => Unit): Unit = {
-			if !success then processor
-		}
-	}
 	
 }

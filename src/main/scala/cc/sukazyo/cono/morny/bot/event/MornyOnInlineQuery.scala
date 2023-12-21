@@ -2,9 +2,8 @@ package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, MornyQueries}
+import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, MornyQueryManager}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResult
 import com.pengrad.telegrambot.request.AnswerInlineQuery
 
@@ -12,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
-class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyCoeur) extends EventListener {
+class MornyOnInlineQuery (using queryManager: MornyQueryManager) (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onInlineQuery (using event: EventEnv): Unit = {
 		import event.update

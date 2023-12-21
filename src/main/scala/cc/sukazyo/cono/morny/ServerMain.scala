@@ -158,7 +158,9 @@ object ServerMain {
 		Thread.currentThread setName THREAD_MORNY_INIT
 		
 		try
-			MornyCoeur(using config build)(
+			MornyCoeur(
+				MornyCoreModule() :: Nil
+			)(using config build)(
 				testRun = mode_testRun
 			)
 		catch {
