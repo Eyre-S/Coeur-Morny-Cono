@@ -6,7 +6,6 @@ import cc.sukazyo.messiva.utils.StackUtils
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable
-import scala.reflect.{classTag, ClassTag}
 
 class EventEnv (
 	
@@ -29,11 +28,11 @@ class EventEnv (
 	
 	//noinspection UnitMethodIsParameterless
 	def setEventOk: Unit =
-		_status += State.OK(StackUtils.getStackTrace(1)(1))
+		_status += State.OK(StackUtils.getStackTrace(1).head)
 	
 	//noinspection UnitMethodIsParameterless
 	def setEventCanceled: Unit =
-		_status += State.CANCELED(StackUtils.getStackTrace(1)(1))
+		_status += State.CANCELED(StackUtils.getStackTrace(1).head)
 	
 	def state: State|Null =
 		_status.lastOption match
