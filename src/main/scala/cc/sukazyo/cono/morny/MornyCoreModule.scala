@@ -25,7 +25,6 @@ class MornyCoreModule extends MornyModule {
 		eventManager.register(
 			// ACTIVITY_RECORDER
 			// KUOHUANHUAN_NEED_SLEEP
-			OnUniMeowTrigger(using commandManager),
 			$OnUserRandom.RandomSelect,
 			//noinspection NonAsciiCharacters
 			$OnUserRandom.尊嘟假嘟,
@@ -43,8 +42,6 @@ class MornyCoreModule extends MornyModule {
 		val $MornyInformation = MornyInformation()
 		val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)
 		val $MornyManagers = MornyManagers()
-		//noinspection NonAsciiCharacters
-		val $喵呜 = 喵呜()
 		//noinspection NonAsciiCharacters
 		val $创 = 创()
 		commandManager.register(
@@ -69,21 +66,9 @@ class MornyCoreModule extends MornyModule {
 			
 			Testing(),
 			DirectMsgClear(),
-			
-			//noinspection NonAsciiCharacters
-			私わね(),
-			//noinspection NonAsciiCharacters
-			$喵呜.Progynova,
 			//noinspection NonAsciiCharacters
 			$创.Chuang
-		
-		)
-		//noinspection NonAsciiCharacters
-		commandManager.registerForUni(
-			$喵呜.抱抱,
-			$喵呜.揉揉,
-			$喵呜.贴贴,
-			$喵呜.蹭蹭
+			
 		)
 		
 		queryManager.register(

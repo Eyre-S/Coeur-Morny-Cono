@@ -21,6 +21,12 @@ object MornyCoeur {
 	
 	val THREAD_SERVER_EXIT = "system-exit"
 	
+	/** A tag that shows current [[MornyCoeur!]] is running under
+	  * test mode.
+	  *
+	  * @see [[MornyCoeur.testRun]] for more introduction for test mode.
+	  * @since 2.0.0
+	  */
 	object TestRun
 	
 	case class OnInitializingPreContext (
@@ -72,6 +78,31 @@ object MornyCoeur {
 	
 }
 
+/** The Coeur (Main Class) of Morny.
+  *
+  * ## Lifecycle
+  *
+  * todo...
+  *
+  * ## Test Mode
+  *
+  * Coeur supports a special launch mode called test mode.When running
+  * under test mode, this instance will only run till the initialize
+  * is complete and exit immediately. In the lifecycle, it is run till
+  * [[MornyModule.onInitializingPost]] event.
+  *
+  * In this way, it will be available to see if the initialize result is
+  * under expected while not really start the service (aka. will not
+  * take side effect).
+  *
+  * This mode can be enabled by the parameter [[testRun]]. When exited
+  * under this mode, the [[exitReason]] will be a special value [[TestRun]].
+  *
+  * @param modules all morny modules.
+  * @param config the immutable [[MornyConfig]] instance, will use all
+  *               over this Morny (Coeur) instance.
+  * @param testRun if the instance should run under test mode.
+  */
 class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(testRun: Boolean = false) {
 	
 	given MornyCoeur = this

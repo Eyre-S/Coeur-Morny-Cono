@@ -1,11 +1,10 @@
-package cc.sukazyo.cono.morny.bot.event
+package cc.sukazyo.cono.morny.uni_meow
 
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.bot.command.MornyCommandManager
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.Log.logger
 
-class OnUniMeowTrigger (using commands: MornyCommandManager) extends EventListener {
+class BotEventUniMeowTrigger (using commands: UniMeowCommandManager) extends EventListener {
 	
 	override def onMessage (using event: EventEnv): Unit = {
 		import event.*
@@ -13,7 +12,7 @@ class OnUniMeowTrigger (using commands: MornyCommandManager) extends EventListen
 		givenCxt >> { (input: InputCommand) =>
 			logger trace s"got input command {$input} from event-context"
 			
-			for ((name, command_instance) <- commands.commands_uni) {
+			for ((name, command_instance) <- commands.commands) {
 				logger trace s"checking uni-meow $name"
 				if (name == input.command)
 					logger trace "checked"

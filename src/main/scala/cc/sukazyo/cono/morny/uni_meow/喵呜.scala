@@ -1,6 +1,7 @@
-package cc.sukazyo.cono.morny.bot.command
+package cc.sukazyo.cono.morny.uni_meow
 
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ISimpleCommand, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec

@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.Log.logger
+import cc.sukazyo.cono.morny.bot.command.MornyCommandManager.CommandMap
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
@@ -12,9 +13,11 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
+object MornyCommandManager:
+	type CommandMap = mutable.SeqMap[String, ISimpleCommand]
+
 class MornyCommandManager (using coeur: MornyCoeur) {
 	
-	private type CommandMap = mutable.SeqMap[String, ISimpleCommand]
 	private val commands: CommandMap = mutable.SeqMap.empty
 	def register [T <: ISimpleCommand] (commands: T*): Unit =
 		for (i <- commands)

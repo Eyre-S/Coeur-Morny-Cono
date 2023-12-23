@@ -159,7 +159,7 @@ object ServerMain {
 		
 		try
 			MornyCoeur(
-				MornyCoreModule() :: Nil
+				ServerModulesLoader.load()
 			)(using config build)(
 				testRun = mode_testRun
 			)
