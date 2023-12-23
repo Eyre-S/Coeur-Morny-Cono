@@ -1,13 +1,33 @@
 package cc.sukazyo.cono.morny.util
 
-import cc.sukazyo.cono.morny.util.GivenContext.ContextNotGivenException
+import cc.sukazyo.cono.morny.util.GivenContext.{ContextNotGivenException, FolderClass, RequestItemClass}
+import cc.sukazyo.messiva.utils.StackUtils
 
 import scala.annotation.targetName
 import scala.collection.mutable
 import scala.reflect.{classTag, ClassTag}
+import scala.util.boundary
 
 object GivenContext {
-	class ContextNotGivenException extends NoSuchElementException
+	case class FolderClass (clazz: Option[Class[?]])
+	object FolderClass:
+		def default: FolderClass = FolderClass(None)
+	case class RequestItemClass (clazz: Class[?])
+	private def lastNonGCStack: StackTraceElement =
+		boundary {
+			for (stack <- StackUtils.getStackTrace(0)) {
+				if (!stack.getClassName.startsWith(classOf[GivenContext].getName))
+					boundary break stack
+			}
+			StackTraceElement("unknown", "unknown", "unknown", -1)
+		}
+	class ContextNotGivenException (using
+		val requestItemClass: RequestItemClass,
+		val folderClass: FolderClass = FolderClass.default,
+		val requestStack: StackTraceElement = UseStacks.getStackHeadBeforeClass[GivenContext]
+	) extends NoSuchElementException (
+		s"None of the ${requestItemClass.clazz.getSimpleName} is in the context${folderClass.clazz.map(" and owned by " + _.getSimpleName).getOrElse("")}, which is required by $requestStack."
+	)
 }
 
 /** A mutable collection that can store(provide) any typed value and read(use/consume) that value by type.
@@ -67,7 +87,8 @@ class GivenContext {
 	
 	private type CxtOption[T] = Either[ContextNotGivenException, T]
 	def use [T: ClassTag]: CxtOption[T] =
-		variables get classTag[T].runtimeClass match
+		given t: RequestItemClass = RequestItemClass(classTag[T].runtimeClass)
+		variables get t.clazz match
 			case Some(i) => Right(i.asInstanceOf[T])
 			case None => Left(ContextNotGivenException())
 	def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
@@ -101,8 +122,12 @@ class GivenContext {
 			this.provide[T](i)
 		
 		def use [T: ClassTag]: CxtOption[T] =
-			variablesWithOwner(classTag[O].runtimeClass) get classTag[T].runtimeClass match
-				case Some(i) => Right(i.asInstanceOf[T])
+			given t: RequestItemClass = RequestItemClass(classTag[T].runtimeClass)
+			given u: FolderClass = FolderClass(Some(classTag[O].runtimeClass))
+			variablesWithOwner get u.clazz.get match
+				case Some(varColl) => varColl get t.clazz match
+					case Some(i) => Right(i.asInstanceOf[T])
+					case None => Left(ContextNotGivenException())
 				case None => Left(ContextNotGivenException())
 		def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			use[T] match

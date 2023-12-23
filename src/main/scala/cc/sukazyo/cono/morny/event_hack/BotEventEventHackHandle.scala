@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.bot.event
+package cc.sukazyo.cono.morny.event_hack
 
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.Log.logger
@@ -11,11 +11,11 @@ import com.pengrad.telegrambot.request.SendMessage
 import scala.collection.mutable
 import scala.language.postfixOps
 
-class OnEventHackHandle (using coeur: MornyCoeur) extends EventListener {
+class BotEventEventHackHandle (using hacker: EventHacker)(using coeur: MornyCoeur) extends EventListener {
 	
 	private def trigger (chat_id: Long, from_id: Long)(using event: EventEnv): Unit =
 		given Update = event.update
-		if coeur.daemons.eventHack.trigger(chat_id, from_id) then
+		if hacker.trigger(chat_id, from_id) then
 			event.setEventOk
 	
 	override def onMessage (using event: EventEnv): Unit =

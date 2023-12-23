@@ -1,12 +1,12 @@
 package cc.sukazyo.cono.morny.uni_meow
 
-import cc.sukazyo.cono.morny.{MornyCoeur, MornyModule, MornySystem}
+import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.internal.MornyInternalModule
 
-class ModuleUniMeow extends MornyModule {
+class ModuleUniMeow extends MornyInternalModule {
 	
 	override val id: String = "coeur.uni_meow"
 	override val name: String = "Coeur Uni-Meow Commands"
-	override val version: String = MornySystem.VERSION
 	override val description: String | Null =
 		// language=Markdown
 		"""Provides support for unicode command in Telegram. Also provided some

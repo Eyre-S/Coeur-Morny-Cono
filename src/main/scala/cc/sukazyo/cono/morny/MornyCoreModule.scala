@@ -33,8 +33,7 @@ class MornyCoreModule extends MornyModule {
 			OnCallMe(),
 			OnCallMsgSend(),
 			OnGetSocial(),
-			OnMedicationNotifyApply(),
-			OnEventHackHandle()
+			OnMedicationNotifyApply()
 		)
 		
 		val $MornyHellos = MornyHellos()
@@ -50,7 +49,6 @@ class MornyCoreModule extends MornyModule {
 			$MornyHellos.Hello,
 			MornyInfoOnStart(),
 			GetUsernameAndId(),
-			EventHack(),
 			Nbnhhsh(),
 			$IP186Query.IP,
 			$IP186Query.Whois,

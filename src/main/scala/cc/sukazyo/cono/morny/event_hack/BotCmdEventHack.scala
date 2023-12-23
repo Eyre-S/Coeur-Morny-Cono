@@ -1,5 +1,7 @@
-package cc.sukazyo.cono.morny.bot.command
+package cc.sukazyo.cono.morny.event_hack
+
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
@@ -8,7 +10,7 @@ import com.pengrad.telegrambot.request.SendSticker
 
 import scala.language.postfixOps
 
-class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
+class BotCmdEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "event_hack"
 	override val aliases: List[ICommandAlias] = Nil
@@ -17,7 +19,7 @@ class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		import coeur.daemons.eventHack.{registerHack, HackType}
+		import hacker.{registerHack, HackType}
 		
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		

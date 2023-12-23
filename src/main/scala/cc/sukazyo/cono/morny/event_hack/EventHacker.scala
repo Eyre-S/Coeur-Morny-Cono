@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.daemon
+package cc.sukazyo.cono.morny.event_hack
 
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
