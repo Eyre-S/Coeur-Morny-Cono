@@ -16,13 +16,13 @@ class BiliToolTest extends MornyTests with TableDrivenPropertyChecks {
 	)
 	
 	forAll (examples) { (bv, av) => s"while using av$av/BV$bv :" - {
-		import cc.sukazyo.cono.morny.util.BiliTool.{toAv, toBv}
+		import cc.sukazyo.cono.morny.social_share.external.bilibili.BiliTool.{toAv, toBv}
 		"av to bv works" in { toBv(av) shouldEqual bv }
 		"bv to av works" in { toAv(bv) shouldEqual av }
 	}}
 	
 	"BV with unsupported length :" - {
-		import cc.sukazyo.cono.morny.util.BiliTool.{toAv, IllegalFormatException}
+		import cc.sukazyo.cono.morny.social_share.external.bilibili.BiliTool.{toAv, IllegalFormatException}
 		val examples = Table(
 			"bv",
 			"12345",
@@ -48,7 +48,7 @@ class BiliToolTest extends MornyTests with TableDrivenPropertyChecks {
 			("1mK4O1C7Bl", "l"),
 			("1--4O1C7Bl", "[symbols]")
 		)
-		import cc.sukazyo.cono.morny.util.BiliTool.{toAv, IllegalFormatException}
+		import cc.sukazyo.cono.morny.social_share.external.bilibili.BiliTool.{toAv, IllegalFormatException}
 		forAll(examples) { (bv, with_sp) =>
 			s"'$with_sp' should throws IllegalFormatException" in:
 				an [IllegalFormatException] should be thrownBy toAv(bv)
@@ -58,7 +58,7 @@ class BiliToolTest extends MornyTests with TableDrivenPropertyChecks {
 	"av/bv converting should be reversible" in {
 		for (_ <- 1 to 20) {
 			val rand_av = Random.between(0, 999999999L)
-			import cc.sukazyo.cono.morny.util.BiliTool.{toAv, toBv}
+			import cc.sukazyo.cono.morny.social_share.external.bilibili.BiliTool.{toAv, toBv}
 			val my_bv = toBv(rand_av)
 			toAv(my_bv) shouldEqual rand_av
 			toBv(toAv(my_bv)) shouldEqual my_bv

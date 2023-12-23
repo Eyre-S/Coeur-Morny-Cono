@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.test.daemon
 
-import cc.sukazyo.cono.morny.daemon.MedicationTimer
+import cc.sukazyo.cono.morny.medication_timer.MedicationTimer
 import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import org.scalatest.prop.TableDrivenPropertyChecks

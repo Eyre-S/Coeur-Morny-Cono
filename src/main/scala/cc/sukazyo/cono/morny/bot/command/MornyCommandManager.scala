@@ -25,13 +25,6 @@ class MornyCommandManager (using coeur: MornyCoeur) {
 			for (alias <- i.aliases)
 				this.commands += (alias.name -> i)
 	
-	private[bot] val commands_uni: CommandMap = mutable.SeqMap.empty
-	def registerForUni [T <: ISimpleCommand] (commands: T*): Unit =
-		for (i <- commands)
-			this.commands_uni += (i.name -> i)
-			for (alias <- i.aliases)
-				this.commands_uni += (alias.name -> i)
-	
 	def execute (using command: InputCommand, event: Update): Boolean = {
 		if (commands contains command.command)
 			commands(command.command) execute;

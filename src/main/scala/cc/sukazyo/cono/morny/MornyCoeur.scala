@@ -37,6 +37,9 @@ object MornyCoeur {
 		userid: Long,
 		tasks: Scheduler,
 		trusted: MornyTrusted,
+		eventManager: EventListenerManager,
+		commandManager: MornyCommandManager,
+		queryManager: MornyQueryManager,
 		givenCxt: GivenContext
 	)
 	
@@ -153,19 +156,45 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
 	
-	modules.foreach(it => it.onInitializingPre(OnInitializingPreContext(
-		externalContext,
-		coeurStartTimestamp, account, username, userid, tasks, trusted,
-		initializeContext)))
-	
 	val daemons: MornyDaemons = MornyDaemons()
 	initializeContext << daemons
 	val eventManager: EventListenerManager = EventListenerManager()
-	eventManager register MornyOnUpdateTimestampOffsetLock()
 	val commands: MornyCommandManager = MornyCommandManager()
 	val queries: MornyQueryManager = MornyQueryManager()
+	
+	// Coeur Initializing Pre Event
+	modules.foreach(it => it.onInitializingPre(OnInitializingPreContext(
+		externalContext,
+		coeurStartTimestamp, account, username, userid, tasks, trusted,
+		eventManager, commands, queries,
+		initializeContext)))
+	
+	// register core/api events
+	eventManager register MornyOnUpdateTimestampOffsetLock()
 	eventManager register MornyOnTelegramCommand(using commands)
 	eventManager register MornyOnInlineQuery(using queries)
+	{ // register core commands
+		import bot.command.*
+		val $MornyHellos = MornyHellos()
+		val $MornyInformation = MornyInformation()
+		val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)
+		val $MornyManagers = MornyManagers()
+		commands.register(
+			
+			$MornyHellos.On,
+			$MornyHellos.Hello,
+			MornyInfoOnStart(),
+			
+			$MornyManagers.SaveData,
+			$MornyInformation,
+			$MornyInformationOlds.Version,
+			$MornyInformationOlds.Runtime,
+			$MornyManagers.Exit,
+			
+			DirectMsgClear(),
+		
+		)
+	}
 	
 	// Coeur Initializing Event
 	modules.foreach(it => it.onInitializing(OnInitializingContext(
@@ -175,7 +204,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		initializeContext)))
 	
 	eventManager register daemons.reporter.EventStatistics.EventInfoCatcher
-	
 	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
 		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
 		logger warn
@@ -184,6 +212,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		tasks.notifyIt()
 	})
 	initializeContext / this << watchDog
+	
+	// Coeur Initializing Post Event
 	modules.foreach(it => it.onInitializingPost(OnInitializingPostContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
@@ -197,11 +227,13 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		logger info "done test run, exiting."
 		this.exit(0, TestRun)
 	
+	// Coeur Starting Pre
 	configure_exitCleanup()
-	// put things that need to cleanup when exit below
-	//  so that it will be correctly cleanup when normal run and will not execute in testRun.
+	
+	// Coeur Starting Event
 	modules.foreach(it => it.onStarting(OnStartingContext(
 		initializeContext)))
+	
 	daemons.start()
 	logger info "start telegram event listening"
 	import com.pengrad.telegrambot.TelegramException
@@ -250,6 +282,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		}
 		
 	})
+	
+	// Coeur Starting Post Event
 	modules.foreach(it => it.onStartingPost(OnStartingPostContext(
 		initializeContext)))
 	
@@ -270,14 +304,15 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	private def exitCleanup (): Unit = {
 		daemons.reporter.reportCoeurExit()
+		modules.foreach(it => it.onExiting)
 		account.shutdown()
 		logger info "stopped bot account"
-		modules.foreach(it => it.onExit)
 		daemons.stop()
 		tasks.waitForStop()
 		logger info s"morny tasks stopped: remains ${tasks.amount} tasks not be executed"
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
+		modules.foreach(it => it.onExited)
 		logger info "done exit cleanup"
 	}
 	

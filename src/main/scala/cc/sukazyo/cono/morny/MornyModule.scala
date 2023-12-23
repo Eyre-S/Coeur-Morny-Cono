@@ -19,6 +19,7 @@ trait MornyModule {
 	
 	def onRoutineSavingData (using MornyCoeur): Unit = {}
 	
-	def onExit (using MornyCoeur): Unit = {}
+	def onExiting (using MornyCoeur): Unit = {}
+	def onExited (using MornyCoeur): Unit = {}
 	
 }

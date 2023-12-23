@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.test.extra
 
-import cc.sukazyo.cono.morny.extra.BilibiliForms.*
+import cc.sukazyo.cono.morny.social_share.external.bilibili.BilibiliForms.*
 import cc.sukazyo.cono.morny.test.MornyTests
 import org.scalatest.prop.TableDrivenPropertyChecks
 

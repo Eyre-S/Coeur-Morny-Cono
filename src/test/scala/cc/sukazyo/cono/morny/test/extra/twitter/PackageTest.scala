@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.test.extra.twitter
 
-import cc.sukazyo.cono.morny.extra.twitter.{parseTweetUrl, TweetUrlInformation}
+import cc.sukazyo.cono.morny.social_share.external.twitter.{parseTweetUrl, TweetUrlInformation}
 import cc.sukazyo.cono.morny.test.MornyTests
 
 class PackageTest extends MornyTests {

@@ -16,11 +16,15 @@ class ModuleUniMeow extends MornyInternalModule {
 	
 	val uni_commands: UniMeowCommandManager = UniMeowCommandManager()
 	
+	override def onInitializingPre (using MornyCoeur)(cxt: MornyCoeur.OnInitializingPreContext): Unit = {
+		import cxt.*
+		externalContext << uni_commands
+		givenCxt << uni_commands
+	}
+	
 	override def onInitializing (using MornyCoeur)(cxt: MornyCoeur.OnInitializingContext): Unit = {
 		import cxt.*
 		
-		externalContext << uni_commands
-		givenCxt << uni_commands
 		eventManager.register(
 			BotEventUniMeowTrigger(using uni_commands)
 		)
@@ -37,7 +41,8 @@ class ModuleUniMeow extends MornyInternalModule {
 		//noinspection NonAsciiCharacters
 		commandManager.register(
 			$喵呜.Progynova,
-			私わね()
+			私わね(),
+			创().Chuang
 		)
 		
 	}

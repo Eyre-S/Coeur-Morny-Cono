@@ -1,16 +1,23 @@
 package cc.sukazyo.cono.morny
 
-import cc.sukazyo.cono.morny.event_hack.ModuleEventHack
-import cc.sukazyo.cono.morny.uni_meow.ModuleUniMeow
-
 object ServerModulesLoader {
 	
 	def load (): List[MornyModule] = {
 		
 		List(
-			ModuleEventHack(),
-			ModuleUniMeow(),
-			MornyCoreModule()
+			
+			tele_utils.ModuleTeleUtils(),
+			randomize_somthing.ModuleRandomize(),
+			slash_action.ModuleSlashAction(),
+			nbnhhsh.ModuleNbnhhsh(),
+			ip186.ModuleIP186(),
+			encrypt_tool.ModuleEncryptor(),
+			call_me.ModuleCallMe(),
+			social_share.ModuleSocialShare(),
+			medication_timer.ModuleMedicationTimer(),
+			morny_misc.ModuleMornyMisc(),
+			uni_meow.ModuleUniMeow()
+			
 		)
 		
 	}

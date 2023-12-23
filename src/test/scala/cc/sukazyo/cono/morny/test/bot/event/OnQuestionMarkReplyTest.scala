@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.test.bot.event
 
-import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply
+import cc.sukazyo.cono.morny.randomize_somthing.OnQuestionMarkReply
 import cc.sukazyo.cono.morny.test.MornyTests
 import org.scalatest.prop.TableDrivenPropertyChecks
 
