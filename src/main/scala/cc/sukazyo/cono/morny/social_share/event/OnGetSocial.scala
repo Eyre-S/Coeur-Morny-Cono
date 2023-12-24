@@ -6,6 +6,7 @@ import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.social_share.event.OnGetSocial.tryFetchSocial
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.social_share.api.{SocialTwitterParser, SocialWeiboParser}
 import cc.sukazyo.cono.morny.social_share.external.{twitter, weibo}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.entitiesSafe
@@ -87,7 +88,7 @@ object OnGetSocial {
 			).replyToMessageId(replyToMessage)
 			logger error
 				"Error on requesting FixTweet API\n" + exceptionLog(e)
-			coeur.daemons.reporter.exception(e, "Error on requesting FixTweet API")
+			coeur.externalContext.consume[MornyReport](_.exception(e, "Error on requesting FixTweet API"))
 	
 	def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
 		import cc.sukazyo.cono.morny.social_share.external.weibo.MApi
@@ -111,6 +112,6 @@ object OnGetSocial {
 				).replyToMessageId(replyToMessage)
 				logger error
 					"Error on requesting Weibo m.API\n" + exceptionLog(e)
-				coeur.daemons.reporter.exception(e, "Error on requesting Weibo m.API")
+				coeur.externalContext.consume[MornyReport](_.exception(e, "Error on requesting Weibo m.API"))
 	
 }

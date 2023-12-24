@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, ITelegramQuery}
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent, ParseMode}
 
@@ -17,7 +18,6 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 	private val ID_PREFIX_BILI_AV = "[morny/share/bili/av]"
 	private val ID_PREFIX_BILI_BV = "[morny/share/bili/bv]"
 	private val LINK_PREFIX = "https://bilibili.com/video/"
-	private val REGEX_BILI_VIDEO: Regex = "^(?:(?:https?://)?(?:www\\.)?bilibili\\.com(?:/s)?/video/((?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))/?(\\?(?:p=(\\d+))?.*)?|(?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))$"r
 	private val SHARE_FORMAT_HTML = "<a href='%s'>%s</a>"
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
@@ -37,7 +37,7 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 						return null;
 					case e: IllegalStateException =>
 						logger error exceptionLog(e)
-						coeur.daemons.reporter.exception(e)
+						coeur.externalContext.consume[MornyReport](_.exception(e))
 						return null;
 		
 		val av = result.av

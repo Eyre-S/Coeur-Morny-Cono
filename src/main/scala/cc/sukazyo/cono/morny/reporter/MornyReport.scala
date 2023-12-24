@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.daemon
+package cc.sukazyo.cono.morny.reporter
 
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}

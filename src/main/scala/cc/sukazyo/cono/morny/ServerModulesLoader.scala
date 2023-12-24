@@ -16,7 +16,8 @@ object ServerModulesLoader {
 			social_share.ModuleSocialShare(),
 			medication_timer.ModuleMedicationTimer(),
 			morny_misc.ModuleMornyMisc(),
-			uni_meow.ModuleUniMeow()
+			uni_meow.ModuleUniMeow(),
+			reporter.Module()
 			
 		)
 		

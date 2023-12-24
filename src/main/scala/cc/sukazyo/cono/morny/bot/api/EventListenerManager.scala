@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.bot.api
 
 import cc.sukazyo.cono.morny.{Log, MornyCoeur}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
@@ -87,7 +88,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 						) indent 4) ++= "\n"
 					case _ =>
 				logger error errorMessage.toString
-				coeur.daemons.reporter.exception(e, "on event running")
+				coeur.externalContext.consume[MornyReport](_.exception(e, "on event running"))
 			}
 		}
 		

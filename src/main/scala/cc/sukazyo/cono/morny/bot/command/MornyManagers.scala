@@ -3,7 +3,7 @@ import cc.sukazyo.cono.morny.bot.command.ICommandAlias.HiddenAlias
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.Log.logger
-import cc.sukazyo.cono.morny.daemon.MornyReport
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
@@ -41,7 +41,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
 				logger attention s"403 exit caught from user ${user toLogTag}"
-				coeur.daemons.reporter.unauthenticatedAction("/exit", user)
+				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/exit", user))
 				
 			}
 			
@@ -76,7 +76,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
 				logger attention s"403 save caught from user ${user toLogTag}"
-				coeur.daemons.reporter.unauthenticatedAction("/save", user)
+				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/save", user))
 				
 			}
 			

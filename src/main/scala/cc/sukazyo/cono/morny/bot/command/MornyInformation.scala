@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.bot.command
 import cc.sukazyo.cono.morny.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
@@ -162,13 +163,17 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echoEventStatistics (using update: Update): Unit = {
-		coeur.account exec SendMessage(
-			update.message.chat.id,
-			// language=html
-			s"""<b>Event Statistics :</b>
-			   |in today
-			   |${coeur.daemons.reporter.EventStatistics.eventStatisticsHTML}""".stripMargin
-		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
+		coeur.externalContext >> { (reporter: MornyReport) =>
+			coeur.account exec SendMessage(
+				update.message.chat.id,
+				// language=html
+				s"""<b>Event Statistics :</b>
+				   |in today
+				   |${reporter.EventStatistics.eventStatisticsHTML}""".stripMargin
+			).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
+		} || {
+			echo404
+		}
 	}
 	
 	private def echo404 (using event: Update): Unit =

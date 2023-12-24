@@ -5,6 +5,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.bot.command.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.CommonEncrypt
 import cc.sukazyo.cono.morny.util.CommonEncrypt.*
@@ -81,7 +82,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					_r.document.fileName
 				)} catch case e: IOException =>
 					logger warn s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-					coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
+					coeur.externalContext.consume[MornyReport](_.exception(e, "NetworkRequest error: TelegramFileAPI"))
 					return
 			} else if ((_r ne null) && (_r.photo ne null)) {
 				try {
@@ -102,11 +103,11 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					case e: IOException =>
 						//noinspection DuplicatedCode
 						logger warn s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-						coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
+						coeur.externalContext.consume[MornyReport](_.exception(e, "NetworkRequest error: TelegramFileAPI"))
 						return
 					case e: IllegalArgumentException =>
 						logger warn s"FileProcess error: PhotoSize:\n\t${e.getMessage}"
-						coeur.daemons.reporter.exception(e, "FileProcess error: PhotoSize")
+						coeur.externalContext.consume[MornyReport](_.exception(e, "FileProcess error: PhotoSize"))
 						return
 			} else if ((_r ne null) && (_r.text ne null)) {
 				XText(_r.text)

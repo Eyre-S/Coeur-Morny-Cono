@@ -1,12 +1,12 @@
 package cc.sukazyo.cono.morny
 
 import cc.sukazyo.cono.morny.bot.command.MornyCommandManager
-import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur.*
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
 import cc.sukazyo.cono.morny.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueryManager
+import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.time.WatchDog
@@ -111,6 +111,14 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	given MornyCoeur = this
 	
 	val externalContext: GivenContext = GivenContext()
+	import util.dataview.Table.format as fmtTable
+	logger info
+		s"""The following Modules have been added to current Morny:
+		   |${fmtTable(
+				("Module ID" :: "Module Name" :: "Module Version" :: Nil)::Nil :::
+				modules.map(f => f.id :: f.name :: f.version :: Nil)
+			).replaceAll("\n", "\n|")}
+		   |""".stripMargin
 	
 	///>>> BLOCK START instance configure & startup stage 1
 	
@@ -156,8 +164,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
 	
-	val daemons: MornyDaemons = MornyDaemons()
-	initializeContext << daemons
 	val eventManager: EventListenerManager = EventListenerManager()
 	val commands: MornyCommandManager = MornyCommandManager()
 	val queries: MornyQueryManager = MornyQueryManager()
@@ -192,7 +198,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			$MornyManagers.Exit,
 			
 			DirectMsgClear(),
-		
+			
 		)
 	}
 	
@@ -203,7 +209,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		eventManager, commands, queries,
 		initializeContext)))
 	
-	eventManager register daemons.reporter.EventStatistics.EventInfoCatcher
 	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
 		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
 		logger warn
@@ -234,7 +239,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	modules.foreach(it => it.onStarting(OnStartingContext(
 		initializeContext)))
 	
-	daemons.start()
 	logger info "start telegram event listening"
 	import com.pengrad.telegrambot.TelegramException
 	account.setUpdatesListener(eventManager, (e: TelegramException) => {
@@ -254,7 +258,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 				   |  server responses:
 				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response) indent 4}
 				   |""".stripMargin
-			this.daemons.reporter.exception(e, "Failed get updates.")
+			externalContext.consume[MornyReport](_.exception(e, "Failed get updates."))
 		}
 		
 		if (e.getCause != null) {
@@ -278,7 +282,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 					logger error
 						s"""Failed get updates:
 						   |${exceptionLog(e_other) indent 3}""".stripMargin
-					this.daemons.reporter.exception(e_other, "Failed get updates.")
+					externalContext.consume[MornyReport](_.exception(e_other, "Failed get updates."))
 		}
 		
 	})
@@ -291,7 +295,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		logger info "resetting telegram command list"
 		commands.automaticTGListUpdate()
 	
-	daemons.reporter.reportCoeurMornyLogin()
 	initializeContext = null
 	logger info "Coeur start complete."
 	
@@ -303,17 +306,26 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	}
 	
 	private def exitCleanup (): Unit = {
-		daemons.reporter.reportCoeurExit()
+		
+		// Morny Exiting
 		modules.foreach(it => it.onExiting)
-		account.shutdown()
-		logger info "stopped bot account"
-		daemons.stop()
+		
+		account.removeGetUpdatesListener()
+		logger info "stopped bot update listener"
 		tasks.waitForStop()
 		logger info s"morny tasks stopped: remains ${tasks.amount} tasks not be executed"
+		
+		// Morny Exiting Post
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
+		modules.foreach(it => it.onExitingPost)
+		
+		account.shutdown()
+		logger info "stopped bot account"
+		// Morny Exited
 		modules.foreach(it => it.onExited)
-		logger info "done exit cleanup"
+		logger info "done exit cleanup\nMorny will EXIT now"
+		
 	}
 	
 	private def configure_exitCleanup (): Unit = {
