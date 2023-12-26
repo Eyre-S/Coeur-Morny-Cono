@@ -24,9 +24,17 @@ class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 				TelegramStickers.ID_404
 			).replyToMessageId(event.message.messageId())
 		
-		if command.args.length < 1 then { do404(); return }
+		val content =
+			if command.args.length > 0 then
+				Right(command.args(0))
+			else if event.message.replyToMessage != null then
+				import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.textWithUrls
+				Left(event.message.replyToMessage.textWithUrls)
+			else
+				do404()
+				return
 		
-		if !OnGetSocial.tryFetchSocial(Right(command.args(0)))(using event.message.chat.id, event.message.messageId) then
+		if !OnGetSocial.tryFetchSocial(content)(using event.message.chat.id, event.message.messageId) then
 			do404()
 		
 	}

@@ -72,6 +72,10 @@ object TelegramExtensions {
 			if self.entities == null then Nil else
 				self.entities.toList
 		
+		def textWithUrls: String =
+			(self.text :: self.entitiesSafe.map(_.url).filterNot(_ == null))
+				.mkString(" ")
+		
 	}}
 	
 	class LimboUser (id: Long) extends User(id)

@@ -9,7 +9,7 @@ import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.social_share.api.{SocialTwitterParser, SocialWeiboParser}
 import cc.sukazyo.cono.morny.social_share.external.{twitter, weibo}
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.entitiesSafe
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.textWithUrls
 import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
@@ -23,9 +23,7 @@ class OnGetSocial (using coeur: MornyCoeur) extends EventListener {
 		if messageEvent.text == null then return;
 		
 		if tryFetchSocial(
-			Left((
-					messageEvent.text :: messageEvent.entitiesSafe.map(f => f.url).filterNot(f => f == null)
-			).mkString(" "))
+			Left(messageEvent.textWithUrls)
 		)(using messageEvent.chat.id, messageEvent.messageId) then
 			event.setEventOk
 		
@@ -74,7 +72,7 @@ object OnGetSocial {
 		
 	}
 	
-	def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
+	def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit =
 		import cc.sukazyo.cono.morny.social_share.external.twitter.FXApi
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.SttpClientException
@@ -90,7 +88,7 @@ object OnGetSocial {
 				"Error on requesting FixTweet API\n" + exceptionLog(e)
 			coeur.externalContext.consume[MornyReport](_.exception(e, "Error on requesting FixTweet API"))
 	
-	def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
+	def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit =
 		import cc.sukazyo.cono.morny.social_share.external.weibo.MApi
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.{HttpError, SttpClientException}
