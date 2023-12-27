@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.nbnhhsh
 
-import cc.sukazyo.cono.morny.internal.MornyInternalModule
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.MornyCoeur
 
 class ModuleNbnhhsh extends MornyInternalModule {
 	

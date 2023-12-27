@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.util
 
-import cc.sukazyo.cono.morny.MornySystem
+import cc.sukazyo.cono.morny.core.MornySystem
 import sttp.client3.basicRequest
 import sttp.model.Header
 

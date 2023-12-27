@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.encrypt_tool
 
-import cc.sukazyo.cono.morny.Log.logger
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
-import cc.sukazyo.cono.morny.bot.command.ICommandAlias.ListedAlias
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.bot.api.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand

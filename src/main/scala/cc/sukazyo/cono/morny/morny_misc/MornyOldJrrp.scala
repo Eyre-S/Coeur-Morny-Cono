@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.morny_misc
 
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec

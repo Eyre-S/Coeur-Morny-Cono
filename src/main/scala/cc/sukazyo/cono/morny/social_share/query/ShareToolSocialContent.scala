@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.social_share.query
 
-import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, ITelegramQuery}
+import cc.sukazyo.cono.morny.core.bot.api.{InlineQueryUnit, ITelegramQuery}
 import cc.sukazyo.cono.morny.social_share.api.{SocialTwitterParser, SocialWeiboParser}
 import cc.sukazyo.cono.morny.social_share.external.{twitter, weibo}
 import cc.sukazyo.cono.morny.social_share.external.twitter.{FXApi, TweetUrlInformation}

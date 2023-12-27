@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.slash_action
 
-import cc.sukazyo.cono.morny.internal.MornyInternalModule
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.MornyCoeur
 
 class ModuleSlashAction extends MornyInternalModule {
 	

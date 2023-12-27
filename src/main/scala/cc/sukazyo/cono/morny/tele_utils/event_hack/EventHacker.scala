@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.tele_utils.event_hack
 
-import cc.sukazyo.cono.morny.Log.logger
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update

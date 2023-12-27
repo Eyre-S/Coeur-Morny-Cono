@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.ip186
 
-import cc.sukazyo.cono.morny.internal.MornyInternalModule
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.MornyCoeur
 
 class ModuleIP186 extends MornyInternalModule {
 	

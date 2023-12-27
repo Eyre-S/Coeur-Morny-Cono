@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.slash_action
 
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.UniversalCommand

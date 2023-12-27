@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.nbnhhsh
 
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
@@ -44,7 +45,6 @@ class CommandNbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 			
 			val message = StringBuilder(NBNHHSH_RESULT_HEAD_HTML)
 			
-			import cc.sukazyo.cono.morny.Log.logger
 			logger trace s"**nbnhhsh got len=${queryResp.words.length}"
 			for (_word <- queryResp.words) {
 				logger trace s"**start for ${_word.name}"

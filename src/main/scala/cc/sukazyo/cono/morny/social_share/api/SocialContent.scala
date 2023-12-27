@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.social_share.api
 
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.InlineQueryUnit
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.{SocialMedia, SocialMediaType, SocialMediaWithUrl}
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.SocialMediaType.{Photo, Video}
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.query.InlineQueryUnit
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.request.*

@@ -1,10 +1,10 @@
 package cc.sukazyo.cono.morny.social_share.command
 
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.social_share.event.OnGetSocial
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker

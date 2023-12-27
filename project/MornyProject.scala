@@ -28,7 +28,7 @@ object MornyProject {
 	val app_group = "cc.sukazyo"
 	val app_package = s"$app_group.cono.morny"
 	val app_archive_name = MornyConfiguration.MORNY_ARCHIVE_NAME
-	val app_application_main = s"$app_package.ServerMain"
+	val app_application_main = s"$app_package.core.ServerMain"
 	
 	val version_base = MornyConfiguration.VERSION
 	val version_delta = MornyConfiguration.VERSION_DELTA

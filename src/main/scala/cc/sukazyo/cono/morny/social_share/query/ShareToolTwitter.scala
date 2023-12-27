@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.social_share.query
 
-import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, ITelegramQuery}
+import cc.sukazyo.cono.morny.core.bot.api.{InlineQueryUnit, ITelegramQuery}
 import cc.sukazyo.cono.morny.social_share.external.twitter
 import cc.sukazyo.cono.morny.social_share.external.twitter.TweetUrlInformation
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId

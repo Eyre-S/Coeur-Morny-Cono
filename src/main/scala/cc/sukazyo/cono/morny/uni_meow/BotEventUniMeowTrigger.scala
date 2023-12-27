@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.uni_meow
 
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.Log.logger
 
 class BotEventUniMeowTrigger (using commands: UniMeowCommandManager) extends EventListener {
 	

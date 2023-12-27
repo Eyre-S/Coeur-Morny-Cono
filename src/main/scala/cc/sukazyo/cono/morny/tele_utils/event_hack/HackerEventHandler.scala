@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.tele_utils.event_hack
 
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.Log.logger
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode

@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.tele_utils.event_hack
 
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.bot.command.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec

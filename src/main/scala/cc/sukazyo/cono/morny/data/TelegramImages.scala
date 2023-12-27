@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.data
 
-import cc.sukazyo.cono.morny.MornyAssets
-import cc.sukazyo.cono.morny.MornyAssets.AssetsException
+import cc.sukazyo.cono.morny.core.MornyAssets
+import cc.sukazyo.cono.morny.core.MornyAssets.AssetsException
 
 import java.io.IOException
 import scala.language.postfixOps

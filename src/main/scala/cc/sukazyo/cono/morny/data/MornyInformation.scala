@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.data
 
-import cc.sukazyo.cono.morny.{MornyAbout, MornySystem}
+import cc.sukazyo.cono.morny.core.{MornyAbout, MornySystem}
 
 import java.net.InetAddress
 import java.rmi.UnknownHostException

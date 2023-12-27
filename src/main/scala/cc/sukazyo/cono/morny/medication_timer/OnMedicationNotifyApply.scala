@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.medication_timer
 
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import com.pengrad.telegrambot.model.Message
 
 class OnMedicationNotifyApply (using instance: MedicationTimer)(using coeur: MornyCoeur) extends EventListener {

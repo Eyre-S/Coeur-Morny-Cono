@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.uni_meow
 
-import cc.sukazyo.cono.morny.bot.command.ISimpleCommand
-import cc.sukazyo.cono.morny.bot.command.MornyCommandManager.CommandMap
+import cc.sukazyo.cono.morny.core.bot.api.ISimpleCommand
+import cc.sukazyo.cono.morny.core.bot.api.MornyCommandManager.CommandMap
 
 import scala.collection.mutable
 

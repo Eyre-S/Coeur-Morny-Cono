@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.reporter
 
-import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
-import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
+import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException

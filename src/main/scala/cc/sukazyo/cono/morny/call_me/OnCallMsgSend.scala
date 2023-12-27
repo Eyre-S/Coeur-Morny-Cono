@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.call_me
 
-import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import com.pengrad.telegrambot.model.{Chat, Message, MessageEntity}

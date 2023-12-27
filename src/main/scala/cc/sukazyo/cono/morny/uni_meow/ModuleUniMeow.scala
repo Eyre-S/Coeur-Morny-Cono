@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.uni_meow
 
-import cc.sukazyo.cono.morny.MornyCoeur
-import cc.sukazyo.cono.morny.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 
 class ModuleUniMeow extends MornyInternalModule {
 	
