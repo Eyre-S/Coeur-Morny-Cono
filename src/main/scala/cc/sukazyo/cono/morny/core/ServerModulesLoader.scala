@@ -19,7 +19,8 @@ object ServerModulesLoader {
 			morny.medication_timer.ModuleMedicationTimer(),
 			morny.morny_misc.ModuleMornyMisc(),
 			morny.uni_meow.ModuleUniMeow(),
-			morny.reporter.Module()
+			morny.reporter.Module(),
+			morny.stickers_get.Module(),
 			
 		)
 		

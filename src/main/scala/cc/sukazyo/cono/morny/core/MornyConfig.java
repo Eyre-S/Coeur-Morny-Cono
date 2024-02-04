@@ -103,7 +103,13 @@ public class MornyConfig {
 	public final boolean commandLogoutClear;
 	
 	/* ======================================= *
-	 *  system: morny report                   *
+	 *  system: http server                    *
+	 * ======================================= */
+	
+	public final int httpPort;
+	
+	/* ======================================= *
+	 *  function: reporter                     *
 	 * ======================================= */
 	
 	/**
@@ -164,11 +170,14 @@ public class MornyConfig {
 		this.medicationTimerUseTimezone = prototype.medicationTimerUseTimezone;
 		prototype.medicationNotifyAt.forEach(i -> { if (i < 0 || i > 23) throw new CheckFailure.UnavailableTimeInMedicationNotifyAt(); });
 		this.medicationNotifyAt = prototype.medicationNotifyAt;
+		if (prototype.httpPort < 0 || prototype.httpPort > 65535) throw new CheckFailure.UnavailableHttpPort();
+		this.httpPort = prototype.httpPort;
 	}
 	
 	public static class CheckFailure extends RuntimeException {
 		public static class NullTelegramBotKey extends CheckFailure {}
 		public static class UnavailableTimeInMedicationNotifyAt extends CheckFailure {}
+		public static class UnavailableHttpPort extends CheckFailure {}
 	}
 	
 	public static class Prototype {
@@ -193,6 +202,7 @@ public class MornyConfig {
 		public long medicationNotifyToChat = -1L;
 		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
 		@Nonnull public final Set<Integer> medicationNotifyAt = new HashSet<>();
+		public int httpPort = 30179;
 		
 	}
 	

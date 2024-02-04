@@ -31,5 +31,9 @@ object TelegramImages {
 	}
 	
 	val IMG_ABOUT: AssetsFileImage = AssetsFileImage("images/featured-image@0.5x.jpg")
+	val IMG_404: AssetsFileImage = AssetsFileImage("images/http-sekai-404.png")
+	val IMG_500: AssetsFileImage = AssetsFileImage("images/http-sekai-500.png")
+	val IMG_501: AssetsFileImage = AssetsFileImage("images/http-sekai-501.png")
+	val IMG_523: AssetsFileImage = AssetsFileImage("images/http-sekai-523.png")
 	
 }

@@ -4,6 +4,8 @@ import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
 import cc.sukazyo.cono.morny.core.bot.api.{EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
+import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
+import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
@@ -38,6 +40,7 @@ object MornyCoeur {
 		eventManager: EventListenerManager,
 		commandManager: MornyCommandManager,
 		queryManager: MornyQueryManager,
+		httpServer: MornyHttpServerContext,
 		givenCxt: GivenContext
 	)
 	
@@ -52,6 +55,7 @@ object MornyCoeur {
 		eventManager: EventListenerManager,
 		commandManager: MornyCommandManager,
 		queryManager: MornyQueryManager,
+		httpServer: MornyHttpServerContext,
 		givenCxt: GivenContext
 	)
 	
@@ -66,6 +70,7 @@ object MornyCoeur {
 		eventManager: EventListenerManager,
 		commandManager: MornyCommandManager,
 		queryManager: MornyQueryManager,
+		httpServer: MornyHttpServerContext,
 		givenCxt: GivenContext
 	)
 	
@@ -166,11 +171,14 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val commands: MornyCommandManager = MornyCommandManager()
 	val queries: MornyQueryManager = MornyQueryManager()
 	
+	private var _httpServerContext: MornyHttpServerContext = MornyHttpServerContextImpl()
+	
 	// Coeur Initializing Pre Event
 	modules.foreach(it => it.onInitializingPre(OnInitializingPreContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
+		_httpServerContext,
 		initializeContext)))
 	
 	// register core/api events
@@ -199,12 +207,16 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			
 		)
 	}
+	// register core http api service
+	import cc.sukazyo.cono.morny.core.http.services as http_srv
+	_httpServerContext register4API http_srv.Ping()
 	
 	// Coeur Initializing Event
 	modules.foreach(it => it.onInitializing(OnInitializingContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
+		_httpServerContext,
 		initializeContext)))
 	
 	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
@@ -221,6 +233,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
+		_httpServerContext,
 		initializeContext)))
 	
 	///>>> BLOCK START instance configure & startup stage 2
@@ -237,6 +250,9 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	modules.foreach(it => it.onStarting(OnStartingContext(
 		initializeContext)))
 	
+	logger info "start http server"
+	val http: HttpServer = _httpServerContext.start
+	_httpServerContext = null
 	logger info "start telegram event listening"
 	import com.pengrad.telegrambot.TelegramException
 	account.setUpdatesListener(eventManager, (e: TelegramException) => {

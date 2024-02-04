@@ -1,15 +1,14 @@
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-
-import java.io.File
+import sbt.*
 
 //noinspection TypeAnnotation
 object MornyProject {
 	
 	val _git_repo = new FileRepositoryBuilder()
-		.setGitDir(new File(".git"))
-		.setWorkTree(new File(""))
+		.setGitDir(file(".git"))
+		.setWorkTree(file("."))
 		.readEnvironment()
 		.build()
 	val _git = new Git(_git_repo)
@@ -45,6 +44,7 @@ object MornyProject {
 	
 	val dependencies = MornyConfiguration.dependencies
 	
+	val publishWithFatJar = !version_is_snapshot
 	def publishTo = MornyConfiguration.publishTo
 	val publishCredentials = MornyConfiguration.publishCredentials
 	

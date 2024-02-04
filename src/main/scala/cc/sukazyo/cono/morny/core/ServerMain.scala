@@ -57,6 +57,10 @@ object ServerMain {
 				case "--trusted-reader-dinner" | "-trsd" => i += 1; config.dinnerTrustedReaders add(args(i) toLong)
 				case "--dinner-chat" | "-chd" => i += 1; config.dinnerChatId = args(i) toLong
 				
+				case "--http-listen-port" | "-hp" =>
+					i += 1
+					config.httpPort = args(i) toInt
+				
 				case "--medication-notify-chat" | "-medc" => i += 1; config.medicationNotifyToChat = args(i) toLong
 				case "--medication-notify-timezone" | "-medtz" =>
 					i += 1

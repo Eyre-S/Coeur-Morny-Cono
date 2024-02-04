@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny
 
+import cc.sukazyo.cono.morny.core.ServerMain
 import cc.sukazyo.cono.morny.util.UniversalCommand
 
 import scala.io.StdIn
