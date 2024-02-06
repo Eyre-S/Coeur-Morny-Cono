@@ -29,6 +29,44 @@ object TelegramExtensions {
 		
 	}}
 	
+	object Update { extension (update: Update) {
+		
+		def extractSourceChat: Option[Chat] =
+			if      (update.message != null)            Some(update.message.chat)
+			else if (update.editedMessage != null)      Some(update.editedMessage.chat)
+			else if (update.channelPost != null)        Some(update.channelPost.chat)
+			else if (update.editedChannelPost != null)  Some(update.editedChannelPost.chat)
+			else if (update.inlineQuery != null)        None
+			else if (update.chosenInlineResult != null) None
+			else if (update.callbackQuery != null)      Some(update.callbackQuery.message.chat)
+			else if (update.shippingQuery != null)      None
+			else if (update.preCheckoutQuery != null)   None
+			else if (update.poll != null)               None
+			else if (update.pollAnswer != null)         None
+			else if (update.myChatMember != null)       Some(update.myChatMember.chat)
+			else if (update.chatMember != null)         Some(update.chatMember.chat)
+			else if (update.chatJoinRequest != null)    Some(update.chatJoinRequest.chat)
+			else None
+		
+		def extractSourceUser: Option[User] =
+			if      (update.message != null)            Some(update.message.from)
+			else if (update.editedMessage != null)      Some(update.editedMessage.from)
+			else if (update.channelPost != null)        None
+			else if (update.editedChannelPost != null)  None
+			else if (update.inlineQuery != null)        Some(update.inlineQuery.from)
+			else if (update.chosenInlineResult != null) Some(update.chosenInlineResult.from)
+			else if (update.callbackQuery != null)      Some(update.callbackQuery.from)
+			else if (update.shippingQuery != null)      Some(update.shippingQuery.from)
+			else if (update.preCheckoutQuery != null)   Some(update.preCheckoutQuery.from)
+			else if (update.poll != null)               None
+			else if (update.pollAnswer != null)         Some(update.pollAnswer.user)
+			else if (update.myChatMember != null)       Some(update.myChatMember.from)
+			else if (update.chatMember != null)         Some(update.chatMember.from)
+			else if (update.chatJoinRequest != null)    Some(update.chatJoinRequest.from)
+			else None
+		
+	}}
+	
 	object Chat { extension (chat: Chat) {
 		
 		def hasMember (user: User) (using TelegramBot): Boolean =

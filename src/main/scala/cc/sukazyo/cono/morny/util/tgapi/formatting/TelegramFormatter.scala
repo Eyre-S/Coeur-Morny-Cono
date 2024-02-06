@@ -34,11 +34,26 @@ object TelegramFormatter {
 		def id_tdLib: Long =
 			if chat.id < 0 then (chat.id - MASK_BOTAPI_ID)abs else chat.id
 		
-		def typeTag: String = chat.`type` match
-			case Type.Private => "🔒"
-			case Type.group => "💭"
-			case Type.supergroup => "💬"
-			case Type.channel => "📢"
+		def typeTag: String =
+			import ChatTypeTag.tag
+			chat.`type`.tag
+		
+	}
+	
+	object ChatTypeTag {
+		
+		inline val PRIVATE = "🔒"
+		inline val GROUP = "💭"
+		inline val SUPERGROUP = "💬"
+		inline val CHANNEL = "📢"
+		
+		extension (t: Type) {
+			def tag: String = t match
+				case Type.Private => this.PRIVATE
+				case Type.group => this.GROUP
+				case Type.supergroup => this.SUPERGROUP
+				case Type.channel => this.CHANNEL
+		}
 		
 	}
 	

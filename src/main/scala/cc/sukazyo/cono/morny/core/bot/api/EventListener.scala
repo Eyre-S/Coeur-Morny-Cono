@@ -28,6 +28,17 @@ trait EventListener () {
 	  */
 	def atEventPost (using EventEnv): Unit = {}
 	
+	/** A overall event listener that can listen every types that supported
+	  * by the bot API.
+	  *
+	  * This method will runs before the specific event listener methods.
+	  * 
+	  * [[executeFilter]] will affect this method.
+	  * 
+	  * @since 2.0.0
+	  */
+	def on (using EventEnv): Unit = {}
+	
 	def onMessage (using EventEnv): Unit = {}
 	def onEditedMessage (using EventEnv): Unit = {}
 	def onChannelPost (using EventEnv): Unit = {}

@@ -48,6 +48,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		private def runEventListener (i: EventListener)(using EventEnv): Unit = {
 			try {
+				i.on
 				updateThreadName("message")
 				if update.message ne null then i.onMessage
 				updateThreadName("edited-message")

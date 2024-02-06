@@ -4,19 +4,22 @@ import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
-import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
+import cc.sukazyo.cono.morny.util.statistics.{NumericStatistics, UniqueCounter}
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.CronTask
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.{extractSourceChat, extractSourceUser}
+import cc.sukazyo.cono.morny.util.CommonEncrypt.hashId
+import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.Cron
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.google.gson.GsonBuilder
+import com.pengrad.telegrambot.model.{Chat, User}
 import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.model.User
 import com.pengrad.telegrambot.request.{BaseRequest, SendMessage}
 import com.pengrad.telegrambot.response.BaseResponse
 import com.pengrad.telegrambot.TelegramException
@@ -30,7 +33,7 @@ class MornyReport (using coeur: MornyCoeur) {
 		logger info "Morny Report is disabled : report chat is set to -1"
 	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
-		if !enabled then return;
+		if !enabled then return
 		try {
 			coeur.account exec report
 		} catch case e: EventRuntimeException => {
@@ -148,11 +151,23 @@ class MornyReport (using coeur: MornyCoeur) {
 		private var eventTotal = 0
 		private var eventCanceled = 0
 		private val runningTime: NumericStatistics[DurationMillis] = NumericStatistics()
+		/** The event which is from a private chat (mostly message) */
+		private val event_from_private = UniqueCounter[String]()
+		/** The event which is from a group (message, or member join etc.) */
+		private val event_from_group = UniqueCounter[String]()
+		/** The event which is from a channel (message, or member join etc.) */
+		private val event_from_channel = UniqueCounter[String]()
+		/** The event which is from a user's action (inline queries etc. which have a executor but not belongs to a chat.) */
+		private val event_from_user_action = UniqueCounter[String]()
 		
 		def reset (): Unit = {
 			eventTotal = 0
 			eventCanceled = 0
 			runningTime.reset()
+			event_from_private.reset()
+			event_from_group.reset()
+			event_from_channel.reset()
+			event_from_user_action.reset()
 		}
 		
 		private def runningTimeStatisticsHTML: String =
@@ -168,11 +183,16 @@ class MornyReport (using coeur: MornyCoeur) {
 		
 		def eventStatisticsHTML: String =
 			import cc.sukazyo.cono.morny.util.UseMath.percentageOf as p
+			import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.ChatTypeTag.*
 			val processed = runningTime.count
 			val canceled = eventCanceled
 			val ignored = eventTotal - processed - canceled
 			// language=html
 			s""" - <i>total event received</i>: <code>$eventTotal</code>
+			   |   - <i>from</i> <code>${event_from_channel.count}</code> <i>$CHANNEL channels</i>
+			   |   - <i>from</i> <code>${event_from_group.count}</code> <i>$SUPERGROUP groups/supergroups</i>
+			   |   - <i>from</i> <code>${event_from_private.count}</code> <i>$PRIVATE private chats</i>
+			   |   - <i>from</i> <code>${event_from_user_action.count}</code> <i>😼 user actions</i>
 			   | - <i>event ignored</i>: (<code>${eventTotal p ignored}%</code>) <code>$ignored</code>
 			   | - <i>event canceled</i>: (<code>${eventTotal p canceled}%</code>) <code>$canceled</code>
 			   | - <i>event processed</i>: (<code>${eventTotal p processed}%</code>) <code>$processed</code>
@@ -186,6 +206,20 @@ class MornyReport (using coeur: MornyCoeur) {
 			override def atEventPost (using event: EventEnv): Unit = {
 				import event.*
 				eventTotal += 1
+				event.update.extractSourceChat match
+					case None =>
+						event.update.extractSourceUser match
+							case None =>
+							case Some(user) =>
+								event_from_user_action << hashId(user.id).toHex
+					case Some(chat) =>
+						chat.`type` match
+							case Chat.Type.Private =>
+								event_from_private << hashId(chat.id).toHex
+							case Chat.Type.group | Chat.Type.supergroup =>
+								event_from_group << hashId(chat.id).toHex
+							case Chat.Type.channel =>
+								event_from_channel << hashId(chat.id).toHex
 				event.state match
 					case State.OK(from) =>
 						val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)

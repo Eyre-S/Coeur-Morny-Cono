@@ -68,9 +68,7 @@ lazy val root = (project in file("."))
 					.withClassifier(Some("fat")),
 			if (MornyProject.publishWithFatJar) {
 				addArtifact(assembly / artifact, assembly)
-			} else {
-				Nil
-			},
+			} else Nil,
 			if (System.getenv("DOCKER_BUILD") != null) {
 				assembly / assemblyJarName := {
 					sLog.value info "environment DOCKER_BUILD checked"
