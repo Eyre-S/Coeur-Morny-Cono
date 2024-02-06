@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.bot.event
 
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
-import com.pengrad.telegrambot.model.{Chat, Message, User}
+import com.pengrad.telegrambot.model.{Chat, ChatMemberUpdated, Message, User}
 
 case class EventContext (
 	message: Option[Message] = None,
@@ -34,6 +34,13 @@ object EventContext {
 				if (message.editDate != null) message.editDate
 				else message.date
 			)
+		)
+	
+	def fromChatMemberUpdated (chatMemberUpdated: ChatMemberUpdated): EventContext =
+		EventContext(
+			invoker = Some(chatMemberUpdated.from),
+			chat = Some(chatMemberUpdated.chat),
+			timestamp = Some(chatMemberUpdated.date)
 		)
 	
 }

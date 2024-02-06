@@ -95,4 +95,14 @@ object CommonEncrypt {
 		case lx if lx endsWith ".base64.txt" => lx dropRight ".base64.txt".length
 		case u => u
 	
+	/** Hash a [[Long]] id to [[Bin]] using [[MD5]] algorithm.
+	  *
+	  * For some privacy cases, this method can provide a standard way to hash an ID to a MD5 hash value.
+	  *
+	  * @param id The [[Long]] number typed id.
+	  * @return The hash value of the id.
+	  */
+	def hashId (id: Long): Bin =
+		MD5(id.toString)
+	
 }

@@ -28,13 +28,15 @@ trait EventListener () {
 	  */
 	def atEventPost (using EventEnv): Unit = {}
 	
-	/** No matter which subevent type, this will always run.
+	/** An overall event listener that can listen every types that supported
+	  * by the bot API.
 	  *
-	  * It behaves as a subevent so that it runs just as a normal listener function, the only difference is it does not
-	  * filter the subevent type.
-	  * 
+	  * This method will run before the specific event listener methods.
+	  *
 	  * Useful if you just want to write some listener that the Telegram event type does not matter, only the event
 	  * context etc. is matters.
+	  *
+	  * @since 1.4.2
 	  */
 	def on (using EventEnv): Unit = {}
 	
