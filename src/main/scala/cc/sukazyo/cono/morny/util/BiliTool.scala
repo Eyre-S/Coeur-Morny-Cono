@@ -30,12 +30,12 @@ object BiliTool {
 	private val V_CONV_XOR = 177451812L
 	private val V_CONV_ADD = 8728348608L
 	
-	private val BV_TABLE = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF"
-	private val TABLE_INT = BV_TABLE.length
-	private val BV_TABLE_REVERSED =
-		val mapping = mutable.HashMap.empty[Char, Int]
-		for (i <- BV_TABLE.indices) mapping += (BV_TABLE(i) -> i)
-		mapping.toMap
+	private val X_AV_MAX = Math.pow(2, 30).toLong
+	private val X_AV_ALT = Int.MaxValue.toLong + 1
+	
+	private val BB58_TABLE_REV: Map[Char, Int] = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF".toCharArray.zipWithIndex.toMap
+	private val BB58_TABLE: Map[Int, Char] = BB58_TABLE_REV.map((k,v) => (v, k))
+	private val BB58_TABLE_SIZE: Long = BB58_TABLE.size
 	private val BV_TEMPLATE = "1  4 1 7  "
 	private val BV_TEMPLATE_FILTER = Array(9, 8, 1, 6, 2, 4)
 	
@@ -56,7 +56,7 @@ object BiliTool {
 		def this (bv: String, length: Int) =
 			this(bv, s"given length is $length")
 		
-		/** Error of illegal BV id, where the reason is the BV id contains non [[BV_TABLE base58 character]].
+		/** Error of illegal BV id, where the reason is the BV id contains non [[BB58_TABLE base58 character]].
 		  *
 		  * @param bv the source of illegal BV id.
 		  * @param c the illegal character
@@ -79,7 +79,7 @@ object BiliTool {
 	  * @see $AvBvSeeAlso
 	  *
 	  * @param bv a BV id, which should be exactly 10 digits and all chars should be
-	  *           a legal base58 char (which means can be found in [[BV_TABLE]]).
+	  *           a legal base58 char (which means can be found in [[BB58_TABLE]]).
 	  *           otherwise, an [[IllegalFormatException]] will be thrown.
 	  * @return an AV id which will shows the save video of input __bv__ in $Bilibili
 	  * @throws IllegalFormatException when the input __bv__ is not a legal 10 digits base58
@@ -91,11 +91,14 @@ object BiliTool {
 		if (bv.length != 10) throw IllegalFormatException(bv, bv.length)
 		for (i <- BV_TEMPLATE_FILTER.indices) {
 			val _get = BV_TEMPLATE_FILTER(i)
-			val tableToken = BV_TABLE_REVERSED get bv(_get)
+			val tableToken = BB58_TABLE_REV get bv(_get)
 			if tableToken isEmpty then throw IllegalFormatException(bv, bv(_get), _get)
-			av = av + (tableToken.get * (TABLE_INT**i).toLong)
+			av = av + (tableToken.get.toLong * (BB58_TABLE_SIZE**i).toLong)
 		}
-		(av - V_CONV_ADD) ^ V_CONV_XOR
+		av = (av - V_CONV_ADD) ^ V_CONV_XOR
+		if (av < 0)
+			av+ X_AV_ALT
+		else av
 	}
 	
 	/** Convert an AV video format to a BV video format for $Bilibili.
@@ -107,11 +110,11 @@ object BiliTool {
 	  * @return a BV id which will shows the save video of input __av__ in $Bilibili
 	  */
 	def toBv (av: Long): String = {
-		val _av = (av^V_CONV_XOR)+V_CONV_ADD
+		val __av =if (av > X_AV_MAX) av - X_AV_ALT else av
+		val _av = (__av^V_CONV_XOR)+V_CONV_ADD
 		val bv = Array(BV_TEMPLATE:_*)
 		for (i <- BV_TEMPLATE_FILTER.indices) {
-			import Math.{floor, pow}
-			bv(BV_TEMPLATE_FILTER(i)) = BV_TABLE( (floor(_av/(TABLE_INT**i)) % TABLE_INT) toInt )
+			bv(BV_TEMPLATE_FILTER(i)) = BB58_TABLE( (_av/(BB58_TABLE_SIZE**i) % BB58_TABLE_SIZE) toInt )
 		}
 		String copyValueOf bv
 	}
