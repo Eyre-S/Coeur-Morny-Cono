@@ -2,8 +2,6 @@ package cc.sukazyo.cono.morny.util
 
 import cc.sukazyo.cono.morny.util.UseMath.**
 
-import scala.collection.mutable
-
 /** Utils about $Bilibili
   *
   * contains utils:
@@ -15,29 +13,35 @@ import scala.collection.mutable
   *
   * @define AvBvFormat
   * === About AV/BV id format ===
-  * the AV id is a number; the BV id is a special 10 digits base58 number, it shows as String
-  * in programming.
+  * the AV id is a int64 number, the max value is 2<sup>51</sup>, and should not be smaller that `1`; the BV
+  * id is a special 10 digits base58 number with the first character is constant `1`, it shows as String in
+  * programming.
   *
   * e.g. while the link ''`https://www.bilibili.com/video/BV17x411w7KC/`'' shows
   * the same with ''`https://www.bilibili.com/video/av170001/`'', the AV id
   * is __`170001`__, the BV id is __`BV17x411w7KC`__.
   *
-  * @define AvBvSeeAlso [[https://www.zhihu.com/question/381784377/answer/1099438784 mcfx的回复: 如何看待 2020 年 3 月 23 日哔哩哔哩将稿件的「av 号」变更为「BV 号」？]]
-  * @todo Maybe make a class `AV`/`BV` and implement the parse in the class
+  * These algorithms accept and return a AV id as a [[Long]] number, and BV id as a 10 digits base58 [[String]]
+  * without the `BV` prefix. For example, the `BV17x411w7KC` will be `"17x411w7KC"` [[String]] in this format, and
+  * the `av170001` should be `170001L` [[Long]] val.
+  *
+  * @define AvBvSeeAlso
+  * [bvid说明 - 哔哩哔哩-API收集整理](https://socialsisteryi.github.io/bilibili-API-collect/docs/misc/bvid_desc.html)
+  * [旧版本：mcfx 的回答...](https://www.zhihu.com/question/381784377/answer/1099438784)
+  *
   */
 object BiliTool {
 	
-	private val V_CONV_XOR = 177451812L
-	private val V_CONV_ADD = 8728348608L
+	private val V_CONV_XOR: Long = 23442827791579L
 	
-	private val X_AV_MAX = Math.pow(2, 30).toLong
-	private val X_AV_ALT = Int.MaxValue.toLong + 1
+	private val X_AV_MAX = 1L << 51
+	private val X_AV_MASK: Long = X_AV_MAX - 1
 	
-	private val BB58_TABLE_REV: Map[Char, Int] = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF".toCharArray.zipWithIndex.toMap
+	private val BB58_TABLE_REV: Map[Char, Int] = "FcwAPNKTMug3GV5Lj7EJnHpWsx4tb8haYeviqBz6rkCy12mUSDQX9RdoZf".toCharArray.zipWithIndex.toMap
 	private val BB58_TABLE: Map[Int, Char] = BB58_TABLE_REV.map((k,v) => (v, k))
-	private val BB58_TABLE_SIZE: Long = BB58_TABLE.size
-	private val BV_TEMPLATE = "1  4 1 7  "
-	private val BV_TEMPLATE_FILTER = Array(9, 8, 1, 6, 2, 4)
+	private val BB58_BASE: Long = BB58_TABLE.size
+	private val BV_TEMPLATE: String = "1---------"
+	private val BV_TEMPLATE_FILTER: Array[Int] = Array(9, 8, 1, 6, 2, 4, 3, 5, 7)
 	
 	/** Error of illegal BV id.
 	  *
@@ -45,7 +49,7 @@ object BiliTool {
 	  * @param bv the source illegal BV id.
 	  * @param reason why it is illegal.
 	  */
-	class IllegalFormatException private (bv: String, reason: String)
+	class IllegalBVFormatException private (bv: String, reason: String)
 			extends RuntimeException (s"`$bv is not a valid 10 digits base58 BV id: $reason`") {
 		
 		/** Error of illegal BV id, where the reason is the BV id is not 10 digits.
@@ -64,57 +68,81 @@ object BiliTool {
 		  */
 		def this (bv: String, c: Char, location: Int) =
 			this(bv, s"char `$c` is not in base58 char table (in position $location)")
+		
+		/** Error of illegal BV id, where the reason is the BV id is not started with `1`.
+		  *
+		  * @param bv the source of illegal BV id.
+		  */
+		def this (bv: String) =
+			this(bv, s"given BV id $bv is not started with 1 which is required in current version.")
+		
 	}
+	
+	
+	/** Error of illegal AV id.
+	  *
+	  * @constructor Build a error with illegal AV details.
+	  * @param av     the source illegal AV id.
+	  * @param reason why it is illegal.
+	  */
+	class IllegalAVFormatException private (av: Long, reason: String)
+		extends RuntimeException(s"`$av is not a valid AV id: $reason`")
+	object IllegalAVFormatException:
+		/** Error of illegal AV id, where the reason is the AV id is too large. */
+		def thusTooLarge (av: Long) =
+			new IllegalAVFormatException(av, s"Given AV id $av is too large, should not be larger than 2^51($X_AV_MAX)")
+		/** Error of illegal AV id, where the reason is the AV id is too small. */
+		def thusTooSmall (av: Long) =
+			new IllegalAVFormatException(av, s"Given AV id $av is too small, should not be smaller than 1")
 	
 	/** Convert an AV video id format to BV video id format for $Bilibili
 	  *
 	  * $AvBvFormat
 	  *
-	  * this method '''available while the __av-id < 2^27^__''', while it theoretically
-	  * available when the av-id < 2^30^. Meanwhile some digits of the BV id is a fixed
-	  * value (like the [[BV_TEMPLATE]] shows) -- input __bv__ can do not follow the format,
-	  * but it will almost certainly gives a wrong AV id (because the fixed number is not
-	  * processed at all!)
-	  *
 	  * @see $AvBvSeeAlso
 	  *
 	  * @param bv a BV id, which should be exactly 10 digits and all chars should be
-	  *           a legal base58 char (which means can be found in [[BB58_TABLE]]).
-	  *           otherwise, an [[IllegalFormatException]] will be thrown.
+	  *           a legal base58 char (which means can be found in [[BB58_TABLE]]) and
+	  *           the first character should must be 1. BV id in this format does NOT
+	  *           contains `BV` prefix. Otherwise, an [[IllegalBVFormatException]]
+	  *           will be thrown.
 	  * @return an AV id which will shows the save video of input __bv__ in $Bilibili
-	  * @throws IllegalFormatException when the input __bv__ is not a legal 10 digits base58
-	  *                                formatted BV id.
+	  * @throws IllegalBVFormatException when the input __bv__ is not a legal 10 digits base58
+	  *                                  formatted BV id.
 	  */
-	@throws[IllegalFormatException]
+	@throws[IllegalBVFormatException]
 	def toAv (bv: String): Long = {
-		var av = 0L
-		if (bv.length != 10) throw IllegalFormatException(bv, bv.length)
-		for (i <- BV_TEMPLATE_FILTER.indices) {
-			val _get = BV_TEMPLATE_FILTER(i)
-			val tableToken = BB58_TABLE_REV get bv(_get)
-			if tableToken isEmpty then throw IllegalFormatException(bv, bv(_get), _get)
-			av = av + (tableToken.get.toLong * (BB58_TABLE_SIZE**i).toLong)
-		}
-		av = (av - V_CONV_ADD) ^ V_CONV_XOR
-		if (av < 0)
-			av+ X_AV_ALT
-		else av
+		if (bv.length != 10) throw IllegalBVFormatException(bv, bv.length)
+		if (bv(0) != '1') throw IllegalBVFormatException(bv)
+		val _bv = bv.toCharArray
+		val av =
+			( for (i <- BV_TEMPLATE_FILTER.indices) yield {
+				val _get = BV_TEMPLATE_FILTER(i)
+				val tableToken = BB58_TABLE_REV get _bv(_get)
+				if tableToken isEmpty then throw IllegalBVFormatException(bv, _bv(_get), _get)
+				tableToken.get * (BB58_BASE**i)
+			} ).sum
+		(av & X_AV_MASK) ^ V_CONV_XOR
 	}
 	
 	/** Convert an AV video format to a BV video format for $Bilibili.
 	  *
-	  * this method '''available while the __av-id < 2^27^__''', while it theoretically
-	  * available when the av-id < 2^30^.
+	  * $AvBvFormat
+	  *
+	  * @see $AvBvSeeAlso
 	  *
 	  * @param av an AV id.
-	  * @return a BV id which will shows the save video of input __av__ in $Bilibili
+	  * @return a BV id which will shows the save video of input __av__ in $Bilibili. A 10 digits
+	  *         base58 formatted BV id, does NOT contains `BV` prefix.
 	  */
 	def toBv (av: Long): String = {
-		val __av =if (av > X_AV_MAX) av - X_AV_ALT else av
-		val _av = (__av^V_CONV_XOR)+V_CONV_ADD
+		if (av > X_AV_MAX) throw IllegalAVFormatException.thusTooLarge(av)
+		if (av < 1) throw IllegalAVFormatException.thusTooSmall(av)
+		var _av = (X_AV_MAX | av) ^ V_CONV_XOR
 		val bv = Array(BV_TEMPLATE:_*)
 		for (i <- BV_TEMPLATE_FILTER.indices) {
-			bv(BV_TEMPLATE_FILTER(i)) = BB58_TABLE( (_av/(BB58_TABLE_SIZE**i) % BB58_TABLE_SIZE) toInt )
+			bv(BV_TEMPLATE_FILTER(i)) = BB58_TABLE((_av % BB58_BASE).toInt)
+			_av /= BB58_BASE
 		}
 		String copyValueOf bv
 	}

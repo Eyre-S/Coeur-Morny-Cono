@@ -13,9 +13,9 @@ object BilibiliForms {
 	
 	case class BiliVideoId (av: Long, bv: String, part: Int|Null = null)
 	
-	private val REGEX_BILI_ID = "^((?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))$"r
+	private val REGEX_BILI_ID = "^((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))$"r
 	private val REGEX_BILI_V_PART_IN_URL_PARAM = "(?:&|^)p=(\\d+)"r
-	private val REGEX_BILI_VIDEO: Regex = "^(?:(?:https?://)?(?:(?:www\\.)?bilibili\\.com(?:/s)?/video/|b23\\.tv/)((?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))/?(?:\\?((?:p=(\\d+))?.*))?|(?:av|AV)(\\d{1,12})|(?:bv|BV)([A-HJ-NP-Za-km-z1-9]{10}))$" r
+	private val REGEX_BILI_VIDEO: Regex = "^(?:(?:https?://)?(?:(?:www\\.)?bilibili\\.com(?:/s)?/video/|b23\\.tv/)((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))/?(?:\\?((?:p=(\\d+))?.*))?|(?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))$" r
 	
 	/** parse a Bilibili video link to a [[BiliVideoId]] format Bilibili Video Id.
 	  *
@@ -34,7 +34,7 @@ object BilibiliForms {
 			case REGEX_BILI_VIDEO(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv) =>
 				
 				val av = select(_url_av, _raw_av)
-				val bv = select(_url_bv, _raw_bv)
+				val bv = "1" + select(_url_bv, _raw_bv)
 				
 				val part_part = if (_url_param == null) null else
 					REGEX_BILI_V_PART_IN_URL_PARAM.findFirstMatchIn(_url_param) match

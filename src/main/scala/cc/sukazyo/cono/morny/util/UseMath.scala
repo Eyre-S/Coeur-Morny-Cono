@@ -15,11 +15,12 @@ object UseMath {
 		@targetName("pow")
 		def ** (other: Int): Double = Math.pow(self, other)
 	}
-	
 	extension (self: Long) {
 		@targetName("pow")
 		def ** (other: Long): Long =
-			Math.pow(self, other).toLong
+			var x = 1L
+			for (_ <- 0L until other) x *= self
+			x
 	}
 	
 	extension (base: Int) {

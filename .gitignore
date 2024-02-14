@@ -9,7 +9,9 @@
 /build/
 /bin/
 /out/
+target/
 .metals/
+.bsp/
 .bloop/
 .project
 lcoal.properties
