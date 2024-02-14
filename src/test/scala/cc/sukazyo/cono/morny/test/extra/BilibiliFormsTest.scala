@@ -57,13 +57,18 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 			parse_videoUrl("bilibili.com/video/AV455017605?mid=12hdowhAI&p=5&x=D82EQ&289EHD8AHDOIWU8=r2aur9%3Bi0%3AJ%7BRQJH%28QJ.%5BropWG%3AKR%24%28O%7BGR") shouldEqual
 				BiliVideoId(455017605L, "1Q541167Qg", 5)
 		
-		"av id with more than 12 digits should not be parsed" in :
-			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av4550176087554")
-			an[IllegalArgumentException] should be thrownBy parse_videoUrl("bilibili.com/video/av4550176087554")
+		"av id with more than 16 digits should not be parsed" in :
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av4611686018427387904")
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av46116860184273870")
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("bilibili.com/video/av4611686018427387904")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av455017608755634345565341256")
 		"av id with 0 digits should not be parsed" in :
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("bilibili.com/video/av")
+		"av id which is < 0 should not be parsed" in :
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av-1")
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("av-296798903")
+			an[IllegalArgumentException] should be thrownBy parse_videoUrl("bilibili.com/video/av-1")
 		"BV id with not 10 digits should not be parsed" in :
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("BV123456789")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("BV12345678")
