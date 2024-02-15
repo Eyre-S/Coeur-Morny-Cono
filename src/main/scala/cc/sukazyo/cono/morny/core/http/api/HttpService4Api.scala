@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.core.http.api
 
 import cats.effect.IO
-import cc.sukazyo.cono.morny.core.Log.exceptionLog
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import org.http4s.{HttpRoutes, Response}
 
 trait HttpService4Api {
@@ -13,7 +13,7 @@ trait HttpService4Api {
 			response.setMornyInternalErrorHeader(
 				e.getClass.getSimpleName,
 				e.getMessage,
-				exceptionLog(e)
+				e.toLogString
 			)
 		def setMornyInternalErrorHeader (
 			`Morny-Internal-Error-Type`: String,

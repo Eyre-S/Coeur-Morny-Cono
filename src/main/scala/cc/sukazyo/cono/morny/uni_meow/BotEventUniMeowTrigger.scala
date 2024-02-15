@@ -10,17 +10,17 @@ class BotEventUniMeowTrigger (using commands: UniMeowCommandManager) extends Eve
 		import event.*
 		
 		givenCxt >> { (input: InputCommand) =>
-			logger trace s"got input command {$input} from event-context"
+			logger `trace` s"got input command {$input} from event-context"
 			
-			for ((name, command_instance) <- commands.commands) {
-				logger trace s"checking uni-meow $name"
+			for ((name, command_instance) <- commands.getCommands) {
+				logger `trace` s"checking uni-meow $name"
 				if (name == input.command)
-					logger trace "checked"
+					logger `trace` "checked"
 					command_instance.execute(using input, event.update)
 					event.setEventOk
 			}
 			
-		} || { logger trace "not command (for uni-meow)" }
+		} || { logger `trace` "not command (for uni-meow)" }
 		
 	}
 	

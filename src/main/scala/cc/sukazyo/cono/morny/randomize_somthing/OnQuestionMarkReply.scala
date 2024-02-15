@@ -3,13 +3,15 @@ package cc.sukazyo.cono.morny.randomize_somthing
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.randomize_somthing.OnQuestionMarkReply.isAllMessageMark
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.TelegramBot
 
-import scala.language.postfixOps
 import scala.util.boundary
+import scala.util.boundary.break
 
 class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
+	private given TelegramBot = coeur.account
 	
 	override def onMessage (using event: EventEnv): Unit = {
 		import event.update
@@ -21,9 +23,10 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		if (1 over 8) chance_is false then return;
 		if !isAllMessageMark(using update.message.text) then return;
 		
-		coeur.account exec SendMessage(
+		SendMessage(
 			update.message.chat.id, update.message.text
 		).replyToMessageId(update.message.messageId)
+			.unsafeExecute
 		event.setEventOk
 		
 	}
@@ -40,7 +43,7 @@ object OnQuestionMarkReply {
 		boundary[Boolean] {
 			for (c <- text)
 				if !(QUESTION_MARKS contains c) then
-					boundary break false
+					break(false)
 			true
 		}
 	}

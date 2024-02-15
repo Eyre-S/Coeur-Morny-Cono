@@ -2,13 +2,12 @@ package cc.sukazyo.cono.morny.core.bot.api
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.core.bot.api.{ISimpleCommand, ITelegramCommand}
-import cc.sukazyo.cono.morny.core.bot.api.MornyCommandManager.CommandMap
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
 import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
+import com.pengrad.telegrambot.TelegramBot
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -17,14 +16,8 @@ import scala.language.postfixOps
 object MornyCommandManager:
 	type CommandMap = mutable.SeqMap[String, ISimpleCommand]
 
-class MornyCommandManager (using coeur: MornyCoeur) {
-	
-	private val commands: CommandMap = mutable.SeqMap.empty
-	def register [T <: ISimpleCommand] (commands: T*): Unit =
-		for (i <- commands)
-			this.commands += (i.name -> i)
-			for (alias <- i.aliases)
-				this.commands += (alias.name -> i)
+class MornyCommandManager (using coeur: MornyCoeur) extends SimpleCommandManager {
+	private given TelegramBot = coeur.account
 	
 	def execute (using command: InputCommand, event: Update): Boolean = {
 		if (commands contains command.command)
@@ -36,25 +29,28 @@ class MornyCommandManager (using coeur: MornyCoeur) {
 	private def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
 		if command.target eq null then false
 		else
-			coeur.account exec SendSticker(
+			SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 			true
 	}
 	
 	def automaticTGListUpdate (): Unit = {
 		val listing = commands_toTelegramList
 		automaticTGListRemove()
-		coeur.account exec SetMyCommands(listing:_*)
-		logger notice
+		SetMyCommands(listing*)
+			.unsafeExecute
+		logger `notice`
 				s"""automatic updated telegram command list :
 				   |${commandsTelegramList_toString(listing)}""".stripMargin
 	}
 	
 	def automaticTGListRemove (): Unit = {
-		coeur.account exec DeleteMyCommands()
-		logger notice "cleaned up command list"
+		DeleteMyCommands()
+			.unsafeExecute
+		logger `notice` "cleaned up command list"
 	}
 	
 	private def commandsTelegramList_toString (list: Array[BotCommand]): String =

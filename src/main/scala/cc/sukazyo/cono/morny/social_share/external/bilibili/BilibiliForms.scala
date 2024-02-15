@@ -72,7 +72,7 @@ object BilibiliForms {
 			IllegalArgumentException(s"not a b23.tv url: $uri")
 		else if uri.pathSegments.segments.size < 1 then
 			throw IllegalArgumentException(s"empty b23.tv url: $uri")
-		else if uri.pathSegments.segments.head.v matches REGEX_BILI_ID.regex then
+		else if uri.pathSegments.segments.head.v `matches` REGEX_BILI_ID.regex then
 			throw IllegalArgumentException(s"is a b23 video link: $uri . (use parse_videoUrl instead)")
 		
 		try {

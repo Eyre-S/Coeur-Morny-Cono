@@ -33,7 +33,7 @@ object MApi {
 		
 		private val httpClient = OkHttpSyncBackend()
 		
-		@throws[HttpError[_]|SttpClientException|ParsingFailure|DecodingFailure]
+		@throws[HttpError[?]|SttpClientException|ParsingFailure|DecodingFailure]
 		def statuses_show (id: String): MApi[MStatus] =
 			import sttp.client3.asString
 			import MApi.CirceADTs.given
@@ -46,7 +46,7 @@ object MApi {
 				.as[MApi[MStatus]]
 				.toTry.get
 		
-		@throws[HttpError[_] | SttpClientException | ParsingFailure | DecodingFailure]
+		@throws[HttpError[?] | SttpClientException | ParsingFailure | DecodingFailure]
 		def pic (picUrl: String): Array[Byte] =
 			import sttp.client3.*
 			import sttp.model.{MediaType, Uri}

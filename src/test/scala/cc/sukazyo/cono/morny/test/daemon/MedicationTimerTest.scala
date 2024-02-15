@@ -26,7 +26,7 @@ class MedicationTimerTest extends MornyTests with TableDrivenPropertyChecks {
 		
 		forAll(examples) { (current, notifyAt, useTimezone, nextNotifyTime) =>
 			val _curr = EpochMillis(current)
-			val _tz = ZoneOffset of useTimezone
+			val _tz = ZoneOffset `of` useTimezone
 			val _next = EpochMillis(nextNotifyTime)
 			
 			s"at time [$_curr], and need to be notify at hours ${notifyAt.mkString(",")} with $_tz :" - {

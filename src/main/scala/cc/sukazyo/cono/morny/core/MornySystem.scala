@@ -1,10 +1,11 @@
 package cc.sukazyo.cono.morny.core
 
-import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.internal.BuildConfigField
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.FileUtils
 import cc.sukazyo.cono.morny.BuildConfig
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 
 import java.io.IOException
 import java.net.URISyntaxException
@@ -38,7 +39,7 @@ object MornySystem {
 			case _: (IOException|URISyntaxException) =>
 				"<non-jar-runtime>"
 			case n: NoSuchAlgorithmException =>
-				logger error exceptionLog(n)
+				logger `error` n.toLogString
 //				MornyReport.exception(n, "<coeur-md5/calculation-error>") // todo: will not implemented
 				"<calculation-error>"
 	}

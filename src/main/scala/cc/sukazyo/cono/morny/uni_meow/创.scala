@@ -3,12 +3,14 @@ package cc.sukazyo.cono.morny.uni_meow
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ISimpleCommand}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.*
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.{MessageEntity, Update}
 import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.TelegramBot
 
 //noinspection NonAsciiCharacters
 class 创 (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	object Chuang extends ISimpleCommand {
 		
@@ -27,12 +29,13 @@ class 创 (using coeur: MornyCoeur) {
 					return;
 			
 			val chuangText = 创.chuangText(text)
-			coeur.account exec SendMessage(
+			SendMessage(
 				event.message.chat.id,
 				chuangText
 			).entities(
 				MessageEntity(MessageEntity.Type.pre, 0, chuangText.length)
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 			
 		}
 		

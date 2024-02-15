@@ -93,14 +93,14 @@ class Scheduler {
 					case readyToRun: Task =>
 						
 						runtimeStatus = State.RUNNING
-						this setName readyToRun.name
+						this `setName` readyToRun.name
 						
 						try {
 							readyToRun.main
 						} catch case _: (Exception | Error) => {}
 						
 						runtimeStatus = State.RUNNING_POST
-						this setName s"${readyToRun.name}#post"
+						this `setName` s"${readyToRun.name}#post"
 						
 						// this if is used for check if post effect need to be
 						//  run. It is useless since the wait/notify changes.
@@ -117,7 +117,7 @@ class Scheduler {
 						}
 						
 //						currentRunning = null
-						this setName runnerName
+						this `setName` runnerName
 						
 					case needToWaitMillis: EpochMillis =>
 						runtimeStatus = State.WAITING
@@ -133,7 +133,7 @@ class Scheduler {
 		}
 		
 	}
-	runtime setName runnerName
+	runtime `setName` runnerName
 	runtime.start()
 	
 	/** Name of the scheduler runner.
@@ -179,7 +179,7 @@ class Scheduler {
 	  *         succeed removed from task queue.
 	  */
 	def cancel (task: Task): Boolean =
-		taskList synchronized:
+		taskList.synchronized:
 			try taskList remove task
 			finally taskList.notifyAll()
 	
@@ -208,7 +208,7 @@ class Scheduler {
 	  * to make the scheduler avoid fails when machine fall asleep or some else conditions.
 	  */
 	def notifyIt(): Unit =
-		taskList synchronized:
+		taskList.synchronized:
 			taskList.notifyAll()
 	
 	/** Stop the scheduler's runner, no matter how much task is not run yet.

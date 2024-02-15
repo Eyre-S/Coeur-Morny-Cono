@@ -5,11 +5,13 @@ import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.social_share.event.OnGetSocial
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
+import com.pengrad.telegrambot.TelegramBot
 
 class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
+	private given TelegramBot = coeur.account
 	
 	override val name: String = "get"
 	override val aliases: List[ICommandAlias] = Nil
@@ -19,10 +21,11 @@ class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		def do404 (): Unit =
-			coeur.account exec SendSticker(
+			SendSticker(
 				event.message.chat.id,
 				TelegramStickers.ID_404
 			).replyToMessageId(event.message.messageId())
+				.unsafeExecute
 		
 		val content =
 			if command.args.length > 0 then

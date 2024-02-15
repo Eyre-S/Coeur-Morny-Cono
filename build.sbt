@@ -3,7 +3,7 @@ aether.AetherKeys.aetherOldVersionMethod := true
 ThisBuild / organization := "cc.sukazyo"
 ThisBuild / organizationName := "A.C. Sukazyo Eyre"
 
-ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / scalaVersion := "3.4.0-RC4"
 
 resolvers ++= Seq(
 		"-ws-releases" at "https://mvn.sukazyo.cc/releases"
@@ -56,6 +56,20 @@ lazy val root = (project in file("."))
 				"-target", "17"
 			),
 			autoAPIMappings := true,
+			apiMappings ++= {
+				def mappingsFor(organization: String, names: List[String], location: String, revision: String => String = identity): Seq[(File, URL)] =
+					for {
+						entry: Attributed[File] <- (Compile / fullClasspath).value
+						module: ModuleID <- entry.get(moduleID.key)
+						if module.organization == organization
+						if names.exists(module.name.startsWith)
+					} yield entry.data -> url(location.format(revision(module.revision)))
+				val mappings: Seq[(File, URL)] = Seq(
+					mappingsFor("org.scala-lang", List("scala-library"), "https://scala-lang.org/api/%s/"),
+					mappingsFor("com.github.pengrad", "java-telegram-bot-api"::Nil, "https://jitpack.io/com/github/pengrad/java-telegram-bot-api/6.3.0/javadoc/"),
+				).flatten
+				mappings.toMap
+			},
 			
 			assemblyMergeStrategy := {
 				case module if module endsWith "module-info.class" => MergeStrategy.concat

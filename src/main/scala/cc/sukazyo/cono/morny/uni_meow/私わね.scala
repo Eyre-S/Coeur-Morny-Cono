@@ -5,12 +5,14 @@ import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ISimpleCommand}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.UseMath.over
 import cc.sukazyo.cono.morny.util.UseRandom.*
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.TelegramBot
 
 //noinspection NonAsciiCharacters
 class 私わね (using coeur: MornyCoeur) extends ISimpleCommand {
+	private given TelegramBot = coeur.account
 	
 	override val name: String = "me"
 	override val aliases: List[ICommandAlias] = Nil
@@ -19,10 +21,11 @@ class 私わね (using coeur: MornyCoeur) extends ISimpleCommand {
 		
 		if ((1 over 521) chance_is true) {
 			val text = "/打假"
-			coeur.account exec new SendMessage(
+			SendMessage(
 				event.message.chat.id,
 				text
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 		}
 		
 	}

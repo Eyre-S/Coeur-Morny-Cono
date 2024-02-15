@@ -9,14 +9,14 @@ import com.pengrad.telegrambot.model.Update
 
 class ShareToolSocialContent extends ITelegramQuery {
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		val _queryRaw = event.inlineQuery.query
 		val query =
 			_queryRaw.trim match
-				case _startsWithTag if _startsWithTag startsWith "get " =>
+				case _startsWithTag if _startsWithTag `startsWith` "get " =>
 					(_startsWithTag drop 4)trim
-				case _endsWithTag if _endsWithTag endsWith " get" =>
+				case _endsWithTag if _endsWithTag `endsWith` " get" =>
 					(_endsWithTag dropRight 4)trim
 				case _ => return null
 		

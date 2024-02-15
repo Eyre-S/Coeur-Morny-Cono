@@ -3,14 +3,16 @@ package cc.sukazyo.cono.morny.ip186
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class BotCommand (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	private enum Subs (val cmd: String):
 		case IP extends Subs("ip")
@@ -35,18 +37,20 @@ class BotCommand (using coeur: MornyCoeur) {
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
 			else if (command.args.length > 1)
-				coeur.account exec SendMessage(
+				SendMessage(
 					event.message.chat.id,
 					"[Unavailable] Too much arguments."
 				).replyToMessageId(event.message.messageId)
+					.unsafeExecute
 				return
 			else command.args(0)
 		
 		if (target eq null)
-			coeur.account exec new SendMessage(
+			SendMessage(
 				event.message.chat.id,
 				"[Unavailable] No ip defined."
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 			return;
 		
 		
@@ -58,20 +62,22 @@ class BotCommand (using coeur: MornyCoeur) {
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
 				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			coeur.account exec SendMessage(
+			SendMessage(
 				event.message.chat.id,
 				s"""${h(response.url)}
 				   |<code>${h(response.body)}</code>"""
 				.stripMargin
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 			
 		} catch case e: Exception =>
-			coeur.account exec new SendMessage(
+			SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""
 				.stripMargin
 			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId())
+				.unsafeExecute
 		
 	}
 	

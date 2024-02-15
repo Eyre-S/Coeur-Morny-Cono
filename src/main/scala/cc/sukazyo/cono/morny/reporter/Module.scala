@@ -27,10 +27,10 @@ class Module extends MornyInternalModule {
 		import cxt.*
 		
 		externalContext >> { (instance: MornyReport) =>
-			logger info "MornyReport will now collect your bot event statistics."
+			logger `info` "MornyReport will now collect your bot event statistics."
 			eventManager register instance.EventStatistics.EventInfoCatcher
 		} || {
-			logger warn "There seems no reporter instance is provided; skipped register events for it."
+			logger `warn` "There seems no reporter instance is provided; skipped register events for it."
 		}
 		
 	}
@@ -40,7 +40,7 @@ class Module extends MornyInternalModule {
 		externalContext >> { (instance: MornyReport) =>
 			instance.start()
 		} || {
-			logger warn "There seems no reporter instance is provided; skipped start it."
+			logger `warn` "There seems no reporter instance is provided; skipped start it."
 		}
 	}
 	
@@ -56,7 +56,7 @@ class Module extends MornyInternalModule {
 		externalContext >> { (instance: MornyReport) =>
 			instance.stop()
 		} || {
-			logger warn "There seems no reporter instance need to be stop."
+			logger `warn` "There seems no reporter instance need to be stop."
 		}
 	}
 	

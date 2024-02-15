@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 object ServerMain {
 	
 	val tz: TimeZone = TimeZone getDefault
-	val tz_offset: ZoneOffset = ZoneOffset ofTotalSeconds(tz.getRawOffset / 1000)
+	val tz_offset: ZoneOffset = ZoneOffset `ofTotalSeconds` (tz.getRawOffset / 1000)
 	
 	private val THREAD_MORNY_INIT: String = "morny-init"
 	
@@ -54,7 +54,7 @@ object ServerMain {
 				case "--report-to" => i += 1; config.reportToChat = args(i) toLong
 				case "--report-zone" => i += 1; config.reportZone = TimeZone.getTimeZone(args(i))
 				
-				case "--trusted-reader-dinner" | "-trsd" => i += 1; config.dinnerTrustedReaders add(args(i) toLong)
+				case "--trusted-reader-dinner" | "-trsd" => i += 1; config.dinnerTrustedReaders `add` (args(i) toLong)
 				case "--dinner-chat" | "-chd" => i += 1; config.dinnerChatId = args(i) toLong
 				
 				case "--http-listen-port" | "-hp" =>
@@ -67,8 +67,8 @@ object ServerMain {
 					config.medicationTimerUseTimezone = ZoneOffset.ofHours(args(i) toInt)
 				case "--medication-notify-times" | "-medt" =>
 					i += 1
-					for (u <- args(i) split ",") {
-						config.medicationNotifyAt add(u toInt)
+					for (u <- args(i) `split` ",") {
+						config.medicationNotifyAt `add` (u toInt)
 					}
 				
 				case "--auto-cmd-list" | "-ca" => config.commandLoginRefresh = true
@@ -87,8 +87,8 @@ object ServerMain {
 		var propToken: String = null
 		var propTokenKey: String = null
 		for (iKey <- MornyConfig.PROP_TOKEN_KEY) {
-			if ((System getenv iKey) != null) {
-				propToken = System getenv iKey
+			if ((System `getenv` iKey) != null) {
+				propToken = System `getenv` iKey
 				propTokenKey = iKey
 			}
 		}
@@ -98,27 +98,27 @@ object ServerMain {
 		/// process startup params - like startup mode
 		///
 		
-		if (showHello) logger info MornyAbout.MORNY_PREVIEW_IMAGE_ASCII
+		if (showHello) logger `info` MornyAbout.MORNY_PREVIEW_IMAGE_ASCII
 		if (mode_echoHello) return
 		
-		if (unknownArgs.nonEmpty) logger warn
+		if (unknownArgs.nonEmpty) logger `warn`
 			s"""Can't understand arg to some meaning
 			   |  ${unknownArgs mkString "\n  "}"""
 				.stripMargin
-		if (deprecatedArgs.nonEmpty) logger warn
+		if (deprecatedArgs.nonEmpty) logger `warn`
 			s"""Those arguments have been deprecated:
 			   |  ${deprecatedArgs map((d, n) => s"$d : use $n instead") mkString "\n  "}
 			   |""".stripMargin
 		
 		if (Log debug)
-			logger warn
+			logger `warn`
 				"""Debug log output enabled.
 				  |  It may lower your performance, make sure that you are not in production environment."""
 					.stripMargin
 		
 		if (mode_echoVersion) {
 			
-			logger info
+			logger `info`
 				s"""Morny Cono Version
 				   |- version :
 				   |    Morny ${MornySystem.CODENAME toUpperCase}
@@ -148,14 +148,14 @@ object ServerMain {
 			
 		}
 		
-		logger info
+		logger `info`
 			s"""ServerMain.java Loaded >>>
 			   |- version ${MornySystem.VERSION_FULL}
 			   |- Morny ${MornySystem.CODENAME toUpperCase}
 			   |- <${MornySystem.getJarMD5}> [${MornySystem.CODE_TIMESTAMP}]""".stripMargin
 		
 		// due to [[MornyFormatterConsole]] will use a localized time, it will output to the log
-		logger info s"logging time will use time-zone ${tz.getID} ($tz_offset)"
+		logger `info` s"logging time will use time-zone ${tz.getID} ($tz_offset)"
 		
 		///
 		/// Check Coeur arguments
@@ -164,10 +164,10 @@ object ServerMain {
 		
 		if (propToken != null) {
 			config.telegramBotKey = propToken
-			logger info s"Parameter <token> set by EnvVar $$$propTokenKey"
+			logger `info` s"Parameter <token> set by EnvVar $$$propTokenKey"
 		}
 		
-		Thread.currentThread setName THREAD_MORNY_INIT
+		Thread.currentThread `setName` THREAD_MORNY_INIT
 		
 		try
 			MornyCoeur(

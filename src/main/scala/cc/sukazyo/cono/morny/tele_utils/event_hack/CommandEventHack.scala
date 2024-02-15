@@ -4,13 +4,15 @@ import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
+import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) extends ITelegramCommand {
+	private given TelegramBot = coeur.account
 	
 	override val name: String = "event_hack"
 	override val aliases: List[ICommandAlias] = Nil
@@ -24,15 +26,17 @@ class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) exte
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
-			coeur.account exec SendSticker(
+			SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_WAITING
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 		def done_forbiddenForAny =
-			coeur.account exec SendSticker(
+			SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 		
 		def doRegister (t: HackType): Unit =
 			registerHack(
@@ -43,7 +47,7 @@ class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) exte
 			)
 		x_mode match
 			case "any" =>
-				if (coeur.trusted isTrusted event.message.from.id)
+				if (coeur.trusted isTrust event.message.from)
 					doRegister(HackType ANY)
 					done_ok
 				else done_forbiddenForAny

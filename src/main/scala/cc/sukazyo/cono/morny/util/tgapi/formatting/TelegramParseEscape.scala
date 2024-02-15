@@ -54,13 +54,13 @@ object TelegramParseEscape {
 						case "br" =>
 							result += TextNode("\n")
 						case "tg-emoji" =>
-							if elem.attributes.hasKey("emoji-id") then
+							if elem.attributes `hasKey` "emoji-id" then
 								result += produceChildNodes(elem)
 							else
 								result += TextNode(elem.text)
 						case "img" =>
-							if elem.attributes hasKey "alt" then
-								result += TextNode(s"[${elem attr "alt"}]")
+							if elem.attributes `hasKey` "alt" then
+								result += TextNode(s"[${elem.attr("alt")}]")
 						case _ =>
 							for (i <- cleanupHtml(elem.childNodes.asScala.toSeq)) result += i
 		}

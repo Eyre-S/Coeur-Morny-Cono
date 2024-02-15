@@ -4,10 +4,11 @@ import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.InlineQueryUnit
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.{SocialMedia, SocialMediaType, SocialMediaWithUrl}
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.SocialMediaType.{Photo, Video}
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.request.*
 import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
+import com.pengrad.telegrambot.TelegramBot
 
 /** Model of social networks' status. for example twitter tweet or
   * weibo status.
@@ -44,18 +45,19 @@ case class SocialContent (
 			case _ => orElse
 	
 	def outputToTelegram (using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit = {
+		given TelegramBot = coeur.account
 		if medias isEmpty then
-			coeur.account exec
-				SendMessage(replyChat, text_html)
-					.parseMode(ParseMode.HTML)
-					.replyToMessageId(replyToMessage)
+			SendMessage(replyChat, text_html)
+				.parseMode(ParseMode.HTML)
+				.replyToMessageId(replyToMessage)
+				.unsafeExecute
 		else
 			val mediaGroup = medias.map(f => f.genTelegramInputMedia)
 			mediaGroup.head.caption(text_html)
 			mediaGroup.head.parseMode(ParseMode.HTML)
-			coeur.account exec
-				SendMediaGroup(replyChat, mediaGroup: _*)
-					.replyToMessageId(replyToMessage)
+			SendMediaGroup(replyChat, mediaGroup*)
+				.replyToMessageId(replyToMessage)
+				.unsafeExecute
 	}
 	
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[InlineQueryUnit[?]] = {
@@ -99,13 +101,13 @@ object SocialContent {
 		def genTelegramInputMedia: InputMedia[?]
 	}
 	case class SocialMediaWithUrl (url: String)(t: SocialMediaType) extends SocialMedia(t) {
-		override def genTelegramInputMedia: InputMedia[_] =
+		override def genTelegramInputMedia: InputMedia[?] =
 			t match
 				case Photo => InputMediaPhoto(url)
 				case Video => InputMediaVideo(url)
 	}
 	case class SocialMediaWithBytesData (data: Array[Byte])(t: SocialMediaType) extends SocialMedia(t) {
-		override def genTelegramInputMedia: InputMedia[_] =
+		override def genTelegramInputMedia: InputMedia[?] =
 			t match
 				case Photo => InputMediaPhoto(data)
 				case Video => InputMediaVideo(data)

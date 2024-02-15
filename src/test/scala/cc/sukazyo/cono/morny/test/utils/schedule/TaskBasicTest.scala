@@ -32,7 +32,7 @@ class TaskBasicTest extends MornyTests {
 	
 	"task can be sync executed by calling its main method." taggedAs Slow in {
 		
-		Thread.currentThread setName "parent-thread"
+		Thread.currentThread `setName` "parent-thread"
 		val data = StringBuilder("")
 		val task = Task("some-task", 0L, {
 			Thread.sleep(100)

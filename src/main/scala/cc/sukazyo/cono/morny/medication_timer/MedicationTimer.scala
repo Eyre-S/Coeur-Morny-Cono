@@ -4,7 +4,7 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.medication_timer.MedicationTimer.calcNextRoutineTimestamp
 import cc.sukazyo.cono.morny.util.schedule.RoutineTask
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.util.CommonFormat
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import com.cronutils.builder.CronBuilder
@@ -13,12 +13,14 @@ import com.cronutils.model.time.ExecutionTime
 import com.pengrad.telegrambot.model.{Message, MessageEntity}
 import com.pengrad.telegrambot.request.{EditMessageText, SendMessage}
 import com.pengrad.telegrambot.response.SendResponse
+import com.pengrad.telegrambot.TelegramBot
 
 import java.time.{Instant, ZonedDateTime, ZoneOffset}
 import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 
 class MedicationTimer (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	private val NOTIFY_MESSAGE = "🍥⏲"
 	private val DAEMON_THREAD_NAME_DEF = "MedicationTimer"
@@ -36,7 +38,7 @@ class MedicationTimer (using coeur: MornyCoeur) {
 		
 		def calcNextSendTime: EpochMillis =
 			val next_time = calcNextRoutineTimestamp(System.currentTimeMillis, use_timeZone, notify_atHour)
-			logger info s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds / 60 / 60)} with $use_timeZone [$next_time]"
+			logger `info` s"medication timer will send next notify at ${CommonFormat.formatDate(next_time, use_timeZone.getTotalSeconds / 60 / 60)} with $use_timeZone [$next_time]"
 			next_time
 		
 		override def firstRoutineTimeMillis: EpochMillis =
@@ -47,24 +49,24 @@ class MedicationTimer (using coeur: MornyCoeur) {
 		
 		override def main: Unit = {
 			sendNotification()
-			logger info "medication notify sent."
+			logger `info` "medication notify sent."
 		}
 		
 	}
 	
 	def start(): Unit =
 		if ((notify_toChat == -1) || (notify_atHour isEmpty))
-			logger notice "Medication Timer disabled : related param is not complete set"
+			logger `notice` "Medication Timer disabled : related param is not complete set"
 			return;
 		coeur.tasks ++ scheduleTask
-		logger notice "Medication Timer started."
+		logger `notice` "Medication Timer started."
 	
 	def stop(): Unit =
 		coeur.tasks % scheduleTask
-		logger notice "Medication Timer stopped."
+		logger `notice` "Medication Timer stopped."
 	
 	private def sendNotification(): Unit = {
-		val sendResponse: SendResponse = coeur.account exec SendMessage(notify_toChat, NOTIFY_MESSAGE)
+		val sendResponse: SendResponse = SendMessage(notify_toChat, NOTIFY_MESSAGE).unsafeExecute
 		if sendResponse isOk then lastNotify_messageId = Some(sendResponse.message.messageId)
 		else lastNotify_messageId = None
 	}
@@ -76,11 +78,11 @@ class MedicationTimer (using coeur: MornyCoeur) {
 		val entities = ArrayBuffer.empty[MessageEntity]
 		if edited.entities ne null then entities ++= edited.entities
 		entities += MessageEntity(MessageEntity.Type.italic, edited.text.length + "\n-- ".length, editTime.length)
-		coeur.account exec EditMessageText(
+		EditMessageText(
 			notify_toChat,
 			edited.messageId,
 			edited.text + s"\n-- $editTime --"
-		).entities(entities toArray:_*)
+		).entities((entities toArray)*).unsafeExecute
 		lastNotify_messageId = None
 		true
 	}
@@ -105,7 +107,7 @@ object MedicationTimer {
 			}))
 			.instance
 		).nextExecution(
-			ZonedDateTime ofInstant (Instant ofEpochMilli baseTimeMillis, zone.normalized)
+			ZonedDateTime `ofInstant` (Instant `ofEpochMilli` baseTimeMillis, zone.normalized)
 		).get.toInstant.toEpochMilli
 	}
 	

@@ -5,14 +5,15 @@ import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.UniversalCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import com.pengrad.telegrambot.model.Update
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
+	private given TelegramBot = coeur.account
 	
 	private val TG_FORMAT = "^\\w+(@\\w+)?$"r
 	
@@ -22,7 +23,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 		val text = update.message.text
 		if text == null then return;
 		
-		if (text startsWith "/") {
+		if (text `startsWith` "/") {
 			
 			// there has to be some special conditions for DP7
 			// due to I have left DP7, I closed those special
@@ -33,7 +34,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 			// these message, here to remember the old DP7.
 			
 			val actions = UniversalCommand.Lossy(text)
-			actions(0) = actions(0) substring 1
+			actions(0) = actions(0) `substring` 1
 			
 			actions(0)
 			
@@ -42,7 +43,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 				case TG_FORMAT(_) =>
 					return;
 				// ignore Path link
-				case x if x contains "/" => return;
+				case x if x `contains` "/" => return;
 				case _ =>
 			
 			val isHardParse = actions(0) isBlank
@@ -52,7 +53,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 			val hasObject = actions.length != hp_len(1)
 			val v_object =
 				if hasObject then
-					actions slice(hp_len(1), actions.length) mkString " "
+					actions `slice` (hp_len(1), actions.length) `mkString` " "
 				else ""
 			val origin = update.message
 			val target =
@@ -60,7 +61,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					origin
 				else update.message.replyToMessage
 			
-			coeur.account exec SendMessage(
+			SendMessage(
 				update.message.chat.id,
 				"%s %s%s %s %s!".format(
 					origin.sender_firstnameRefHTML,
@@ -71,6 +72,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					if hasObject then h(v_object+" ") else ""
 				)
 			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
+				.unsafeExecute
 			event.setEventOk
 			
 		}

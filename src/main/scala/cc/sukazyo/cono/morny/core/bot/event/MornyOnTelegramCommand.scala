@@ -14,21 +14,21 @@ class MornyOnTelegramCommand (using commandManager: MornyCommandManager) (using 
 		
 		def _isCommandMessage(message: Message): Boolean =
 			if message.text eq null then false
-			else if !(message.text startsWith "/") then false
-			else if message.text startsWith "/ " then false
+			else if !(message.text `startsWith` "/") then false
+			else if message.text `startsWith` "/ " then false
 			else true
 		
 		if !_isCommandMessage(update.message) then return
 		val inputCommand = InputCommand(update.message.text drop 1)
 		givenCxt << inputCommand
-		logger trace ":provided InputCommand for event"
+		logger `trace` ":provided InputCommand for event"
 		
-		if (!(inputCommand.command matches "^\\w+$"))
-			logger debug "not command"
+		if (!(inputCommand.command `matches` "^\\w+$"))
+			logger `debug` "not command"
 		else if ((inputCommand.target ne null) && (inputCommand.target != coeur.username))
-			logger debug "not morny command"
+			logger `debug` "not morny command"
 		else
-			logger debug "is command"
+			logger `debug` "is command"
 			if commandManager.execute(using inputCommand) then
 				setEventOk
 		

@@ -1,26 +1,17 @@
 package cc.sukazyo.cono.morny.util
 
 import cc.sukazyo.cono.morny.util.GivenContext.{ContextNotGivenException, FolderClass, RequestItemClass}
-import cc.sukazyo.messiva.utils.StackUtils
 
 import scala.annotation.targetName
 import scala.collection.mutable
 import scala.reflect.{classTag, ClassTag}
-import scala.util.boundary
 
 object GivenContext {
 	case class FolderClass (clazz: Option[Class[?]])
 	object FolderClass:
 		def default: FolderClass = FolderClass(None)
 	case class RequestItemClass (clazz: Class[?])
-	private def lastNonGCStack: StackTraceElement =
-		boundary {
-			for (stack <- StackUtils.getStackTrace(0)) {
-				if (!stack.getClassName.startsWith(classOf[GivenContext].getName))
-					boundary break stack
-			}
-			StackTraceElement("unknown", "unknown", "unknown", -1)
-		}
+	
 	class ContextNotGivenException (using
 		val requestItemClass: RequestItemClass,
 		val folderClass: FolderClass = FolderClass.default,
@@ -69,7 +60,12 @@ object GivenContext {
   *     } catch case e: ContextNotGivenException =>          // if any of the above val is not available, it will catch the exception
   *         e.printStackTrace()
   * }}}
+  * 
+  * TODO: Tests
+  * 
+  * @since 2.0.0
   */
+//noinspection NoTargetNameAnnotationForOperatorLikeDefinition
 class GivenContext {
 	
 	private type ImplicitsMap [T <: Any] = mutable.HashMap[Class[?], T]
@@ -77,7 +73,7 @@ class GivenContext {
 	private val variables: ImplicitsMap[Any] = mutable.HashMap.empty
 	private val variablesWithOwner: ImplicitsMap[ImplicitsMap[Any]] = mutable.HashMap.empty
 	
-	def provide [T: ClassTag] (i: T): Unit =
+	infix def provide [T: ClassTag] (i: T): Unit =
 		variables += (classTag[T].runtimeClass -> i)
 	def << [T: ClassTag] (is: (Class[T], T)): Unit =
 		val (_, i) = is
@@ -91,7 +87,7 @@ class GivenContext {
 		variables get t.clazz match
 			case Some(i) => Right(i.asInstanceOf[T])
 			case None => Left(ContextNotGivenException())
-	def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+	infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.use[T] match
 			case Left(_) => ConsumeFailed[U]()
 			case Right(i) => ConsumeSucceed[U](consumer(i))
@@ -101,7 +97,7 @@ class GivenContext {
 		this.use[T].toTry.get
 	def >>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.use[T,U](consumer)
-	def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
+	infix def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
 		this.use[T,Any](consume)
 	
 	@targetName("ownedBy")
@@ -112,7 +108,7 @@ class GivenContext {
 	
 	class OwnedContext [O: ClassTag] {
 		
-		def provide [T: ClassTag] (i: T): Unit =
+		infix def provide [T: ClassTag] (i: T): Unit =
 			(variablesWithOwner getOrElseUpdate (classTag[O].runtimeClass, mutable.HashMap.empty))
 				.addOne(classTag[T].runtimeClass -> i)
 		def << [T: ClassTag] (is: (Class[T], T)): Unit =
@@ -129,7 +125,7 @@ class GivenContext {
 					case Some(i) => Right(i.asInstanceOf[T])
 					case None => Left(ContextNotGivenException())
 				case None => Left(ContextNotGivenException())
-		def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+		infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			use[T] match
 				case Left(_) => ConsumeFailed[U]()
 				case Right(i) => ConsumeSucceed[U](consumer(i))
@@ -139,7 +135,7 @@ class GivenContext {
 			this.use[T].toTry.get
 		def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			this.use[T,U](consumer)
-		def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
+		infix def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
 			this.use[T,Any](consume)
 		
 	}

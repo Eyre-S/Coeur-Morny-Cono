@@ -5,9 +5,6 @@ import cc.sukazyo.cono.morny.util.CommonFormat.formatDate
 import cc.sukazyo.messiva.formatter.ILogFormatter
 import cc.sukazyo.messiva.log.Log
 
-import java.time.{ZoneId, ZoneOffset}
-import java.util.TimeZone
-
 class MornyFormatterConsole extends ILogFormatter {
 	
 	override def format (log: Log): String =

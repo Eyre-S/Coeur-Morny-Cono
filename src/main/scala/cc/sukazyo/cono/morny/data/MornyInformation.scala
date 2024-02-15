@@ -13,7 +13,7 @@ object MornyInformation {
 			case None => ""
 			case Some(commit) =>
 				val g = StringBuilder()
-				val cm = commit substring(0, 8)
+				val cm = commit.substring(0, 8)
 				val cp = MornySystem.currentCodePath
 				if (cp == null) g ++= s"<code>$cm</code>"
 				else g ++= s"<a href='$cp'>$cm</a>"

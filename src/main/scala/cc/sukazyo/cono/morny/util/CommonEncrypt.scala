@@ -37,7 +37,7 @@ object CommonEncrypt {
 	
 	private def hash (data: Bin)(using algorithm: String): Bin =
 		try {
-			MessageDigest.getInstance(algorithm) digest data
+			MessageDigest.getInstance(algorithm) `digest` data
 		} catch case n: NoSuchAlgorithmException =>
 			throw IllegalStateException(n)
 	
@@ -47,7 +47,7 @@ object CommonEncrypt {
 	  *
 	  * $WhenString2Bin
 	  */
-	def MD5 (data: String): Bin = hash(data getBytes ENCRYPT_STANDARD_CHARSET)(using "md5")
+	def MD5 (data: String): Bin = hash(data.getBytes(ENCRYPT_STANDARD_CHARSET))(using "md5")
 	
 	/** the [[https://en.wikipedia.org/wiki/SHA-1 SHA-1]] hash value of input [[Bin]] `data`. */
 	def SHA1 (data: Bin): Bin = hash(data)(using "sha1")
@@ -55,7 +55,7 @@ object CommonEncrypt {
 	  *
 	  * $WhenString2Bin
 	  */
-	def SHA1 (data: String): Bin = hash(data getBytes ENCRYPT_STANDARD_CHARSET)(using "sha1")
+	def SHA1 (data: String): Bin = hash(data.getBytes(ENCRYPT_STANDARD_CHARSET))(using "sha1")
 	
 	/** the [[https://en.wikipedia.org/wiki/SHA-2 SHA-2/256]] hash value of input [[Bin]] `data`. */
 	def SHA256 (data: Bin): Bin = hash(data)(using "sha256")
@@ -63,7 +63,7 @@ object CommonEncrypt {
 	  *
 	  * $WhenString2Bin
 	  */
-	def SHA256 (data: String): Bin = hash(data getBytes ENCRYPT_STANDARD_CHARSET)(using "sha256")
+	def SHA256 (data: String): Bin = hash(data.getBytes(ENCRYPT_STANDARD_CHARSET))(using "sha256")
 	
 	/** the [[https://en.wikipedia.org/wiki/SHA-2 SHA-2/512]] hash value of input [[Bin]] `data`. */
 	def SHA512 (data: Bin): Bin = hash(data)(using "sha512")
@@ -71,7 +71,7 @@ object CommonEncrypt {
 	  *
 	  * $WhenString2Bin
 	  */
-	def SHA512 (data: String): Bin = hash(data getBytes ENCRYPT_STANDARD_CHARSET)(using "sha512")
+	def SHA512 (data: String): Bin = hash(data.getBytes(ENCRYPT_STANDARD_CHARSET))(using "sha512")
 	
 	/** Try get the filename before it got encrypted.
 	  *
@@ -89,10 +89,10 @@ object CommonEncrypt {
 	  * @return the file fullname removed the base64 file extension.
 	  */
 	def lint_base64FileName (encrypted: String): String = encrypted match
-		case i  if i  endsWith ".b64"        => i  dropRight ".b64".length
-		case ix if ix endsWith ".b64.txt"    => ix dropRight ".b64.txt".length
-		case l  if l  endsWith ".base64"     => l  dropRight ".base64".length
-		case lx if lx endsWith ".base64.txt" => lx dropRight ".base64.txt".length
+		case i  if i  `endsWith` ".b64"        => i  dropRight ".b64".length
+		case ix if ix `endsWith` ".b64.txt"    => ix dropRight ".b64.txt".length
+		case l  if l  `endsWith` ".base64"     => l  dropRight ".base64".length
+		case lx if lx `endsWith` ".base64.txt" => lx dropRight ".base64.txt".length
 		case u => u
 	
 	/** Hash a [[Long]] id to [[Bin]] using [[MD5]] algorithm.

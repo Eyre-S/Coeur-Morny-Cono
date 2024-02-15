@@ -4,10 +4,11 @@ import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ISimpleCommand, ITelegramCommand}
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.{Message, Update}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
+import com.pengrad.telegrambot.TelegramBot
 
 import javax.swing.text.html.HTML
 import scala.annotation.unused
@@ -15,6 +16,7 @@ import scala.language.postfixOps
 
 //noinspection NonAsciiCharacters
 class 喵呜 (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	object 抱抱 extends ISimpleCommand {
 		override val name: String = "抱抱"
@@ -50,20 +52,22 @@ class 喵呜 (using coeur: MornyCoeur) {
 		override val paramRule: String = ""
 		override val description: String = "抽取一个神秘盒子"
 		override def execute (using command: InputCommand, event: Update): Unit = {
-			coeur.account exec new SendSticker(
+			SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_PROGYNOVA
 			).replyToMessageId(event.message.messageId)
+				.unsafeExecute
 		}
 	}
 	
 	private def replyingSet (whileRec: String, whileNew: String)(using event: Update): Unit = {
 		val isNew = event.message.replyToMessage == null
 		val target = if (isNew) event.message else event.message.replyToMessage
-		coeur.account exec new SendMessage(
+		SendMessage(
 			event.message.chat.id,
 			if (isNew) whileNew else whileRec
 		).replyToMessageId(target.messageId).parseMode(ParseMode HTML)
+			.unsafeExecute
 	}
 	
 }

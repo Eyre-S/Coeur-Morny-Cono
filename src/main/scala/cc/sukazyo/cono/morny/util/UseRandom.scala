@@ -10,7 +10,7 @@ import scala.util.Random
 object UseRandom {
 	
 	class ChancePossibility[T <: Any] (val one: T) (using possibility: Double) {
-		def nor[U] (another: U): T|U =
+		infix def nor[U] (another: U): T|U =
 			if Random.nextDouble < possibility then one else another
 	}
 	
@@ -19,7 +19,7 @@ object UseRandom {
 	
 	extension (num: Double) {
 		
-		def chance_is[T <: Any] (one: T): ChancePossibility[T] =
+		infix def chance_is[T <: Any] (one: T): ChancePossibility[T] =
 			ChancePossibility(one)(using num)
 		
 	}

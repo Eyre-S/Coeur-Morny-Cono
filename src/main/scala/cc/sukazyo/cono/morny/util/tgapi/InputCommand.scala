@@ -16,7 +16,7 @@ class InputCommand private (
 object InputCommand {
 	
 	def apply (input: Array[String]): InputCommand = {
-		val _ex = if input.nonEmpty then input(0) split ("@", 2) else Array.empty[String]
+		val _ex = if input.nonEmpty then input(0).split("@", 2) else Array.empty[String]
 		val _args = input drop 1
 		new InputCommand(
 			if _ex.length > 1 then _ex(1) else null,

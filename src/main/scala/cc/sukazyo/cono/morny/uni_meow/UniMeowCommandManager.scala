@@ -1,17 +1,9 @@
 package cc.sukazyo.cono.morny.uni_meow
 
-import cc.sukazyo.cono.morny.core.bot.api.ISimpleCommand
-import cc.sukazyo.cono.morny.core.bot.api.MornyCommandManager.CommandMap
+import cc.sukazyo.cono.morny.core.bot.api.SimpleCommandManager
 
-import scala.collection.mutable
-
-class UniMeowCommandManager {
+class UniMeowCommandManager extends SimpleCommandManager{
 	
-	private[uni_meow] val commands: CommandMap = mutable.SeqMap.empty
-	def register [T <: ISimpleCommand] (commands: T*): Unit =
-		for (i <- commands)
-			this.commands += (i.name -> i)
-			for (alias <- i.aliases)
-				this.commands += (alias.name -> i)
+	protected[uni_meow] def getCommands: this.commands.type = this.commands
 	
 }

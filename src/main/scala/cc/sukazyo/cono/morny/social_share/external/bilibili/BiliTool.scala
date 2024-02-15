@@ -108,12 +108,12 @@ object BiliTool {
 	  */
 	def toBv (av: Long): String = {
 		val _av = (av^V_CONV_XOR)+V_CONV_ADD
-		val bv = Array(BV_TEMPLATE:_*)
+		val bv = Array(BV_TEMPLATE*)
 		for (i <- BV_TEMPLATE_FILTER.indices) {
 			import Math.{floor, pow}
 			bv(BV_TEMPLATE_FILTER(i)) = BV_TABLE( (floor(_av/(TABLE_INT**i)) % TABLE_INT) toInt )
 		}
-		String copyValueOf bv
+		String `copyValueOf` bv
 	}
 	
 }

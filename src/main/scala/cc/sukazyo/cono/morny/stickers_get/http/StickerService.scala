@@ -4,7 +4,10 @@ import cats.effect.IO
 import cc.sukazyo.cono.morny.core.http.api.HttpService4Api
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramImages
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.File.getContent
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.execute
 import com.pengrad.telegrambot.request.GetFile
+import com.pengrad.telegrambot.TelegramBot
 import org.http4s.{HttpRoutes, MediaType}
 import org.http4s.dsl.io.*
 import org.http4s.headers.`Content-Type`
@@ -17,10 +20,11 @@ class StickerService (using coeur: MornyCoeur) extends HttpService4Api {
 		
 		case GET -> Root / "sticker" / "id" / id =>
 			try {
-				val response = coeur.account execute GetFile(id)
+				val response = GetFile(id).execute(using coeur.account)
 				if response.isOk then
 					try {
-						val file = coeur.account getFileContent response.file
+						given TelegramBot = coeur.account
+						val file = response.file.getContent
 						Ok(file)
 					} catch {
 						case e: IOException =>

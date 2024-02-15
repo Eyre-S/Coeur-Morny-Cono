@@ -4,6 +4,7 @@ import cc.sukazyo.messiva.utils.StackUtils
 
 import scala.reflect.{classTag, ClassTag}
 import scala.util.boundary
+import scala.util.boundary.break
 
 object UseStacks {
 	
@@ -11,7 +12,7 @@ object UseStacks {
 		boundary {
 			for (stack <- StackUtils.getStackTrace(1)) {
 				if (!stack.getClassName.startsWith(classTag[T].runtimeClass.getName))
-					boundary break stack
+					break(stack)
 			}
 			StackTraceElement("unknown", "unknown", "unknown", -1)
 		}

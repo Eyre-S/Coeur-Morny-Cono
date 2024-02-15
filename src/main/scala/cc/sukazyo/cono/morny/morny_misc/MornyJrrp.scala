@@ -8,7 +8,7 @@ import scala.language.postfixOps
 object MornyJrrp {
 	
 	def jrrp_of_telegramUser (user: User, timestamp: EpochMillis): Double =
-		jrrp_v_xmomi(user.id, EpochDays fromEpochMillis timestamp) * 100.0
+		jrrp_v_xmomi(user.id, EpochDays fromMillis timestamp) * 100.0
 	
 	private def jrrp_v_xmomi (identifier: Long, dayStamp: EpochDays): Double =
 		import cc.sukazyo.cono.morny.util.CommonEncrypt.MD5

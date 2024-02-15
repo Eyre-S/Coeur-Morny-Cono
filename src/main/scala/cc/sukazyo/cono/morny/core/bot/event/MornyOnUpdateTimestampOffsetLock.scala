@@ -20,7 +20,7 @@ class MornyOnUpdateTimestampOffsetLock (using coeur: MornyCoeur) extends EventLi
 	override def on (using event: EventEnv): Unit =
 		event.update.sourceTime match
 			case Some(timestamp) =>
-				if coeur.config.eventIgnoreOutdated && (EpochMillis.fromEpochSeconds(timestamp) < coeur.coeurStartTimestamp) then
+				if coeur.config.eventIgnoreOutdated && ((EpochMillis fromSeconds timestamp) < coeur.coeurStartTimestamp) then
 					event.setEventCanceled
 			case None =>
 	

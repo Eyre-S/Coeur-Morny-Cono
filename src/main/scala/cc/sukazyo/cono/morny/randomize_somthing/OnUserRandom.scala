@@ -2,13 +2,14 @@ package cc.sukazyo.cono.morny.randomize_somthing
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.response.SendResponse
+import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class OnUserRandom (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	object RandomSelect extends EventListener {
 		
@@ -19,10 +20,10 @@ class OnUserRandom (using coeur: MornyCoeur) {
 			import event.update
 			
 			if update.message.text == null then return;
-			if !(update.message.text startsWith "/") then return
+			if !(update.message.text `startsWith` "/") then return
 			
 			import cc.sukazyo.cono.morny.util.UseRandom.rand_half
-			val query = update.message.text substring 1
+			val query = update.message.text `substring` 1
 			val result: String | Null = query match
 				case USER_OR_QUERY(_con1, _con2) =>
 					if rand_half then _con1 else _con2
@@ -34,10 +35,11 @@ class OnUserRandom (using coeur: MornyCoeur) {
 			
 			if result == null then return;
 			
-			coeur.account exec SendMessage(
+			SendMessage(
 				update.message.chat.id,
 				result
 			).replyToMessageId(update.message.messageId)
+				.unsafeExecute
 			event.setEventOk
 			
 		}
@@ -58,14 +60,15 @@ class OnUserRandom (using coeur: MornyCoeur) {
 			var result: String|Null = null
 			import cc.sukazyo.cono.morny.util.UseRandom.rand_half
 			for (k <- keywords)
-				if update.message.text endsWith k then
+				if update.message.text `endsWith` k then
 					result = if rand_half then "尊嘟" else "假嘟"
-			if result == null then return;
+			if result == null then return
 			
-			coeur.account exec SendMessage(
+			SendMessage(
 				update.message.chat.id,
 				result
 			).replyToMessageId(update.message.messageId)
+				.unsafeExecute
 			event.setEventOk
 			
 		}

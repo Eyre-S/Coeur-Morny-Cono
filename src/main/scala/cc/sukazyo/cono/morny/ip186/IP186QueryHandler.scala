@@ -28,7 +28,7 @@ object IP186QueryHandler {
 	@throws[IOException]
 	def query_whoisPretty (domain: String): IP186Response =
 		val raw = query_whois(domain)
-		IP186Response(raw.url, raw.body substring(0, (raw.body indexOf "<<<")+3))
+		IP186Response(raw.url, raw.body `substring`(0, (raw.body `indexOf` "<<<")+3))
 	
 	@throws[IOException]
 	private def commonQuery (requestPath: Uri): IP186Response = {

@@ -1,12 +1,13 @@
 package cc.sukazyo.cono.morny.util.tgapi
 
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
-import cc.sukazyo.cono.morny.util.EpochDateTime.{EpochMillis, EpochSeconds}
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.*
 import com.pengrad.telegrambot.request.{BaseRequest, GetChatMember}
 import com.pengrad.telegrambot.response.BaseResponse
 
+import java.io.IOException
 import scala.annotation.targetName
 
 object TelegramExtensions {
@@ -39,7 +40,7 @@ object TelegramExtensions {
 		@throws[EventRuntimeException]
 		def exec [T <: BaseRequest[T, R], R <: BaseResponse] (request: BaseRequest[T, R], onError_message: String = ""): R = {
 			try {
-				val response = bot execute request
+				val response = bot `execute` request
 				if response isOk then return response
 				throw EventRuntimeException.ActionFailed(
 					if onError_message isEmpty then response.errorCode toString else onError_message,
@@ -229,11 +230,14 @@ object TelegramExtensions {
 		  * It needs to execute a request getting chat member, so it requires a live [[TelegramBot]] instance,
 		  * and the bot needs to be a member of this chat so that it can read the chat member.
 		  *
+		  * This method will only use the [[Chat]]'s [[Chat.id]], so it is safe to call on a [[LimboChat]].
+		  *
 		  * **Notice:** This method will execute a request to the Telegram Bot API, so it may be slow.
 		  *
 		  * @see [[memberHasPermission]]
 		  *
-		  * @param user The user that want to check if they are a member of this chat.
+		  * @param user The user that want to check if they are a member of this chat.Only its [[User.id]] will
+		  *             be used so it is safe using a [[LimboUser]].
 		  * @return [[true]] when the user is a member of this chat, [[false]] otherwise.
 		  *
 		  * @since 1.0.0
@@ -257,9 +261,14 @@ object TelegramExtensions {
 		  * | [[ChatMember.Status.left]] | -3 |
 		  * | [[ChatMember.Status.kicked]] | -5 |
 		  *
+		  * This method will only use the [[Chat]]'s [[Chat.id]], so it is safe to call on a [[LimboChat]].
+		  *
 		  * **Notice:** This method will execute a request to the Telegram Bot API, so it may be slow.
-		  * 
-		  * @param user The user that wanted to check if they have the permission.
+		  *
+		  * @since 1.0.0
+		  *
+		  * @param user The user that wanted to check if they have the permission. Only its [[User.id]] will
+		  *             be used so it is safe using a [[LimboUser]].
 		  * @param permission The required permission level.
 		  * @param bot A live [[TelegramBot]] that will be used to execute the getChatMember request. It
 		  *            should be a member of this chat so that can read the chat member for this method works.
@@ -288,8 +297,8 @@ object TelegramExtensions {
 						case ChatMember.Status.kicked => KICKED
 				def apply (chatMember: ChatMember): UserPermissionLevel = apply(chatMember.status)
 			
-			import Bot.*
-			val chatMember: ChatMember = (bot exec GetChatMember(chat.id, user.id)).chatMember
+			import Requests.execute
+			val chatMember: ChatMember = GetChatMember(chat.id, user.id).execute(using bot).chatMember
 			if chatMember eq null then false
 			else UserPermissionLevel(chatMember) >= UserPermissionLevel(permission)
 			
@@ -309,7 +318,65 @@ object TelegramExtensions {
 		
 	}}
 	
+	object File { extension (self: File) {
+		
+		/** Alias of [[TelegramBot.getFileContent]] */
+		@throws[IOException]
+		def getContent (using bot: TelegramBot): Array[Byte] =
+			bot.getFileContent(self)
+		
+		/** Alias of [[TelegramBot.getFullFilePath]] */
+		def getFullPath (using bot: TelegramBot): String =
+			bot.getFullFilePath(self)
+		
+	}}
+	
+	object Requests { extension [T<:BaseRequest[T,R], R<:BaseResponse] (self: BaseRequest[T,R]) {
+		/** Run this request with the given bot. Returns [[BaseResponse response]] if succeed, or throws
+		  * [[EventRuntimeException]] if run failed.
+		  * 
+		  * This method is an alias for [[Bot.exec]]
+		  * 
+		  * @since 2.0.0
+		  */
+		@throws[EventRuntimeException]
+		def unsafeExecute (using bot: TelegramBot): R =
+			import Bot.exec
+			bot.exec(self)
+		/** Run this request with the given bot and returns no matter it succeed or not.
+		  * 
+		  * Notice that if there's some client errors (like network error, etc.), this method will still
+		  * throws an Exception following the [[TelegramBot.execute]]'s behavior.
+		  * 
+		  * This method is an alias for the native [[TelegramBot.execute]].
+		  * 
+		  * @since 2.0.0
+		  */
+		def execute (using bot: TelegramBot): R =
+			bot.execute(self)
+	}}
+	
+	/** A [[User]] instance with only a [[User.id]] is defined.
+	  *
+	  * This is only for capabilities that some method need a [[User]] but only need its [[User.id]]. If
+	  * you don't have a [[User]] instance for some reason, you can use this instead.
+	  *
+	  * Many methods may crashes on this class for this is highly mutilated. Use this only the method declares
+	  * that using this is safe.
+	  *
+	  * @since 1.0.0
+	  */
 	class LimboUser (id: Long) extends User(id)
+	/** A [[Chat]] instance with only a [[Chat.id]] is defined.
+	  *
+	  * This is only for capabilities that some method need a [[Chat]] but only need its [[Chat.id]]. If
+	  * you don't have a [[Chat]] instance for some reason, you can use this instead.
+	  *
+	  * Many methods may crashes on this class for this is highly mutilated. Use this only the method declares
+	  * that using this is safe.
+	  *
+	  * @since 1.0.0
+	  */
 	class LimboChat (val _id: Long) extends Chat() {
 		override val id: java.lang.Long = _id
 	}

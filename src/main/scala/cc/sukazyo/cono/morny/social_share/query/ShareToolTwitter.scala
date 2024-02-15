@@ -8,7 +8,6 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
 
 import scala.language.postfixOps
-import scala.util.matching.Regex
 
 class ShareToolTwitter extends ITelegramQuery {
 	
@@ -17,7 +16,7 @@ class ShareToolTwitter extends ITelegramQuery {
 	private val TITLE_FX = "[tweet] Share as Fix-Tweet"
 	private val ID_PREFIX_FX = "[morny/share/twitter/fxtwi]"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if (event.inlineQuery.query == null) return null
 		

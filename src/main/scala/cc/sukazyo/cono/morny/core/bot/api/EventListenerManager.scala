@@ -1,15 +1,15 @@
 package cc.sukazyo.cono.morny.core.bot.api
 
 import cc.sukazyo.cono.morny.core.{Log, MornyCoeur}
-import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.UpdatesListener
 
 import scala.collection.mutable
-import scala.language.postfixOps
 
 /** Contains a [[scala.collection.mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
   *
@@ -21,13 +21,16 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	
 	private val listeners = mutable.Queue.empty[EventListener]
 	
+	infix def register (listener: EventListener): Unit =
+		this.listeners += listener
+	
 	def register (listeners: EventListener*): Unit =
 		this.listeners ++= listeners
 	
 	private class EventRunner (using update: Update) extends Thread {
-		this setName s"upd-${update.updateId()}-nn"
+		this `setName` s"upd-${update.updateId()}-nn"
 		private def updateThreadName (t: String): Unit =
-			this setName s"upd-${update.updateId()}-$t"
+			this `setName` s"upd-${update.updateId()}-$t"
 		
 		override def run (): Unit = {
 			
@@ -80,15 +83,15 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 			} catch case e => {
 				val errorMessage = StringBuilder()
 				errorMessage ++= "Event throws unexpected exception:\n"
-				errorMessage ++= (exceptionLog(e) indent 4)
+				errorMessage ++= (e.toLogString `indent` 4)
 				e match
 					case actionFailed: EventRuntimeException.ActionFailed =>
 						errorMessage ++= "\ntg-api action: response track: "
 						errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
 							actionFailed.response
-						) indent 4) ++= "\n"
+						) `indent` 4) ++= "\n"
 					case _ =>
-				logger error errorMessage.toString
+				logger `error` errorMessage.toString
 				coeur.externalContext.consume[MornyReport](_.exception(e, "on event running"))
 			}
 		}

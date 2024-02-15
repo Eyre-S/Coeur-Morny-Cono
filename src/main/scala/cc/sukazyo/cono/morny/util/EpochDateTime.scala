@@ -8,10 +8,14 @@ object EpochDateTime {
 	/** The UNIX Epoch Time in milliseconds.
 	  *
 	  * aka. Milliseconds since 00:00:00 UTC on Thursday, 1 January 1970.
+	  *
+	  * @since 1.1.1
 	  */
 	type EpochMillis = Long
 	object EpochMillis:
 		/** convert a localtime with timezone to epoch milliseconds
+		  *
+		  * @since 1.1.1
 		  *
 		  * @param time the local time in that timezone, should be formatted
 		  *             in [[DateTimeFormatter.ISO_DATE_TIME]]
@@ -22,7 +26,7 @@ object EpochDateTime {
 		def apply (time: String, zone: String): EpochMillis = {
 			val formatter = DateTimeFormatter.ISO_DATE_TIME
 			val innerTime = LocalDateTime.parse(time, formatter)
-			val instant = innerTime.toInstant(ZoneOffset of zone)
+			val instant = innerTime.toInstant(ZoneOffset `of` zone)
 			instant.toEpochMilli
 		}
 		def apply (time_zone: (String, String)): EpochMillis =
@@ -33,8 +37,10 @@ object EpochDateTime {
 		  *
 		  * Due to the missing accuracy, the converted EpochMillis will
 		  * be always in 0ms aligned.
+		  *
+		  * @since 2.0.0
 		  */
-		def fromEpochSeconds (epochSeconds: EpochSeconds): EpochMillis =
+		infix def fromSeconds (epochSeconds: EpochSeconds): EpochMillis =
 			epochSeconds.longValue * 1000L
 	
 	/** The UNIX Epoch Time in seconds.
@@ -45,6 +51,8 @@ object EpochDateTime {
 	  *
 	  * Notice that, currently, it stores using [[Int]] (also the implementation
 	  * method of Telegram), which will only store times before 2038-01-19 03:14:07.
+	  *
+	  * @since 1.3.0
 	  */
 	type EpochSeconds = Int
 	
@@ -56,13 +64,20 @@ object EpochDateTime {
 	  *
 	  * Notice that, currently, it stores using [[Short]] (also the implementation
 	  * method of Telegram), which will only store times before 2059-09-18.
+	  *
+	  * @since 1.3.0
 	  */
 	type EpochDays = Short
 	object EpochDays:
-		def fromEpochMillis (epochMillis: EpochMillis): EpochDays =
+		/** Convert a [[EpochMillis]] to [[EpochDays]]. Will be loss of precision.
+		  * @since 2.0.0
+		  */
+		infix def fromMillis (epochMillis: EpochMillis): EpochDays =
 			(epochMillis / (1000*60*60*24)).toShort
 	
-	/** Time duration/interval in milliseconds. */
+	/** Time duration/interval in milliseconds.
+	  * @since 1.3.0
+	  */
 	type DurationMillis = Long
 	
 }

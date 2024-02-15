@@ -25,4 +25,3 @@ class ModuleSocialShare extends MornyInternalModule {
 	}
 	
 }
- 

@@ -1,19 +1,20 @@
 package cc.sukazyo.cono.morny.reporter
 
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
-import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.statistics.{NumericStatistics, UniqueCounter}
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.CronTask
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.{sourceChat, sourceUser}
 import cc.sukazyo.cono.morny.util.CommonEncrypt.hashId
 import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.Cron
 import com.cronutils.model.definition.CronDefinitionBuilder
@@ -30,25 +31,25 @@ class MornyReport (using coeur: MornyCoeur) {
 	
 	private val enabled = coeur.config.reportToChat != -1
 	if !enabled then
-		logger info "Morny Report is disabled : report chat is set to -1"
+		logger `info` "Morny Report is disabled : report chat is set to -1"
 	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
 		if !enabled then return
 		try {
-			coeur.account exec report
+			report.unsafeExecute(using coeur.account)
 		} catch case e: EventRuntimeException => {
 			import EventRuntimeException.*
 			e match
 				case e: ActionFailed =>
-					logger warn
+					logger `warn`
 						s"""cannot execute report to telegram:
-						   |${exceptionLog(e) indent 4}
+						   |${e.toLogString `indent` 4}
 						   |  tg-api response:
-						   |${(e.response toString) indent 4}""".stripMargin
+						   |${(e.response toString) `indent` 4}""".stripMargin
 				case e: ClientFailed =>
-					logger error
+					logger `error`
 						s"""failed when report to telegram:
-						   |${exceptionLog(e.getCause) indent 4}
+						   |${e.getCause.toLogString `indent` 4}
 						   |""".stripMargin
 		}
 	}
@@ -69,7 +70,7 @@ class MornyReport (using coeur: MornyCoeur) {
 			// language=html
 			s"""<b>▌Coeur Unexpected Exception </b>
 			   |${if description ne null then h(description)+"\n" else ""}
-			   |<pre><code class="language-log">${h(exceptionLog(e))}</code></pre>$_tgErrFormat"""
+			   |<pre><code class="language-log">${h(e.toLogString)}</code></pre>$_tgErrFormat"""
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}
@@ -120,9 +121,9 @@ class MornyReport (using coeur: MornyCoeur) {
 				case e: (IllegalAccessException|IllegalArgumentException|NullPointerException) =>
 					// language=html
 					echo ++= s": <i>${h("<read-error>")}</i>"
-					logger error
+					logger `error`
 							s"""error while reading config field ${field.getName}
-							   |${exceptionLog(e)}""".stripMargin
+							   |${e.toLogString}""".stripMargin
 					exception(e, s"error while reading config field ${field.getName}")
 			echo ++= "\n"
 		}
@@ -224,14 +225,14 @@ class MornyReport (using coeur: MornyCoeur) {
 					case State.OK(from) =>
 						val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
 						givenCxt << timeUsed
-						logger debug
+						logger `debug`
 							s"""event done with OK
 							   |  with time consumed ${timeUsed.it}ms
 							   |  by $from""".stripMargin
 						runningTime ++ timeUsed.it
 					case State.CANCELED(from) =>
 						eventCanceled += 1
-						logger debug
+						logger `debug`
 							s"""event done with CANCELED"
 							   |  by $from""".stripMargin
 					case null =>

@@ -27,7 +27,7 @@ class ModuleMedicationTimer extends MornyInternalModule {
 		externalContext >> { (instance: MedicationTimer) =>
 			eventManager register OnMedicationNotifyApply(using instance)
 		} || {
-			logger warn "There seems no Medication Timer instance is provided; skipped register events for it."
+			logger `warn` "There seems no Medication Timer instance is provided; skipped register events for it."
 		}
 		
 	}
@@ -38,7 +38,7 @@ class ModuleMedicationTimer extends MornyInternalModule {
 		externalContext >> { (instance: MedicationTimer) =>
 			instance.start()
 		} || {
-			logger warn "There seems no Medication Timer instance is provided; skipped start it."
+			logger `warn` "There seems no Medication Timer instance is provided; skipped start it."
 		}
 		
 	}
@@ -49,7 +49,7 @@ class ModuleMedicationTimer extends MornyInternalModule {
 		externalContext >> { (instance: MedicationTimer) =>
 			instance.stop()
 		} || {
-			logger warn "There seems no Medication Timer instance need to be stop."
+			logger `warn` "There seems no Medication Timer instance need to be stop."
 		}
 		
 	}

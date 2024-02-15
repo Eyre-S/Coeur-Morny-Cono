@@ -10,13 +10,16 @@ class MornyQueryManager (using MornyCoeur) {
 	
 	private val queries = mutable.Queue.empty[ITelegramQuery]
 	
+	infix def register (query: ITelegramQuery): Unit =
+		this.queries += query
+	
 	def register (queries: ITelegramQuery*): Unit =
 		this.queries ++= queries
 	
-	def query (event: Update): List[InlineQueryUnit[_]] = {
-		val results = ListBuffer[InlineQueryUnit[_]]()
+	def query (event: Update): List[InlineQueryUnit[?]] = {
+		val results = ListBuffer[InlineQueryUnit[?]]()
 		for (instance <- queries) {
-			val r = instance query event
+			val r = instance `query` event
 			if (r != null) results ++= r
 		}
 		results.result()

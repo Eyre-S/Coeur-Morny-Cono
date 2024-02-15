@@ -18,7 +18,7 @@ object FileUtils {
 		Using (FileInputStream(path)) { stream =>
 			len = stream.read(buffer)
 			while (len != -1)
-				algo update (buffer, 0, len)
+				algo.update(buffer, 0, len)
 				len = stream.read(buffer)
 		}
 		import ConvertByteHex.toHex

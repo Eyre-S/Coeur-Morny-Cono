@@ -19,7 +19,7 @@ class EpochDateTimeTest extends MornyTests with TableDrivenPropertyChecks {
 			
 			forAll(examples) { (epochSeconds, epochMillis) =>
 				s"EpochSeconds($epochSeconds) should be converted to EpochMillis($epochMillis)" in {
-					(EpochMillis fromEpochSeconds epochSeconds) shouldEqual epochMillis
+					(EpochMillis fromSeconds epochSeconds) shouldEqual epochMillis
 				}
 			}
 			
@@ -42,7 +42,7 @@ class EpochDateTimeTest extends MornyTests with TableDrivenPropertyChecks {
 			
 			forAll(examples) { (epochMillis, epochDays) =>
 				s"EpochMillis($epochMillis) should be converted to EpochDays($epochDays)" in {
-					(EpochDays fromEpochMillis epochMillis) shouldEqual epochDays
+					(EpochDays fromMillis epochMillis) shouldEqual epochDays
 				}
 			}
 			

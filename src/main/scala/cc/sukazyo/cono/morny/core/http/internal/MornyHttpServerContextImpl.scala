@@ -3,7 +3,8 @@ package cc.sukazyo.cono.morny.core.http.internal
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, HttpService4Api, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.ServiceUI
-import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 
 import scala.collection.mutable
 
@@ -12,6 +13,9 @@ class MornyHttpServerContextImpl (using coeur: MornyCoeur) extends MornyHttpServ
 	private val services_api = mutable.Queue.empty[HttpService4Api]
 	
 	private lazy val service_ui = ServiceUI()
+	
+	override infix def register4API (service: HttpService4Api): Unit =
+		services_api += service
 	
 	override def register4API (services: HttpService4Api*): Unit =
 		services_api ++= services
@@ -31,9 +35,9 @@ class MornyHttpServerContextImpl (using coeur: MornyCoeur) extends MornyHttpServ
 		
 		def errorHandler (t: Throwable, message: =>String): OptionT[IO, Unit] =
 			OptionT.liftF(IO {
-				logger error
+				logger `error`
 					s"""Unexpected exception occurred on Morny Http Server :
-					   |${exceptionLog(t)}""".stripMargin
+					   |${t.toLogString}""".stripMargin
 			})
 		val withErrorHandler = ErrorHandling.Recover.total(
 			ErrorAction.log(
@@ -49,7 +53,7 @@ class MornyHttpServerContextImpl (using coeur: MornyCoeur) extends MornyHttpServ
 			.resource
 		val (_server, _shutdown_io) = server.allocated.unsafeRunSync() match
 			case (_1, _2) => (_1, _2)
-		logger notice s"Morny HTTP Server started at ${_server.baseUri}"
+		logger `notice` s"Morny HTTP Server started at ${_server.baseUri}"
 		
 		new HttpServer(using global):
 			val server: Server = _server

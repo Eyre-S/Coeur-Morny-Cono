@@ -8,13 +8,13 @@ import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendSticker
-
-import scala.language.postfixOps
+import com.pengrad.telegrambot.TelegramBot
 
 class MornyManagers (using coeur: MornyCoeur) {
+	private given TelegramBot = coeur.account
 	
 	object Exit extends ITelegramCommand {
 		
@@ -27,22 +27,24 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			val user = event.message.from
 			
-			if (coeur.trusted isTrusted user.id) {
+			if (coeur.trusted isTrust user) {
 				
-				coeur.account exec SendSticker(
+				SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
-				logger attention s"Morny exited by user ${user toLogTag}"
+					.unsafeExecute
+				logger `attention` s"Morny exited by user ${user toLogTag}"
 				coeur.exit(0, user)
 				
 			} else {
 				
-				coeur.account exec SendSticker(
+				SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger attention s"403 exit caught from user ${user toLogTag}"
+					.unsafeExecute
+				logger `attention` s"403 exit caught from user ${user toLogTag}"
 				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/exit", user))
 				
 			}
@@ -62,22 +64,24 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			val user = event.message.from
 			
-			if (coeur.trusted isTrusted user.id) {
+			if (coeur.trusted isTrust user) {
 				
-				logger attention s"call save from command by ${user toLogTag}"
+				logger `attention` s"call save from command by ${user toLogTag}"
 				coeur.saveDataAll()
-				coeur.account exec SendSticker(
+				SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_SAVED
 				).replyToMessageId(event.message.messageId)
+					.unsafeExecute
 				
 			} else {
 				
-				coeur.account exec SendSticker(
+				SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger attention s"403 save caught from user ${user toLogTag}"
+					.unsafeExecute
+				logger `attention` s"403 save caught from user ${user toLogTag}"
 				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/save", user))
 				
 			}

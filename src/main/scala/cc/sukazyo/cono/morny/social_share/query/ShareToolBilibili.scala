@@ -1,10 +1,11 @@
 package cc.sukazyo.cono.morny.social_share.query
 
-import cc.sukazyo.cono.morny.core.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{InlineQueryUnit, ITelegramQuery}
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent, ParseMode}
 
@@ -20,7 +21,7 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 	private val LINK_PREFIX = "https://bilibili.com/video/"
 	private val SHARE_FORMAT_HTML = "<a href='%s'>%s</a>"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if (event.inlineQuery.query == null) return null
 		if (event.inlineQuery.query isBlank) return null
@@ -36,7 +37,7 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 					case _: IllegalArgumentException =>
 						return null;
 					case e: IllegalStateException =>
-						logger error exceptionLog(e)
+						logger `error` e.toLogString
 						coeur.externalContext.consume[MornyReport](_.exception(e))
 						return null;
 		
