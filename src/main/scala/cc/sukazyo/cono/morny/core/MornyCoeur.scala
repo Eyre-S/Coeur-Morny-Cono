@@ -24,7 +24,7 @@ object MornyCoeur {
 	/** A tag that shows current [[MornyCoeur!]] is running under
 	  * test mode.
 	  *
-	  * @see [[MornyCoeur.testRun]] for more introduction for test mode.
+	  * @see *Test Mode* in [[MornyCoeur]] for more introduction for test mode.
 	  * @since 2.0.0
 	  */
 	object TestRun
@@ -88,7 +88,7 @@ object MornyCoeur {
   *
   * ## Lifecycle
   *
-  * todo...
+  * todo
   *
   * ## Test Mode
   *

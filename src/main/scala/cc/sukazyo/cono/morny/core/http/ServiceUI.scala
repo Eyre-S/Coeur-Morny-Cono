@@ -4,7 +4,6 @@ import cats.effect.IO
 import cc.sukazyo.cono.morny.core.http.api.HttpService4Api
 import cc.sukazyo.cono.morny.data.TelegramImages
 import org.http4s.{HttpRoutes, MediaType}
-import org.http4s.dsl.impl./
 import org.http4s.dsl.io.*
 import org.http4s.headers.`Content-Type`
 

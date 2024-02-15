@@ -2,16 +2,26 @@ package cc.sukazyo.cono.morny.core.bot.event
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.sourceTime
+import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 
 class MornyOnUpdateTimestampOffsetLock (using coeur: MornyCoeur) extends EventListener {
 	
-	private def checkOutdated (timestamp: Int)(using event: EventEnv): Unit =
-		if coeur.config.eventIgnoreOutdated && (timestamp < (coeur.coeurStartTimestamp/1000)) then
-			event.setEventCanceled
+	override def executeFilter (using env: EventEnv): Boolean =
+		if (
+			(env.update.message != null) ||
+			(env.update.editedMessage != null) ||
+			(env.update.channelPost != null) ||
+			(env.update.editedChannelPost != null)
+		)
+			true
+		else false
 	
-	override def onMessage (using event: EventEnv): Unit = checkOutdated(event.update.message.date)
-	override def onEditedMessage (using event: EventEnv): Unit = checkOutdated(event.update.editedMessage.date)
-	override def onChannelPost (using event: EventEnv): Unit = checkOutdated(event.update.channelPost.date)
-	override def onEditedChannelPost (using event: EventEnv): Unit = checkOutdated(event.update.editedChannelPost.date)
+	override def on (using event: EventEnv): Unit =
+		event.update.sourceTime match
+			case Some(timestamp) =>
+				if coeur.config.eventIgnoreOutdated && (EpochMillis.fromEpochSeconds(timestamp) < coeur.coeurStartTimestamp) then
+					event.setEventCanceled
+			case None =>
 	
 }

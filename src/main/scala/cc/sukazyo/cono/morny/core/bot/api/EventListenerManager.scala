@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.UpdatesListener
 import scala.collection.mutable
 import scala.language.postfixOps
 
-/** Contains a [[mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
+/** Contains a [[scala.collection.mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
   *
   * Implemented [[process]] in [[UpdatesListener]] so it can directly used in [[com.pengrad.telegrambot.TelegramBot.setupListener]].
   *

@@ -12,8 +12,8 @@ class HackerEventHandler (using hacker: EventHacker)(using coeur: MornyCoeur) ex
 	override def on (using event: EventEnv): Unit =
 		given update: Update = event.update
 		if hacker.trigger(
-			update.extractSourceChat.map[Long](_.id).getOrElse(0),
-			update.extractSourceUser.map[Long](_.id).getOrElse(0)
+			update.sourceChat.map[Long](_.id).getOrElse(0),
+			update.sourceUser.map[Long](_.id).getOrElse(0)
 		) then
 			event.setEventOk
 	

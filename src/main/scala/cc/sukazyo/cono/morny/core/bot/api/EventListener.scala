@@ -4,7 +4,7 @@ trait EventListener () {
 	
 	/** Determine if this event listener should be processed.
 	  *
-	  * Default implementation is it only be [[true]] when the event
+	  * Default implementation is it only be `true` when the event
 	  * is not ok yet (when [[EventEnv.isEventOk]] is false).
 	  *
 	  * Notice that: You should not override this method to filter some
@@ -13,7 +13,7 @@ trait EventListener () {
 	  * method is just for event low-level controls.
 	  *
 	  * @param env The [[EventEnv event variable]].
-	  * @return [[true]] if this event listener should run; [[false]]
+	  * @return `true` if this event listener should run; `false`
 	  *         if it should not run.
 	  */
 	def executeFilter (using env: EventEnv): Boolean =

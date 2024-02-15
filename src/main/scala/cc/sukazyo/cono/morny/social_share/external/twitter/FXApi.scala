@@ -11,18 +11,18 @@ import io.circe.{DecodingFailure, ParsingFailure}
   *
   * @see [[https://github.com/FixTweet/FixTweet/wiki/Status-Fetch-API]]
   *
-  * @param code Status code, normally be [[200]], but can be 401
-  *             or [[404]] or [[500]] due to different reasons.
+  * @param code Status code, normally be `200`, but can be 401
+  *             or `404` or `500` due to different reasons.
   *
   *             Related to [[message]]
   * @param message Status message.
   *
-  *                 - When [[code]] is [[200]], it should be `OK`
-  *                 - When [[code]] is [[401]], it should be `PRIVATE_TWEET`,
+  *                 - When [[code]] is `200`, it should be `OK`
+  *                 - When [[code]] is `401`, it should be `PRIVATE_TWEET`,
   *                   while in practice, it seems PRIVATE_TWEET will
-  *                   just return [[404]].
-  *                 - When [[code]] is [[404]], it should be `NOT_FOUND`
-  *                 - When [[code]] is [[500]], it should be `API_FILE`
+  *                   just return `404`.
+  *                 - When [[code]] is `404`, it should be `NOT_FOUND`
+  *                 - When [[code]] is `500`, it should be `API_FILE`
   * @param tweet [[FXTweet]] content.
   * @since 1.3.0
   * @version 2023.11.21
@@ -86,7 +86,7 @@ object FXApi {
 		  * @throws DecodingFailure When cannot decode the API response to a [[FXApi]]
 		  *                         object. It might be some wrong with the [[FXApi]]
 		  *                         model, or the remote API spec changes.
-		  * @return a [[FXApi]] response object, with [[200]] or any other response code.
+		  * @return a [[FXApi]] response object, with `200` or any other response code.
 		  */
 		@throws[SttpClientException|ParsingFailure|DecodingFailure]
 		def status (screen_name: Option[String], id: String, translate_to: Option[String] = None): FXApi =

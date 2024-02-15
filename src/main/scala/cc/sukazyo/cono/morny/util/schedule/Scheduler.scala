@@ -151,7 +151,7 @@ class Scheduler {
 		schedule(task)
 		this
 	/** Add one task to scheduler task queue.
-	  * @return [[true]] if the task is added.
+	  * @return `true` if the task is added.
 	  */
 	def schedule (task: Task): Boolean =
 		taskList.synchronized:
@@ -175,7 +175,7 @@ class Scheduler {
 	  * If the removal task is running, the method will wait for the current run
 	  * complete (and current run post effect complete), then do remove.
 	  *
-	  * @return [[true]] if the task is in task queue or is running, and have been
+	  * @return `true` if the task is in task queue or is running, and have been
 	  *         succeed removed from task queue.
 	  */
 	def cancel (task: Task): Boolean =

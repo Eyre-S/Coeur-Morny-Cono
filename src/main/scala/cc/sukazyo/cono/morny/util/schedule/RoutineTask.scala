@@ -43,7 +43,7 @@ trait RoutineTask extends Task {
 	  *
 	  * @param previousRoutineScheduledTimeMillis The previous task routine's
 	  *                                           scheduled time.
-	  * @return The next task routine's scheduled time, or [[null]] means end
+	  * @return The next task routine's scheduled time, or `null` means end
 	  *         of the task.
 	  */
 	def nextRoutineTimeMillis (previousRoutineScheduledTimeMillis: EpochMillis): EpochMillis|Null

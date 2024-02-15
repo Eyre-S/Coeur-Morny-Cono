@@ -11,7 +11,7 @@ import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtm
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.CronTask
-import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.{extractSourceChat, extractSourceUser}
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.{sourceChat, sourceUser}
 import cc.sukazyo.cono.morny.util.CommonEncrypt.hashId
 import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
 import com.cronutils.builder.CronBuilder
@@ -206,9 +206,9 @@ class MornyReport (using coeur: MornyCoeur) {
 			override def atEventPost (using event: EventEnv): Unit = {
 				import event.*
 				eventTotal += 1
-				event.update.extractSourceChat match
+				event.update.sourceChat match
 					case None =>
-						event.update.extractSourceUser match
+						event.update.sourceUser match
 							case None =>
 							case Some(user) =>
 								event_from_user_action << hashId(user.id).toHex

@@ -33,7 +33,7 @@ object CommonFormat {
 	  * @param utcOffset the hour offset of the time zone, the time-zone controls
 	  *                  which local time describe will use.
 	  *
-	  *                  for example, timestamp [[0]] describes 1970-1-1 00:00:00 in
+	  *                  for example, timestamp `0` describes 1970-1-1 00:00:00 in
 	  *                  UTC+0, so, use the `timestamp` `0` and `utfOffset` `0` will
 	  *                  returns `"1970-1-1 00:00:00:000"`; however, at the same time,
 	  *                  in UTC+8, the local time is 1970-1-1 08:00:00:000, so use
