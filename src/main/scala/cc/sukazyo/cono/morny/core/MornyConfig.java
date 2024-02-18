@@ -103,10 +103,22 @@ public class MornyConfig {
 	public final boolean commandLogoutClear;
 	
 	/* ======================================= *
+	 *  system: inline queries                 *
+	 * ======================================= */
+	
+	public final int inlineQueryCacheTimeMax;
+	
+	/* ======================================= *
 	 *  system: http server                    *
 	 * ======================================= */
 	
 	public final int httpPort;
+	
+	/* ======================================= *
+	 *  system: debug flags                    *
+	 * ======================================= */
+	
+	public final boolean debugMode; 
 	
 	/* ======================================= *
 	 *  function: reporter                     *
@@ -172,6 +184,8 @@ public class MornyConfig {
 		this.medicationNotifyAt = prototype.medicationNotifyAt;
 		if (prototype.httpPort < 0 || prototype.httpPort > 65535) throw new CheckFailure.UnavailableHttpPort();
 		this.httpPort = prototype.httpPort;
+		this.debugMode = prototype.debugMode;
+		this.inlineQueryCacheTimeMax = prototype.inlineQueryCacheTimeMax;
 	}
 	
 	public static class CheckFailure extends RuntimeException {
@@ -203,6 +217,8 @@ public class MornyConfig {
 		@Nonnull public ZoneOffset medicationTimerUseTimezone = ZoneOffset.UTC;
 		@Nonnull public final Set<Integer> medicationNotifyAt = new HashSet<>();
 		public int httpPort = 30179;
+		public boolean debugMode = false;
+		public int inlineQueryCacheTimeMax = 300;
 		
 	}
 	

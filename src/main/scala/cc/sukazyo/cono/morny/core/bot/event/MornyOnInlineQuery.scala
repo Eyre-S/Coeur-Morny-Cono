@@ -18,11 +18,14 @@ class MornyOnInlineQuery (using queryManager: MornyQueryManager) (using coeur: M
 		
 		val results: List[InlineQueryUnit[?]] = queryManager `query` update
 		
-		var cacheTime = Int.MaxValue
+		var cacheTime =
+			if (coeur.config.debugMode) 0
+			else coeur.config.inlineQueryCacheTimeMax
 		var isPersonal = InlineQueryUnit.defaults.IS_PERSONAL
 		val resultAnswers = ListBuffer[InlineQueryResult[?]]()
 		for (r <- results) {
-			if (cacheTime > r.cacheTime) cacheTime = r.cacheTime
+			if (!coeur.config.debugMode)
+				if (cacheTime > r.cacheTime) cacheTime = r.cacheTime
 			if (r isPersonal) isPersonal = true
 			resultAnswers += r.result
 		}

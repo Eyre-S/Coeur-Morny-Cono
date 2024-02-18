@@ -30,7 +30,16 @@ object ServerMain {
 		while (i < args.length) {
 			args(i) match {
 				
-				case "-d" | "--dbg" | "--debug" => Log.debug(true)
+				case "-d" | "--debug" =>
+					Log.debug(true)
+					config.debugMode = true
+				case "--debug-run" =>
+					config.debugMode = true
+				case "--dbg" =>
+					Log.debug(true)
+					deprecatedArgs += "--dbg" -> "--verbose-logging"
+				case "--verbose-logging" | "--verbose" =>
+					Log.debug(true)
 				case "-t" | "--test" => mode_testRun = true
 				
 				case "--no-hello" | "-hf" | "--quiet" | "-q" => showHello = false
@@ -110,10 +119,31 @@ object ServerMain {
 			   |  ${deprecatedArgs map((d, n) => s"$d : use $n instead") mkString "\n  "}
 			   |""".stripMargin
 		
-		if (Log debug)
+		if (config.debugMode && Log.debug)
+			logger `warn`
+				"""Coeur Debug mode enabled.
+				  |
+				  |  The debug log will be outputted, and caches will be disabled.
+				  |  It will cause much unnecessary performance cost, may caused extremely slow down on your bot.
+				  |  Make sure that you are not in production environment.
+				  |  
+				  |  Since 2.0.0, this mode is the combined of the two following options:
+				  |    --debug-run       enable coeur debug mode, that will disabled all the caches.
+				  |    --verbose-logging enable the logger to output debug/trace logs."""
+					.stripMargin
+		else if (config.debugMode)
+			logger `warn`
+				"""Coeur Debug mode enabled.
+				  |
+				  |  All the bot caches will be disabled.
+				  |  It will cause much unnecessary performance cost, may caused extremely slow down on your bot.
+				  |  Make sure that you are not in production environment."""
+					.stripMargin
+		else if (Log debug)
 			logger `warn`
 				"""Debug log output enabled.
-				  |  It may lower your performance, make sure that you are not in production environment."""
+				  |  It will output much more debug/trace logs, may lower your performance,
+				  |  so make sure that you are not in production environment."""
 					.stripMargin
 		
 		if (mode_echoVersion) {
