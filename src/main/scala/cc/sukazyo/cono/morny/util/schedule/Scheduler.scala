@@ -18,10 +18,16 @@ import scala.collection.mutable
   * If you want to remove a task, use [[Scheduler.%]] or [[Scheduler.cancel]].
   * Removal task should be the same task object, but not just the same name.
   *
-  * The scheduler will not automatic stop when the tasks is all done and the
-  * main thread is stopped. You can/should use [[stop]], [[waitForStop]],
-  * [[tagStopAtAllDone]], [[waitForStopAtAllDone]] to async or syncing stop
-  * the scheduler.
+  * As defaults behavior, the scheduler will not automatic stop when the tasks
+  * is all done and the main thread is stopped. You can/should use [[stop]],
+  * [[waitForStop]], [[tagStopAtAllDone]], [[waitForStopAtAllDone]] to async
+  * or syncing stop the scheduler.
+  * 
+  * If you want to let it stop automatically when the main thread is stopped,
+  * set the `isDaemon` parameter to `true` when creating the scheduler. Therefore
+  * this scheduler's runner thread will be tagged as a daemon thread, and will
+  * automatically stop when the main thread is stopped. For more details about daemon
+  * thread, see [[Thread.setDaemon]].
   *
   * == Implementation details ==
   *
@@ -37,8 +43,11 @@ import scala.collection.mutable
   * thread name will be set to <code>[[Task.name]]#post</code>. After all of
   * that, the task is fully complete, and the runner's thread name will be
   * reset to [[runnerName]].
+  * 
+  * @param isDaemon if the runner thread should be a daemon thread. See [[Thread.setDaemon]]
+  *                 for more information. Defaults are false.
   */
-class Scheduler {
+class Scheduler (isDaemon: Boolean = false) {
 	
 	/** Status tag of this scheduler. */
 	//noinspection ScalaWeakerAccess
@@ -134,6 +143,7 @@ class Scheduler {
 		
 	}
 	runtime `setName` runnerName
+	runtime.setDaemon(isDaemon)
 	runtime.start()
 	
 	/** Name of the scheduler runner.

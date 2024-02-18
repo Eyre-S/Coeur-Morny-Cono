@@ -3,7 +3,9 @@ package cc.sukazyo.cono.morny.core
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
 import cc.sukazyo.cono.morny.core.bot.api.{EventListenerManager, MornyCommandManager, MornyQueryManager}
+import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
+import cc.sukazyo.cono.morny.core.bot.internal.ThreadingManagerImpl
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.reporter.MornyReport
@@ -167,6 +169,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val tasks: Scheduler = Scheduler()
 	/** current Morny's [[MornyTrusted]] instance */
 	val trusted: MornyTrusted = MornyTrusted()
+	private val _messageThreading: ThreadingManagerImpl = ThreadingManagerImpl(using account)
+	val messageThreading: ThreadingManager = _messageThreading
 	
 	val eventManager: EventListenerManager = EventListenerManager()
 	val commands: MornyCommandManager = MornyCommandManager()
@@ -186,6 +190,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	eventManager register MornyOnUpdateTimestampOffsetLock()
 	eventManager register MornyOnTelegramCommand(using commands)
 	eventManager register MornyOnInlineQuery(using queries)
+	eventManager register _messageThreading.NextMessageCatcher
 	{ // register core commands
 		import bot.command.*
 		val $MornyHellos = MornyHellos()
@@ -205,6 +210,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			$MornyManagers.Exit,
 			
 			DirectMsgClear(),
+			_messageThreading.CancelCommand,
 			
 		)
 	}
