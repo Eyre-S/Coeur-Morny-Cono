@@ -28,6 +28,8 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 	/** Send an [[ErrorMessage]] and add this error message to ErrorMessage stash.
 	  *
 	  * This will execute the SendRequest using the default send config.
+	  *
+	  * @since 2.0.0
 	  */
 	def sendErrorMessage (message: ErrorMessage[?, ?]): Unit =
 		// todo: which should be sent using user config
@@ -35,6 +37,8 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 		sendErrorMessage(message, useType, isNewMessage = true)
 	
 	/** Send an [[ErrorMessage]] and add it to the stash if it is new.
+	  *
+	  * @since 2.0.0
 	  *
 	  * @param message The [[ErrorMessage]] to be sent.
 	  * @param useType Which type of the message should be sent.
@@ -80,6 +84,8 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 	  *
 	  * Notice that one [[ErrorMessage]] will only be stashed for 5 hours then it will be
 	  * cleaned up from the stash.
+	  *
+	  * @since 2.0.0
 	  */
 	def inspectMessage (messageKey: MessagingContext.WithMessage.Key): Option[ErrorMessage[?, ?]] =
 		errorMessageMap.get(messageKey)

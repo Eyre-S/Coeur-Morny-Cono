@@ -8,6 +8,13 @@ import scala.jdk.CollectionConverters.*
 
 object TelegramParseEscape {
 	
+	/** Encoded a [[String]] that make it can be used as plain texts in Telegram HTML.
+	  *
+	  * This method will just remove `&`, `<` and `>` characters and encode them to
+	  * HTML entities.
+	  *
+	  * @since 1.0.0
+	  */
 	def escapeHtml (input: String): String =
 		var process = input
 		process = process.replaceAll("&", "&amp;")
@@ -15,6 +22,24 @@ object TelegramParseEscape {
 		process = process.replaceAll(">", "&gt;")
 		process
 	
+	/** Transform a [[String]] encoded HTML document/fragment into a Telegram capable
+	  * HTML fragment, make it can be used in sending Telegram message etc.
+	  *
+	  * This method will remove all unsupported HTML tags and attributes. Here is the
+	  * specific rule list of how to process the tags:
+	  *
+	  *  - If the tag is supported by Telegram HTML, it will be kept, and the inner HTML
+	  *    children items will be processed recursively.
+	  *  - If the tag is `<br>`, it will be converted to a newline character (`\n`). If
+	  *    there's any children in the `<br>` tag (which is not allowed in HTML), they
+	  *    will just be ignored.
+	  *  - If the tag is `<img>`, it will be removed. If the `alt` attribute is present,
+	  *    a string `"[$alt]"` will be used as the replacement text.
+	  *  - If the tag is any other tag, it will be removed, and the inner HTML children
+	  *    will be kept and processed recursively.
+	  *
+	  * @since 1.3.0
+	  */
 	def cleanupHtml (input: String): String =
 		import org.jsoup.nodes.*
 		val source = Jsoup.parse(input)
@@ -32,7 +57,7 @@ object TelegramParseEscape {
 //			case _: (DataNode | XmlDeclaration | DocumentType | Comment) => ""
 //			case elem: Element => elem.childNodes.asScala.map(f => toHtmlRaw(f)).mkString("")
 	
-	def cleanupHtml (input: Seq[Node]): List[Node] =
+	private def cleanupHtml (input: Seq[Node]): List[Node] =
 		val result = mutable.ListBuffer.empty[Node]
 		for (i <- input) {
 			import org.jsoup.nodes.*

@@ -37,6 +37,8 @@ trait ErrorMessage[T1 <: AbstractSendRequest[T1], T2 <: AbstractSendRequest[T2]]
 	  * This method returns a union type [[T1]] and [[T2]]. This may be
 	  * not useful when you don't care about the specific return types (maybe for
 	  * the most times). You can use [[getByTypeNormal]] instead.
+	  *
+	  * @since 2.0.0
 	  */
 	def getByType (t: ErrorMessage.Types): AbstractSendRequest[T1] | AbstractSendRequest[T2] =
 		t match
@@ -49,6 +51,7 @@ trait ErrorMessage[T1 <: AbstractSendRequest[T1], T2 <: AbstractSendRequest[T2]]
 	  * this returns with a bit universal type `AbstractSendRequest[?]`.
 	  *
 	  * @see [[getByType]]
+	  * @since 2.0.0
 	  */
 	def getByTypeNormal (t: ErrorMessage.Types): AbstractSendRequest[?] =
 		getByType(t)

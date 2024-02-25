@@ -12,8 +12,9 @@ object BotExtension {
 		/** Submit this [[ErrorMessage]] to a [[MornyCoeur]].
 		  * 
 		  * Will send this [[ErrorMessage]] with the basic send config.
-		  * 
+		  *
 		  * @see [[cc.sukazyo.cono.morny.core.bot.internal.ErrorMessageManager.sendErrorMessage]]
+		  * @since 2.0.0
 		  */
 		def submit (using coeur: MornyCoeur): Unit =
 			coeur.errorMessageManager.sendErrorMessage(errorMessage)

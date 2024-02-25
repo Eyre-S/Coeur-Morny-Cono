@@ -70,6 +70,8 @@ object MessagingContext {
 	
 	/** Extract a message context from a message (or message event).
 	  * 
+	  * @since 2.0.0
+	  * 
 	  * @param message The message.
 	  * @return The message context, contains the message's belongs chat, sender user and message itself.
 	  */
