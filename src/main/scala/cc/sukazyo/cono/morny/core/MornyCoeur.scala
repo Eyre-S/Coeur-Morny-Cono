@@ -5,7 +5,7 @@ import cc.sukazyo.cono.morny.core.MornyCoeur.*
 import cc.sukazyo.cono.morny.core.bot.api.{EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
-import cc.sukazyo.cono.morny.core.bot.internal.ThreadingManagerImpl
+import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.reporter.MornyReport
@@ -171,6 +171,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val trusted: MornyTrusted = MornyTrusted()
 	private val _messageThreading: ThreadingManagerImpl = ThreadingManagerImpl(using account)
 	val messageThreading: ThreadingManager = _messageThreading
+	val errorMessageManager: ErrorMessageManager = ErrorMessageManager()
 	
 	val eventManager: EventListenerManager = EventListenerManager()
 	val commands: MornyCommandManager = MornyCommandManager()
@@ -211,6 +212,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			
 			DirectMsgClear(),
 			_messageThreading.CancelCommand,
+			errorMessageManager.ShowErrorMessageCommand,
 			
 		)
 	}

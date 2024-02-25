@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.core.bot.command
 
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
@@ -36,7 +37,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		if (command.args isEmpty) {
-			echoInfo(event.message.chat.id, event.message.messageId)
+			echoInfo(event)
 			return
 		}
 		
@@ -53,9 +54,24 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		
 	}
 	
-	private def echoInfo (chatId: Long, replyTo: Int): Unit = {
+	private def echoInfo (update: Update): Unit = {
+		val cxt = MessagingContext.extract(using update.message)
+		val cxtReplied = Option(update.message.replyToMessage).map(MessagingContext.extract(using _))
+		
+		cxtReplied match
+			case None =>
+			case Some(_cxtReplied) =>
+				// check if theres associated information about error message on the replied context.
+				//   if there really is, that means the replied message is a error message,
+                //   so the error message's complex information will be sent
+				coeur.errorMessageManager.inspectMessage(_cxtReplied.toChatMessageKey) match
+					case None =>
+					case Some(errMessage) =>
+						coeur.errorMessageManager.sendErrorMessage(errMessage, ErrorMessage.Types.Complex, Some(cxt))
+		
+		// if theres no any associated information on the context
 		SendPhoto(
-			chatId,
+			cxt.bind_chat.id,
 			getAboutPic
 		).caption(
 			s"""<b>Morny Cono</b>
@@ -63,8 +79,9 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |————————————————
 			   |$getMornyAboutLinksHTML"""
 					.stripMargin
-		).parseMode(ParseMode HTML).replyToMessageId(replyTo)
+		).parseMode(ParseMode HTML).replyToMessageId(cxt.bind_message.messageId)
 			.unsafeExecute
+		
 	}
 	
 	private def echoStickers (using command: InputCommand, event: Update): Unit = {
