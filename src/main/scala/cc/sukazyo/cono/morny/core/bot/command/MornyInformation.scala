@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.core.bot.command
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
+import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
@@ -10,13 +11,14 @@ import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
+import cc.sukazyo.cono.morny.util.var_text
+import cc.sukazyo.cono.morny.util.var_text.VarText
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
 import com.pengrad.telegrambot.TelegramBot
 
 import java.lang.System
-// todo: maybe move some utils method outside
 class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	private given TelegramBot = coeur.account
 	
@@ -74,11 +76,19 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			cxt.bind_chat.id,
 			getAboutPic
 		).caption(
-			s"""<b>Morny Cono</b>
-			   |来自安妮的侍从小鼠。
-			   |————————————————
-			   |$getMornyAboutLinksHTML"""
-					.stripMargin
+			// language=html
+			(VarText(
+				"""<b>Morny Cono</b>
+				  |来自安妮的侍从小鼠。
+				  |————————————————
+				  |{about_links}""".stripMargin
+			).render(
+				"about_links" -> getMornyAboutLinksHTML
+			) :: Nil)
+				.map( f =>
+					logger `trace` f
+					f
+				).head
 		).parseMode(ParseMode HTML).replyToMessageId(cxt.bind_message.messageId)
 			.unsafeExecute
 		
@@ -127,16 +137,26 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		val versionGitHTML = if (MornySystem.GIT_COMMIT nonEmpty) s"git $getVersionGitTagHTML" else ""
 		SendMessage(
 			event.message.chat.id,
-			// language=html
-			s"""version:
-			   |- Morny <code>${h(MornySystem.CODENAME toUpperCase)}</code>
-			   |- <code>${h(MornySystem.VERSION_BASE)}</code>$versionDeltaHTML${if (MornySystem.GIT_COMMIT nonEmpty) "\n- " + versionGitHTML else ""}
-			   |coeur md5_hash:
-			   |- <code>${h(MornySystem.getJarMD5)}</code>
-			   |coding timestamp:
-			   |- <code>${MornySystem.CODE_TIMESTAMP}</code>
-			   |- <code>${h(formatDate(MornySystem.CODE_TIMESTAMP, 0))} [UTC]</code>
-			   |""".stripMargin
+			VarText(
+				// language=html
+				"""version:
+				  |- Morny <code>{version_codename}</code>
+				  |- <code>{version_base}</code>{version_delta_html}{version_git_suffix}
+				  |coeur md5_hash:
+				  |- <code>{md5}</code>
+				  |coding timestamp:
+				  |- <code>{time_millis}</code>
+				  |- <code>{time_utc} [UTC]</code>
+				  |""".stripMargin
+			).render(
+				"version_codename" -> h(MornySystem.CODENAME.toUpperCase),
+				"version_base" -> h(MornySystem.VERSION_BASE),
+				"version_delta_html" -> versionDeltaHTML,
+				"version_git_suffix" -> (if (MornySystem.GIT_COMMIT nonEmpty) "\n- " + versionGitHTML else ""),
+				"md5" -> h(MornySystem.getJarMD5),
+				"time_millis" -> MornySystem.CODE_TIMESTAMP,
+				"time_utc" -> h(formatDate(MornySystem.CODE_TIMESTAMP, 0)),
+			)
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 			.unsafeExecute
 	}
@@ -145,27 +165,48 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		def sysprop (p: String): String = System.getProperty(p)
 		SendMessage(
 			event.message.chat.id,
-			/* language=html */
-			s"""system:
-			   |- <code>${h(if getRuntimeHostname nonEmpty then getRuntimeHostname.get else "<unknown-host>")}</code>
-			   |- <code>${h(sysprop("os.name"))}</code> <code>${h(sysprop("os.arch"))}</code> <code>${h(sysprop("os.version"))}</code>
-			   |java runtime:
-			   |- <code>${h(sysprop("java.vm.vendor"))}.${h(sysprop("java.vm.name"))}</code>
-			   |- <code>${h(sysprop("java.vm.version"))}</code>
-			   |vm memory:
-			   |- <code>${Runtime.getRuntime.totalMemory/1024/1024}</code> / <code>${Runtime.getRuntime.maxMemory/1024/1024}</code> MB
-			   |- <code>${Runtime.getRuntime.availableProcessors}</code> cores
-			   |coeur version:
-			   |- $getVersionAllFullTagHTML
-			   |- <code>${h(MornySystem.getJarMD5)}</code>
-			   |- <code>${h(formatDate(MornySystem.CODE_TIMESTAMP, 0))} [UTC]</code>
-			   |- [<code>${MornySystem.CODE_TIMESTAMP}</code>]
-			   |continuous:
-			   |- <code>${h(formatDuration(System.currentTimeMillis - coeur.coeurStartTimestamp))}</code>
-			   |- [<code>${System.currentTimeMillis - coeur.coeurStartTimestamp}</code>]
-			   |- <code>${h(formatDate(coeur.coeurStartTimestamp, 0))}</code>
-			   |- [<code>${coeur.coeurStartTimestamp}</code>]"""
-			.stripMargin
+			VarText(
+				/* language=html */
+				"""system:
+				  |- <code>{hostname}</code>
+				  |- <code>{os.name}</code> <code>{os.arch}</code> <code>{os.version}</code>
+				  |java runtime:
+				  |- <code>{java.vm.vendor}.{java.vm.name}</code>
+				  |- <code>{java.vm.version}</code>
+				  |vm memory:
+				  |- <code>{memory_used_mb}</code> / <code>{memory_available_mb}</code> MB
+				  |- <code>{cpu_cores}</code> cores
+				  |coeur version:
+				  |- {version_full}
+				  |- <code>{coeur_md5}</code>
+				  |- <code>{compile_time_utc} [UTC]</code>
+				  |- [<code>{compile_time_millis}</code>]
+				  |continuous:
+				  |- <code>{running_duration}</code>
+				  |- [<code>{running_duration_ms}</code>]
+				  |- <code>{startup_time_utc}</code>
+				  |- [<code>{startup_time_millis}</code>]"""
+					.stripMargin
+			).render(
+				"hostname" -> h(if getRuntimeHostname nonEmpty then getRuntimeHostname.get else "<unknown-host>"),
+				"os.name" -> h(sysprop("os.name")),
+				"os.arch" -> h(sysprop("os.arch")),
+				"os.version" -> h(sysprop("os.version")),
+				"java.vm.vendor" -> h(sysprop("java.vm.vendor")),
+				"java.vm.name" -> h(sysprop("java.vm.name")),
+				"java.vm.version" -> h(sysprop("java.vm.version")),
+				"memory_used_mb" -> (Runtime.getRuntime.totalMemory/1024/1024),
+				"memory_available_mb" -> (Runtime.getRuntime.maxMemory/1024/1024),
+				"cpu_cores" -> Runtime.getRuntime.availableProcessors,
+				"version_full" -> getVersionAllFullTagHTML,
+				"coeur_md5" -> h(MornySystem.getJarMD5),
+				"compile_time_utc" -> h(formatDate(MornySystem.CODE_TIMESTAMP, 0)),
+				"compile_time_millis" -> MornySystem.CODE_TIMESTAMP,
+				"running_duration" -> h(formatDuration(System.currentTimeMillis - coeur.coeurStartTimestamp)),
+				"running_duration_ms" -> (System.currentTimeMillis - coeur.coeurStartTimestamp),
+				"startup_time_utc" -> h(formatDate(coeur.coeurStartTimestamp, 0)),
+				"startup_time_millis" -> coeur.coeurStartTimestamp
+			)
 		).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			.unsafeExecute
 	}
@@ -174,12 +215,18 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 //		if !coeur.trusted.isTrusted(update.message.from.id) then return;
 		SendMessage(
 			update.message.chat.id,
-			// language=html
-			s"""<b>Coeur Task Scheduler:</b>
-			   | - <i>scheduled tasks</i>: <code>${coeur.tasks.amount}</code>
-			   | - <i>scheduler status</i>: <code>${coeur.tasks.state}</code>
-			   | - <i>current runner status</i>: <code>${coeur.tasks.runnerState}</code>
-			   |""".stripMargin
+			VarText(
+				// language=html
+				"""<b>Coeur Task Scheduler:</b>
+				  | - <i>scheduled tasks</i>: <code>{coeur.tasks.amount}</code>
+				  | - <i>scheduler status</i>: <code>{coeur.tasks.state}</code>
+				  | - <i>current runner status</i>: <code>{coeur.tasks.runnerState}</code>
+				  |""".stripMargin
+			).render(
+				"coeur.tasks.amount" -> coeur.tasks.amount,
+				"coeur.tasks.state" -> coeur.tasks.state,
+				"coeur.tasks.runnerState" -> coeur.tasks.runnerState
+			)
 		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
 			.unsafeExecute
 	}
@@ -188,10 +235,14 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		coeur.externalContext >> { (reporter: MornyReport) =>
 			SendMessage(
 				update.message.chat.id,
-				// language=html
-				s"""<b>Event Statistics :</b>
-				   |in today
-				   |${reporter.EventStatistics.eventStatisticsHTML}""".stripMargin
+				VarText(
+					// language=html
+					"""<b>Event Statistics :</b>
+					  |in today
+					  |{event_statistics}""".stripMargin
+				).render(
+					"event_statistics" -> reporter.EventStatistics.eventStatisticsHTML
+				)
 			).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
 				.unsafeExecute
 		} || {

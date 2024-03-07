@@ -2,7 +2,8 @@ package cc.sukazyo.cono.morny.util.dataview
 
 object Table {
 	
-	def format (table: Seq[Seq[Any]]): String = {
+	def format (title: Seq[Any], data: Seq[Any]*): String = {
+		val table = data.prepended(title)
 		if (table.isEmpty) ""
 		else {
 			// Get column widths based on the maximum cell width in each column (+2 for a one character padding on each side)

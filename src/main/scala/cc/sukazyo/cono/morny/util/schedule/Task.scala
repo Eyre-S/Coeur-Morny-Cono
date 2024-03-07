@@ -38,8 +38,7 @@ trait Task extends Ordered[Task] {
 	
 	/** Returns this task's object name and the task name.
 	  *
-	  * for example:
-	  * {{{
+	  * @example {{{
 	  *     scala> val task = new Task {
 	  *         val name = "example-task"
 	  *         val scheduledTimeMillis = 0

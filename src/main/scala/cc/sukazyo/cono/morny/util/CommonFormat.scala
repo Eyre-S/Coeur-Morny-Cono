@@ -65,7 +65,7 @@ object CommonFormat {
 	
 	/** human readable [[String]] that describes the millis duration.
 	  *
-	  * {{{
+	  * @example {{{
 	  *	    scala> formatDuration(10)
 	  *	    val res0: String = 10ms
 	  *

@@ -23,8 +23,7 @@ object GivenContext {
 
 /** A mutable collection that can store(provide) any typed value and read(use/consume) that value by type.
   *
-  * ## Simple Guide
-  * {{{
+  * @example {{{
   *     val cxt = GivenContext()
   *     class BaseClass {}
   *     class MyImplementation extends BaseClass {}

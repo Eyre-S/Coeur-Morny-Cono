@@ -2,7 +2,6 @@ package cc.sukazyo.cono.morny.util
 
 object StringEnsure {
 	
-	
 	extension (str: String) {
 		
 		/** Ensure the string have a length not smaller that the given length.
@@ -36,8 +35,8 @@ object StringEnsure {
 		  * Notice that this method have un-defined behavior when the length of the String is less than
 		  * the character that will be kept, so change the character length that will be kept in your need.
 		  *
-		  * Examples:
-		  * {{{
+		  * 
+		  * @example {{{
 		  *     scala> val someUserToken = "TOKEN_UV:V927c092FV$REFV[p':V<IE#*&@()U8eR)c"
 		  *     val someUserToken: String = TOKEN_UV:V927c092FV$REFV[p':V<IE#*&@()U8eR)c
 		  *

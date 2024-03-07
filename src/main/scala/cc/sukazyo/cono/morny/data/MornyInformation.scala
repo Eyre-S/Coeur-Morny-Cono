@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.data
 
 import cc.sukazyo.cono.morny.core.{MornyAbout, MornySystem}
+import cc.sukazyo.cono.morny.util.var_text.VarText
 
 import java.net.InetAddress
 import java.rmi.UnknownHostException
@@ -39,9 +40,16 @@ object MornyInformation {
 	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT get
 	
 	def getMornyAboutLinksHTML: String =
-		s"""<a href='${MornyAbout MORNY_SOURCECODE_LINK}'>source code</a> | <a href='${MornyAbout MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
-		   |<a href='${MornyAbout MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
-		   |<a href='${MornyAbout MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>"""
-			.stripMargin
+		VarText(
+			// language=html
+			"""<a href='{MORNY_SOURCECODE_LINK}'>source code</a> | <a href='{MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
+			  |<a href='{MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
+			  |<a href='{MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>""".stripMargin
+		).render(
+			"MORNY_SOURCECODE_LINK" -> MornyAbout.MORNY_SOURCECODE_LINK,
+			"MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK" -> MornyAbout.MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK,
+			"MORNY_ISSUE_TRACKER_LINK" -> MornyAbout.MORNY_ISSUE_TRACKER_LINK,
+			"MORNY_USER_GUIDE_LINK" -> MornyAbout.MORNY_USER_GUIDE_LINK
+		)
 	
 }

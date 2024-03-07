@@ -13,6 +13,7 @@ import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.GivenContext
+import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
@@ -119,12 +120,12 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val externalContext: GivenContext = GivenContext()
 	import cc.sukazyo.cono.morny.util.dataview.Table.format as fmtTable
 	logger `info`
-		s"""The following Modules have been added to current Morny:
+		m"""The following Modules have been added to current Morny:
 		   |${fmtTable(
-				("Module ID" :: "Module Name" :: "Module Version" :: Nil)::Nil :::
-				modules.map(f => f.id :: f.name :: f.version :: Nil)
-			).replaceAll("\n", "\n|")}
-		   |""".stripMargin
+			"Module ID" :: "Module Name" :: "Module Version" :: Nil,
+			modules.map(f => f.id :: f.name :: f.version :: Nil)*
+		)}
+		   |"""
 	
 	///>>> BLOCK START instance configure & startup stage 1
 	
