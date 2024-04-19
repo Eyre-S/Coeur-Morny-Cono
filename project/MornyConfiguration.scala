@@ -1,4 +1,4 @@
-
+import sbt.*
 
 //noinspection TypeAnnotation
 object MornyConfiguration {
