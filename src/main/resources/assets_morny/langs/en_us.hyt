@@ -1,0 +1,53 @@
+	Morny Translations File
+
+%1.0
+&encoding=utf8
+&indent=1
+
+morny.command.info.message.about
+| <b>Morny Cono</b>
+| An assistant rat(micromys minutus) from Annie。
+| ————————————————
+| {about_links}
+
+morny.command.info.version
+| version:
+| - Morny <code>{version_codename}</code>
+| - <code>{version_base}</code>{version_delta_html}{version_git_suffix}
+| coeur md5_hash:
+| - <code>{md5}</code>
+| coding timestamp:
+| - <code>{time_millis}</code>
+| - <code>{time_utc} [UTC]</code>
+
+morny.command.info.message.runtime
+| system:
+| - <code>{hostname}</code>
+| - <code>{os.name}</code> <code>{os.arch}</code> <code>{os.version}</code>
+| java runtime:
+| - <code>{java.vm.vendor}.{java.vm.name}</code>
+| - <code>{java.vm.version}</code>
+| vm memory:
+| - <code>{memory_used_mb}</code> / <code>{memory_available_mb}</code> MB
+| - <code>{cpu_cores}</code> cores
+| coeur version:
+| - {version_full}
+| - <code>{coeur_md5}</code>
+| - <code>{compile_time_utc} [UTC]</code>
+| - [<code>{compile_time_millis}</code>]
+| continuous:
+| - <code>{running_duration}</code>
+| - [<code>{running_duration_ms}</code>]
+| - <code>{startup_time_utc}</code>
+| - [<code>{startup_time_millis}</code>]
+
+morny.command.info.message.tasks
+| <b>Coeur Task Scheduler:</b>
+|  - <i>scheduled tasks</i>: <code>{coeur.tasks.amount}</code>
+|  - <i>scheduler status</i>: <code>{coeur.tasks.state}</code>
+|  - <i>current runner status</i>: <code>{coeur.tasks.runnerState}</code>
+
+morny.command.info.message.event
+| <b>Event Statistics :</b>
+| in today
+| {event_statistics}""".stripMargin

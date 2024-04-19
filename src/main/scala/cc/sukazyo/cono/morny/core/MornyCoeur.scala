@@ -397,7 +397,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 					break(Some(LoginResult(account, remote.username, remote.id)))
 				} catch
 					case r: boundary.Break[Option[LoginResult]] => throw r
-					case e =>
+					case e: Throwable =>
 						logger `error`
 							s"""${e.toLogString}
 							   |login failed"""

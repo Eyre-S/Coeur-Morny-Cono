@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.core
+package cc.sukazyo.cono.morny.data
 
 import cc.sukazyo.restools.ResourcesPackage
 

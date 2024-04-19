@@ -1,0 +1,11 @@
+	Morny Translations File
+
+%1.0
+&encoding=utf8
+&indent=1
+
+morny.command.info.about
+| <b>Morny Cono</b>
+| 来自安妮的侍从小鼠。
+| ————————————————
+| {about_links}

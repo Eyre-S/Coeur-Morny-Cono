@@ -3,7 +3,7 @@ aether.AetherKeys.aetherOldVersionMethod := true
 ThisBuild / organization := "cc.sukazyo"
 ThisBuild / organizationName := "A.C. Sukazyo Eyre"
 
-ThisBuild / scalaVersion := "3.4.0-RC4"
+ThisBuild / scalaVersion := "3.4.1"
 
 resolvers ++= Seq(
 		"-ws-releases" at "https://mvn.sukazyo.cc/releases"

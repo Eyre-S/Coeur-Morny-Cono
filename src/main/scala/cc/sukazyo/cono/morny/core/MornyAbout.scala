@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.core
 
-import cc.sukazyo.cono.morny.core.MornyAssets
+import cc.sukazyo.cono.morny.data.MornyAssets
 
 import java.io.IOException
 
