@@ -2,10 +2,16 @@ package cc.sukazyo.cono.morny.core.http.api
 
 import cats.effect.IO
 import cc.sukazyo.cono.morny.data.TelegramImages
+import cc.sukazyo.cono.morny.util.StringEnsure.firstLine
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import org.http4s.{Header, MediaType, Response}
 import org.http4s.dsl.io.*
 import org.http4s.headers.`Content-Type`
+
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
+object HttpStatus extends HttpStatus
 
 trait HttpStatus {
 	
@@ -13,12 +19,28 @@ trait HttpStatus {
 	private type ResponseIO = IO[ResponseT]
 	
 	extension (response: ResponseT) {
+		
+		
 		def setMornyInternalErrorHeader (e: Throwable): ResponseT =
 			response.setMornyInternalErrorHeader(
-				e.getClass.getSimpleName,
-				e.getMessage,
-				e.toLogString
+				e.getClass.getSimpleName.firstLine,
+				e.getMessage.firstLine,
+				URLEncoder.encode(e.toLogString, StandardCharsets.UTF_8) // todo: maybe extract this const
 			)
+		
+		/** Set HTTP Header that shows Morny's Internal Server Error related information.
+		  *
+		  * It will set the following headers, corresponding to this method's parameters, you
+		  * can customize those values.
+		  *   - Morny-Internal-Error-Type
+		  *   - Morny-Internal-Error-Message
+		  *   - Morny-Internal-Error-Detail
+		  *
+		  * **Notice that ANY header value MUST NOT contains line breaking!** Or it will only
+		  * returns an empty 500 response.
+		  *
+		  * @return the [[ResponseT]], with above headers added.
+		  */
 		def setMornyInternalErrorHeader (
 			`Morny-Internal-Error-Type`: String,
 			`Morny-Internal-Error-Message`: String,
@@ -43,7 +65,7 @@ trait HttpStatus {
 			.map(_.withContentType(`Content-Type`(MediaType.image.png)))
 	
 	/** 500 Internal Server Error */
-	def MornyInternalServerError  (): ResponseIO =
+	def MornyInternalServerError (): ResponseIO =
 		InternalServerError(TelegramImages.IMG_500.get)
 			.map(_.withContentType(`Content-Type`(MediaType.image.png)))
 	

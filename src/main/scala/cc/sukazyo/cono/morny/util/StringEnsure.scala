@@ -4,6 +4,14 @@ object StringEnsure {
 	
 	extension (str: String) {
 		
+		/** Take the first line of this String.
+		  *
+		  * It will find the first `\n` (unicode 0x0a, aka. LF) or `\n` (unicode 0x0e, aka. CR)
+		  * and take all the chars before it, and ignores all the contents after it.
+		  */
+		def firstLine : String =
+			str.takeWhile(c => (c != '\n') && (c != '\r'))
+		
 		/** Ensure the string have a length not smaller that the given length.
 		  * 
 		  * If the length of the string is smaller than the given length, then the string will be padded
