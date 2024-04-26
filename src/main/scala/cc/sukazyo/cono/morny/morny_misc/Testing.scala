@@ -3,29 +3,26 @@ package cc.sukazyo.cono.morny.morny_misc
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ISimpleCommand}
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
-import cc.sukazyo.cono.morny.core.bot.api.BotExtension.submit
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.{Message, Update}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
 
 class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.{*, given}
 	
 	override val name: String = "test"
 	override val aliases: List[ICommandAlias] = Nil
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		given context: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
+		given lang: String = context.bind_user.prefer_language
 		
 		SendMessage(
 			event.message.chat.id,
-			// language=html
-			"<b>Just</b> a TEST command.\n"
-				+ "Please input something to test the command."
+			translations.trans("morny.misc.command_test.message")
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
 			.unsafeExecute
 		
@@ -34,11 +31,13 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 	}
 	
 	private def execute2 (message: Message, previousContext: MessagingContext.WithUserAndMessage): Unit = {
+		given context: MessagingContext.WithUserAndMessage = MessagingContext.extract(using message)
+		given lang: String = context.bind_user.prefer_language
 		
 		if (message.text == "oops")
 			SendMessage(
 				message.chat.id,
-				"A test error message will be generated."
+				translations.trans("morny.misc.command_test.branch_oops.err_message_simple")
 			).replyToMessageId(message.messageId)
 				.unsafeExecute
 			ErrorMessage(
@@ -48,16 +47,17 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 				).replyToMessageId(message.messageId),
 				_complex = SendMessage(
 					message.chat.id,
-					"Oops: There is just a test error."
+					translations.trans("morny.misc.command_test.branch_oops.err_message_complex")
 				).replyToMessageId(message.messageId)
-			)(using MessagingContext.extract(using message))
-				.submit
+			).submit
 			return;
 		
 		SendMessage(
 			message.chat.id,
-			// language=html
-			"<b><u>Test command with following input:</u></b>\n" + message.text
+			translations.trans(
+				"morny.misc.command_test.branch_normal.message",
+				"replied_message" -> message.text
+			)
 		).replyToMessageId(message.messageId).parseMode(ParseMode HTML)
 			.unsafeExecute
 		

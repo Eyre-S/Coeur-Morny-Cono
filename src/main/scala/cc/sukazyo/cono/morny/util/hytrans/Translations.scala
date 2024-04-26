@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.util.hytrans
 
 import cc.sukazyo.cono.morny.util.var_text.{Var, VarText}
+import cc.sukazyo.cono.morny.util.var_text.Var.String_As_VarText
 
 import scala.util.boundary
 
@@ -41,5 +42,8 @@ class Translations (
 	
 	def trans (key: String, args: Var*)(using lang: String): String =
 		trans(key).render(args*)
+	
+	def transAsVar (key: String, args: Var*)(using lang: String): Var =
+		trans(key, args*).asVar(key)
 	
 }

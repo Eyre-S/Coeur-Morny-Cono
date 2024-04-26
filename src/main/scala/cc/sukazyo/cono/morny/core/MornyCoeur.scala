@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
-import cc.sukazyo.cono.morny.core.bot.api.{EventListenerManager, MornyCommandManager, MornyQueryManager}
+import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
@@ -15,6 +15,7 @@ import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.GivenContext
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
+import cc.sukazyo.cono.morny.util.hytrans.Translations
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -126,6 +127,12 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			modules.map(f => f.id :: f.name :: f.version :: Nil)*
 		)}
 		   |"""
+	
+	///>>> BLOCK START local storage / data configuration
+	
+	val lang: MornyLangs = MornyLangs()
+	
+	///>>> BLOCK END local storage / data configuration
 	
 	///>>> BLOCK START instance configure & startup stage 1
 	
@@ -324,6 +331,47 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	///<<< BLOCK END instance configure & startup stage 2
 	
+	/** Provide DSLs of Morny Coeur
+	  *
+	  * Provide the following coeur values to using/given context:
+	  *
+	  *  - Coeur itself
+	  *  - its Telegram bot account: [[MornyCoeur.account]]
+	  *  - its i18n translation instance: [[MornyCoeur.lang.translations]]
+	  *
+	  * Also provides the DSLs defined in [[BotExtension]].
+	  *
+	  * You can simply add the following line to use the vals and DSL functions in your code:
+	  *
+	  * {{{
+	  *     // assuming the Coeur instance is coeur
+	  *     import coeur.dsl.given
+	  *
+	  *     // now you can use the vals in your code
+	  *     translations.trans(/* ... */)
+	  *     // or use as an implicit/using value
+	  *     import com.pengrad.telegrambot.request.SendMessage
+	  *     import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
+	  *     SendMessage(/* ... */)
+	  *         .unsafeExecute // implicitly use coeur.account
+	  *
+	  *     // you need to use the * import to use DSL functions
+	  *     import coeur.dsl.*
+	  *     // or use the following line to import both vals and DSL functions
+	  *     import coeur.dsl.{*, given}
+	  *
+	  *     // now you can use the DSL functions in your code
+	  *     import com.pengrad.telegrambot.model.User
+	  *     val prefer_languge = user.asInstanceOf[User].prefer_language
+	  *
+	  * }}}
+	  */
+	object dsl extends BotExtension {
+		given coeur: MornyCoeur = MornyCoeur.this
+		given account: TelegramBot = MornyCoeur.this.account
+		given translations: Translations = MornyCoeur.this.lang.translations
+	}
+	
 	def saveDataAll(): Unit = {
 		modules.foreach(it => it.onRoutineSavingData)
 		logger `notice` "done all save action."
@@ -396,7 +444,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 					logger `info` s"Succeed logged in to @${remote.username}"
 					break(Some(LoginResult(account, remote.username, remote.id)))
 				} catch
-					case r: boundary.Break[Option[LoginResult]] => throw r
+					/* boundary.Break[Option[LoginResult] */
+					case r: boundary.Break[_] => throw r
 					case e: Throwable =>
 						logger `error`
 							s"""${e.toLogString}

@@ -24,6 +24,7 @@ object Parser {
 				case Some(' ') | Some('\t') | None => // empty lines, will be ignored
 				case Some('#') => // comment line, will be ignored
 				case Some('%') => // document meta definition line, currently not supported
+				case Some('&') => // document meta definition line, currently not supported
 				case Some('|') => // content line
 					addLine(line drop 2)
 				case Some(_) => // a key definition line

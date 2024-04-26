@@ -8,7 +8,7 @@ import scala.language.implicitConversions
   *
   * You can just call the [[Var]] constructor to create a new Var, or use the implicit
   * conversion to create a var from a tuple of ([[String]], [[String]]), or use the extension
-  * method [[Var.StringAsVarText.asVar]] to convert a [[String]] to a var.
+  * method [[Var.String_As_VarText.asVar]] to convert a [[String]] to a var.
   * 
   * @since 2.0.0
   *
@@ -77,11 +77,11 @@ object Var {
 	  * 
 	  * @since 2.0.0
 	  */
-	implicit def StrStrTupleAsVar (tuple: (String, Any)): Var =
+	implicit def StrStrTuple_as_Var (tuple: (String, Any)): Var =
 		Var(tuple._1, tuple._2.toString)
 	
 	/** @see [[asVar]] */
-	implicit class StringAsVarText (text: String):
+	implicit class String_As_VarText (text: String):
 		/** Convert this string text to a [[Var]].
 		  * @since 2.0.0
 		  * @param id the var-id.

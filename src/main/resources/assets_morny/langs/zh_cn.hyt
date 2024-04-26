@@ -4,8 +4,40 @@
 &encoding=utf8
 &indent=1
 
-morny.command.info.about
+morny.information.about_links
+| <a href='{MORNY_SOURCECODE_LINK}'>source code</a> | <a href='{MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
+| <a href='{MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
+| <a href='{MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>
+
+morny.command.info.message.about
 | <b>Morny Cono</b>
 | 来自安妮的侍从小鼠。
 | ————————————————
-| {about_links}
+| {morny.information.about_links}
+
+morny.command.info.sub_start.message
+| 欢迎使用 <b>Morny Cono</b>，<i>来自安妮的侍从小鼠</i>。
+| Morny 具有各种各样的功能。
+|
+| ————————————————
+| {morny.information.about_links}
+| ————————————————
+|
+| （你可以随时通过 /info 重新获得这些信息）
+
+morny.misc.command_test.message
+| <b>这只是一个 /test 测试命令。</b>测试 <i>id</i> 为 <code>1</code>。
+| 你可以回复一条消息来测试回复消息的功能。
+
+morny.misc.command_test.branch_normal.message
+| 你完成了一个回复消息的测试！
+| 你所回复的消息为：
+| 
+| {replied_message}
+
+morny.misc.command_test.branch_oops.err_message_simple
+| 将会生成一条错误！ (使用 <b>/inspect</b> 命令来洞察错误详细信息)
+
+morny.misc.command_test.branch_oops.err_message_complex
+| Oops: There is just a test error.
+| 这个错误是由 <b>/test</b> 命令手动触发的，为了测试错误洞察命令是否可以正常工作。

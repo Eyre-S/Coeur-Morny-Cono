@@ -2,6 +2,8 @@ package cc.sukazyo.cono.morny.util.var_text
 
 import cc.sukazyo.cono.morny.util.var_text.Var.isLegalId
 
+import scala.language.implicitConversions
+
 /** A text/string template that may contains some named replaceable variables. It's concept may
   * be similar with scala's `StringContext` or `GString` in groovy.
   *
@@ -55,6 +57,9 @@ object VarText {
 	
 	def apply (_nodes: VTNode*): VarText = new VarText:
 		override val nodes: List[VTNode] = _nodes.toList
+	
+	implicit def VarText_is_String (varText: VarText): String =
+		varText.render()
 	
 	private val symbol_escape = '/'
 	private val symbol_var_start = '{'

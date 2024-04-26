@@ -4,11 +4,26 @@
 &encoding=utf8
 &indent=1
 
+morny.information.about_links
+| <a href='{MORNY_SOURCECODE_LINK}'>source code</a> | <a href='{MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
+| <a href='{MORNY_ISSUE_TRACKER_LINK}'>Feedback / issue tracker</a>
+| <a href='{MORNY_USER_GUIDE_LINK}'>User's Guide / documentations</a>
+
 morny.command.info.message.about
 | <b>Morny Cono</b>
 | An assistant rat(micromys minutus) from Annie。
 | ————————————————
-| {about_links}
+| {morny.information.about_links}
+
+morny.command.info.sub_start.message
+| Welcome you meet the <b>Morny Cono</b>，<i>an assistant rat from Annie</i>。
+| Morny has a lot variety of features。
+|
+| ————————————————
+| {morny.information.about_links}
+| ————————————————
+|
+| （You can use /info command to get these message in any time）
 
 morny.command.info.version
 | version:
@@ -50,4 +65,4 @@ morny.command.info.message.tasks
 morny.command.info.message.event
 | <b>Event Statistics :</b>
 | in today
-| {event_statistics}""".stripMargin
+| {event_statistics}

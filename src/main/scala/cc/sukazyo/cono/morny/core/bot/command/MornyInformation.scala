@@ -3,7 +3,6 @@ package cc.sukazyo.cono.morny.core.bot.command
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
-import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
@@ -16,11 +15,11 @@ import cc.sukazyo.cono.morny.util.var_text.VarText
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
 
 import java.lang.System
+
 class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.{*, given}
 	
 	private case object Subs {
 		val STICKERS = "stickers"
@@ -76,19 +75,10 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			cxt.bind_chat.id,
 			getAboutPic
 		).caption(
-			// language=html
-			(VarText(
-				"""<b>Morny Cono</b>
-				  |来自安妮的侍从小鼠。
-				  |————————————————
-				  |{about_links}""".stripMargin
-			).render(
-				"about_links" -> getMornyAboutLinksHTML
-			) :: Nil)
-				.map( f =>
-					logger `trace` f
-					f
-				).head
+			translations.trans(
+				"morny.command.info.message.about",
+				translations.transAsVar("morny.information.about_links", getMornyAboutLinksVars*)(using cxt.bind_message.from.prefer_language)
+			)(using cxt.bind_message.from.prefer_language)
 		).parseMode(ParseMode HTML).replyToMessageId(cxt.bind_message.messageId)
 			.unsafeExecute
 		
@@ -229,7 +219,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			)
 		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
 			.unsafeExecute
-	}
+	} 
 	
 	private def echoEventStatistics (using update: Update): Unit = {
 		coeur.externalContext >> { (reporter: MornyReport) =>
