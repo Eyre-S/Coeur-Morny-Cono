@@ -31,6 +31,13 @@ class IP186Query (using coeur: MornyCoeur) {
 	
 	private def query (using event: Update, command: InputCommand): Unit = {
 		
+		coeur.account exec SendMessage(
+			event.message.chat.id,
+			"🥺 This feature has been deprecated, due to the upstream service (https://ip.186526.xyz) has been gone for a long time."
+		).replyToMessageId(event.message.messageId)
+		
+		return
+		
 		val target: String|Null =
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
