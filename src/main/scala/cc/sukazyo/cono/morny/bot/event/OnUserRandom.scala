@@ -13,9 +13,8 @@ class OnUserRandom (using coeur: MornyCoeur) {
 	
 	object RandomSelect extends EventListener {
 		
-		
-		private val USER_OR_QUERY = "^(.+)(?:还是|or)(.+)$" r
-		private val USER_IF_QUERY = "^(.+)(?:吗\\?|？|\\?|吗？)$" r
+		private val USER_OR_QUERY = "^(.+)(?:还是| or )(.+)$"r
+		private val USER_IF_QUERY = "^(.+)(?:吗\\?|？|\\?|吗？)$"r
 		
 		override def onMessage (using event: EventEnv): Unit = {
 			import event.update
