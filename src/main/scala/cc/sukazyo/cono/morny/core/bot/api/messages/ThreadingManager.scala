@@ -39,6 +39,18 @@ trait ThreadingManager {
 	  */
 	def doAfter[P] (thread: MessageThread[P]): Unit
 	
+	/** Ensure current context have no ongoing message thread so that you can create a new one
+	  * safely.
+	  * 
+	  * If there's already an ongoing message thread, it will be canceled. Also, depends on the
+	  * implementation, it may throw an exception or log a warning etc.
+	  * 
+	  * @see [[cancelThread]] the method that will be used to cancel the ongoing message thread.
+	  * 
+	  * @param _cxt the current context you want to check.
+	  */
+	def ensureCleanState (using _cxt: MessagingContext.WithUserAndMessage): Unit
+	
 	/** Try to continue run a message thread using the given message.
 	  * 
 	  * @since 2.0.0

@@ -3,18 +3,61 @@ package cc.sukazyo.cono.morny.core.bot.command
 import cc.sukazyo.cono.morny.core.bot.api.ICommandAlias.HiddenAlias
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.core.bot.api.{ICommandAlias, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.bot.api.{messages, ICommandAlias, ISimpleCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.core.bot.api.messages.MessagingContext
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Requests.unsafeExecute
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.SendSticker
-import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.request.{EditMessageText, SendMessage, SendSticker}
 
 class MornyManagers (using coeur: MornyCoeur) {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.{*, given}
+	
+	private def verifyTrusted (command: ISimpleCommand)(using cxt: MessagingContext.WithUserAndMessage): Boolean = {
+		if !(coeur.trusted isTrust cxt.bind_user) then
+			SendSticker(
+				cxt.bind_chat.id,
+				TelegramStickers ID_403
+			).replyToMessageId(cxt.bind_message.messageId)
+				.unsafeExecute
+			logger `attention` s"403 ${command.name} caught from user ${cxt.bind_user toLogTag}"
+			coeur.externalContext.consume[MornyReport](_.unauthenticatedAction(s"/${command.name}", cxt.bind_user))
+			false
+		else true
+	}
+	
+	object Reload extends ITelegramCommand {
+		
+		override val name: String = "reload"
+		override val aliases: List[ICommandAlias] = Nil
+		override val paramRule: String = ""
+		override val description: String = "重新载入 Bot 资源文件 / 配置文件"
+		
+		override def execute (using command: InputCommand, event: Update): Unit = {
+			given cxt: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
+			
+			if !verifyTrusted(this) then return
+			
+			val statusMessage = SendMessage(
+				cxt.bind_chat.id,
+				"[ .... ] Coeur reload."
+			).replyToMessageId(cxt.bind_message.messageId)
+				.unsafeExecute
+			
+			coeur.reload()
+			
+			EditMessageText(
+				statusMessage.message.chat.id,
+				statusMessage.message.messageId,
+				"[  OK  ] Coeur reload."
+			).unsafeExecute
+			
+		}
+		
+	}
 	
 	object Exit extends ITelegramCommand {
 		
@@ -24,30 +67,17 @@ class MornyManagers (using coeur: MornyCoeur) {
 		override val description: String = "关闭 Bot （仅可信成员）"
 		
 		override def execute (using command: InputCommand, event: Update): Unit = {
+			given cxt: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
 			
-			val user = event.message.from
+			if !verifyTrusted(this) then return
 			
-			if (coeur.trusted isTrust user) {
-				
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_EXIT
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
-				logger `attention` s"Morny exited by user ${user toLogTag}"
-				coeur.exit(0, user)
-				
-			} else {
-				
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_403
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
-				logger `attention` s"403 exit caught from user ${user toLogTag}"
-				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/exit", user))
-				
-			}
+			SendSticker(
+				cxt.bind_chat.id,
+				TelegramStickers ID_EXIT
+			).replyToMessageId(cxt.bind_message.messageId)
+				.unsafeExecute
+			logger `attention` s"Morny exited by user ${cxt.bind_user toLogTag}"
+			coeur.exit(0, cxt.bind_user)
 			
 		}
 		
@@ -61,30 +91,17 @@ class MornyManagers (using coeur: MornyCoeur) {
 		override val description: String = "保存缓存数据到文件（仅可信成员）"
 		
 		override def execute (using command: InputCommand, event: Update): Unit = {
+			given cxt: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
 			
-			val user = event.message.from
+			if !verifyTrusted(this) then return
 			
-			if (coeur.trusted isTrust user) {
-				
-				logger `attention` s"call save from command by ${user toLogTag}"
-				coeur.saveDataAll()
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_SAVED
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
-				
-			} else {
-				
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_403
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
-				logger `attention` s"403 save caught from user ${user toLogTag}"
-				coeur.externalContext.consume[MornyReport](_.unauthenticatedAction("/save", user))
-				
-			}
+			logger `attention` s"call save from command by ${cxt.bind_user toLogTag}"
+			coeur.saveDataAll()
+			SendSticker(
+				cxt.bind_chat.id,
+				TelegramStickers ID_SAVED
+			).replyToMessageId(cxt.bind_message.messageId)
+				.unsafeExecute
 			
 		}
 		

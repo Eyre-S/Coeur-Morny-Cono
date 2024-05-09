@@ -78,6 +78,28 @@ class ThreadingManagerImpl (using bot: TelegramBot) extends ThreadingManager {
 		threadMap.get(ThreadKey fromMessage message)
 			.exists(_.onExecuteIt(message))
 	
+	/** Ensure current context have no ongoing message thread so that you can create a new one
+	  * safely.
+	  *
+	  * If there's already an ongoing message thread, it will be canceled, and will output a
+	  * notice message to that context.
+	  *
+	  * @see [[cancelThread]] the method that will be used to cancel the ongoing message thread.
+	  *
+	  * @param _cxt the current context you want to check. This context will be converted to the
+	  *             [[ThreadKey]] in order to do the check, if needed, some message will also
+	  *             sent to this context.
+	  */
+	override def ensureCleanState (using _cxt: MessagingContext.WithUserAndMessage): Unit =
+		if cancelThread(ThreadKey fromContext _cxt) then
+			SendMessage(
+				_cxt.bind_chat.id,
+				"""There seems another message thread is waiting for future messages.
+				  |That thread has been canceled automatically.
+				  |""".stripMargin
+			).replyToMessageId(_cxt.bind_message.messageId)
+				.unsafeExecute
+	
 	override def cancelThread (threadKey: ThreadKey): Boolean =
 		threadMap.get(threadKey)
 			.exists(_.onCancelIt())

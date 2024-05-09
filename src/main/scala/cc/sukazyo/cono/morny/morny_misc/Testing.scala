@@ -20,6 +20,8 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 		given context: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
 		given lang: String = context.bind_user.prefer_language
 		
+		coeur.messageThreading.ensureCleanState
+		
 		SendMessage(
 			event.message.chat.id,
 			translations.trans("morny.misc.command_test.message")

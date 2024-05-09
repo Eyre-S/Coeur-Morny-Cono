@@ -26,7 +26,7 @@ morny.command.info.sub_start.message
 | （你可以随时通过 /info 重新获得这些信息）
 
 morny.misc.command_test.message
-| <b>这只是一个 /test 测试命令。</b>测试 <i>id</i> 为 <code>1</code>。
+| <b>这只是一个 /test 测试命令。</b>测试 <i>id</i> 为 <code>2</code>。
 | 你可以回复一条消息来测试回复消息的功能。
 
 morny.misc.command_test.branch_normal.message

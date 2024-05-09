@@ -15,7 +15,6 @@ import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.GivenContext
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
-import cc.sukazyo.cono.morny.util.hytrans.Translations
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -212,10 +211,11 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			$MornyHellos.Hello,
 			MornyInfoOnStart(),
 			
-			$MornyManagers.SaveData,
 			$MornyInformation,
 			$MornyInformationOlds.Version,
 			$MornyInformationOlds.Runtime,
+			$MornyManagers.SaveData,
+			$MornyManagers.Reload,
 			$MornyManagers.Exit,
 			
 			DirectMsgClear(),
@@ -369,12 +369,18 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	object dsl extends BotExtension {
 		given coeur: MornyCoeur = MornyCoeur.this
 		given account: TelegramBot = MornyCoeur.this.account
-		given translations: Translations = MornyCoeur.this.lang.translations
+		given translations: MornyLangs = MornyCoeur.this.lang
 	}
 	
 	def saveDataAll(): Unit = {
 		modules.foreach(it => it.onRoutineSavingData)
 		logger `notice` "done all save action."
+	}
+	
+	def reload (): Unit = {
+		logger `info` "Reloading coeur data / config..."
+		lang.reload()
+		logger `info` "done reload coeur data / config."
 	}
 	
 	private def exitCleanup (): Unit = {
