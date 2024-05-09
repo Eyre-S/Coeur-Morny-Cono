@@ -74,6 +74,7 @@ lazy val root = (project in file("."))
 			assemblyMergeStrategy := {
 				case module if module endsWith "module-info.class" => MergeStrategy.concat
 				case module_kt if module_kt endsWith ".kotlin_module" => MergeStrategy.concat
+				case version if (version startsWith "META-INF") && (version endsWith ".versions.properties") => MergeStrategy.concat
 				case x =>
 					val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
 					oldStrategy(x)
