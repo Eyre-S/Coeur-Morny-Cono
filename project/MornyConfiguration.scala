@@ -22,8 +22,8 @@ object MornyConfiguration {
 		"cc.sukazyo" % "resource-tools" % "0.2.2",
 		
 		"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
-		"org.http4s" %% "http4s-dsl"          % "0.23.26",
-		"org.http4s" %% "http4s-circe"        % "0.23.26",
+		"org.http4s" %% "http4s-dsl"          % "0.23.27",
+		"org.http4s" %% "http4s-circe"        % "0.23.27",
 		"org.http4s" %% "http4s-netty-server" % "0.5.16",
 		
 		"com.softwaremill.sttp.client3" %% "core"           % "3.9.5",
@@ -32,9 +32,9 @@ object MornyConfiguration {
 		
 		"org.typelevel" %% "case-insensitive" % "1.4.0",
 		"com.google.code.gson" % "gson" % "2.10.1",
-		"io.circe" %% "circe-core"    % "0.14.6",
-		"io.circe" %% "circe-generic" % "0.14.6",
-		"io.circe" %% "circe-parser"  % "0.14.6",
+		"io.circe" %% "circe-core"    % "0.14.7",
+		"io.circe" %% "circe-generic" % "0.14.7",
+		"io.circe" %% "circe-parser"  % "0.14.7",
 		"org.jsoup" % "jsoup" % "1.17.2",
 		
 		"com.cronutils" % "cron-utils" % "9.2.1",
