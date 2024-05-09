@@ -61,6 +61,14 @@ public class MornyConfig {
 	 */
 	@Nullable public final String telegramBotUsername;
 	
+	/**
+	 * 是否在启动的时候跳过登录过程。
+	 * <p>
+	 * 这将能够在没有联网的情况下也能够启动 Coeur 程序，但是可能会引发一些初始化过程中不可预知的
+	 * 错误。
+	 */
+	public final boolean telegramSkipLogin;
+	
 	/* ======================================= *
 	 *  morny trusted config                   *
 	 * ======================================= */
@@ -186,6 +194,7 @@ public class MornyConfig {
 		this.httpPort = prototype.httpPort;
 		this.debugMode = prototype.debugMode;
 		this.inlineQueryCacheTimeMax = prototype.inlineQueryCacheTimeMax;
+		this.telegramSkipLogin = prototype.telegramSkipLogin;
 	}
 	
 	public static class CheckFailure extends RuntimeException {
@@ -219,6 +228,7 @@ public class MornyConfig {
 		public int httpPort = 30179;
 		public boolean debugMode = false;
 		public int inlineQueryCacheTimeMax = 300;
+		public boolean telegramSkipLogin = false;
 		
 	}
 	

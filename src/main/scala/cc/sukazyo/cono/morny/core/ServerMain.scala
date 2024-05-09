@@ -47,9 +47,9 @@ object ServerMain {
 				case "--version" | "-v" => mode_echoVersion = true
 				
 				// deprecated: use --outdated-ignore instead
-				case "--outdated-block" | "-ob" =>
-					config.eventIgnoreOutdated = true
-					deprecatedArgs += "--outdated-block" -> "--outdated-ignore"
+//				case "--outdated-block" | "-ob" =>
+//					config.eventIgnoreOutdated = true
+//					deprecatedArgs += "--outdated-block" -> "--outdated-ignore"
 				case "--outdated-ignore" | "-oig" => config.eventIgnoreOutdated = true
 				
 				case "--api" | "-a" => i += 1; config.telegramBotApiServer = args(i)
@@ -85,6 +85,9 @@ object ServerMain {
 				case "--auto-cmd" | "-cmd" | "-c" =>
 					config.commandLoginRefresh = true
 					config.commandLogoutClear = true
+				
+				case "--skip-login" =>
+					config.telegramSkipLogin = true
 				
 				case _ => unknownArgs append args(i)
 				
@@ -129,8 +132,8 @@ object ServerMain {
 				  |  
 				  |  Since 2.0.0, this mode is the combined of the two following options:
 				  |    --debug-run       enable coeur debug mode, that will disabled all the caches.
-				  |    --verbose-logging enable the logger to output debug/trace logs."""
-					.stripMargin
+				  |    --verbose-logging enable the logger to output debug/trace logs.
+				  |""".stripMargin
 		else if (config.debugMode)
 			logger `warn`
 				"""Coeur Debug mode enabled.
@@ -145,6 +148,24 @@ object ServerMain {
 				  |  It will output much more debug/trace logs, may lower your performance,
 				  |  so make sure that you are not in production environment."""
 					.stripMargin
+		
+		if (config.telegramSkipLogin)
+			logger `notice`
+				s"""Skip Login feature enabled.
+				   |
+				   |  This will skips the login process, means you can succeed start the coeur
+				   |  even if the telegram bot key / username / userid is wrong or there's no
+				   |  network connection at all.
+				   |
+				   |  This may cause the bot runs in an unstable or even unworkable state, breaks
+				   |  many features and even occurred bugs.
+				   |
+				   |  Make sure you know what you are doing, and be well.
+				   |
+				   |""".stripMargin
+			logger `warn`
+				s"""The Skip Login feature is not implemented yet!
+				   |""".stripMargin
 		
 		if (mode_echoVersion) {
 			

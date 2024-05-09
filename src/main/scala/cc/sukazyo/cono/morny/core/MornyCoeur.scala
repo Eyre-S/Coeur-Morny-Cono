@@ -416,7 +416,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	private case class LoginResult(account: TelegramBot, username: String, userid: Long)
 	
-	private def login (): Option[LoginResult] = {
+	private def login (skip_login: Boolean = false): Option[LoginResult] = {
 		
 		val builder = TelegramBot.Builder(config.telegramBotKey)
 		var api_bot = config.telegramBotApiServer
