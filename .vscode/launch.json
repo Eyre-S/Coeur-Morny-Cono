@@ -1,0 +1,57 @@
+{
+	// 使用 IntelliSense 以得知可用的屬性。
+	// 暫留以檢視現有屬性的描述。
+	// 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Morny Coeur [user:dev|q|d|mm|tc:rm|ac|ob|trd|dc|r:m|med] [pr]",
+			"type": "java",
+			"request": "launch",
+			"projectName": "Coeur Morny Cono",
+			"cwd": "${workspaceFolder}/run",
+			"mainClass": "cc.sukazyo.cono.morny.ServerMain",
+			"vmArgs": ["-Djava.net.useSystemProxies=true"],
+			"envFile": "${workspaceFolder}/.run/debug.env",
+			"args": [
+				"--quiet",
+				"--debug",
+				"--username", "sukazyo_deving_bot",
+				"--master", "793274677",
+				"--trusted-chat", "-1",
+				"--auto-cmd",
+				"--outdated-block",
+				"--trusted-reader-dinner", "1040613596",
+				"--dinner-chat", "-1001670950261",
+				"--report-to", "793274677",
+				"-medc", "793274677", "-medt", "0,2,18,19", "-medtz", "8",
+			]
+		},
+		{
+			"name": "Morny Test [pr]",
+			"type": "java",
+			"request": "launch",
+			"cwd": "${workspaceFolder}/run",
+			"vmArgs": ["-Djava.net.useSystemProxies=true"],
+			"projectName": "Coeur Morny Cono",
+			"mainClass": "cc.sukazyo.cono.morny.MornyTest",
+		},
+		{
+			"name": "UniversalTest [pr]",
+			"type": "java",
+			"request": "launch",
+			"cwd": "${workspaceFolder}/run",
+			"vmArgs": ["-Djava.net.useSystemProxies=true"],
+			"projectName": "Coeur Morny Cono",
+			"mainClass": "cc.sukazyo.cono.morny.UniversalTest",
+		},
+		{
+			"name": "Current File [pr]",
+			"type": "java",
+			"request": "launch",
+			"cwd": "${workspaceFolder}/run",
+			"vmArgs": ["-Djava.net.useSystemProxies=true"],
+			"mainClass": "${file}"
+		},
+	]
+}

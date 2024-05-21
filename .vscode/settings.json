@@ -1,0 +1,14 @@
+{
+	"java.dependency.packagePresentation": "hierarchical",
+	"java.configuration.updateBuildConfiguration": "disabled",
+	"java.compile.nullAnalysis.mode": "disabled",
+	"files.watcherExclude": {
+		"**/target": true
+	},
+	"cSpell.words": [
+		"Coeur",
+		"Gson",
+		"Morny",
+		"userid"
+	]
+}

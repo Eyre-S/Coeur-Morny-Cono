@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Morny Coeur [user:dev(env).u|q|c|r:m]  [pr]" type="Application" factoryName="Application">
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.run/debug.env" />
+    </option>
+    <option name="MAIN_CLASS_NAME" value="cc.sukazyo.cono.morny.core.ServerMain" />
+    <module name="Coeur Morny Cono" />
+    <option name="PROGRAM_PARAMETERS" value="--quiet --debug --username sukazyo_deving_bot --master 793274677 --trusted-chat -1 --auto-cmd --outdated-block --trusted-reader-dinner 1040613596 --report-to 793274677 -medc 793274677 -medt 0,2,18,19 -medtz 8 --dinner-chat -1001670950261" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/run" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value=".*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

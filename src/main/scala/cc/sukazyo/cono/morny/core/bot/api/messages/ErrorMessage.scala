@@ -27,9 +27,28 @@ import com.pengrad.telegrambot.request.AbstractSendRequest
   */
 trait ErrorMessage[T1 <: AbstractSendRequest[T1], T2 <: AbstractSendRequest[T2]] {
 	
+	/** The simple variant of this error message.
+	  * 
+	  * In Morny, this is usually a sticker that shows the generic type of the error. 
+	  *
+	  * Can be get by using [[getByType]] with variant tag [[ErrorMessage.Types.Simple]]
+	  * @since 2.0.0
+	  */
 	val simple: T1
+	/** The complex variant of this error message.
+	  *
+	  * In Morny, this should be a text-based message that shows key information of the error
+	  * which want to describe.
+	  *
+	  * Can be get by using [[getByType]] with variant tag [[ErrorMessage.Types.Complex]]
+	  * @since 2.0.0
+	  */
 	val complex: T2
 	
+	/** An context that defines where this error message belongs. Will be used to publish this
+	  * message (aka. send message).
+	  * @since 2.0.0
+	  */
 	val context: MessagingContext.WithMessage
 	
 	/** Get the simple or complex message by the given [[ErrorMessage.Types]] infer.
@@ -58,12 +77,30 @@ trait ErrorMessage[T1 <: AbstractSendRequest[T1], T2 <: AbstractSendRequest[T2]]
 	
 }
 
+/** @see [[ErrorMessage]] */
 object ErrorMessage {
 	
+	/** An enum that contains the tag of an [[ErrorMessage]]'s variant type.
+	  *
+	  * Can be used to get the specific type's message of that type using [[ErrorMessage.getByType]].
+	  *
+	  * @since 2.0.0
+	  */
 	enum Types:
+		/** @see [[ErrorMessage.simple]] */
 		case Simple
+		/** @see [[ErrorMessage.complex]] */
 		case Complex
 	
+	/** A new [[ErrorMessage]].
+	  *
+	  * @since 2.0.0
+	  * @see [[ErrorMessage]]
+	  *
+	  * @param _simple The [[ErrorMessage.simple]] message of this error message.
+	  * @param _complex The [[ErrorMessage.complex]] message of this error message.
+	  * @param cxt The context of this error message, defines where the error message belongs.
+	  */
 	def apply [T1 <: AbstractSendRequest[T1], T2<: AbstractSendRequest[T2]]
 	(_simple: T1, _complex: T2)(using cxt: MessagingContext.WithMessage): ErrorMessage[T1, T2] =
 		new ErrorMessage[T1, T2]:

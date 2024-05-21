@@ -26,6 +26,19 @@ trait BotExtension {
 	
 	extension (user: User) {
 		
+		/** Get this telegram [[User]]'s prefer language.
+		  * 
+		  * It will check the [[User.languageCode]] provided by Telegram API.
+		  * 
+		  * If a language code is provided, it will be [[LangTag.normalizeLangTag normalized]]
+		  * to [[LangTag]] and return.
+		  * 
+		  * If cannot find a language code associated with this [[User]], the empty string will
+		  * be return.
+		  * 
+		  * @return A [[LangTag.normalizeLangTag normalized]] [[LangTag]] that should be this
+		  *         [[User]]'s prefer language, or a empty string.
+		  */
 		def prefer_language: String =
 			user.languageCode match
 				case null => ""
