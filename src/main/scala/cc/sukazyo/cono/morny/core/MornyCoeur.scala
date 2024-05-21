@@ -367,7 +367,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	  * }}}
 	  */
 	object dsl extends BotExtension {
-		given coeur: MornyCoeur = MornyCoeur.this
 		given account: TelegramBot = MornyCoeur.this.account
 		given translations: MornyLangs = MornyCoeur.this.lang
 	}

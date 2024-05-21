@@ -13,6 +13,7 @@ object ServerModulesLoader {
 			morny.slash_action.ModuleSlashAction(),
 			morny.nbnhhsh.ModuleNbnhhsh(),
 			morny.ip186.ModuleIP186(),
+			morny.crons.ModuleCRONs(),
 			morny.encrypt_tool.ModuleEncryptor(),
 			morny.call_me.ModuleCallMe(),
 			morny.social_share.ModuleSocialShare(),
