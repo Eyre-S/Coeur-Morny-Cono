@@ -3,7 +3,7 @@ package cc.sukazyo.cono.morny.util.tgapi
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.*
+import com.pengrad.telegrambot.model.{Chat as TChat, ChatMember as TChatMember, File as TFile, Message as TMessage, MessageEntity as TMessageEntity, Update as TUpdate, User as TUser}
 import com.pengrad.telegrambot.request.{BaseRequest, GetChatMember}
 import com.pengrad.telegrambot.response.BaseResponse
 
@@ -54,43 +54,43 @@ object TelegramExtensions {
 		
 	}}
 	
-	object Update { extension (update: Update) {
+	object Update { extension (update: TUpdate) {
 		
-		/** Get the [[Chat]] that the update comes from.
+		/** Get the [[TChat]] that the update comes from.
 		  *
 		  * For the update types that is non-chat related, or the update types that framework does not
 		  * supported yet, this method will return [[None]].
 		  *
 		  * ### Supported Update Types
 		  *
-		  * Belows are the supported update types that will return a valid [[Chat]].
+		  * Belows are the supported update types that will return a valid [[TChat]].
 		  *
-		  *  - [[Update.message]]: Chat that the message belongs.
-		  *  - [[Update.editedMessage]]: Chat that the edited message belongs.
-		  *  - [[Update.channelPost]]: Chat that the channel post message belongs.
-		  *  - [[Update.editedChannelPost]]: Chat that the edited channel post message belongs.
-		  *  - [[Update.callbackQuery]]: Chat that the callback query's source message (a callback query
+		  *  - [[TUpdate.message]]: Chat that the message belongs.
+		  *  - [[TUpdate.editedMessage]]: Chat that the edited message belongs.
+		  *  - [[TUpdate.channelPost]]: Chat that the channel post message belongs.
+		  *  - [[TUpdate.editedChannelPost]]: Chat that the edited channel post message belongs.
+		  *  - [[TUpdate.callbackQuery]]: Chat that the callback query's source message (a callback query
 		  *    is triggered from a inline message button, that inline message is the source message) belongs.
-		  *  - [[Update.myChatMember]]: Chat that where member status of current bot changed there.
-		  *  - [[Update.chatMember]]: Chat that any one user's member status changed there.
-		  *  - [[Update.chatJoinRequest]]: Chat that the join request comes from.
+		  *  - [[TUpdate.myChatMember]]: Chat that where member status of current bot changed there.
+		  *  - [[TUpdate.chatMember]]: Chat that any one user's member status changed there.
+		  *  - [[TUpdate.chatJoinRequest]]: Chat that the join request comes from.
 		  *
 		  * Belows are the known update types that is not chat related, so there's only a [[None]] returned.
 		  *
-		  *  - [[Update.inlineQuery]]
-		  *  - [[Update.chosenInlineResult]]
-		  *  - [[Update.shippingQuery]]
-		  *  - [[Update.preCheckoutQuery]]
-		  *  - [[Update.poll]]
-		  *  - [[Update.pollAnswer]]
+		  *  - [[TUpdate.inlineQuery]]
+		  *  - [[TUpdate.chosenInlineResult]]
+		  *  - [[TUpdate.shippingQuery]]
+		  *  - [[TUpdate.preCheckoutQuery]]
+		  *  - [[TUpdate.poll]]
+		  *  - [[TUpdate.pollAnswer]]
 		  *
 		  * Supported up to Telegram Bot API 6.2
 		  *
-		  * @return An [[Option]] either contains a [[Chat]] that the update comes from, or [[None]] if there's
+		  * @return An [[Option]] either contains a [[TChat]] that the update comes from, or [[None]] if there's
 		  *         no user or update type is unsupported.
 		  * @since 2.0.0
 		  */
-		def sourceChat: Option[Chat] =
+		def sourceChat: Option[TChat] =
 			if      (update.message != null)            Some(update.message.chat)
 			else if (update.editedMessage != null)      Some(update.editedMessage.chat)
 			else if (update.channelPost != null)        Some(update.channelPost.chat)
@@ -107,42 +107,42 @@ object TelegramExtensions {
 			else if (update.chatJoinRequest != null)    Some(update.chatJoinRequest.chat)
 			else None
 		
-		/** Get the [[User]] that the update comes from.
+		/** Get the [[TUser]] that the update comes from.
 		  *
 		  * For the update types that is non-user related, or the update types that framework does not
 		  * supported yet, this method will return [[None]].
 		  *
-		  * ### Supported Update Types
+		  * ### Supported Update TypesT
 		  *
-		  * Belows are the supported update types that will return a valid [[User]].
+		  * Belows are the supported update types that will return a valid [[TUser]].
 		  *
-		  *  - [[Update.message]]: User that sent the message.
-		  *  - [[Update.editedMessage]]: User that sent the message. Notice that is the user who ORIGINAL
+		  *  - [[TUpdate.message]]: User that sent the message.
+		  *  - [[TUpdate.editedMessage]]: User that sent the message. Notice that is the user who ORIGINAL
 		  *    SENT the message but NOT EDITED the message due to the API limitation, while in current Bot
 		  *    API version (v7.0), editing other's message is not allowed so it should have no problem.
-		  *  - [[Update.inlineQuery]]: User that executing the inline query.
-		  *  - [[Update.chosenInlineResult]]: User that chosen the inline result of a inline query.
-		  *  - [[Update.callbackQuery]]: User that triggered the callback query.
-		  *  - [[Update.shippingQuery]]: User that sent the shipping query.
-		  *  - [[Update.preCheckoutQuery]]: User that sent the pre-checkout query.
-		  *  - [[Update.pollAnswer]]: User that answered a un-anonymous poll.
-		  *  - [[Update.myChatMember]]: Current bot that my member status changed.
-		  *  - [[Update.chatMember]]: User that their member status changed.
-		  *  - [[Update.chatJoinRequest]]: User that sent a join request.
+		  *  - [[TUpdate.inlineQuery]]: User that executing the inline query.
+		  *  - [[TUpdate.chosenInlineResult]]: User that chosen the inline result of a inline query.
+		  *  - [[TUpdate.callbackQuery]]: User that triggered the callback query.
+		  *  - [[TUpdate.shippingQuery]]: User that sent the shipping query.
+		  *  - [[TUpdate.preCheckoutQuery]]: User that sent the pre-checkout query.
+		  *  - [[TUpdate.pollAnswer]]: User that answered a un-anonymous poll.
+		  *  - [[TUpdate.myChatMember]]: Current bot that my member status changed.
+		  *  - [[TUpdate.chatMember]]: User that their member status changed.
+		  *  - [[TUpdate.chatJoinRequest]]: User that sent a join request.
 		  *
 		  * Belows are the known update types that is not user related, so there's only a [[None]] returned.
 		  *
-		  *  - [[Update.channelPost]]
-		  *  - [[Update.editedChannelPost]]
-		  *  - [[Update.poll]] <small>(odd, but it is no sender in the latest Bot API 7.0)</small>
+		  *  - [[TUpdate.channelPost]]
+		  *  - [[TUpdate.editedChannelPost]]
+		  *  - [[TUpdate.poll]] <small>(odd, but it is no sender in the latest Bot API 7.0)</small>
 		  *
 		  * Supported up to Telegram Bot API 6.2
 		  *
-		  * @return An [[Option]] either contains a [[User]] that the update comes from, or [[None]] if there's
+		  * @return An [[Option]] either contains a [[TUser]] that the update comes from, or [[None]] if there's
 		  *         no user or update type is unsupported.
 		  * @since 2.0.0
 		  */
-		def sourceUser: Option[User] =
+		def sourceUser: Option[TUser] =
 			if      (update.message != null)            Some(update.message.from)
 			else if (update.editedMessage != null)      Some(update.editedMessage.from)
 			else if (update.channelPost != null)        None
@@ -173,25 +173,25 @@ object TelegramExtensions {
 		  *
 		  * Belows are the supported update types that will return a valid time.
 		  *
-		  *  - [[Update.message]]: Time that the message is sent. Should be fixed and accurate.
-		  *  - [[Update.editedMessage]]: Time that the message is edited. Can be changed when the message is
+		  *  - [[TUpdate.message]]: Time that the message is sent. Should be fixed and accurate.
+		  *  - [[TUpdate.editedMessage]]: Time that the message is edited. Can be changed when the message is
 		  *    edited again, but should be the fixed editing time in the specific update.
-		  *  - [[Update.channelPost]]: Time that the channel post message is sent. Should be fixed and accurate.
-		  *  - [[Update.editedChannelPost]]: Time that the channel post message is edited. Same with
-		  *    [[Update.editedMessage]]
-		  *  - [[Update.myChatMember]]: Time that the member status of current bot changes done.
-		  *  - [[Update.chatMember]]: Time that one user's member status changes done.
-		  *  - [[Update.chatJoinRequest]]: Time that the join request is sent.
+		  *  - [[TUpdate.channelPost]]: Time that the channel post message is sent. Should be fixed and accurate.
+		  *  - [[TUpdate.editedChannelPost]]: Time that the channel post message is edited. Same with
+		  *    [[TUpdate.editedMessage]]
+		  *  - [[TUpdate.myChatMember]]: Time that the member status of current bot changes done.
+		  *  - [[TUpdate.chatMember]]: Time that one user's member status changes done.
+		  *  - [[TUpdate.chatJoinRequest]]: Time that the join request is sent.
 		  *
 		  * Belows have no any time information, so there's only a [[None]] returned.
 		  *
-		  *  - [[Update.inlineQuery]]
-		  *  - [[Update.chosenInlineResult]]
-		  *  - [[Update.callbackQuery]]
-		  *  - [[Update.shippingQuery]]
-		  *  - [[Update.preCheckoutQuery]]
-		  *  - [[Update.poll]]
-		  *  - [[Update.pollAnswer]]
+		  *  - [[TUpdate.inlineQuery]]
+		  *  - [[TUpdate.chosenInlineResult]]
+		  *  - [[TUpdate.callbackQuery]]
+		  *  - [[TUpdate.shippingQuery]]
+		  *  - [[TUpdate.preCheckoutQuery]]
+		  *  - [[TUpdate.poll]]
+		  *  - [[TUpdate.pollAnswer]]
 		  *
 		  * Supported up to Telegram Bot API 6.2
 		  *
@@ -218,32 +218,32 @@ object TelegramExtensions {
 		
 	}}
 	
-	object Chat { extension (chat: Chat) {
+	object Chat { extension (chat: TChat) {
 		
 		/** Check if a user is a member of this chat.
 		  *
 		  * It is equivalent to `memberHasPermission(user, ChatMember.Status.member)`.
 		  *
-		  * It checks if the user's member status is [[ChatMember.Status.member]], so if the member is in
-		  * this chat but they are been [[ChatMember.Status.restricted]], it will be treated as *not a member*.
+		  * It checks if the user's member status is [[TChatMember.Status.member]], so if the member is in
+		  * this chat but they are been [[TChatMember.Status.restricted]], it will be treated as *not a member*.
 		  * 
 		  * It needs to execute a request getting chat member, so it requires a live [[TelegramBot]] instance,
 		  * and the bot needs to be a member of this chat so that it can read the chat member.
 		  *
-		  * This method will only use the [[Chat]]'s [[Chat.id]], so it is safe to call on a [[LimboChat]].
+		  * This method will only use the [[TChat]]'s [[TChat.id]], so it is safe to call on a [[LimboChat]].
 		  *
 		  * **Notice:** This method will execute a request to the Telegram Bot API, so it may be slow.
 		  *
 		  * @see [[memberHasPermission]]
 		  *
-		  * @param user The user that want to check if they are a member of this chat.Only its [[User.id]] will
+		  * @param user The user that want to check if they are a member of this chat.Only its [[TUser.id]] will
 		  *             be used so it is safe using a [[LimboUser]].
 		  * @return [[true]] when the user is a member of this chat, [[false]] otherwise.
 		  *
 		  * @since 1.0.0
 		  */
-		def hasMember (user: User) (using TelegramBot): Boolean =
-			memberHasPermission(user, ChatMember.Status.member)
+		def hasMember (user: TUser) (using TelegramBot): Boolean =
+			memberHasPermission(user, TChatMember.Status.member)
 		
 		/** Check if a user has a permission level in this chat.
 		  * 
@@ -261,20 +261,20 @@ object TelegramExtensions {
 		  * | [[ChatMember.Status.left]] | -3 |
 		  * | [[ChatMember.Status.kicked]] | -5 |
 		  *
-		  * This method will only use the [[Chat]]'s [[Chat.id]], so it is safe to call on a [[LimboChat]].
+		  * This method will only use the [[TChat]]'s [[TChat.id]], so it is safe to call on a [[LimboChat]].
 		  *
 		  * **Notice:** This method will execute a request to the Telegram Bot API, so it may be slow.
 		  *
 		  * @since 1.0.0
 		  *
-		  * @param user The user that wanted to check if they have the permission. Only its [[User.id]] will
+		  * @param user The user that wanted to check if they have the permission. Only its [[TUser.id]] will
 		  *             be used so it is safe using a [[LimboUser]].
 		  * @param permission The required permission level.
 		  * @param bot A live [[TelegramBot]] that will be used to execute the getChatMember request. It
 		  *            should be a member of this chat so that can read the chat member for this method works.
 		  * @return [[true]] if the user have the permission or higher permission, [[false]] otherwise.
 		  */
-		def memberHasPermission (user: User, permission: ChatMember.Status) (using bot: TelegramBot): Boolean = {
+		def memberHasPermission (user: TUser, permission: TChatMember.Status) (using bot: TelegramBot): Boolean = {
 			
 			//noinspection ScalaUnusedSymbol
 			enum UserPermissionLevel(val level: Int):
@@ -287,28 +287,46 @@ object TelegramExtensions {
 				@targetName("equalOrGreaterThan")
 				def >= (another: UserPermissionLevel): Boolean = this.level >= another.level
 			object UserPermissionLevel:
-				def apply(status: ChatMember.Status): UserPermissionLevel =
+				def apply(status: TChatMember.Status): UserPermissionLevel =
 					status match
-						case ChatMember.Status.creator => CREATOR
-						case ChatMember.Status.administrator => ADMINISTRATOR
-						case ChatMember.Status.member => MEMBER
-						case ChatMember.Status.restricted => RESTRICTED
-						case ChatMember.Status.left => LEFT
-						case ChatMember.Status.kicked => KICKED
-				def apply (chatMember: ChatMember): UserPermissionLevel = apply(chatMember.status)
+						case TChatMember.Status.creator => CREATOR
+						case TChatMember.Status.administrator => ADMINISTRATOR
+						case TChatMember.Status.member => MEMBER
+						case TChatMember.Status.restricted => RESTRICTED
+						case TChatMember.Status.left => LEFT
+						case TChatMember.Status.kicked => KICKED
+				def apply (chatMember: TChatMember): UserPermissionLevel = apply(chatMember.status)
 			
 			import Requests.execute
-			val chatMember: ChatMember = GetChatMember(chat.id, user.id).execute(using bot).chatMember
+			val chatMember: TChatMember = GetChatMember(chat.id, user.id).execute(using bot).chatMember
 			if chatMember eq null then false
 			else UserPermissionLevel(chatMember) >= UserPermissionLevel(permission)
 			
 		}
 		
+		/** If this [[TChat.Type]] is of the type specific.
+		  * 
+		  * @since 2.0.0
+		  * 
+		  * @return `true` if this [[TChat.type]] IS of the type. `false` otherwise.
+		  */
+		infix def ofType (ty: TChat.Type): Boolean =
+			chat.`type` == ty
+		
+		/** If this [[TChat.Type]] is not of the type specific.
+		  * 
+		  * @since 2.0.0
+		  *
+		  * @return `true` if this [[TChat.type]] IS NOT of the type specific. `false` otherwise.
+		  */
+		infix def notOfType (ty: TChat.Type): Boolean =
+			chat.`type` != ty
+		
 	}}
 	
-	object Message { extension (self: Message) {
+	object Message { extension (self: TMessage) {
 		
-		def entitiesSafe: List[MessageEntity] =
+		def entitiesSafe: List[TMessageEntity] =
 			if self.entities == null then Nil else
 				self.entities.toList
 		
@@ -318,7 +336,7 @@ object TelegramExtensions {
 		
 	}}
 	
-	object File { extension (self: File) {
+	object File { extension (self: TFile) {
 		
 		/** Alias of [[TelegramBot.getFileContent]] */
 		@throws[IOException]
@@ -356,28 +374,28 @@ object TelegramExtensions {
 			bot.execute(self)
 	}}
 	
-	/** A [[User]] instance with only a [[User.id]] is defined.
+	/** A [[TUser]] instance with only a [[TUser.id]] is defined.
 	  *
-	  * This is only for capabilities that some method need a [[User]] but only need its [[User.id]]. If
-	  * you don't have a [[User]] instance for some reason, you can use this instead.
-	  *
-	  * Many methods may crashes on this class for this is highly mutilated. Use this only the method declares
-	  * that using this is safe.
-	  *
-	  * @since 1.0.0
-	  */
-	class LimboUser (id: Long) extends User(id)
-	/** A [[Chat]] instance with only a [[Chat.id]] is defined.
-	  *
-	  * This is only for capabilities that some method need a [[Chat]] but only need its [[Chat.id]]. If
-	  * you don't have a [[Chat]] instance for some reason, you can use this instead.
+	  * This is only for capabilities that some method need a [[TUser]] but only need its [[TUser.id]]. If
+	  * you don't have a [[TUser]] instance for some reason, you can use this instead.
 	  *
 	  * Many methods may crashes on this class for this is highly mutilated. Use this only the method declares
 	  * that using this is safe.
 	  *
 	  * @since 1.0.0
 	  */
-	class LimboChat (val _id: Long) extends Chat() {
+	class LimboUser (id: Long) extends TUser(id)
+	/** A [[TChat]] instance with only a [[TChat.id]] is defined.
+	  *
+	  * This is only for capabilities that some method need a [[TChat]] but only need its [[TChat.id]]. If
+	  * you don't have a [[TChat]] instance for some reason, you can use this instead.
+	  *
+	  * Many methods may crashes on this class for this is highly mutilated. Use this only the method declares
+	  * that using this is safe.
+	  *
+	  * @since 1.0.0
+	  */
+	class LimboChat (val _id: Long) extends TChat() {
 		override val id: java.lang.Long = _id
 	}
  

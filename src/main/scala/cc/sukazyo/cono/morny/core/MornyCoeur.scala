@@ -194,12 +194,16 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		_httpServerContext,
 		initializeContext)))
 	
-	// register core/api events
-	eventManager register MornyOnUpdateTimestampOffsetLock()
-	eventManager register MornyOnTelegramCommand(using commands)
-	eventManager register MornyOnInlineQuery(using queries)
-	eventManager register _messageThreading.NextMessageCatcher
-	{ // register core commands
+	{
+		
+		// register core/api events
+		eventManager register MornyOnUpdateTimestampOffsetLock()
+		eventManager register MornyOnTelegramCommand(using commands)
+		eventManager register MornyOnInlineQuery(using queries)
+		eventManager register _messageThreading.NextMessageCatcher
+		
+		// register core commands
+		
 		import bot.command.*
 		val $MornyHellos = MornyHellos()
 		val $MornyInformation = MornyInformation()
@@ -223,10 +227,15 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			errorMessageManager.ShowErrorMessageCommand,
 			
 		)
+		
+		// register core utils events
+		eventManager register $MornyHellos.PrivateChat_O
+		
+		// register core http api service
+		import cc.sukazyo.cono.morny.core.http.services as http_srv
+		_httpServerContext register4API http_srv.Ping()
+		
 	}
-	// register core http api service
-	import cc.sukazyo.cono.morny.core.http.services as http_srv
-	_httpServerContext register4API http_srv.Ping()
 	
 	// Coeur Initializing Event
 	modules.foreach(it => it.onInitializing(OnInitializingContext(
