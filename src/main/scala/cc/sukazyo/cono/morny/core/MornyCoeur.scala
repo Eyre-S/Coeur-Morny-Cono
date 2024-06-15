@@ -187,7 +187,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	private var _httpServerContext: MornyHttpServerContext = MornyHttpServerContextImpl()
 	
 	// Coeur Initializing Pre Event
-	modules.foreach(it => it.onInitializingPre(OnInitializingPreContext(
+	tryCallModulesEvent("onInitializingPre", _.onInitializingPre(OnInitializingPreContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
@@ -238,7 +238,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	}
 	
 	// Coeur Initializing Event
-	modules.foreach(it => it.onInitializing(OnInitializingContext(
+	tryCallModulesEvent("onInitializing", _.onInitializing(OnInitializingContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
@@ -255,7 +255,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	initializeContext / this << watchDog
 	
 	// Coeur Initializing Post Event
-	modules.foreach(it => it.onInitializingPost(OnInitializingPostContext(
+	tryCallModulesEvent("onInitializingPost", _.onInitializingPost(OnInitializingPostContext(
 		externalContext,
 		coeurStartTimestamp, account, username, userid, tasks, trusted,
 		eventManager, commands, queries,
@@ -273,7 +273,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	configure_exitCleanup()
 	
 	// Coeur Starting Event
-	modules.foreach(it => it.onStarting(OnStartingContext(
+	tryCallModulesEvent("onStarting", _.onStarting(OnStartingContext(
 		initializeContext)))
 	
 	logger `info` "start http server"
@@ -328,7 +328,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	})
 	
 	// Coeur Starting Post Event
-	modules.foreach(it => it.onStartingPost(OnStartingPostContext(
+	tryCallModulesEvent("onStartingPost", _.onStartingPost(OnStartingPostContext(
 		initializeContext)))
 	
 	if config.commandLoginRefresh then
@@ -381,7 +381,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	}
 	
 	def saveDataAll(): Unit = {
-		modules.foreach(it => it.onRoutineSavingData)
+		tryCallModulesEvent("onRoutineSaveData", _.onRoutineSavingData)
 		logger `notice` "done all save action."
 	}
 	
@@ -394,7 +394,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	private def exitCleanup (): Unit = {
 		
 		// Morny Exiting
-		modules.foreach(it => it.onExiting)
+		tryCallModulesEvent("onExiting", _.onExiting)
 		
 		account.removeGetUpdatesListener()
 		logger `info` "stopped bot update listener"
@@ -404,12 +404,12 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		// Morny Exiting Post
 		if config.commandLogoutClear then
 			commands.automaticTGListRemove()
-		modules.foreach(it => it.onExitingPost)
+		tryCallModulesEvent("onExitingPost", _.onExitingPost)
 		
 		account.shutdown()
 		logger `info` "stopped bot account"
 		// Morny Exited
-		modules.foreach(it => it.onExited)
+		tryCallModulesEvent("onExited", _.onExited)
 		logger `info` "done exit cleanup\nMorny will EXIT now"
 		
 	}
@@ -423,6 +423,15 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		System `exit` status
 	
 	private case class LoginResult(account: TelegramBot, username: String, userid: Long)
+	
+	private def tryCallModulesEvent (eventName: String, calls: MornyModule=>Unit): Unit =
+		modules.foreach { mod =>
+			try { calls(mod) }
+			catch case e: Exception =>
+				logger `error`
+					s"""Morny Coeur Lifecycle Event `$eventName` execution failed on module ${mod.id}
+					   |${e.toLogString}""".stripMargin
+		}
 	
 	private def login (skip_login: Boolean = false): Option[LoginResult] = {
 		

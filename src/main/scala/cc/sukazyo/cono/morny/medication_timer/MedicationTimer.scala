@@ -32,6 +32,7 @@ class MedicationTimer (using coeur: MornyCoeur) {
 	
 	private var lastNotify_messageId: Option[Int] = None
 	
+	private var isScheduleTaskRegistered = false
 	private val scheduleTask: RoutineTask = new RoutineTask {
 		
 		override def name: String = DAEMON_THREAD_NAME_DEF
@@ -59,11 +60,15 @@ class MedicationTimer (using coeur: MornyCoeur) {
 			logger `notice` "Medication Timer disabled : related param is not complete set"
 			return;
 		coeur.tasks ++ scheduleTask
+		isScheduleTaskRegistered = true
 		logger `notice` "Medication Timer started."
 	
 	def stop(): Unit =
-		coeur.tasks % scheduleTask
-		logger `notice` "Medication Timer stopped."
+		if isScheduleTaskRegistered then
+			coeur.tasks % scheduleTask
+			logger `notice` "Medication Timer stopped."
+		else
+			logger `notice` "Medication Timer have not run, skipped stop it."
 	
 	private def sendNotification(): Unit = {
 		val sendResponse: SendResponse = SendMessage(notify_toChat, NOTIFY_MESSAGE).unsafeExecute
@@ -82,7 +87,7 @@ class MedicationTimer (using coeur: MornyCoeur) {
 			notify_toChat,
 			edited.messageId,
 			edited.text + s"\n-- $editTime --"
-		).entities((entities toArray)*).unsafeExecute
+		).entities(entities.toArray*).unsafeExecute
 		lastNotify_messageId = None
 		true
 	}

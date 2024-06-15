@@ -5,7 +5,7 @@
     </option>
     <option name="MAIN_CLASS_NAME" value="cc.sukazyo.cono.morny.core.ServerMain" />
     <module name="Coeur Morny Cono" />
-    <option name="PROGRAM_PARAMETERS" value="--quiet --debug --username sukazyo_deving_bot --master 793274677 --trusted-chat -1 --outdated-block --trusted-reader-dinner 1040613596 -medc 793274677 -medt 0,2,18,19 -medtz 8 --dinner-chat -1001670950261" />
+    <option name="PROGRAM_PARAMETERS" value="--quiet --debug --username sukazyo_deving_bot --master 793274677 --trusted-chat -1 --outdated-ignore --trusted-reader-dinner 1040613596 -medc 793274677 -medtz 8 --dinner-chat -1001670950261" />
     <option name="VM_PARAMETERS" value="-Djava.net.useSystemProxies=true" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/run" />
     <extension name="coverage">
