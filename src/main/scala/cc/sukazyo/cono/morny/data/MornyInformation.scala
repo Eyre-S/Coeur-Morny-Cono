@@ -38,8 +38,9 @@ object MornyInformation {
 	
 	def getMornyAboutLinksHTML: String =
 		s"""<a href='${MornyAbout MORNY_SOURCECODE_LINK}'>source code</a> | <a href='${MornyAbout MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
-		   |<a href='${MornyAbout MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
-		   |<a href='${MornyAbout MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>"""
+		   |<a href='${MornyAbout MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>
+		   |<a href='${MornyAbout.MORNY_SOCIAL_MEDIA_LINK}'>情报频道 / fediverse</a>
+		   |<a href='${MornyAbout MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>"""
 			.stripMargin
 	
 }

@@ -13,5 +13,6 @@ object MornyAbout {
 	val MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK = "https://storage.sukazyo.cc/Eyre_S/Coeur-Morny-Cono"
 	val MORNY_ISSUE_TRACKER_LINK = "https://github.com/Eyre-S/Coeur-Morny-Cono/issues"
 	val MORNY_USER_GUIDE_LINK = "https://book.sukazyo.cc/morny"
+	val MORNY_SOCIAL_MEDIA_LINK = "https://a.sukazyo.cc/@morny"
 	
 }
