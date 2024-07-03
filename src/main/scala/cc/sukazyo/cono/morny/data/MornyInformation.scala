@@ -37,7 +37,7 @@ object MornyInformation {
 		catch case _: UnknownHostException => None
 	}
 	
-	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT get
+	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT.get
 	
 	def getMornyAboutLinksVars: List[Var] =
 		List(

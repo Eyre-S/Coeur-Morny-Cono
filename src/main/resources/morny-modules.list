@@ -1,0 +1,14 @@
+cc.sukazyo.cono.morny.tele_utils.ModuleTeleUtils
+cc.sukazyo.cono.morny.randomize_somthing.ModuleRandomize
+cc.sukazyo.cono.morny.slash_action.ModuleSlashAction
+cc.sukazyo.cono.morny.nbnhhsh.ModuleNbnhhsh
+cc.sukazyo.cono.morny.ip186.ModuleIP186
+cc.sukazyo.cono.morny.crons.ModuleCRONs
+cc.sukazyo.cono.morny.encrypt_tool.ModuleEncryptor
+cc.sukazyo.cono.morny.call_me.ModuleCallMe
+cc.sukazyo.cono.morny.social_share.ModuleSocialShare
+cc.sukazyo.cono.morny.medication_timer.ModuleMedicationTimer
+cc.sukazyo.cono.morny.morny_misc.ModuleMornyMisc
+cc.sukazyo.cono.morny.uni_meow.ModuleUniMeow
+cc.sukazyo.cono.morny.reporter.Module
+cc.sukazyo.cono.morny.stickers_get.Module

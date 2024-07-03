@@ -1,7 +1,8 @@
 package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.core.MornyConfig.CheckFailure
+import cc.sukazyo.cono.morny.core.MornyConfig.{CheckFailure, PROP_TOKEN_KEY}
+import cc.sukazyo.cono.morny.core.module.{ModuleHelper, ModuleLoader}
 import cc.sukazyo.cono.morny.util.CommonFormat
 
 import java.time.ZoneOffset
@@ -19,6 +20,7 @@ object ServerMain {
 		
 		val config = new MornyConfig.Prototype()
 		var mode_echoVersion = false
+		var mode_echoModules = false
 		var mode_echoHello = false
 		var mode_testRun = false
 		var showHello = true
@@ -45,6 +47,7 @@ object ServerMain {
 				case "--no-hello" | "-hf" | "--quiet" | "-q" => showHello = false
 				case "--only-hello" | "-ho" | "-o" | "-hi" => mode_echoHello = true
 				case "--version" | "-v" => mode_echoVersion = true
+				case "--modules" | "-mod" => mode_echoModules = true
 				
 				// deprecated: use --outdated-ignore instead
 //				case "--outdated-block" | "-ob" =>
@@ -167,6 +170,8 @@ object ServerMain {
 				s"""The Skip Login feature is not implemented yet!
 				   |""".stripMargin
 		
+		val loadedModules = ModuleLoader.loadCoreModules()
+		
 		if (mode_echoVersion) {
 			
 			logger `info`
@@ -195,9 +200,17 @@ object ServerMain {
 				   |    ${MornySystem.CODE_TIMESTAMP}
 				   |    ${CommonFormat.formatDate(MornySystem.CODE_TIMESTAMP, 0)} [UTC]"""
 					.stripMargin
-			return
 			
 		}
+		
+		if (mode_echoModules) {
+			
+			logger `info` s"Loaded modules ::: \n${ModuleHelper.drawTable(loadedModules)}"
+			
+		}
+		
+		if mode_echoVersion | mode_echoModules then
+			return
 		
 		logger `info`
 			s"""ServerMain.java Loaded >>>
@@ -222,7 +235,7 @@ object ServerMain {
 		
 		try
 			MornyCoeur(
-				ServerModulesLoader.load()
+				loadedModules
 			)(using config build)(
 				testRun = mode_testRun
 			)

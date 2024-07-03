@@ -22,8 +22,8 @@ object MornyLangs {
 			
 			val (lang_dir, lang_index_content) = try {
 				(
-					MornyAssets.pack.getResDir("langs"),
-					MornyAssets.pack.getResource("langs/_index.hyl").readAsString()
+					MornyAssets.assets.getDirectory("langs"),
+					MornyAssets.assets.getFile("langs/_index.hyl").readString
 				)
 			} catch case e: IOException =>
 				throw Exception("Cannot read Morny's translations file.", e)
@@ -37,11 +37,10 @@ object MornyLangs {
 			
 			val language_translations = mutable.HashMap.empty[String, Definitions]
 			
-			for (file <- lang_dir.listFiles().filter(_.isFile)) yield {
+			for (file <- lang_dir.listFiles()) yield {
 				boundary {
-					import file.getPath as raw_path
-					if !(raw_path.endsWith(".hyt") || raw_path.endsWith(".hytrans")) then break()
-					val file_name = file.getPath.reverse.takeWhile(c => (c != '/') && (c != '\\')).reverse
+					val file_name = file.getPath.last
+					if !(file_name.endsWith(".hyt") || file_name.endsWith(".hytrans")) then break()
 					val file_basename = file_name.dropRight(
 						if file_name.endsWith(".hyt") then ".hyt".length
 						else ".hytrans".length
@@ -51,7 +50,7 @@ object MornyLangs {
 						logger `warn` s"translation file \"$file_name\" is not in language index, so it got ignored (normalized lang name is \"$normalized\")."
 						break()
 					val lang_def = try {
-						val content = file.readAsString()
+						val content = file.readString
 						Parser.parse(content)
 					} catch case e: IOException =>
 						logger `error`

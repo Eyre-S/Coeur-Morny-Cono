@@ -7,7 +7,7 @@ import java.io.IOException
 object MornyAbout {
 	
 	val MORNY_PREVIEW_IMAGE_ASCII: String =
-		try { MornyAssets.pack `getResource` "texts/server-hello.txt" readAsString }
+		try { MornyAssets.assets.getFile("texts/server-hello.txt").readString }
 		catch case e: IOException =>
 			throw RuntimeException("Cannot read MORNY_PREVIEW_IMAGE_ASCII from assets pack", e)
 	

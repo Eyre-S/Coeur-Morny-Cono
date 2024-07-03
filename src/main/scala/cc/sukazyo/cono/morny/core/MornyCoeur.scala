@@ -8,6 +8,7 @@ import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegram
 import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
+import cc.sukazyo.cono.morny.core.module.ModuleHelper
 import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
@@ -15,6 +16,7 @@ import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.GivenContext
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
+import cc.sukazyo.cono.morny.util.dataview.Table
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -118,13 +120,9 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	given MornyCoeur = this
 	
 	val externalContext: GivenContext = GivenContext()
-	import cc.sukazyo.cono.morny.util.dataview.Table.format as fmtTable
 	logger `info`
 		m"""The following Modules have been added to current Morny:
-		   |${fmtTable(
-			"Module ID" :: "Module Name" :: "Module Version" :: Nil,
-			modules.map(f => f.id :: f.name :: f.version :: Nil)*
-		)}
+		   |${ModuleHelper.drawTable(modules)}
 		   |"""
 	
 	///>>> BLOCK START local storage / data configuration

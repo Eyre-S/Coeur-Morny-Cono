@@ -83,7 +83,7 @@ class CommonEncryptTest extends MornyTests with TableDrivenPropertyChecks {
 				if file == null then
 					Array.empty[Byte]
 				else
-					assets.getResource(file).read.readAllBytes
+					assets.getFile(file).read.readAllBytes
 			
 			s"while hashing binary $_name :" - {
 				
