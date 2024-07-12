@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Morny CLI [pr]" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="cc.sukazyo.cono.morny.MornyCLI" />
-    <module name="Coeur Morny Cono" />
+    <module name="root.Coeur Morny Cono" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/run" />
     <extension name="coverage">
       <pattern>

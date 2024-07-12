@@ -24,10 +24,9 @@ object MornyProject {
 	
 	// todo: git status log
 	
-	val app_group = "cc.sukazyo"
-	val app_package = s"$app_group.cono.morny"
-	val app_archive_name = MornyConfiguration.MORNY_ARCHIVE_NAME
-	val app_application_main = s"$app_package.core.ServerMain"
+//	val app_group = "cc.sukazyo"
+//	val app_package = s"$app_group.cono.morny"
+//	val app_application_main = s"$app_package.core.ServerMain"
 	
 	val version_base = MornyConfiguration.VERSION
 	val version_delta = MornyConfiguration.VERSION_DELTA
@@ -42,12 +41,16 @@ object MornyProject {
 	val version_codename = MornyConfiguration.CODENAME
 	def code_time = if (git_is_clean) git_commit_time else System.currentTimeMillis
 	
-	val dependencies = MornyConfiguration.dependencies
+	val group = MornyConfiguration.GROUP
+	val group_name = MornyConfiguration.GROUP_NAME
 	
 	val publishWithFatJar = !version_is_snapshot
 	def publishTo = MornyConfiguration.publishTo
 	val publishCredentials = MornyConfiguration.publishCredentials
 	
 	val source_encoding = "utf-8"
+	
+	val morny_system_lib = MornyConfiguration.Morny_System_Library
+	val morny_coeur = MornyConfiguration.Morny_Coeur
 	
 }

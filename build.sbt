@@ -1,37 +1,79 @@
 aether.AetherKeys.aetherOldVersionMethod := true
 
-ThisBuild / organization := "cc.sukazyo"
-ThisBuild / organizationName := "A.C. Sukazyo Eyre"
+ThisBuild / organization := MornyProject.group
+ThisBuild / organizationName := MornyProject.group_name
+
+ThisBuild / version := MornyProject.version
 
 ThisBuild / scalaVersion := "3.4.1"
 
-resolvers ++= Seq(
+ThisBuild / resolvers ++= Seq(
 		"-ws-releases" at "https://mvn.sukazyo.cc/releases"
 )
 
-lazy val root = (project in file("."))
+ThisBuild / crossPaths := false
+
+ThisBuild / Compile / packageDoc / publishArtifact := false
+artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
+	val classifier = artifact.classifier match {
+		case Some(value) => s"-$value"
+		case None => ""
+	}
+	s"${module.name}-${module.revision}$classifier.${artifact.extension}"
+}
+
+ThisBuild / scalacOptions ++= Seq(
+	"-language:postfixOps",
+	"-encoding", MornyProject.source_encoding
+)
+ThisBuild / javacOptions ++= Seq(
+	"-encoding", MornyProject.source_encoding,
+	"-source", "17",
+	"-target", "17"
+)
+ThisBuild / autoAPIMappings := true
+ThisBuild / apiMappings ++= {
+	def mappingsFor(organization: String, names: List[String], location: String, revision: String => String = identity): Seq[(File, URL)] =
+		for {
+			entry: Attributed[File] <- (Compile / fullClasspath).value
+			module: ModuleID <- entry.get(moduleID.key)
+			if module.organization == organization
+			if names.exists(module.name.startsWith)
+		} yield entry.data -> url(location.format(revision(module.revision)))
+	val mappings: Seq[(File, URL)] = Seq(
+		mappingsFor("org.scala-lang", List("scala-library"), "https://scala-lang.org/api/%s/"),
+		mappingsFor("com.github.pengrad", "java-telegram-bot-api"::Nil, "https://jitpack.io/com/github/pengrad/java-telegram-bot-api/6.3.0/javadoc/"),
+	).flatten
+	mappings.toMap
+}
+
+ThisBuild / publishTo := MornyProject.publishTo
+ThisBuild / credentials ++= MornyProject.publishCredentials
+
+lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
 		.enablePlugins(BuildInfoPlugin)
 		.settings(
 			
-			name := "Coeur Morny Cono",
-			version := MornyProject.version,
+			name := MornyProject.morny_system_lib.name,
+			moduleName := MornyProject.morny_system_lib.id,
 			
-			crossPaths := false,
-			moduleName := MornyProject.app_archive_name,
-			Compile / packageDoc / publishArtifact := false,
-			artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-				val classifier = artifact.classifier match {
-					case Some(value) => s"-$value"
-					case None => ""
-				}
-				s"${module.name}-${MornyProject.version_full}$classifier.${artifact.extension}"
-			},
+			libraryDependencies ++= MornyProject.morny_system_lib.dependencies,
 			
-			Compile / mainClass := Some(MornyProject.app_application_main),
+		)
+
+lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
+		.enablePlugins(BuildInfoPlugin)
+		.dependsOn(morny_system_lib)
+		.settings(
 			
-			libraryDependencies ++= MornyProject.dependencies,
+			name := MornyProject.morny_coeur.name,
+			moduleName := MornyProject.morny_coeur.id,
 			
-			buildInfoPackage := MornyProject.app_package,
+			Compile / mainClass := Some(MornyProject.morny_coeur.main_class),
+			
+			libraryDependencies ++= MornyProject.morny_coeur.dependencies,
+			
+			buildInfoPackage := MornyProject.morny_coeur.root_package,
 			buildInfoObject := "BuildConfig",
 			buildInfoKeys ++= Seq(
 				BuildInfoKey[String]("VERSION", MornyProject.version),
@@ -45,31 +87,6 @@ lazy val root = (project in file("."))
 				BuildInfoKey[String]("CODE_STORE", MornyProject.git_store),
 				BuildInfoKey[String]("COMMIT_PATH", MornyProject.git_store_path),
 			),
-			
-			scalacOptions ++= Seq(
-				"-language:postfixOps",
-				"-encoding", MornyProject.source_encoding
-			),
-			javacOptions ++= Seq(
-				"-encoding", MornyProject.source_encoding,
-				"-source", "17",
-				"-target", "17"
-			),
-			autoAPIMappings := true,
-			apiMappings ++= {
-				def mappingsFor(organization: String, names: List[String], location: String, revision: String => String = identity): Seq[(File, URL)] =
-					for {
-						entry: Attributed[File] <- (Compile / fullClasspath).value
-						module: ModuleID <- entry.get(moduleID.key)
-						if module.organization == organization
-						if names.exists(module.name.startsWith)
-					} yield entry.data -> url(location.format(revision(module.revision)))
-				val mappings: Seq[(File, URL)] = Seq(
-					mappingsFor("org.scala-lang", List("scala-library"), "https://scala-lang.org/api/%s/"),
-					mappingsFor("com.github.pengrad", "java-telegram-bot-api"::Nil, "https://jitpack.io/com/github/pengrad/java-telegram-bot-api/6.3.0/javadoc/"),
-				).flatten
-				mappings.toMap
-			},
 			
 			assemblyMergeStrategy := {
 				case module if module endsWith "module-info.class" => MergeStrategy.concat
@@ -88,11 +105,11 @@ lazy val root = (project in file("."))
 				assembly / assemblyJarName := {
 					sLog.value info "environment DOCKER_BUILD checked"
 					sLog.value info "assembly will output for docker build (morny-coeur-docker-build.jar)"
-					"morny-coeur-docker-build.jar"
+					s"${MornyProject.morny_coeur.id}-docker-build.jar"
 				}
 			} else Nil,
 			
-			publishTo := MornyProject.publishTo,
-			credentials ++= MornyProject.publishCredentials,
-			
 		)
+
+lazy val root = (project in file ("."))
+		.aggregate(morny_system_lib, morny_coeur)

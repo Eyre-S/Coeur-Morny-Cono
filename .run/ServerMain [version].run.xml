@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="ServerMain [version]" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="cc.sukazyo.cono.morny.core.ServerMain" />
-    <module name="Coeur Morny Cono" />
+    <module name="root.Coeur Morny Cono" />
     <option name="PROGRAM_PARAMETERS" value="--version" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/run" />
     <extension name="coverage">
