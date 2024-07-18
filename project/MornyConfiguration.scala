@@ -43,7 +43,7 @@ object MornyConfiguration {
 			"com.github.spotbugs" % "spotbugs-annotations" % "4.8.4" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "resource-tools" % "0.3.0",
+			"cc.sukazyo" % "resource-tools" % "0.3.1",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			
@@ -70,14 +70,14 @@ object MornyConfiguration {
 		
 		override val group = GROUP
 		override val root_package = s"$GROUP.cono.morny"
-		override val main_class = s"${this.root_package}.ServerMain"
+		override val main_class = s"${this.root_package}.core.ServerMain"
 		
 		override val dependencies = Seq(
 			
 			"com.github.spotbugs" % "spotbugs-annotations" % "4.8.4" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "resource-tools" % "0.3.0",
+			"cc.sukazyo" % "resource-tools" % "0.3.1",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			"org.http4s" %% "http4s-dsl" % "0.23.27",

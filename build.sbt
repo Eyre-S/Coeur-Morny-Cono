@@ -113,3 +113,12 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 
 lazy val root = (project in file ("."))
 		.aggregate(morny_system_lib, morny_coeur)
+		.settings(
+			assembly / aggregate := false,
+			assembly := {
+				(morny_coeur / assembly).value
+			},
+			run := {
+				(morny_coeur / Compile / run).evaluated
+			}
+		)
