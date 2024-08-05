@@ -1,7 +1,7 @@
 package cc.sukazyo.cono.morny.util
 
 import cc.sukazyo.cono.morny.MornySystem
-import sttp.client3.basicRequest
+import sttp.client3.{basicRequest, RequestT}
 import sttp.model.Header
 
 object SttpPublic {
@@ -23,7 +23,7 @@ object SttpPublic {
 		
 	}
 	
-	val mornyBasicRequest =
+	val mornyBasicRequest: RequestT[sttp.client3.Empty, Either[String, String], Any] =
 		basicRequest
 			.header(Headers.UserAgent.MORNY_CURRENT, true)
 	

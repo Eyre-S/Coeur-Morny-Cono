@@ -13,6 +13,7 @@ class MornyQueries (using MornyCoeur) {
 		MyInformation(),
 		ShareToolTwitter(),
 		ShareToolBilibili(),
+		ShareToolXhs(),
 		ShareToolSocialContent()
 	)
 	
