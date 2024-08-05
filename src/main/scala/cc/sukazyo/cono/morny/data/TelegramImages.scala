@@ -22,7 +22,7 @@ object TelegramImages {
 		
 		@throws[AssetsException]
 		private def read (): Unit = {
-			Using ((MornyAssets.pack getResource assetsPath)read) { stream =>
+			Using (MornyAssets.pack getFile assetsPath read) { stream =>
 				try { this.cache = Some(stream.readAllBytes()) }
 				catch case e: IOException => {
 					throw AssetsException(e)
