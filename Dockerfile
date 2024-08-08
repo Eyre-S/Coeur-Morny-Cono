@@ -8,7 +8,7 @@ ARG DOCKER_BUILD=yes
 RUN cd ./source \
 &&  sbt assembly \
 &&  cd .. \
-&&  cp ./source/target/morny-coeur-docker-build.jar ./morny-coeur.jar
+&&  cp ./source/morny-coeur/target/morny-coeur-docker-build.jar ./morny-coeur.jar
 #&&  rm -r ./source \
 #&&  rm -r /root/.gradle \
 

@@ -13,7 +13,10 @@ ThisBuild / resolvers ++= Seq(
 
 ThisBuild / crossPaths := false
 
-ThisBuild / Compile / packageDoc / publishArtifact := false
+if (!MornyProject.publishWithDocJar) {
+	(ThisBuild / packageDoc / publishArtifact := false) :: Nil
+} else Nil
+
 artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
 	val classifier = artifact.classifier match {
 		case Some(value) => s"-$value"
@@ -49,6 +52,7 @@ ThisBuild / apiMappings ++= {
 
 ThisBuild / publishTo := MornyProject.publishTo
 ThisBuild / credentials ++= MornyProject.publishCredentials
+
 
 lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
 		.settings(
@@ -110,6 +114,10 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 			
 		)
 
+lazy val dockerImageName: SettingKey[String] = settingKey[String]("Docker image name that want to built")
+lazy val dockerImageTag: SettingKey[String] = settingKey[String]("Docker image tag or aka image version of the built image")
+lazy val dockerBuild: TaskKey[Unit] = taskKey("Build using system docker with current version as the container tag")
+
 lazy val root = (project in file ("."))
 		.aggregate(morny_system_lib, morny_coeur)
 		.settings(
@@ -126,6 +134,24 @@ lazy val root = (project in file ("."))
 			run / aggregate := false,
 			run := {
 				(morny_coeur / Compile / run).evaluated
+			},
+			
+			dockerImageName := MornyProject.docker_image_name,
+			dockerImageTag := version.value,
+			dockerBuild := {
+				
+				val builtImageName = dockerImageName.value
+				val builtImageTag = (ThisProject / dockerImageTag).value
+				sLog.value info s"Building docker image with name $builtImageName:$builtImageTag"
+				
+				import scala.language.postfixOps
+				import scala.sys.process.*
+				s"docker build -t $builtImageName:$builtImageTag ."!
+				
+				sLog.value info s"Built docker image $builtImageName:$builtImageTag"
+				
 			}
 			
 		)
+
+

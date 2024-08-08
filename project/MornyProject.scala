@@ -44,7 +44,10 @@ object MornyProject {
 	val group = MornyConfiguration.GROUP
 	val group_name = MornyConfiguration.GROUP_NAME
 	
+	val docker_image_name = MornyConfiguration.DOCKER_IMAGE_NAME
+	
 	val publishWithFatJar = !version_is_snapshot
+	val publishWithDocJar = !version_is_snapshot
 	def publishTo = MornyConfiguration.publishTo
 	val publishCredentials = MornyConfiguration.publishCredentials
 	

@@ -6,14 +6,16 @@ object MornyConfiguration {
 	val MORNY_CODE_STORE = "https://github.com/Eyre-S/Coeur-Morny-Cono"
 	val MORNY_COMMIT_PATH = "https://github.com/Eyre-S/Coeur-Morny-Cono/commit/%s"
 	
-	val VERSION = "2.0.0-alpha20"
+	val VERSION = "2.0.0-alpha21"
 	val VERSION_DELTA: Option[String] = None
 	val CODENAME = "xinzheng"
 	
-	val SNAPSHOT = false
+	val SNAPSHOT = true
 	
 	val GROUP = "cc.sukazyo"
 	val GROUP_NAME = "A.C. Sukazyo Eyre"
+	
+	val DOCKER_IMAGE_NAME = "coeur-morny-cono"
 	
 	trait ProjectMetadata {
 		
