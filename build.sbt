@@ -51,7 +51,6 @@ ThisBuild / publishTo := MornyProject.publishTo
 ThisBuild / credentials ++= MornyProject.publishCredentials
 
 lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
-		.enablePlugins(BuildInfoPlugin)
 		.settings(
 			
 			name := MornyProject.morny_system_lib.name,
@@ -114,11 +113,19 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 lazy val root = (project in file ("."))
 		.aggregate(morny_system_lib, morny_coeur)
 		.settings(
+			
+			name := "Coeur Morny Cono",
+			
+			skip := true,
+			update / skip := false,
+			
 			assembly / aggregate := false,
 			assembly := {
 				(morny_coeur / assembly).value
 			},
+			run / aggregate := false,
 			run := {
 				(morny_coeur / Compile / run).evaluated
 			}
+			
 		)

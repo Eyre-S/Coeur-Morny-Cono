@@ -10,7 +10,7 @@ object MornyConfiguration {
 	val VERSION_DELTA: Option[String] = None
 	val CODENAME = "xinzheng"
 	
-	val SNAPSHOT = true
+	val SNAPSHOT = false
 	
 	val GROUP = "cc.sukazyo"
 	val GROUP_NAME = "A.C. Sukazyo Eyre"
@@ -65,7 +65,7 @@ object MornyConfiguration {
 	
 	object Morny_Coeur extends ProjectMetadata with Runnable {
 		
-		override val name = "Coeur Morny Cono"
+		override val name = "Morny Coeur"
 		override val id = "morny-coeur"
 		
 		override val group = GROUP
