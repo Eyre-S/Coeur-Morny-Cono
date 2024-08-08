@@ -14,8 +14,8 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 	private val TITLE_BILI_BV = "[bilibili] Share video / BV"
 	private val ID_PREFIX_BILI_AV = "[morny/share/bili/av]"
 	private val ID_PREFIX_BILI_BV = "[morny/share/bili/bv]"
-	private val LINK_PREFIX = "https://bilibili.com/video/"
 	private val SHARE_FORMAT_HTML = "<a href='%s'>%s</a>"
+	private def formatShareHTML (url: String, name: String): String = SHARE_FORMAT_HTML.format(url, name)
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
 		
@@ -31,27 +31,20 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 					parse_videoUrl(destructB23Url(event.inlineQuery.query))
 				catch
 					case _: IllegalArgumentException =>
-						return null;
+						return null
 					case e: IllegalStateException =>
 						logger error exceptionLog(e)
 						coeur.daemons.reporter.exception(e)
-						return null;
+						return null
 		
-		val av = result.av
-		val bv = result.bv
-		val id_av = s"av$av"
-		val id_bv = s"BV$bv"
-		val linkParams = if (result.part != null) s"?p=${result.part}" else ""
-		val link_av = LINK_PREFIX + id_av + linkParams
-		val link_bv = LINK_PREFIX + id_bv + linkParams
 		List(
 			InlineQueryUnit(InlineQueryResultArticle(
-				inlineQueryId(ID_PREFIX_BILI_AV + av), TITLE_BILI_AV + av,
-				InputTextMessageContent(SHARE_FORMAT_HTML.format(link_av, id_av)).parseMode(ParseMode HTML)
+				inlineQueryId(ID_PREFIX_BILI_AV + result.av), TITLE_BILI_AV + result.av,
+				InputTextMessageContent(formatShareHTML(result.avLink, result.toAvString)).parseMode(ParseMode HTML)
 			)),
 			InlineQueryUnit(InlineQueryResultArticle(
-				inlineQueryId(ID_PREFIX_BILI_BV + bv), TITLE_BILI_BV + bv,
-				InputTextMessageContent(SHARE_FORMAT_HTML.format(link_bv, id_bv)).parseMode(ParseMode HTML)
+				inlineQueryId(ID_PREFIX_BILI_BV + result.bv), TITLE_BILI_BV + result.bv,
+				InputTextMessageContent(formatShareHTML(result.bvLink, result.toBvString)).parseMode(ParseMode HTML)
 			))
 		)
 		

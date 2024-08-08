@@ -11,7 +11,23 @@ import scala.util.matching.Regex
 
 object BilibiliForms {
 	
-	case class BiliVideoId (av: Long, bv: String, part: Int|Null = null)
+	case class BiliVideoId (av: Long, bv: String, part: Int|Null = null):
+		def withPart (part: Int|Null): BiliVideoId = BiliVideoId(av, bv, part)
+		def link (useFormat: BiliVideoId.Formats = BiliVideoId.Formats.AV): String =
+			val useId: String = useFormat match
+				case BiliVideoId.Formats.AV => avLink
+				case BiliVideoId.Formats.BV => bvLink
+			s"https://www.bilibili.com/video/$useId" +
+				(if part == null then "" else s"?p=$part")
+		def avLink: String = link(BiliVideoId.Formats.AV)
+		def bvLink: String = link(BiliVideoId.Formats.BV)
+		def toAvString: String = s"av$av"
+		def toBvString: String = s"BV$bv"
+	object BiliVideoId:
+		enum Formats:
+			case AV, BV
+		def fromAv (av: Long): BiliVideoId = BiliVideoId(av, BiliTool.toBv(av))
+		def fromBv (bv: String): BiliVideoId = BiliVideoId(BiliTool.toAv(bv), bv)
 	
 	private val REGEX_BILI_ID = "^((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))$"r
 	private val REGEX_BILI_V_PART_IN_URL_PARAM = "(?:&|^)p=(\\d+)"r
@@ -36,23 +52,23 @@ object BilibiliForms {
 				val av = select(_url_av, _raw_av)
 				val bv = "1" + select(_url_bv, _raw_bv)
 				
-				val part_part = if (_url_param == null) null else
+				val part_part = if _url_param == null then null else
 					REGEX_BILI_V_PART_IN_URL_PARAM.findFirstMatchIn(_url_param) match
 						case Some(part) => part.group(1)
 						case None => null
-				val part: Int | Null = if (part_part != null) part_part toInt else null
+				val part: Int | Null = if part_part != null then part_part toInt else null
 				
 				if (av == null) {
 					assert(bv != null)
-					BiliVideoId(BiliTool.toAv(bv), bv, part)
+					BiliVideoId fromBv bv withPart part
 				} else {
 					val _av = av.toLong
-					BiliVideoId(_av, BiliTool.toBv(_av), part)
+					BiliVideoId fromAv _av withPart part
 				}
 				
 			case _ => throw IllegalArgumentException(s"not a valid Bilibili video link: $url")
 	
-	private val httpClient = OkHttpSyncBackend()
+	private lazy val httpClient = OkHttpSyncBackend()
 	
 	/** get the bilibili video url from b23.tv share url.
 	  *
