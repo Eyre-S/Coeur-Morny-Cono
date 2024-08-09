@@ -1,0 +1,11 @@
+name: Tests
+on: [push]
+jobs:
+  check-build:
+    uses: ./.github/workflows/build.yml
+  check-unit-tests:
+    needs: [check-build]
+    uses: ./.github/workflows/unit-test.yml
+  check-assembly-run:
+    needs: [check-build]
+    uses: ./.github/workflows/assembly-run.yml

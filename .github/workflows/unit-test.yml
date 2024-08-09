@@ -1,0 +1,39 @@
+name: "Unit Test"
+run-name: "Test projects using Unit Test framework to ensure code quality"
+on: [workflow_call]
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+  unit-test:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup cached built project"
+        uses: actions/cache/restore@v4
+        with:
+          path: "./"
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          fail-on-cache-miss: 'true'
+      - name: "Setup Java 21 with SBT"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: sbt
+      - name: "Run unit tests"
+        id: do-unit-test
+        run: sbt test
+      - name: "Upload test reports as artifact"
+        if: steps.do-unit-test.conclusion == 'failure' || steps.do-unit-test.conclusion == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'unit-test-report'
+          path: ./*/target/test-reports/*
+      - name: "Publish test report to summary"
+        if: steps.do-unit-test.conclusion == 'failure' || steps.do-unit-test.conclusion == 'success'
+        uses: phoenix-actions/test-reporting@v15
+        with:
+          output-to: 'step-summary'
+          name: 'Unit Tests Report'
+          path: ./*/target/test-reports/*.xml
+          reporter: 'java-junit'

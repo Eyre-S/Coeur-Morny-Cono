@@ -1,0 +1,33 @@
+name: assembly-run.yml
+on: [workflow_call]
+jobs:
+  generate-assembly:
+    uses: ./.github/workflows/assembly-generate.yml
+  run-assembly:
+    needs: [generate-assembly]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup assembly jar from artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: 'assembly-jar'
+          path: ./assembles/
+      - name: "Setup Java 21"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: "Run assembly jar"
+        id: assembly-run
+        shell: bash
+        run: |
+          
+          exec 5>&1
+          outputs=$(java -jar ./assembles/*.jar -q -v | tee >(cat - >&5))
+          
+          echo '# Assembly Jar Runs' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo 'The execution result while running assembly jar:' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$outputs" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
