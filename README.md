@@ -17,7 +17,10 @@
 [//]: # ([Task Listing][todo] | [~~BBS~~][issues] | [Published][artifact])
 [badge_release_img]: https://img.shields.io/github/v/release/Eyre-S/Coeur-Morny-Cono?display_name=release&label=latest&color=#00fa9a
 [badge_release_target]: https://mvn.sukazyo.cc/#/releases/cc/sukazyo/morny-coeur
-[badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/test?label=Tests&color=dark-green
+[//]: # (on branch master)
+[//]: # ([badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/test.yml?branch=master&label=Tests)
+[//]: # (on branch 2.0.0)
+[badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/test.yml?branch=2.0.0&label=Tests%20on%202.0.0
 [badge_snapshot_img]: https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvn.sukazyo.cc%2Fsnapshots%2Fcc%2Fsukazyo%2Fmorny-coeur%2Fmaven-metadata.xml&label=snapshots&color=%231e90ff
 [badge_snapshot_target]: https://mvn.sukazyo.cc/#/snapshots/cc/sukazyo/morny-coeur
 [![GitHub release][badge_release_img]][badge_release_target]
@@ -45,16 +48,19 @@
 [tg4j]: https://github.com/pengrad/java-telegram-bot-api
 [okhttp]: https://square.github.io/okhttp/
 [gson]: https://github.com/google/gson
-[sttp]: https://github.com/softwaremill/sttp
+[scalatest]: https://scalatest.org/
+[messiva]: https://github.com/suk-ws/messiva
+[resource-tools]: https://github.com/Eyre-S/ResourceTools
+[sttp]: https://sttp.softwaremill.com/
 [circe]: https://circe.github.io/circe/
 [jsoup]: https://jsoup.org/
-[cron-utils]: http://cron-parser.com/
-[scalatest]: https://scalatest.org/
+[cron-utils]: https://github.com/jmrozanec/cron-utils
+[http4s]: https://http4s.org/
+[da4a]: https://github.com/suk-ws/da4a
 
-[Java Telegram Bot API][tg4j]
-
-[sttp] | [okhttp] | [Gson] | [circe] | [jsoup] | [cron-utils]
-
-[Scala][scala] | [SpotBugs Annotations][spotbugs] | [ScalaTest][scalatest]
+[Scala 3][scala] | [SpotBugs Annotations][spotbugs] | [ScalaTest] \
+[messiva] | [resource-tools] | [da4a] \
+[Java Telegram Bot API][tg4j] | [http4s] \
+[okhttp] | [sttp] | [Gson] | [circe] | [jsoup] | [cron-utils]
 
 </div>

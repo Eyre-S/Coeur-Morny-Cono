@@ -90,7 +90,6 @@ object MornyConfiguration {
 			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.9.5",
 			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
 			
-			"org.typelevel" %% "case-insensitive" % "1.4.0",
 			"com.google.code.gson" % "gson" % "2.10.1",
 			"io.circe" %% "circe-core" % "0.14.7",
 			"io.circe" %% "circe-generic" % "0.14.7",
