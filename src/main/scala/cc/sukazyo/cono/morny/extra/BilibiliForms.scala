@@ -7,6 +7,7 @@ import sttp.client3.{HttpError, SttpClientException}
 import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.model.Uri
 
+import scala.runtime.stdLibPatches.Predef.assert as fromBv
 import scala.util.matching.Regex
 
 object BilibiliForms {
@@ -15,23 +16,80 @@ object BilibiliForms {
 		def withPart (part: Int|Null): BiliVideoId = BiliVideoId(av, bv, part)
 		def link (useFormat: BiliVideoId.Formats = BiliVideoId.Formats.AV): String =
 			val useId: String = useFormat match
-				case BiliVideoId.Formats.AV => avLink
-				case BiliVideoId.Formats.BV => bvLink
+				case BiliVideoId.Formats.AV => toAvString
+				case BiliVideoId.Formats.BV => toBvString
 			s"https://www.bilibili.com/video/$useId" +
 				(if part == null then "" else s"?p=$part")
 		def avLink: String = link(BiliVideoId.Formats.AV)
 		def bvLink: String = link(BiliVideoId.Formats.BV)
 		def toAvString: String = s"av$av"
 		def toBvString: String = s"BV$bv"
-	object BiliVideoId:
+	object BiliVideoId {
+		
 		enum Formats:
 			case AV, BV
+		
 		def fromAv (av: Long): BiliVideoId = BiliVideoId(av, BiliTool.toBv(av))
 		def fromBv (bv: String): BiliVideoId = BiliVideoId(BiliTool.toAv(bv), bv)
+		
+		def searchIn (texts: String): List[BiliVideoId] =
+			REGEX_BILI_VIDEO findAllMatchIn texts map {
+				case Regex.Groups(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv) =>
+					parseBiliUrlParamsToBiliVideoId(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv)
+				case _ => throw IllegalArgumentException("Unexpected tokenize result in BiliVideoId.searchIn")
+			} toList
+		
+		def matchUrl (url: String): BiliVideoId =
+			url match
+				case REGEX_BILI_VIDEO(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv) =>
+					BiliVideoId.parseBiliUrlParamsToBiliVideoId(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv)
+				case _ => throw IllegalArgumentException(s"not a valid Bilibili video link: $url")
+		
+		private[BilibiliForms] def parseBiliUrlParamsToBiliVideoId (
+			_url_v: String, _url_av: String, _url_bv: String,
+			_url_param: String, _url_v_part: String,
+			_raw_av: String, _raw_bv: String
+		): BiliVideoId = {
+			
+			val av = select(_url_av, _raw_av)
+			val bv = "1" + select(_url_bv, _raw_bv)
+			
+			val part_part = if _url_param == null then null else
+				REGEX_BILI_V_PART_IN_URL_PARAM.findFirstMatchIn(_url_param) match
+					case Some(part) => part.group(1)
+					case None => null
+			val part: Int | Null = if part_part != null then part_part toInt else null
+			
+			if (av == null) {
+				assert(bv != null)
+				BiliVideoId fromBv bv withPart part
+			} else {
+				val _av = av.toLong
+				BiliVideoId fromAv _av withPart part
+			}
+			
+		}
+		
+	}
 	
-	private val REGEX_BILI_ID = "^((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))$"r
+	case class BiliB23 (shareId: String):
+		def link: String = s"https://b23.tv/$shareId"
+		def toVideoId: BiliVideoId =
+			BilibiliForms.parse_videoUrl(BilibiliForms.destructB23Url(this.link))
+	object BiliB23 {
+		
+		val REGEX_URL: Regex = "(?:https?://)?(?:www\\.)?b23\\.tv/(\\w{7})(?!\\w)" r
+		
+		def searchIn (texts: String): List[BiliB23] =
+			(REGEX_URL findAllMatchIn texts).toList map {
+				case Regex.Groups(shareId) => BiliB23(shareId)
+				case _ => throw IllegalArgumentException("Unexpected tokenize result in BiliB23.searchIn")
+			}
+		
+	}
+	private val REGEX_BILI_ID = "((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))"r
 	private val REGEX_BILI_V_PART_IN_URL_PARAM = "(?:&|^)p=(\\d+)"r
-	private val REGEX_BILI_VIDEO: Regex = "^(?:(?:https?://)?(?:(?:www\\.)?bilibili\\.com(?:/s)?/video/|b23\\.tv/)((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))/?(?:\\?((?:p=(\\d+))?.*))?|(?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))$" r
+	private val REGEX_BILI_VIDEO: Regex = "(?:https?://)?(?:(?:www\\.)?bilibili\\.com(?:/s)?/video/|b23\\.tv/)((?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9}))/?(?:\\?((?:p=(\\d+))?.*))?|(?:av|AV)(\\d{1,16})|(?:bv1|BV1)([A-HJ-NP-Za-km-z1-9]{9})"r
 	
 	/** parse a Bilibili video link to a [[BiliVideoId]] format Bilibili Video Id.
 	  *
@@ -46,27 +104,7 @@ object BilibiliForms {
 	  */
 	@throws[IllegalArgumentException]
 	def parse_videoUrl (url: String): BiliVideoId =
-		url match
-			case REGEX_BILI_VIDEO(_url_v, _url_av, _url_bv, _url_param, _url_v_part, _raw_av, _raw_bv) =>
-				
-				val av = select(_url_av, _raw_av)
-				val bv = "1" + select(_url_bv, _raw_bv)
-				
-				val part_part = if _url_param == null then null else
-					REGEX_BILI_V_PART_IN_URL_PARAM.findFirstMatchIn(_url_param) match
-						case Some(part) => part.group(1)
-						case None => null
-				val part: Int | Null = if part_part != null then part_part toInt else null
-				
-				if (av == null) {
-					assert(bv != null)
-					BiliVideoId fromBv bv withPart part
-				} else {
-					val _av = av.toLong
-					BiliVideoId fromAv _av withPart part
-				}
-				
-			case _ => throw IllegalArgumentException(s"not a valid Bilibili video link: $url")
+		BiliVideoId.matchUrl(url)
 	
 	private lazy val httpClient = OkHttpSyncBackend()
 	

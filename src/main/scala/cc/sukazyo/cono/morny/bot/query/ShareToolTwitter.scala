@@ -20,22 +20,25 @@ class ShareToolTwitter extends ITelegramQuery {
 		
 		if (event.inlineQuery.query == null) return null
 		
-		twitter.parseTweetUrl(event.inlineQuery.query) match
-			
-			case Some(TweetUrlInformation(_, _path_data, _, _, _, _)) =>
-				List(
-					InlineQueryUnit(InlineQueryResultArticle(
-						inlineQueryId(ID_PREFIX_FX + event.inlineQuery.query), TITLE_FX,
-						s"https://fxtwitter.com/$_path_data"
-					)),
-					InlineQueryUnit(InlineQueryResultArticle(
-						inlineQueryId(ID_PREFIX_VX+event.inlineQuery.query), TITLE_VX,
-						s"https://vxtwitter.com/$_path_data"
-					))
-				)
-			
-			case _ => null
+		def getQueryTweetId (prefix: String, tweet: TweetUrlInformation): String =
+			prefix + tweet.hashCode
+		def getTweetName (title_prefix: String, tweet: TweetUrlInformation): String =
+			s"$title_prefix ${tweet.screenName}.${tweet.statusId}"
 		
+		twitter.guessTweetUrl(event.inlineQuery.query).flatMap(tweet =>
+			List(
+				InlineQueryUnit(InlineQueryResultArticle(
+					getQueryTweetId(ID_PREFIX_FX, tweet),
+					getTweetName(TITLE_FX, tweet),
+					s"https://fxtwitter.com/${tweet.statusPath}"
+				)),
+				InlineQueryUnit(InlineQueryResultArticle(
+					getQueryTweetId(ID_PREFIX_VX, tweet),
+					getTweetName(TITLE_VX, tweet),
+					s"https://vxtwitter.com/${tweet.statusPath}"
+				))
+			)
+		)
 	}
 	
 }

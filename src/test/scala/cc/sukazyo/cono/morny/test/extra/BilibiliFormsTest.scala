@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.test.extra
 
 import cc.sukazyo.cono.morny.extra.BilibiliForms.*
 import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.test.assets.BilibiliAssets
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
@@ -90,6 +91,22 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 		"b23 video link should not take www. or /video prefix" in:
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://www.b23.tv/av123456")
 			an[IllegalArgumentException] should be thrownBy parse_videoUrl("https://b23.tv/video/av123456")
+		
+	}
+	
+	"b23.tv share url" - {
+		
+		"should be get" - {
+			
+			"from searching in texts" in {
+				for (messageIt <- BilibiliAssets.message_with_urls.with_b23_url) {
+					BiliB23.searchIn(messageIt.content) shouldEqual messageIt.with_links
+						.map(_.shareId.map(BiliB23(_)).orNull)
+						.filterNot(_ == null)
+				}
+			}
+			
+		}
 		
 	}
 	

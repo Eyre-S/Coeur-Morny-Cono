@@ -4,11 +4,21 @@ import cc.sukazyo.restools.{ResourceDirectory, ResourcePackage}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should
 
-abstract class MornyTests extends AnyFreeSpec with should.Matchers {
+object MornyTests extends MornyTests.Assets with MornyTests.Keywords {
 	
-	val assets: ResourceDirectory =
-		ResourcePackage.get("assets_morny_tests").getDirectory("assets_morny_tests")
+	trait Assets {
+		val assetsPackage: ResourcePackage = ResourcePackage.get("assets_morny_tests")
+		val assets: ResourceDirectory = assetsPackage.getDirectory("assets_morny_tests")
+	}
 	
-	val pending_val = "[not-implemented]"
+	trait Keywords {
+		val pending_val = "[not-implemented]"
+	}
 	
 }
+
+abstract class MornyTests
+	extends AnyFreeSpec
+	with should.Matchers
+	with MornyTests.Assets
+	with MornyTests.Keywords

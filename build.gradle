@@ -7,6 +7,7 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'com.github.gmazzo.buildconfig' version '4.1.2'
 	id 'org.ajoberstar.grgit' version '5.2.0'
+	id "me.champeau.jmh" version "0.7.2"
 }
 
 import org.ajoberstar.grgit.Status
@@ -93,6 +94,7 @@ dependencies {
 	implementation group: 'io.circe', name: scala('circe-core'), version: lib_circe_v
 	implementation group: 'io.circe', name: scala('circe-generic'), version: lib_circe_v
 	implementation group: 'io.circe', name: scala('circe-parser'), version: lib_circe_v
+	implementation group: 'io.circe', name: scala('circe-yaml-v12'), version: '0.16.0'
 	implementation group: 'org.jsoup', name: 'jsoup', version: lib_jsoup_v
 	implementation group: 'com.cronutils', name: 'cron-utils', version: lib_cron_utils_v
 	

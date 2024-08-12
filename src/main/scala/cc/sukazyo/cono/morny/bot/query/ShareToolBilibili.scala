@@ -1,14 +1,12 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
-import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultArticle, InputTextMessageContent, ParseMode}
 
 import scala.language.postfixOps
 
-class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
+class ShareToolBilibili extends ITelegramQuery {
 	
 	private val TITLE_BILI_AV = "[bilibili] Share video / av"
 	private val TITLE_BILI_BV = "[bilibili] Share video / BV"
@@ -21,31 +19,26 @@ class ShareToolBilibili (using coeur: MornyCoeur) extends ITelegramQuery {
 		
 		if (event.inlineQuery.query == null) return null
 		if (event.inlineQuery.query isBlank) return null
+		val content = event.inlineQuery.query
 		
 		import cc.sukazyo.cono.morny.extra.BilibiliForms.*
-		val result: BiliVideoId =
-			try
-				parse_videoUrl(event.inlineQuery.query)
-			catch case _: IllegalArgumentException =>
-				try
-					parse_videoUrl(destructB23Url(event.inlineQuery.query))
-				catch
-					case _: IllegalArgumentException =>
-						return null
-					case e: IllegalStateException =>
-						logger error exceptionLog(e)
-						coeur.daemons.reporter.exception(e)
-						return null
+		val results: List[(String, BiliVideoId)] =
+			BiliVideoId.searchIn(content).map(x => (x.toString, x)) ++
+			BiliB23.searchIn(content).map(x => (x.toString, x.toVideoId))
 		
-		List(
-			InlineQueryUnit(InlineQueryResultArticle(
-				inlineQueryId(ID_PREFIX_BILI_AV + result.av), TITLE_BILI_AV + result.av,
-				InputTextMessageContent(formatShareHTML(result.avLink, result.toAvString)).parseMode(ParseMode HTML)
-			)),
-			InlineQueryUnit(InlineQueryResultArticle(
-				inlineQueryId(ID_PREFIX_BILI_BV + result.bv), TITLE_BILI_BV + result.bv,
-				InputTextMessageContent(formatShareHTML(result.bvLink, result.toBvString)).parseMode(ParseMode HTML)
-			))
+		results.flatMap( (_, it) =>
+			List(
+				InlineQueryUnit(InlineQueryResultArticle(
+					inlineQueryId(ID_PREFIX_BILI_AV + it.av),
+					TITLE_BILI_AV + it.av,
+					InputTextMessageContent(formatShareHTML(it.avLink, it.toAvString)).parseMode(ParseMode HTML)
+				)),
+				InlineQueryUnit(InlineQueryResultArticle(
+					inlineQueryId(ID_PREFIX_BILI_BV + it.bv),
+					TITLE_BILI_BV + it.bv,
+					InputTextMessageContent(formatShareHTML(it.bvLink, it.toBvString)).parseMode(ParseMode HTML)
+				))
+			)
 		)
 		
 	}

@@ -14,22 +14,22 @@ class ShareToolXhs extends ITelegramQuery {
 		if inlineQuery.query == null then return null
 		val content = inlineQuery.query
 		
-		val xhsLink: XHSLink = {
-			XHSLink.matchUrl(content) match
-				case Some(matched) => matched match
-					case xhsLink: XHSLink => xhsLink
-					case shareLink: XHSLink.ShareLink =>
-						shareLink.getXhsLink
-				case None =>
-					XHSLink.searchShareText(content).map(_.getXhsLink) match
-						case Some(found) => found
-						case None => return null
+		def getTitle (xhsLink: XHSLink): String = {
+			s"$TITLE [${xhsLink.exploreId}]"
 		}
 		
-		List(
+		val xhsLinks: List[(String, XHSLink)] = {
+			XHSLink.searchUrls(content).map {
+				case xhsLink: XHSLink => (xhsLink.toString, xhsLink)
+				case shareLink: XHSLink.ShareLink =>
+					(shareLink.toString, shareLink.getXhsLink)
+			}
+		}
+		
+		xhsLinks.map((uniqueId, xhsLink) =>
 			InlineQueryUnit(InlineQueryResultArticle(
-				ID+content.hashCode,
-				TITLE,
+				ID+uniqueId,
+				getTitle(xhsLink),
 				xhsLink.link
 			))
 		)

@@ -5,6 +5,8 @@ import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.client3.{HttpError, RequestT, SttpClientException}
 import sttp.model.Uri
 
+import scala.util.matching.Regex.Groups
+
 case class XHSLink (exploreId: String) {
 	
 	def link =
@@ -26,18 +28,39 @@ object XHSLink {
 			case _ => None
 	}
 	
+	def searchExplorerUrl (texts: String): List[XHSLink] = {
+		REGEX_EXPLORER_URL.findAllMatchIn(texts).map {
+			case Groups(explorerId) => XHSLink(explorerId)
+			case _ => throw IllegalArgumentException("Unexpected tokenize result in XHSLink.searchExplorerUrl")
+		}.toList
+	}
+	
 	def matchShareUrl (url: String): Option[ShareLink] = {
 		url match
 			case REGEX_SHARE_URL(shareId) => Some(ShareLink(shareId))
 			case _ => None
 	}
 	
+	def searchShareUrl (texts: String): List[ShareLink] = {
+		REGEX_SHARE_URL.findAllMatchIn(texts).map {
+			case Groups(shareId) => ShareLink(shareId)
+			case _ => throw IllegalArgumentException("Unexpected tokenize result in XHSLink.searchShareUrl")
+		}.toList
+	}
+	
 	def matchUrl (url: String): Option[XHSLink|ShareLink] = {
 		matchExplorerUrl(url) orElse matchShareUrl(url)
 	}
 	
-	def searchShareText (texts: String): Option[ShareLink] = {
-		REGEX_SHARE_TEXTS.findFirstMatchIn(texts).map(x => ShareLink(x.group(2)))
+	def searchUrls (texts: String): List[XHSLink|ShareLink] = {
+		searchExplorerUrl(texts) ++ searchShareUrl(texts)
+	}
+	
+	def searchShareText (texts: String): List[ShareLink] = {
+		REGEX_SHARE_TEXTS.findAllMatchIn(texts).map {
+			case Groups(shareId) => ShareLink(shareId)
+			case _ => throw IllegalArgumentException("Unexpected tokenize result in XHSLink.searchShareText")
+		}.toList
 	}
 	
 	case class ShareLink (shareId: String) {
