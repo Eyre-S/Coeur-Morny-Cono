@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.bot.query
+import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import com.pengrad.telegrambot.model.Update
 

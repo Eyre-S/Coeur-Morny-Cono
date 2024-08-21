@@ -62,7 +62,7 @@ case class SocialContent (
 		(
 			if (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
 				InlineQueryUnit(InlineQueryResultPhoto(
-					inlineQueryId(s"[$id_head/photo/mosaic]$id_param"),
+					s"[$id_head/photo/mosaic]$id_param",
 					medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url,
 					thumbnailOrElse(medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url)
 				).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
@@ -71,18 +71,20 @@ case class SocialContent (
 				media match
 					case media_url: SocialMediaWithUrl =>
 						InlineQueryUnit(InlineQueryResultPhoto(
-							inlineQueryId(s"[$id_head/photo/0]$id_param"),
+							s"[$id_head/photo/0]$id_param",
 							media_url.url,
 							thumbnailOrElse(media_url.url)
 						).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
 					case _ =>
 						InlineQueryUnit(InlineQueryResultArticle(
-							inlineQueryId(s"[$id_head/text_only]$id_param"), s"$name (text only)",
+							s"[$id_head/text_only]$id_param",
+							s"$name (text only)",
 							InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
 						)) :: Nil
 			else
 				InlineQueryUnit(InlineQueryResultArticle(
-					inlineQueryId(s"[$id_head/text]$id_param"), s"$name",
+					s"[$id_head/text]$id_param",
+					s"$name",
 					InputTextMessageContent(text_html).parseMode(ParseMode.HTML)
 				)) :: Nil
 		) ::: Nil

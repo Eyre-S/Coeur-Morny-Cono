@@ -73,7 +73,7 @@ object OnGetSocial {
 		
 	}
 	
-	def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
+	private def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.SttpClientException
 		import twitter.FXApi
@@ -89,7 +89,7 @@ object OnGetSocial {
 				"Error on requesting FixTweet API\n" + exceptionLog(e)
 			coeur.daemons.reporter.exception(e, "Error on requesting FixTweet API")
 	
-	def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
+	private def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.{HttpError, SttpClientException}
 		import weibo.MApi

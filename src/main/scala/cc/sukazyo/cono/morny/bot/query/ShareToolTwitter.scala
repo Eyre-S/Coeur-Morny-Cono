@@ -2,19 +2,17 @@ package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.extra.twitter
 import cc.sukazyo.cono.morny.extra.twitter.TweetUrlInformation
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
 
 import scala.language.postfixOps
-import scala.util.matching.Regex
 
 class ShareToolTwitter extends ITelegramQuery {
 	
 	private val TITLE_VX = "[tweet] Share as VxTwitter"
-	private val ID_PREFIX_VX = "[morny/share/twitter/vxtwi]"
+	private val ID_PREFIX_VX = "[morny/share/twitter/vx_url]"
 	private val TITLE_FX = "[tweet] Share as Fix-Tweet"
-	private val ID_PREFIX_FX = "[morny/share/twitter/fxtwi]"
+	private val ID_PREFIX_FX = "[morny/share/twitter/fx_url]"
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
 		
