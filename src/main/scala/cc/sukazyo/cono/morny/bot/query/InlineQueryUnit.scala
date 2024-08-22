@@ -6,7 +6,7 @@ import com.pengrad.telegrambot.model.request.InlineQueryResult
 object InlineQueryUnit {
 	
 	object defaults:
-		val CACHE_TIME = 1
+		val CACHE_TIME = 300
 		val IS_PERSONAL = false
 	
 }

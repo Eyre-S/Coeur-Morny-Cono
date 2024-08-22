@@ -6,7 +6,6 @@ import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, MornyQueries}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.logger
 import com.google.gson.Gson
-import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.InlineQueryResult
 import com.pengrad.telegrambot.request.AnswerInlineQuery
 
@@ -32,8 +31,7 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 		
 		if (results isEmpty) return;
 		
-		logger debug resultAnswers.map(Gson().toJson(_)).mkString("\n")
-		
+		logger trace "Query answers:\n" + resultAnswers.map("  " + Gson().toJson(_)).mkString("\n")
 		coeur.account exec AnswerInlineQuery(
 			update.inlineQuery.id, resultAnswers toArray:_*
 		).cacheTime(cacheTime).isPersonal(isPersonal)
