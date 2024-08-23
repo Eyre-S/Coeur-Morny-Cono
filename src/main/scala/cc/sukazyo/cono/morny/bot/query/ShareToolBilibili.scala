@@ -8,8 +8,6 @@ import scala.language.postfixOps
 
 class ShareToolBilibili extends ITelegramQuery {
 	
-	private val TITLE_BILI_AV = "[bilibili] Share video / av"
-	private val TITLE_BILI_BV = "[bilibili] Share video / BV"
 	private val ID_PREFIX_BILI_AV = "[morny/share/bili/av]"
 	private val ID_PREFIX_BILI_BV = "[morny/share/bili/bv]"
 	private val SHARE_FORMAT_HTML = "<a href='%s'>%s</a>"
@@ -30,13 +28,17 @@ class ShareToolBilibili extends ITelegramQuery {
 			List(
 				InlineQueryUnit(InlineQueryResultArticle(
 					inlineQueryId(ID_PREFIX_BILI_AV + it.av),
-					TITLE_BILI_AV + it.av,
+					s"[Bilibili] Video av${it.av}",
 					InputTextMessageContent(formatShareHTML(it.avLink, it.toAvString)).parseMode(ParseMode HTML)
+				).description(
+					s"Video URL only. Aka BV${it.bv}"
 				)),
 				InlineQueryUnit(InlineQueryResultArticle(
 					inlineQueryId(ID_PREFIX_BILI_BV + it.bv),
-					TITLE_BILI_BV + it.bv,
+					s"[Bilibili] Video BV${it.bv}",
 					InputTextMessageContent(formatShareHTML(it.bvLink, it.toBvString)).parseMode(ParseMode HTML)
+				).description(
+					s"Video URL only. Aka av${it.av}"
 				))
 			)
 		)

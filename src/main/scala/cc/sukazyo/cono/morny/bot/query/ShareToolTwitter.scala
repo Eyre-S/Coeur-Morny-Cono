@@ -9,9 +9,9 @@ import scala.language.postfixOps
 
 class ShareToolTwitter extends ITelegramQuery {
 	
-	private val TITLE_VX = "[tweet] Share as VxTwitter"
+	private val TITLE_VX = "[Twitter/X][VxTwitter]"
 	private val ID_PREFIX_VX = "[morny/share/twitter/vx_url]"
-	private val TITLE_FX = "[tweet] Share as Fix-Tweet"
+	private val TITLE_FX = "[Twitter/X][Fix-Tweet]"
 	private val ID_PREFIX_FX = "[morny/share/twitter/fx_url]"
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
@@ -21,7 +21,7 @@ class ShareToolTwitter extends ITelegramQuery {
 		def getQueryTweetId (prefix: String, tweet: TweetUrlInformation): String =
 			prefix + tweet.hashCode
 		def getTweetName (title_prefix: String, tweet: TweetUrlInformation): String =
-			s"$title_prefix ${tweet.screenName}.${tweet.statusId}"
+			s"$title_prefix ${tweet.screenName}/${tweet.statusId}"
 		
 		twitter.guessTweetUrl(event.inlineQuery.query).flatMap(tweet =>
 			List(

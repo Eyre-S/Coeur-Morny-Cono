@@ -4,14 +4,16 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.bot.event.OnGetSocial.tryFetchSocial
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.extra.{twitter, weibo}
+import cc.sukazyo.cono.morny.extra.{twitter, weibo, BilibiliForms}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.data.social.{SocialTwitterParser, SocialWeiboParser}
+import cc.sukazyo.cono.morny.extra.BilibiliForms.{BiliB23, BiliVideoId}
+import cc.sukazyo.cono.morny.extra.bilibili.XWebAPI
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.entitiesSafe
 import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
+import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
 
 class OnGetSocial (using coeur: MornyCoeur) extends EventListener {
 	
@@ -69,7 +71,40 @@ object OnGetSocial {
 			succeed += 1
 			tryFetchSocialOfWeibo(f)
 		})
+		
+		{
+			val bilibiliVideos: List[BiliVideoId] = text match
+				case Left(texts) =>
+					BiliVideoId.searchIn(texts) ::: BiliB23.searchIn(texts).map(_.toVideoId)
+				case Right(url) =>
+					try BilibiliForms.parse_videoUrl(url) :: Nil
+					catch case _: IllegalArgumentException =>
+						try BiliVideoId.matchUrl(BilibiliForms.destructB23Url(url)) :: Nil
+						catch case _: Exception => Nil
+			bilibiliVideos.foreach( video =>
+				succeed += 1
+				tryFetchSocialOfBilibili(video)
+			)
+		}
+		
 		succeed > 0
+		
+	}
+	
+	private def tryFetchSocialOfBilibili (video: BiliVideoId)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) = {
+		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
+		
+		val video_info = XWebAPI.get_view(video)
+		coeur.account exec new SendPhoto(
+			replyChat,
+			video_info.data.pic
+		).replyToMessageId(replyToMessage)
+			.caption(
+				// language=html
+				s"""<a href="https://www.bilibili.com/video/av${video.av}"><b>${h(video_info.data.title)}</b></a>
+				   |  <a href="https://space.bilibili.com/${video_info.data.owner.mid}">@${h(video_info.data.owner.name)}</a>
+				   |${h(video_info.data.desc)}""".stripMargin
+			).parseMode(ParseMode.HTML)
 		
 	}
 	

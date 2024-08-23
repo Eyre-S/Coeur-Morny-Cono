@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.model.request.InlineQueryResultArticle
 
 class ShareToolXhs extends ITelegramQuery {
 	
-	private val TITLE = "[Xiaohongshu] Share Link"
+	private val TITLE = "[Xiaohongshu] Note"
 	private val ID = "[morny/share/xhs/link]"
 	
 	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
@@ -15,22 +15,24 @@ class ShareToolXhs extends ITelegramQuery {
 		val content = inlineQuery.query
 		
 		def getTitle (xhsLink: XHSLink): String = {
-			s"$TITLE [${xhsLink.exploreId}]"
+			s"$TITLE ${xhsLink.exploreId}"
 		}
 		
-		val xhsLinks: List[(String, XHSLink)] = {
+		val xhsLinks: List[(String, XHSLink, Option[String])] = {
 			XHSLink.searchUrls(content).map {
-				case xhsLink: XHSLink => (xhsLink.toString, xhsLink)
+				case xhsLink: XHSLink => (xhsLink.toString, xhsLink, None)
 				case shareLink: XHSLink.ShareLink =>
-					(shareLink.toString, shareLink.getXhsLink)
+					(shareLink.toString, shareLink.getXhsLink, Some(shareLink.link))
 			}
 		}
 		
-		xhsLinks.map((uniqueId, xhsLink) =>
+		xhsLinks.map((uniqueId, xhsLink, maybeFromShare) =>
 			InlineQueryUnit(InlineQueryResultArticle(
 				ID+uniqueId,
 				getTitle(xhsLink),
 				xhsLink.link
+			).description(
+				"URL only." + (if maybeFromShare.nonEmpty then s" from $maybeFromShare" else "")
 			))
 		)
 		
