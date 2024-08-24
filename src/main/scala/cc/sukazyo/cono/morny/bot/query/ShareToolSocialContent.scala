@@ -52,17 +52,17 @@ class ShareToolSocialContent extends ITelegramQuery {
 			SocialTwitterParser.parseFXTweet(FXApi.Fetch.status(Some(tweet.statusPath), tweet.statusId))
 				.genInlineQueryResults(using
 					"morny/share/tweet/content", tweet.statusId,
-					"Twitter Tweet Content"
+					"[Twitter]"
 				)
 		}
 	}
 	
 	private def weiboStatus (query: String): List[InlineQueryUnit[_]] = {
-		weibo.guessWeiboStatusUrl(query).flatMap { status =>
-			SocialWeiboParser.parseMStatus(MApi.Fetch.statuses_show(status.id))
+		weibo.guessWeiboStatusUrl(query).flatMap { (url, status) =>
+			SocialWeiboParser.parseMStatus(MApi.Fetch.statuses_show(status.id))(url)
 				.genInlineQueryResults(using
 					"morny/share/weibo/status/content", status.id,
-					"Weibo Content"
+					"[Weibo]"
 				)
 		}
 	}

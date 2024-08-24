@@ -29,11 +29,15 @@ class ShareToolTwitter extends ITelegramQuery {
 					getQueryTweetId(ID_PREFIX_FX, tweet),
 					getTweetName(TITLE_FX, tweet),
 					s"https://fxtwitter.com/${tweet.statusPath}"
+				).description(
+					"URL only, and Fix-Tweet web preview available."
 				)),
 				InlineQueryUnit(InlineQueryResultArticle(
 					getQueryTweetId(ID_PREFIX_VX, tweet),
 					getTweetName(TITLE_VX, tweet),
 					s"https://vxtwitter.com/${tweet.statusPath}"
+				).description(
+					"URL only, and VxTwitter web preview available."
 				))
 			)
 		)

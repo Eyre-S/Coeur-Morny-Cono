@@ -5,6 +5,8 @@ import cc.sukazyo.cono.morny.data.social.SocialContent.SocialMediaType.{Photo, V
 import cc.sukazyo.cono.morny.extra.twitter.{FXApi, FXTweet}
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 
+import cc.sukazyo.cono.morny.util.StringEnsure.ensureNotExceed
+
 object SocialTwitterParser {
 	
 	def parseFXTweet_forMediaPlaceholderInContent (tweet: FXTweet): String =
@@ -21,7 +23,7 @@ object SocialTwitterParser {
 					// language=html
 					s"""❌ Fix-Tweet <code>${api.code}</code>
 					   |<i>${h(api.message)}</i>""".stripMargin
-				SocialContent(content, content, Nil)
+				SocialContent("ERROR", "ERROR", content, content, Nil)
 			case Some(tweet) =>
 				val content: String =
 				// language=html
@@ -39,9 +41,11 @@ object SocialTwitterParser {
 					   |
 					   |<i>💬${tweet.replies}   🔗${tweet.retweets}   ❤️${tweet.likes}</i>
 					   |<i><a href="${tweet.url}">${h(tweet.created_at)}</a></i>""".stripMargin
+				val title: String = tweet.text.ensureNotExceed(35)
+				val description: String = tweet.url
 				tweet.media match
 					case None =>
-						SocialContent(content, content_withMediasPlaceholder, Nil)
+						SocialContent(title, description, content, content_withMediasPlaceholder, Nil)
 					case Some(media) =>
 						val mediaGroup: List[SocialMedia] =
 							(
@@ -60,7 +64,11 @@ object SocialTwitterParser {
 						val mediaMosaic = media.mosaic match
 							case Some(mosaic) => Some(SocialMediaWithUrl(mosaic.formats.jpeg)(Photo))
 							case None => None
-						SocialContent(content, content_withMediasPlaceholder, mediaGroup, mediaMosaic, thumbnail)
+						SocialContent(
+							if title.nonEmpty then title else
+							s"from ${tweet.author.name}",
+							description, content, content_withMediasPlaceholder, mediaGroup, mediaMosaic, thumbnail
+						)
 	}
 	
 }

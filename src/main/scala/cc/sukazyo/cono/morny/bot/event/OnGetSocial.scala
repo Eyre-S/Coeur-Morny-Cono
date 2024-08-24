@@ -66,11 +66,11 @@ object OnGetSocial {
 				case Left(texts) =>
 					weibo.guessWeiboStatusUrl(texts.trim)
 				case Right(url) =>
-					weibo.parseWeiboStatusUrl(url.trim).toList
-		}.map(f => {
+					weibo.parseWeiboStatusUrl(url.trim).map(url -> _).toList
+		}.map { (url, status) =>
 			succeed += 1
-			tryFetchSocialOfWeibo(f)
-		})
+			tryFetchSocialOfWeibo(status, url)
+		}
 		
 		{
 			val bilibiliVideos: List[BiliVideoId] = text match
@@ -124,13 +124,13 @@ object OnGetSocial {
 				"Error on requesting FixTweet API\n" + exceptionLog(e)
 			coeur.daemons.reporter.exception(e, "Error on requesting FixTweet API")
 	
-	private def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
+	private def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo, rawUrl: String)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.{HttpError, SttpClientException}
 		import weibo.MApi
 		try {
 			val api = MApi.Fetch.statuses_show(url.id)
-			SocialWeiboParser.parseMStatus(api).outputToTelegram
+			SocialWeiboParser.parseMStatus(api)(rawUrl).outputToTelegram
 		} catch
 			case e: HttpError[?] =>
 				coeur.account exec SendMessage(

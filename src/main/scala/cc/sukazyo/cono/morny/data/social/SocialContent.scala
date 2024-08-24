@@ -30,11 +30,13 @@ import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
   *                  parser/formatter implementation.
   */
 case class SocialContent (
+	title: String,
+	description: String,
 	text_html: String,
 	text_withPicPlaceholder: String,
 	medias: List[SocialMedia],
 	medias_mosaic: Option[SocialMedia] = None,
-	thumbnail: Option[SocialMedia] = None
+	thumbnail: Option[SocialMedia] = None,
 ) {
 	
 	def thumbnailOrElse[T] (orElse: T): String | T =
@@ -61,31 +63,55 @@ case class SocialContent (
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[InlineQueryUnit[?]] = {
 		(
 			if (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
+				// It has multi medias, and the mosaic version is provided.
 				InlineQueryUnit(InlineQueryResultPhoto(
 					s"[$id_head/photo/mosaic]$id_param",
 					medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url,
 					thumbnailOrElse(medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url)
-				).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
+				).title(
+					s"$name $title"
+				).description(
+					s"Pictures are combined. $description"
+				).caption(
+					text_html
+				).parseMode(ParseMode.HTML)) :: Nil
 			else if (medias nonEmpty) && (medias.head.t == Photo) then
 				val media = medias.head
 				media match
 					case media_url: SocialMediaWithUrl =>
+						// the medias is provided, and the first one is in URL format.
+						//   it may still contain multiple medias.
+						//   although in only two implementations, the Twitter implementation will always give a mosaic
+						//   pic; and the Weibo implementation never uses URL formatted medias.
 						InlineQueryUnit(InlineQueryResultPhoto(
 							s"[$id_head/photo/0]$id_param",
 							media_url.url,
 							thumbnailOrElse(media_url.url)
-						).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
+						).title(
+							s"$name $title"
+						).description(
+							s"Pic 1. $description"
+						).caption(
+							text_html
+						).parseMode(ParseMode.HTML)) :: Nil
 					case _ =>
+						// the medias are provided but are not in URL format.
+						//   in this case, the plain text version will be used.
 						InlineQueryUnit(InlineQueryResultArticle(
 							s"[$id_head/text_only]$id_param",
-							s"$name (text only)",
+							s"$name $title",
 							InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
+						).description(
+							s"Plain text only. $description"
 						)) :: Nil
 			else
+				// There are never any medias.
 				InlineQueryUnit(InlineQueryResultArticle(
 					s"[$id_head/text]$id_param",
-					s"$name",
+					s"$name $title",
 					InputTextMessageContent(text_html).parseMode(ParseMode.HTML)
+				).description(
+					description
 				)) :: Nil
 		) ::: Nil
 	}

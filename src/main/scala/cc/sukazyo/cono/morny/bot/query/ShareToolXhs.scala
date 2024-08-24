@@ -32,7 +32,7 @@ class ShareToolXhs extends ITelegramQuery {
 				getTitle(xhsLink),
 				xhsLink.link
 			).description(
-				"URL only." + (if maybeFromShare.nonEmpty then s" from $maybeFromShare" else "")
+				"URL only." + (if maybeFromShare.nonEmpty then s" from ${maybeFromShare.get}" else "")
 			))
 		)
 		

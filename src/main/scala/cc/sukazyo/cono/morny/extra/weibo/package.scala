@@ -30,9 +30,9 @@ package object weibo {
 			case REGEX_WEIBO_STATUS_URL(_, uid, id, _) => Some(StatusUrlInfo(uid, id))
 			case _ => None
 	
-	def guessWeiboStatusUrl (text: String): List[StatusUrlInfo] =
+	def guessWeiboStatusUrl (text: String): List[(String, StatusUrlInfo)] =
 		REGEX_WEIBO_STATUS_URL.findAllMatchIn(text).map(matches => {
-			StatusUrlInfo(matches.group(2), matches.group(3))
+			matches.group(0) -> StatusUrlInfo(matches.group(2), matches.group(3))
 		}).toList
 	
 	def genWeiboStatusUrl (url: StatusUrlInfo): String =
