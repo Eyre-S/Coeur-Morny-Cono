@@ -28,8 +28,8 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 			if (r isPersonal) isPersonal = true
 			resultAnswers += r.result
 		}
-		cacheTime = 1
-		logger debug "Inline Query remote caches is DISABLED, you may received duplicate queries logs."
+//		cacheTime = 1
+//		logger debug "Inline Query remote caches is DISABLED, you may received duplicate queries logs."
 		
 		if (results isEmpty) return;
 		
