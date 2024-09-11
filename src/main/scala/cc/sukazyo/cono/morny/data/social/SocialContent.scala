@@ -9,6 +9,8 @@ import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.request.*
 import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
 
+import scala.collection.mutable.ListBuffer
+
 /** Model of social networks' status. for example twitter tweet or
   * weibo status.
   *
@@ -61,9 +63,12 @@ case class SocialContent (
 	}
 	
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[InlineQueryUnit[?]] = {
-		(
-			if (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
-				// It has multi medias, and the mosaic version is provided.
+		val results = ListBuffer[InlineQueryUnit[?]]()
+		
+		// It has multi medias, and the mosaic version is provided,
+		//  uses the mosaic version to provide an image+text result.
+		if (medias.length > 1) && (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
+			results +=
 				InlineQueryUnit(InlineQueryResultPhoto(
 					s"[$id_head/photo/mosaic]$id_param",
 					medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url,
@@ -71,49 +76,73 @@ case class SocialContent (
 				).title(
 					s"$name $title"
 				).description(
-					s"Pictures are combined. $description"
+					s"Medias combined. $description"
 				).caption(
 					text_html
-				).parseMode(ParseMode.HTML)) :: Nil
-			else if (medias nonEmpty) && (medias.head.t == Photo) then
-				val media = medias.head
-				media match
-					case media_url: SocialMediaWithUrl =>
-						// the medias is provided, and the first one is in URL format.
-						//   it may still contain multiple medias.
-						//   although in only two implementations, the Twitter implementation will always give a mosaic
-						//   pic; and the Weibo implementation never uses URL formatted medias.
-						InlineQueryUnit(InlineQueryResultPhoto(
-							s"[$id_head/photo/0]$id_param",
-							media_url.url,
-							thumbnailOrElse(media_url.url)
-						).title(
-							s"$name $title"
-						).description(
-							s"Pic 1. $description"
-						).caption(
-							text_html
-						).parseMode(ParseMode.HTML)) :: Nil
-					case _ =>
-						// the medias are provided but are not in URL format.
-						//   in this case, the plain text version will be used.
-						InlineQueryUnit(InlineQueryResultArticle(
-							s"[$id_head/text_only]$id_param",
-							s"$name $title",
-							InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
-						).description(
-							s"Plain text only. $description"
-						)) :: Nil
-			else
-				// There are never any medias.
+				).parseMode(ParseMode.HTML))
+		
+		// It has medias, and the first media is URL formatted, then provide the first media with content,
+		//  uses the first media to provide an image1+text result.
+		else if (medias nonEmpty) && medias.head.isInstanceOf[SocialMediaWithUrl] then
+			val media = medias.head.asInstanceOf[SocialMediaWithUrl]
+			results +=
+				InlineQueryUnit(InlineQueryResultPhoto(
+					s"[$id_head/photo/0/contented]$id_param",
+					media.url,
+					thumbnailOrElse(media.url)
+				).title(
+					s"$name $title"
+				).description(
+					s"Pic 1/${medias.length}, with content. $description"
+				).caption(
+					text_html
+				).parseMode(ParseMode.HTML))
+		
+		// It has medias, and all the previous method failed,
+		//  then a plain text version will be provided.
+		else if medias.nonEmpty then
+			results +=
+				InlineQueryUnit(InlineQueryResultArticle(
+					s"[$id_head/text_only]$id_param",
+					s"$name $title",
+					InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
+				).description(
+					s"Plain text. $description"
+				))
+		
+		// The medias is provided, iterate all the medias and provide a media-only result.
+		//   Note that the media are not URL formatted will be ignored.
+		val resultsMediaOnly: IndexedSeq[InlineQueryUnit[?]] = if medias nonEmpty then for mediaId <- medias.indices yield {
+			val media = medias(mediaId)
+			media match
+				case media_url: SocialMediaWithUrl =>
+					InlineQueryUnit(InlineQueryResultPhoto(
+						s"[$id_head/photo/$mediaId/bare]$id_param",
+						media_url.url,
+						thumbnailOrElse(media_url.url)
+					).title(
+						s"$name $title"
+					).description(
+						s"Pic ${mediaId+1}/${medias.length}, pic only. $description"
+					).caption(
+						media_url.sourceUrl
+					))
+				case _ => null
+		} else Nil.toIndexedSeq
+		results ++= resultsMediaOnly
+		
+		// If there are no any medias, use the plain text mode.
+		if results isEmpty then
+			results +=
 				InlineQueryUnit(InlineQueryResultArticle(
 					s"[$id_head/text]$id_param",
 					s"$name $title",
 					InputTextMessageContent(text_html).parseMode(ParseMode.HTML)
 				).description(
 					description
-				)) :: Nil
-		) ::: Nil
+				))
+		
+		results.toList
 	}
 	
 }
@@ -123,16 +152,16 @@ object SocialContent {
 	enum SocialMediaType:
 		case Photo
 		case Video
-	sealed trait SocialMedia(val t: SocialMediaType) {
+	sealed trait SocialMedia(val t: SocialMediaType, val sourceUrl: String) {
 		def genTelegramInputMedia: InputMedia[?]
 	}
-	case class SocialMediaWithUrl (url: String)(t: SocialMediaType) extends SocialMedia(t) {
+	case class SocialMediaWithUrl (url: String)(t: SocialMediaType, sourceUrl: String) extends SocialMedia(t, sourceUrl) {
 		override def genTelegramInputMedia: InputMedia[_] =
 			t match
 				case Photo => InputMediaPhoto(url)
 				case Video => InputMediaVideo(url)
 	}
-	case class SocialMediaWithBytesData (data: Array[Byte])(t: SocialMediaType) extends SocialMedia(t) {
+	case class SocialMediaWithBytesData (data: Array[Byte])(t: SocialMediaType, sourceUrl: String) extends SocialMedia(t, sourceUrl) {
 		override def genTelegramInputMedia: InputMedia[_] =
 			t match
 				case Photo => InputMediaPhoto(data)

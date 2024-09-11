@@ -51,18 +51,18 @@ object SocialTwitterParser {
 							(
 								media.photos match
 									case None => List.empty
-									case Some(photos) => for i <- photos yield SocialMediaWithUrl(i.url)(Photo)
+									case Some(photos) => for i <- photos yield SocialMediaWithUrl(i.url)(Photo, tweet.url)
 							) ::: (
 								media.videos match
 									case None => List.empty
-									case Some(videos) => for i <- videos yield SocialMediaWithUrl(i.url)(Video)
+									case Some(videos) => for i <- videos yield SocialMediaWithUrl(i.url)(Video, tweet.url)
 							)
 						val thumbnail =
 							if media.videos.nonEmpty then
-								Some(SocialMediaWithUrl(media.videos.get.head.thumbnail_url)(Photo))
+								Some(SocialMediaWithUrl(media.videos.get.head.thumbnail_url)(Photo, tweet.url))
 							else None
 						val mediaMosaic = media.mosaic match
-							case Some(mosaic) => Some(SocialMediaWithUrl(mosaic.formats.jpeg)(Photo))
+							case Some(mosaic) => Some(SocialMediaWithUrl(mosaic.formats.jpeg)(Photo, tweet.url))
 							case None => None
 						SocialContent(
 							if title.nonEmpty then title else
