@@ -19,8 +19,8 @@ object XHSLink {
 	private lazy val http_client = OkHttpSyncBackend()
 	
 	private lazy val REGEX_EXPLORER_URL = "(?:(?:https?:)?//)?(?:www\\.)?xiaohongshu\\.com/(?:explore/|discovery/item/)([a-fA-F0-9]+)/?(?:\\?.+)?"r
-	private lazy val REGEX_SHARE_URL = "(?:(?:https?:)?//)?(?:www\\.)?xhslink\\.com/([a-zA-Z0-9]+)/?(?:\\?.+)?"r
-	private lazy val REGEX_SHARE_TEXTS = "\uD83D\uDE06 ([0-9a-zA-Z]+) \uD83D\uDE06 (?:(?:https?:)?//)?(?:www\\.)?xhslink\\.com/([a-zA-Z0-9]+)/?"r
+	private lazy val REGEX_SHARE_URL = "(?:(?:https?:)?//)?(?:www\\.)?xhslink\\.com/(?:([a-zA-Z0-9]+)/([a-zA-Z0-9]+)|([a-zA-Z0-9]+))/?(?:\\?.+)?"r
+	private lazy val REGEX_SHARE_TEXTS = "\uD83D\uDE06 ([0-9a-zA-Z]+) \uD83D\uDE06 (?:(?:https?:)?//)?(?:www\\.)?xhslink\\.com/(?:([a-zA-Z0-9]+)/([a-zA-Z0-9]+)|([a-zA-Z0-9]+))/?"r
 	
 	def matchExplorerUrl (url: String): Option[XHSLink] = {
 		url match
@@ -37,13 +37,13 @@ object XHSLink {
 	
 	def matchShareUrl (url: String): Option[ShareLink] = {
 		url match
-			case REGEX_SHARE_URL(shareId) => Some(ShareLink(shareId))
+			case REGEX_SHARE_URL(variant, varId, traditional) => Some(ShareLink(variant, varId, traditional))
 			case _ => None
 	}
 	
 	def searchShareUrl (texts: String): List[ShareLink] = {
 		REGEX_SHARE_URL.findAllMatchIn(texts).map {
-			case Groups(shareId) => ShareLink(shareId)
+			case Groups(variant, varId, traditional) => ShareLink(variant, varId, traditional)
 			case _ => throw IllegalArgumentException("Unexpected tokenize result in XHSLink.searchShareUrl")
 		}.toList
 	}
@@ -58,15 +58,20 @@ object XHSLink {
 	
 	def searchShareText (texts: String): List[ShareLink] = {
 		REGEX_SHARE_TEXTS.findAllMatchIn(texts).map {
-			case Groups(shareId) => ShareLink(shareId)
+			case Groups(_, variant, varId, traditional) => ShareLink(variant, varId, traditional)
 			case _ => throw IllegalArgumentException("Unexpected tokenize result in XHSLink.searchShareText")
 		}.toList
 	}
 	
-	case class ShareLink (shareId: String) {
+	object ShareLink {
+		def apply (variant: String, varId: String, traditional: String): ShareLink =
+			if (variant != null) ShareLinkWithVariant(variant, varId)
+			else ShareLinkTraditional(traditional)
+	}
+	
+	trait ShareLink {
 		
-		def link =
-			s"https://xhslink.com/$shareId"
+		def link: String
 		
 		/** Get the [[XHSLink xiaohongshu explorer link]] that this share link is linked to via sttp request.
 		  *
@@ -106,5 +111,11 @@ object XHSLink {
 		}
 		
 	}
+	
+	case class ShareLinkTraditional (shareId: String) extends ShareLink:
+		def link = s"https://xhslink.com/$shareId"
+	
+	case class ShareLinkWithVariant (variant: String, shareId: String) extends ShareLink:
+		def link = s"https://xhslink.com/$variant/$shareId"
 	
 }
