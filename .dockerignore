@@ -1,17 +1,23 @@
+# Ignore everything
+*
 
-# IDE
-.idea/
-.vscode/
-.gradle/
-.settings/
+# Allow files and directories
+!/.git
+!/src
+!/.editorconfig
+!/.gitattributes
+!/.gitignore
+!/build.gradle
+!/gradle.properties
+!/gradlew
+!/gradlew.bat
+!/morny-github-social-preview-card@0.75x.png
+!/README.md
+!/settings.gradle
 
-#build
-/build/
-/bin/
-.metals/
-.bloop/
-.project
-lcoal.properties
-
-# debug dir
-/run/
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+**/*~
+**/*.log
+**/.DS_Store
+**/Thumbs.db
