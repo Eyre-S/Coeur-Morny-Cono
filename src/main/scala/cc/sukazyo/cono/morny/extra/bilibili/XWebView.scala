@@ -26,7 +26,7 @@ case class XWebView (
 	owner: XWebView.User,
 	stat: Ignore,
 	dynamic: String,
-	cid: Int,
+	cid: Long,
 	dimension: Ignore,
 	premiere: Ignore,
 	teenage_mode: Int,

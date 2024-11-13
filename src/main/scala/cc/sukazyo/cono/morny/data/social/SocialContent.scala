@@ -5,7 +5,6 @@ import cc.sukazyo.cono.morny.data.social.SocialContent.SocialMediaType.{Photo, V
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.query.InlineQueryUnit
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import cc.sukazyo.cono.morny.util.tgapi.formatting.NamingUtils.inlineQueryId
 import com.pengrad.telegrambot.model.request.*
 import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
 

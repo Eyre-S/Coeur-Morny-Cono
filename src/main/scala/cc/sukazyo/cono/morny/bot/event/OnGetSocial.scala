@@ -11,9 +11,12 @@ import cc.sukazyo.cono.morny.data.social.{SocialTwitterParser, SocialWeiboParser
 import cc.sukazyo.cono.morny.extra.BilibiliForms.{BiliB23, BiliVideoId}
 import cc.sukazyo.cono.morny.extra.bilibili.XWebAPI
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.entitiesSafe
+import cc.sukazyo.cono.morny.util.CommonFormat.formatDurationTimers
 import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
+
+import java.time.Duration
 
 class OnGetSocial (using coeur: MornyCoeur) extends EventListener {
 	
@@ -102,7 +105,8 @@ object OnGetSocial {
 			.caption(
 				// language=html
 				s"""<a href="https://www.bilibili.com/video/av${video.av}"><b>${h(video_info.data.title)}</b></a>
-				   |  <a href="https://space.bilibili.com/${video_info.data.owner.mid}">@${h(video_info.data.owner.name)}</a>
+				   |  <i>${formatDurationTimers(Duration.ofSeconds(video_info.data.duration))}</i>  <a href="https://space.bilibili.com/${video_info.data.owner.mid}">@${h(video_info.data.owner.name)}</a>
+				   |
 				   |${h(video_info.data.desc)}""".stripMargin
 			).parseMode(ParseMode.HTML)
 		

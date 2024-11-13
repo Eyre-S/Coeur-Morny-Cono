@@ -1,12 +1,22 @@
 package cc.sukazyo.cono.morny
 
-import cc.sukazyo.cono.morny.util.UniversalCommand
+import cc.sukazyo.cono.morny.util.CommonFormat
 
-import scala.io.StdIn
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 @main def MornyCLI (): Unit = {
 	
-	print("$ java -jar morny-coeur-\"+MornySystem.VERSION_FULL+\".jar ")
-	ServerMain main UniversalCommand(StdIn readLine)
+	val duration = Duration.ZERO
+//		.plusDays(2)
+//		.plusHours(21)
+//		.plusMinutes(2)
+//		.plusSeconds(5)
+		.plusMillis(123)
+		.plusNanos(876548)
+	
+	val echo = CommonFormat.formatDurationTimers(duration, ChronoUnit.SECONDS)
+	
+	println(echo)
 	
 }
