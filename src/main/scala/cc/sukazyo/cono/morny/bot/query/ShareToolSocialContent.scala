@@ -1,17 +1,13 @@
 package cc.sukazyo.cono.morny.bot.query
 
-import cc.sukazyo.cono.morny.data.social.{SocialTwitterParser, SocialWeiboParser}
+import cc.sukazyo.cono.morny.data.social.{SocialBilibiliParser, SocialTwitterParser, SocialWeiboParser}
 import cc.sukazyo.cono.morny.extra.{twitter, weibo}
 import cc.sukazyo.cono.morny.extra.twitter.FXApi
 import cc.sukazyo.cono.morny.extra.weibo.MApi
 import cc.sukazyo.cono.morny.extra.BilibiliForms.{BiliB23, BiliVideoId}
 import cc.sukazyo.cono.morny.extra.bilibili.XWebAPI
-import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.util.CommonFormat.formatDurationTimers
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.{InlineQueryResultPhoto, ParseMode}
-
-import java.time.Duration
 
 class ShareToolSocialContent extends ITelegramQuery {
 	
@@ -41,11 +37,7 @@ class ShareToolSocialContent extends ITelegramQuery {
 			).description(
 				s"av${video.av} / BV${video.bv} - Preview"
 			).caption(
-				// language=html
-				s"""<a href="https://www.bilibili.com/video/av${video.av}"><b>${h(video_info.data.title)}</b></a>
-				   |  <i>${formatDurationTimers(Duration.ofSeconds(video_info.data.duration))}</i>  <a href="https://space.bilibili.com/${video_info.data.owner.mid}">@${h(video_info.data.owner.name)}</a>
-				   |
-				   |${h(video_info.data.desc)}""".stripMargin
+				SocialBilibiliParser.printsBilibiliVideoCaption(video, video_info.data)
 			).parseMode(ParseMode.HTML))
 		}
 		

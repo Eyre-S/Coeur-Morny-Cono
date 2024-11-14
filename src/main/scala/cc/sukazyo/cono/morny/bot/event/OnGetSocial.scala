@@ -7,16 +7,13 @@ import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.extra.{twitter, weibo, BilibiliForms}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
-import cc.sukazyo.cono.morny.data.social.{SocialTwitterParser, SocialWeiboParser}
+import cc.sukazyo.cono.morny.data.social.{SocialBilibiliParser, SocialTwitterParser, SocialWeiboParser}
 import cc.sukazyo.cono.morny.extra.BilibiliForms.{BiliB23, BiliVideoId}
 import cc.sukazyo.cono.morny.extra.bilibili.XWebAPI
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Message.entitiesSafe
-import cc.sukazyo.cono.morny.util.CommonFormat.formatDurationTimers
 import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
-
-import java.time.Duration
 
 class OnGetSocial (using coeur: MornyCoeur) extends EventListener {
 	
@@ -95,7 +92,6 @@ object OnGetSocial {
 	}
 	
 	private def tryFetchSocialOfBilibili (video: BiliVideoId)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) = {
-		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 		
 		val video_info = XWebAPI.get_view(video)
 		coeur.account exec new SendPhoto(
@@ -103,11 +99,7 @@ object OnGetSocial {
 			video_info.data.pic
 		).replyToMessageId(replyToMessage)
 			.caption(
-				// language=html
-				s"""<a href="https://www.bilibili.com/video/av${video.av}"><b>${h(video_info.data.title)}</b></a>
-				   |  <i>${formatDurationTimers(Duration.ofSeconds(video_info.data.duration))}</i>  <a href="https://space.bilibili.com/${video_info.data.owner.mid}">@${h(video_info.data.owner.name)}</a>
-				   |
-				   |${h(video_info.data.desc)}""".stripMargin
+				SocialBilibiliParser.printsBilibiliVideoCaption(video, video_info.data)
 			).parseMode(ParseMode.HTML)
 		
 	}
