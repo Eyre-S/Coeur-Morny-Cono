@@ -8,16 +8,19 @@ import scala.util.Random
 class BiliToolTest extends MornyTests with TableDrivenPropertyChecks {
 	
 	private val examples = Table(
-		("bv", "av"),
-		("17x411w7KC", 170001L),
-		("1Q541167Qg", 455017605L),
-		("1mK4y1C7Bz", 882584971L),
-		("1T24y197V2", 688730800L),
-		("1b2421A7FH", 1600345142L),
-		("1DB421k7zX", 1350018000L),
-		("19m411D7wx", 1900737470L),
-		("1LQ4y1A7im", 709042411L),
-		("1L9Uoa9EUx", 111298867365120L),
+		(    "bv id"   ,      "av id"     ),
+		( "17x411w7KC" ,          170001L ),
+		( "1Q541167Qg" ,       455017605L ),
+		( "1mK4y1C7Bz" ,       882584971L ),
+		( "1T24y197V2" ,       688730800L ),
+		( "1b2421A7FH" ,      1600345142L ),
+		( "1DB421k7zX" ,      1350018000L ),
+		( "19m411D7wx" ,      1900737470L ),
+		( "1LQ4y1A7im" ,       709042411L ),
+		( "1L9Uoa9EUx" , 111298867365120L ),
+		// from #54 (https://github.com/Eyre-S/Coeur-Morny-Cono/issues/54)
+		( "1mS411K7Ba" ,      1905492274L ),
+		( "1mgt8edE43" , 113150779333900L )
 	)
 	
 	forAll (examples) { (bv, av) => s"while using av$av/BV$bv :" - {
