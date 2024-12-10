@@ -54,6 +54,7 @@ object MornyProject {
 	val source_encoding = "utf-8"
 	
 	val morny_system_lib = MornyConfiguration.Morny_System_Library
+	val morny_core = MornyConfiguration.Morny_Core
 	val morny_coeur = MornyConfiguration.Morny_Coeur
 	
 }

@@ -64,8 +64,20 @@ lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
 			
 		)
 
+lazy val morny_core = (project in file(MornyProject.morny_core.id))
+		.dependsOn(morny_system_lib)
+		.settings(
+			
+			name := MornyProject.morny_core.name,
+			moduleName := MornyProject.morny_core.id,
+			
+			libraryDependencies ++= MornyProject.morny_core.dependencies,
+			
+		)
+
 lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 		.enablePlugins(BuildInfoPlugin)
+		.dependsOn(morny_core)
 		.dependsOn(morny_system_lib)
 		.settings(
 			

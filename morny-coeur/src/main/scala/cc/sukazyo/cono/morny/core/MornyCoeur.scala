@@ -16,7 +16,6 @@ import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
-import cc.sukazyo.cono.morny.util.dataview.Table
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 

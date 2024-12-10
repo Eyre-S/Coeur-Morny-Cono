@@ -60,8 +60,20 @@ object MornyConfiguration {
 			// for test report
 			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
 			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
-		
+			
 		)
+		
+	}
+	
+	object Morny_Core extends ProjectMetadata {
+		
+		override val name = "Morny Core"
+		override val id = "morny-core"
+		
+		override val group = GROUP
+		override val root_package = s"$GROUP.cono.morny.core"
+		
+		override val dependencies = Seq()
 		
 	}
 	
@@ -108,7 +120,7 @@ object MornyConfiguration {
 			// for test report
 			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
 			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
-		
+			
 		)
 		
 	}

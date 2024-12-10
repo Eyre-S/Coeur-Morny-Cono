@@ -1,51 +1,69 @@
 package cc.sukazyo.cono.morny.core.module
 
-import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyModule}
-import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
+import cc.sukazyo.cono.morny.core.MornyModule
 
-import java.nio.charset.StandardCharsets
 import scala.collection.mutable.ListBuffer
 
 object ModuleLoader {
 	
-	def loadCoreModules (): List[MornyModule] = {
-		loadFromJar(classOf[MornyCoeur])
+	class MornyModuleInitializingException (val className: String, message: String) extends Exception (
+		s"Failed to initialize module $className : $message"
+	)
+	
+	class NotMornyModuleException (className: String) extends MornyModuleInitializingException (
+		className,
+		s"Class is not a MornyModule, due to it does not implements the cc.sukazyo.cono.morny.core.MornyModule trait."
+	)
+	
+	class MornyModuleNotFoundException (className: String) extends MornyModuleInitializingException (
+		className,
+		s"Cannot found class in this name."
+	)
+	
+	@throws[MornyModuleInitializingException]
+	def loadModuleByClass (clazz: Class[?]): MornyModule = {
+		try {
+			val instance = clazz.getConstructor().newInstance()
+			instance match
+				case module: MornyModule =>
+					module
+				case _ =>
+					throw NotMornyModuleException(clazz.getName)
+		} catch {
+			case e_module: MornyModuleInitializingException =>
+				throw e_module
+			case e_any: Exception =>
+				throw MornyModuleInitializingException(clazz.getName, e_any.getMessage).initCause(e_any)
+		}
 	}
 	
-	def loadFromJar (packageClazz: Class[?]): List[MornyModule] = {
+	@throws[MornyModuleInitializingException]
+	def loadModuleByClassName (className: String): MornyModule = {
+		try {
+			val clazz = Class.forName(className)
+			loadModuleByClass(clazz)
+		} catch {
+			case e_module: MornyModuleInitializingException =>
+				throw e_module
+			case e_notFound: ClassNotFoundException =>
+				throw MornyModuleNotFoundException(className).initCause(e_notFound)
+		}
+	}
+	
+	def loadModuleByNameList (moduleClassNames: List[String], onLoadingErrors: MornyModuleInitializingException =>Any): List[MornyModule] = {
+		
 		val list = ListBuffer[MornyModule]()
 		
-		val moduleListFile = packageClazz.getResourceAsStream("/morny-modules.list")
-			.readAllBytes()
-		val modules = String(moduleListFile, StandardCharsets.UTF_8)
-			.split("\n")
-			.map(_.strip)
-			.filter(_.nonEmpty)
-		
-		modules.foreach { (clazzName: String) =>
+		moduleClassNames.foreach { (clazzName: String) =>
 			try {
-				val clazz = Class.forName(clazzName)
-				val instance = clazz.getConstructor().newInstance()
-				instance match
-					case module: MornyModule =>
-						list += module
-					case _ =>
-						logger `error`
-							s"""Module is not a Morny Module :
-							   | - in package : ${packageClazz.getName}
-							   | - declared class name : $clazzName
-							   |You need to implement a MornyModule trait to make it a REAL morny module!""".stripMargin
-			} catch case e: Exception =>
-				logger `error`
-					s"""Failed to create a module instance :
-					   | - in package : ${packageClazz.getName}
-					   | - declared class name : $clazzName
-					   |${e.toLogString}
-					   |Is this a typo or packaging error? You need to add morny-modules.list and your code to the same jar.""".stripMargin
+				val module = loadModuleByClassName(clazzName)
+				list += module
+			} catch case e: MornyModuleInitializingException =>
+				onLoadingErrors(e)
 		}
 		
 		list.toList
+		
 	}
 	
 }
