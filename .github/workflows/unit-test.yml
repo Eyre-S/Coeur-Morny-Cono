@@ -24,15 +24,14 @@ jobs:
         uses: sbt/setup-sbt@v1
       - name: "Run unit tests"
         id: do-unit-test
+        continue-on-error: true
         run: sbt test
       - name: "Upload test reports as artifact"
-        if: steps.do-unit-test.conclusion == 'failure' || steps.do-unit-test.conclusion == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: 'unit-test-report'
           path: ./*/target/test-reports/*
       - name: "Publish test report to summary"
-        if: steps.do-unit-test.conclusion == 'failure' || steps.do-unit-test.conclusion == 'success'
         uses: phoenix-actions/test-reporting@v15
         with:
           output-to: 'step-summary'
