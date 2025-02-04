@@ -42,21 +42,21 @@ object MornyConfiguration {
 		
 		override val dependencies = Seq(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.8.4" % Compile,
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.0" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "resource-tools" % "0.3.1",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			
-			"com.softwaremill.sttp.client3" %% "core" % "3.9.5",
-			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.9.5",
+			"com.softwaremill.sttp.client3" %% "core" % "3.10.3",
+			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.10.3",
 			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
 			
-			"org.jsoup" % "jsoup" % "1.17.2",
+			"org.jsoup" % "jsoup" % "1.18.3",
 			
-			"org.scalatest" %% "scalatest" % "3.2.18" % Test,
-			"org.scalatest" %% "scalatest-freespec" % "3.2.18" % Test,
+			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
+			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
 			// for test report
 			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
 			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
@@ -88,35 +88,35 @@ object MornyConfiguration {
 		
 		override val dependencies = Seq(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.8.4" % Compile,
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.0" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "resource-tools" % "0.3.1",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
-			"org.http4s" %% "http4s-dsl" % "0.23.27",
-			"org.http4s" %% "http4s-circe" % "0.23.27",
-			"org.http4s" %% "http4s-netty-server" % "0.5.16",
+			"org.http4s" %% "http4s-dsl" % "0.23.30",
+			"org.http4s" %% "http4s-circe" % "0.23.30",
+			"org.http4s" %% "http4s-netty-server" % "0.5.22",
 			
-			"com.softwaremill.sttp.client3" %% "core" % "3.9.5",
-			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.9.5",
+			"com.softwaremill.sttp.client3" %% "core" % "3.10.3",
+			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.10.3",
 			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
 			
-			"com.google.code.gson" % "gson" % "2.10.1",
-			"io.circe" %% "circe-core" % "0.14.7",
-			"io.circe" %% "circe-generic" % "0.14.7",
-			"io.circe" %% "circe-parser" % "0.14.7",
-			"org.jsoup" % "jsoup" % "1.17.2",
+			"com.google.code.gson" % "gson" % "2.12.1",
+			"io.circe" %% "circe-core" % "0.14.10",
+			"io.circe" %% "circe-generic" % "0.14.10",
+			"io.circe" %% "circe-parser" % "0.14.10",
+			"org.jsoup" % "jsoup" % "1.18.3",
 			
 			"com.cronutils" % "cron-utils" % "9.2.1",
 			
-			// used for disable slf4j
+			// for disable slf4j
 			// due to the slf4j api have been used in the following libraries:
 			//  - cron-utils
-			"org.slf4j" % "slf4j-nop" % "2.0.13" % Runtime,
+			"org.slf4j" % "slf4j-nop" % "2.0.16" % Runtime,
 			
-			"org.scalatest" %% "scalatest" % "3.2.18" % Test,
-			"org.scalatest" %% "scalatest-freespec" % "3.2.18" % Test,
+			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
+			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
 			// for test report
 			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
 			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test

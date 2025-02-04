@@ -4,7 +4,7 @@
       <option value="$PROJECT_DIR$/.run/debug.env" />
     </option>
     <option name="MAIN_CLASS_NAME" value="cc.sukazyo.cono.morny.core.ServerMain" />
-    <module name="root.Coeur Morny Cono" />
+    <module name="Coeur Morny Cono.Morny Coeur" />
     <option name="PROGRAM_PARAMETERS" value="--quiet --debug -t --username sukazyo_deving_bot --master 793274677 --trusted-chat -1 --auto-cmd --outdated-ignore --trusted-reader-dinner 1040613596 --report-to 793274677 -medc 793274677 -medt 0,2,18,19 -medtz 8 --dinner-chat -1001670950261" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/run" />
     <extension name="coverage">
