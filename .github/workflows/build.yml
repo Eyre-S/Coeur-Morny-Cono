@@ -15,12 +15,15 @@ jobs:
       - if: steps.check-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
       - if: steps.check-cache.outputs.cache-hit != 'true'
-        name: "Setup Java 21 with SBT"
+        name: "Setup Java 21"
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: sbt
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "Setup sbt"
+        uses: sbt/setup-sbt@v1
       - if: steps.check-cache.outputs.cache-hit != 'true'
         name: "Compile Project"
         run: sbt compile
