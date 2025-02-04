@@ -4,7 +4,7 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply.isAllMessageMark
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
-import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.request.{ForwardMessage, SendMessage}
 
 import scala.language.postfixOps
 import scala.util.boundary
@@ -21,9 +21,27 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		if (1 over 8) chance_is false then return;
 		if !isAllMessageMark(using update.message.text) then return;
 		
-		coeur.account exec SendMessage(
-			update.message.chat.id, update.message.text
-		).replyToMessageId(update.message.messageId)
+		if (update.message.hasProtectedContent) {
+			// Copy the message
+			// if the message cannot be forwarded.
+			// Some chats may have restrictions on forwarding messages caused
+			// we cannot use the best behavior (on the 'else' branch).
+			// so use this as a fallback.
+			// Due to the CopyMessage function only exists in the newer version's API,
+			// we can only send the message again.
+			// TODO: change to CopyMessage when the API is updated.
+			// This is the old behavior with changes that removes the reply to the original message.
+			coeur.account exec SendMessage(
+				update.message.chat.id, update.message.text
+			)
+		} else {
+			// forward the message
+			//  if the message triggers question mark repeat
+			coeur.account exec ForwardMessage(
+				update.message.chat.id,
+				update.message.chat.id, update.message.messageId
+			)
+		}
 		event.setEventOk
 		
 	}
