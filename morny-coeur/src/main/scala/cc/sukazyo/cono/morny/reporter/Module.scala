@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.reporter
 import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
 
 class Module extends MornyInternalModule {
 	
@@ -38,17 +39,27 @@ class Module extends MornyInternalModule {
 	override def onStarting (using coeur: MornyCoeur)(cxt: MornyCoeur.OnStartingContext): Unit = {
 		import coeur.externalContext
 		externalContext >> { (instance: MornyReport) =>
+			
 			instance.start()
+			
+			TelegramBotEvents.inCoeur.OnGetUpdateFailed
+				.registerListener(instance.botErrorsReport.onGetUpdateFailed)
+			TelegramBotEvents.inCoeur.OnListenerOccursException
+				.registerListener(instance.botErrorsReport.onEventListenersThrowException)
+			
 		} || {
 			logger `warn` "There seems no reporter instance is provided; skipped start it."
 		}
 	}
 	
 	override def onStartingPost (using coeur: MornyCoeur)(cxt: MornyCoeur.OnStartingPostContext): Unit = {
+		
 		import coeur.externalContext
+		
 		externalContext >> { (instance: MornyReport) =>
 			instance.reportCoeurMornyLogin()
 		}
+		
 	}
 	
 	override def onExiting (using coeur: MornyCoeur): Unit = {

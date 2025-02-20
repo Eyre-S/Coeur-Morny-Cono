@@ -8,8 +8,13 @@ ThisBuild / version := MornyProject.version
 ThisBuild / scalaVersion := "3.4.1"
 
 ThisBuild / resolvers ++= Seq(
-		"-ws-releases" at "https://mvn.sukazyo.cc/releases"
-)
+		"-ws-releases" at "https://mvn.sukazyo.cc/releases",
+		if (MornyProject.version_is_snapshot) {
+			"-ws-snapshots" at "https://mvn.sukazyo.cc/snapshots"
+		} else {
+			null
+		}
+).filter(x => x != null)
 
 ThisBuild / crossPaths := false
 

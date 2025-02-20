@@ -1,8 +1,8 @@
 package cc.sukazyo.cono.morny.system.telegram_api.event
 
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
-import cc.sukazyo.cono.morny.system.utils.GivenContext
 import cc.sukazyo.messiva.utils.StackUtils
+import cc.sukazyo.std.contexts.GivenContext
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable

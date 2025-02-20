@@ -42,10 +42,11 @@ object MornyConfiguration {
 		
 		override val dependencies = Seq(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.0" % Compile,
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "resource-tools" % "0.3.1",
+			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			
@@ -88,10 +89,11 @@ object MornyConfiguration {
 		
 		override val dependencies = Seq(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.0" % Compile,
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "resource-tools" % "0.3.1",
+			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			"org.http4s" %% "http4s-dsl" % "0.23.30",

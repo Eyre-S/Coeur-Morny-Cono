@@ -6,16 +6,16 @@ import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, M
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
+import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.core.module.ModuleHelper
-import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
-import cc.sukazyo.cono.morny.system.utils.GivenContext
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
+import cc.sukazyo.std.contexts.GivenContext
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
 
@@ -118,6 +118,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	given MornyCoeur = this
 	
+	val telegramBotEvents = new TelegramBotEvents()
+	
 	val externalContext: GivenContext = GivenContext()
 	logger `info`
 		m"""The following Modules have been added to current Morny:
@@ -150,7 +152,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	///<<< BLOCK END instance configure & startup stage 1
 	
-	/** inner value: about why morny exit, used in [[daemon.MornyReport]]. */
+	/** inner value: about why morny exit. */
 	private var whileExit_reason: Option[AnyRef] = None
 	/** About why morny exits. */
 	def exitReason: Option[AnyRef] = whileExit_reason
@@ -295,7 +297,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 				   |  server responses:
 				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response).indent(4)}
 				   |""".stripMargin
-			externalContext.consume[MornyReport](_.exception(e, "Failed get updates."))
 		}
 		
 		if (e.getCause != null) {
@@ -319,7 +320,9 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 					logger `error`
 						s"""Failed get updates:
 						   |${e_other.toLogString `indent` 3}""".stripMargin
-					externalContext.consume[MornyReport](_.exception(e_other, "Failed get updates."))
+			
+			TelegramBotEvents.inCoeur.OnGetUpdateFailed.emit(e)
+			
 		}
 		
 	})

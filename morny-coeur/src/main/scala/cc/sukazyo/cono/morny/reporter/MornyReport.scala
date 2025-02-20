@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.reporter
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
+import cc.sukazyo.cono.morny.reporter.telegram_bot.BotErrorsReport
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener, EventRuntimeException}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
@@ -26,7 +27,9 @@ import com.pengrad.telegrambot.TelegramException
 
 import java.time.ZoneId
 
-class MornyReport (using coeur: MornyCoeur) {
+class MornyReport (using val coeur: MornyCoeur) {
+	
+	given reporter: MornyReport = this
 	
 	private val enabled = coeur.config.reportToChat != -1
 	if !enabled then
@@ -145,6 +148,8 @@ class MornyReport (using coeur: MornyCoeur) {
 			.stripMargin
 		).parseMode(ParseMode HTML))
 	}
+	
+	object botErrorsReport extends BotErrorsReport()
 	
 	object EventStatistics {
 		
@@ -278,5 +283,12 @@ class MornyReport (using coeur: MornyCoeur) {
 	def stop (): Unit = {
 		coeur.tasks % DailyReportTask
 	}
+	
+}
+
+object MornyReport {
+	
+	def inCoeur (coeur: MornyCoeur): MornyReport =
+		coeur.externalContext.getUnsafe[MornyReport]
 	
 }

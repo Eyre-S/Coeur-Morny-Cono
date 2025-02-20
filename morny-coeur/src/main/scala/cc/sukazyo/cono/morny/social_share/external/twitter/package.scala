@@ -2,6 +2,12 @@ package cc.sukazyo.cono.morny.social_share.external
 
 import scala.util.matching.Regex
 
+/** Public twitter objects and utilities.
+  * 
+  * Contains:
+  * - Twitter's tweet url object [[TweetUrlInformation]], and its parser [[parseTweetUrl]] &
+  *   [[guessTweetUrl]].
+  */
 package object twitter {
 	
 	private val REGEX_TWEET_URL: Regex = "(?:https?://)?((?:(?:(?:c\\.)?vx|fx|www\\.)?twitter|(?:www\\.|fixup|fixv)?x)\\.com)/((\\w+)/status/(\\d+)(?:/photo/(\\d+))?)/?(?:\\?(\\S+))?"r
@@ -69,6 +75,20 @@ package object twitter {
 				))
 			case _ => None
 	
+	/** Find all the possible Twitter/X URL from the given text.
+	  *
+	  * It supports url like [[parseTweetUrl]] supports, the only difference is that this
+	  * method can find all the possible urls in the text using [[Regex.findAllMatchIn]],
+	  * instead of strictly match the text.
+	  *
+	  * For each Twitter URL found in the text, a corresponds [[TweetUrlInformation]] will be
+	  * created.
+	  * 
+	  * @param text The text that may contain tweet url.
+	  * @return A list of [[TweetUrlInformation]].
+	  *         Each twitter url found in the text corresponds to one [[TwitterUrlInformation]].
+	  *         If no url is found, an empty list will be returned.
+	  */
 	def guessTweetUrl (text: String): List[TweetUrlInformation] =
 		REGEX_TWEET_URL.findAllMatchIn(text).map(f => {
 			TweetUrlInformation(

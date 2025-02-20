@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.core.bot.api
 
 import cc.sukazyo.cono.morny.core.{Log, MornyCoeur}
 import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.reporter.MornyReport
+import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener, EventRuntimeException}
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.google.gson.GsonBuilder
@@ -49,7 +49,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 			i.atEventPost
 		}
 		
-		private def runEventListener (i: EventListener)(using EventEnv): Unit = {
+		private def runEventListener (i: EventListener)(using event: EventEnv): Unit = {
 			try {
 				i.on
 				updateThreadName("message")
@@ -80,7 +80,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 				if update.chatMember ne null then i.onChatMemberUpdated
 				updateThreadName("chat-join-request")
 				if update.chatJoinRequest ne null then i.onChatJoinRequest
-			} catch case e => {
+			} catch case e: Throwable => {
 				val errorMessage = StringBuilder()
 				errorMessage ++= "Event throws unexpected exception:\n"
 				errorMessage ++= (e.toLogString `indent` 4)
@@ -92,7 +92,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 						) `indent` 4) ++= "\n"
 					case _ =>
 				logger `error` errorMessage.toString
-				coeur.externalContext.consume[MornyReport](_.exception(e, "on event running"))
+				TelegramBotEvents.inCoeur.OnListenerOccursException.emit((e, i, event))
 			}
 		}
 		
