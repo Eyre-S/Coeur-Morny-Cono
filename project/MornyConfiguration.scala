@@ -74,7 +74,32 @@ object MornyConfiguration {
 		override val group = GROUP
 		override val root_package = s"$GROUP.cono.morny.core"
 		
-		override val dependencies = Seq()
+		override val dependencies = Seq(
+			
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
+			
+			"cc.sukazyo" % "messiva" % "0.2.0",
+			"cc.sukazyo" % "resource-tools" % "0.3.1",
+			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
+			
+			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
+			"org.http4s" %% "http4s-dsl" % "0.23.30",
+			"org.http4s" %% "http4s-circe" % "0.23.30",
+			"org.http4s" %% "http4s-netty-server" % "0.5.22",
+			
+			"io.circe" %% "circe-core" % "0.14.10",
+			"io.circe" %% "circe-generic" % "0.14.10",
+			"io.circe" %% "circe-parser" % "0.14.10",
+			
+			"com.cronutils" % "cron-utils" % "9.2.1",
+			
+			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
+			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
+			// for test report
+			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
+			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
+			
+		)
 		
 	}
 	

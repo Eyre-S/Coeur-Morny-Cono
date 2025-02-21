@@ -4,7 +4,6 @@ import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
@@ -220,23 +219,24 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			.unsafeExecute
 	} 
 	
+	// todo: fix this
 	private def echoEventStatistics (using update: Update): Unit = {
-		coeur.externalContext >> { (reporter: MornyReport) =>
-			SendMessage(
-				update.message.chat.id,
-				VarText(
-					// language=html
-					"""<b>Event Statistics :</b>
-					  |in today
-					  |{event_statistics}""".stripMargin
-				).render(
-					"event_statistics" -> reporter.EventStatistics.eventStatisticsHTML
-				)
-			).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
-				.unsafeExecute
-		} || {
-			echo404
-		}
+//		coeur.externalContext >> { (reporter: MornyReport) =>
+//			SendMessage(
+//				update.message.chat.id,
+//				VarText(
+//					// language=html
+//					"""<b>Event Statistics :</b>
+//					  |in today
+//					  |{event_statistics}""".stripMargin
+//				).render(
+//					"event_statistics" -> reporter.EventStatistics.eventStatisticsHTML
+//				)
+//			).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
+//				.unsafeExecute
+//		} || {
+//			echo404
+//		}
 	}
 	
 	private def echo404 (using event: Update): Unit =

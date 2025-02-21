@@ -3,7 +3,7 @@ package cc.sukazyo.cono.morny.reporter
 import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
-import cc.sukazyo.cono.morny.reporter.telegram_bot.BotErrorsReport
+import cc.sukazyo.cono.morny.reporter.telegram_bot.{BotErrorsReport, CoreCommandsReports}
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener, EventRuntimeException}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
@@ -150,6 +150,7 @@ class MornyReport (using val coeur: MornyCoeur) {
 	}
 	
 	object botErrorsReport extends BotErrorsReport()
+	object coreCommandsReports extends CoreCommandsReports()
 	
 	object EventStatistics {
 		

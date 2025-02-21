@@ -2,15 +2,11 @@ package cc.sukazyo.cono.morny.core.event
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener as TelegramEventListener}
-import cc.sukazyo.std.event.{EventContext, RichEvent}
+import cc.sukazyo.std.event.RichEvent
 import cc.sukazyo.std.event.impl.NormalEventManager
 import com.pengrad.telegrambot.TelegramException
 
 class TelegramBotEvents (using coeur: MornyCoeur) {
-	
-	private val contextInitializer: EventContext[?]=>Unit = context => {
-		context.givenCxt << coeur
-	}
 	
 	/**
 	  * Event: OnGetUpdateFailed in TelegramBotEvents
@@ -25,10 +21,10 @@ class TelegramBotEvents (using coeur: MornyCoeur) {
 	  * You should register your own listener at stage [[MornyModule.onStartingPost]].
 	  */
 	val OnGetUpdateFailed: NormalEventManager[TelegramException, Unit] =
-		NormalEventManager().initContextWith(contextInitializer)
+		NormalEventManager().initContextWith(initWithCoeur)
 	
 	val OnListenerOccursException: RichEvent[(Throwable, TelegramEventListener, EventEnv), Unit] =
-		NormalEventManager().initContextWith(contextInitializer)
+		NormalEventManager().initContextWith(initWithCoeur)
 	
 }
 

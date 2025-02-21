@@ -3,7 +3,7 @@ package cc.sukazyo.cono.morny.reporter
 import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
+import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
 
 class Module extends MornyInternalModule {
 	
@@ -46,6 +46,8 @@ class Module extends MornyInternalModule {
 				.registerListener(instance.botErrorsReport.onGetUpdateFailed)
 			TelegramBotEvents.inCoeur.OnListenerOccursException
 				.registerListener(instance.botErrorsReport.onEventListenersThrowException)
+			TelegramCoreCommandEvents.inCoeur.OnUnauthorizedManageCommandCall
+				.registerListener(instance.coreCommandsReports.onUnauthorizedManageCommandCall)
 			
 		} || {
 			logger `warn` "There seems no reporter instance is provided; skipped start it."

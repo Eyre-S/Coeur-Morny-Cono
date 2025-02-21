@@ -6,7 +6,7 @@ import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, M
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
-import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
+import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.core.module.ModuleHelper
@@ -119,6 +119,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	given MornyCoeur = this
 	
 	val telegramBotEvents = new TelegramBotEvents()
+	val telegramCoreCommandEvents = new TelegramCoreCommandEvents()
 	
 	val externalContext: GivenContext = GivenContext()
 	logger `info`

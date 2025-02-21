@@ -4,8 +4,8 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.messages
 import cc.sukazyo.cono.morny.core.bot.api.messages.MessagingContext
+import cc.sukazyo.cono.morny.core.event.TelegramCoreCommandEvents
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.reporter.MornyReport
 import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.HiddenAlias
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
@@ -24,7 +24,7 @@ class MornyManagers (using coeur: MornyCoeur) {
 			).replyToMessageId(cxt.bind_message.messageId)
 				.unsafeExecute
 			logger `attention` s"403 ${command.name} caught from user ${cxt.bind_user toLogTag}"
-			coeur.externalContext.consume[MornyReport](_.unauthenticatedAction(s"/${command.name}", cxt.bind_user))
+			TelegramCoreCommandEvents.inCoeur.OnUnauthorizedManageCommandCall.emit((cxt, command))
 			false
 		else true
 	}
