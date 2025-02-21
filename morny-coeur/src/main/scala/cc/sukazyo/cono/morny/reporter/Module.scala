@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.reporter
 import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.bot.command.MornyInformation
 import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
 
 class Module extends MornyInternalModule {
@@ -28,8 +29,14 @@ class Module extends MornyInternalModule {
 		import cxt.*
 		
 		externalContext >> { (instance: MornyReport) =>
+			given MornyReport = instance
+			
 			logger `info` "MornyReport will now collect your bot event statistics."
 			eventManager register instance.EventStatistics.EventInfoCatcher
+			
+			import command.*
+			MornyInformation.inCoeur register Info_EventStatistic()
+			
 		} || {
 			logger `warn` "There seems no reporter instance is provided; skipped register events for it."
 		}

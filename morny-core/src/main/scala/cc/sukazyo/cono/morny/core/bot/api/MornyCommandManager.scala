@@ -19,14 +19,7 @@ object MornyCommandManager:
 class MornyCommandManager (using coeur: MornyCoeur) extends SimpleCommandManager {
 	private given TelegramBot = coeur.account
 	
-	def execute (using command: InputCommand, event: Update): Boolean = {
-		if (commands contains command.command)
-			commands(command.command) execute;
-			true
-		else nonCommandExecutable
-	}
-	
-	private def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
+	protected override def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
 		if command.target eq null then false
 		else
 			SendSticker(

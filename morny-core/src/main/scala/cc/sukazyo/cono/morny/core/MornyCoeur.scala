@@ -194,6 +194,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		_httpServerContext,
 		initializeContext)))
 	
+	import bot.command.MornyInformation
+	private[core] val $MornyInformation = MornyInformation()
 	{
 		
 		// register core/api events
@@ -206,8 +208,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		
 		import bot.command.*
 		val $MornyHellos = MornyHellos()
-		val $MornyInformation = MornyInformation()
-		val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)
 		val $MornyManagers = MornyManagers()
 		commands.register(
 			
@@ -216,8 +216,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			MornyInfoOnStart(),
 			
 			$MornyInformation,
-			$MornyInformationOlds.Version,
-			$MornyInformationOlds.Runtime,
 			$MornyManagers.SaveData,
 			$MornyManagers.Reload,
 			$MornyManagers.Exit,
@@ -227,6 +225,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 			errorMessageManager.ShowErrorMessageCommand,
 			
 		)
+		commands.register($MornyInformation.toplevelCommands*)
 		
 		// register core utils events
 		eventManager register $MornyHellos.PrivateChat_O

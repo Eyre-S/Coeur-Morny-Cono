@@ -30,7 +30,7 @@ class MornyOnTelegramCommand (using commandManager: MornyCommandManager) (using 
 			logger `debug` "not morny command"
 		else
 			logger `debug` "is command"
-			if commandManager.execute(using inputCommand) then
+			if commandManager.emitCommands(using inputCommand) then
 				setEventOk
 		
 	}
