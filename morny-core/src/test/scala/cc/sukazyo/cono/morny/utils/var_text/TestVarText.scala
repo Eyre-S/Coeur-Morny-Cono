@@ -1,9 +1,9 @@
-package cc.sukazyo.cono.morny.test.utils.var_text
+package cc.sukazyo.cono.morny.utils.var_text
 
-import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.var_text.{VarText, VTNodeLiteral, VTNodeVar}
+import cc.sukazyo.cono.morny.MornyCoreTests
 
-class VarTextTest extends MornyTests {
+class TestVarText extends MornyCoreTests {
 	
 	"VarText template convertor works." in {
 		VarText("abcdefg {one_var}{following}it /{escaped}it and this is //double-escape-literal, with a /no-need-to-escape then {{non formatted}}xxx {missing_part")

@@ -1,10 +1,10 @@
-package cc.sukazyo.cono.morny.test.utils.schedule
+package cc.sukazyo.cono.morny.utils.schedule
 
-import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.schedule.{IntervalWithTimesTask, Scheduler}
+import cc.sukazyo.cono.morny.MornyCoreTests
 import org.scalatest.tagobjects.Slow
 
-class IntervalsTest extends MornyTests {
+class TestIntervalTask extends MornyCoreTests {
 	
 	"IntervalWithTimesTest should work even scheduler is scheduled to stop" taggedAs Slow in {
 		val scheduler = Scheduler()

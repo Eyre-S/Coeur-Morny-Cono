@@ -1,9 +1,8 @@
-package cc.sukazyo.cono.morny.test.utils.tgapi.formatting
+package cc.sukazyo.cono.morny.system.telegram_api.formatting
 
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.NamingUtils
-import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.system.MornySystemTests
 
-class NamingUtilsTest extends MornyTests {
+class TestNamingUtils extends MornySystemTests {
 	
 	"while generating inline query result id :" - {
 		

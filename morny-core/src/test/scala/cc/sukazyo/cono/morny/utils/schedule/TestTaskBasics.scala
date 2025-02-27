@@ -1,10 +1,10 @@
-package cc.sukazyo.cono.morny.test.utils.schedule
+package cc.sukazyo.cono.morny.utils.schedule
 
-import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.schedule.Task
+import cc.sukazyo.cono.morny.MornyCoreTests
 import org.scalatest.tagobjects.Slow
 
-class TaskBasicTest extends MornyTests {
+class TestTaskBasics extends MornyCoreTests {
 	
 	"while comparing tasks :" - {
 		

@@ -1,12 +1,12 @@
-package cc.sukazyo.cono.morny.test.utils.schedule
+package cc.sukazyo.cono.morny.utils.schedule
 
-import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.schedule.{DelayedTask, Scheduler, Task}
+import cc.sukazyo.cono.morny.MornyCoreTests
 import org.scalatest.tagobjects.Slow
 
 import scala.collection.mutable
 
-class SchedulerTest extends MornyTests {
+class TestTaskScheduler extends MornyCoreTests {
 	
 	"While executing tasks using scheduler :" - {
 		

@@ -1,9 +1,9 @@
-package cc.sukazyo.cono.morny.test.utils
+package cc.sukazyo.cono.morny.system.utils
 
-import cc.sukazyo.cono.morny.test.MornyTests
-import org.scalatest.prop.TableDrivenPropertyChecks
+import cc.sukazyo.cono.morny.system.MornySystemTests
+import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 
-class ConvertByteHexTest extends MornyTests with TableDrivenPropertyChecks {
+class TestConvertByteHex extends MornySystemTests {
 	
 	private val examples_hex = Table(
 		("byte"      , "hex"),
@@ -19,7 +19,6 @@ class ConvertByteHexTest extends MornyTests with TableDrivenPropertyChecks {
 	
 	"while using Byte#toHex :" - forAll (examples_hex) ((byte, hex) => {
 		s"byte ($byte) should be hex '$hex''" in {
-			import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 			(byte toHex) shouldEqual hex
 		}
 	})
@@ -37,7 +36,6 @@ class ConvertByteHexTest extends MornyTests with TableDrivenPropertyChecks {
 	
 	"while using Array[Byte]#toHex :" - forAll(examples_hexs) ((bytes, hex) => {
 		s"byte array(${bytes mkString ","}) should be hex string $hex" in {
-			import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 			(bytes toHex) shouldEqual hex
 		}
 	})

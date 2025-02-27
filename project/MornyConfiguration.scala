@@ -45,7 +45,6 @@ object MornyConfiguration {
 			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "resource-tools" % "0.3.1",
 			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
@@ -55,6 +54,8 @@ object MornyConfiguration {
 			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
 			
 			"org.jsoup" % "jsoup" % "1.18.3",
+			
+			"cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT" % Test changing(),
 			
 			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
 			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,

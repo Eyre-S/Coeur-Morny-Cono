@@ -1,10 +1,9 @@
-package cc.sukazyo.cono.morny.test.utils
+package cc.sukazyo.cono.morny.utils
 
-import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.MornyCoreTests
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
-import org.scalatest.prop.TableDrivenPropertyChecks
 
-class CommonFormatTest extends MornyTests with TableDrivenPropertyChecks {
+class TestCommonFormat extends MornyCoreTests {
 	
 	"while using #formatDate :" - {
 		

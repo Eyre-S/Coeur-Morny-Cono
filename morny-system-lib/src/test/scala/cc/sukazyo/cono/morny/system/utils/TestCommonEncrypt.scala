@@ -1,14 +1,12 @@
-package cc.sukazyo.cono.morny.test.utils
+package cc.sukazyo.cono.morny.system.utils
 
-import cc.sukazyo.cono.morny.test.MornyTests
-import org.scalatest.prop.TableDrivenPropertyChecks
+import cc.sukazyo.cono.morny.system.MornySystemTests
+import cc.sukazyo.cono.morny.system.utils.CommonEncrypt.{MD5, SHA1, SHA256, SHA512}
+import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 
-class CommonEncryptTest extends MornyTests with TableDrivenPropertyChecks {
+class TestCommonEncrypt extends MornySystemTests {
 	
 	"while doing hash :" - {
-		
-		import cc.sukazyo.cono.morny.system.utils.CommonEncrypt.{MD5, SHA1, SHA256, SHA512}
-		import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 		
 		val examples = Table(
 			(
@@ -52,7 +50,6 @@ class CommonEncryptTest extends MornyTests with TableDrivenPropertyChecks {
 			}
 		}
 		
-		// todo: binary file source
 		case class ExampleHashValue (
 			md5: String,
 			sha1: String,
@@ -83,7 +80,7 @@ class CommonEncryptTest extends MornyTests with TableDrivenPropertyChecks {
 				if file == null then
 					Array.empty[Byte]
 				else
-					assets.getFile(file).read.readAllBytes
+					Assets.root.getFile(file).read.readAllBytes
 			
 			s"while hashing binary $_name :" - {
 				

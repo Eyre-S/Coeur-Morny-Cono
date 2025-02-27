@@ -1,10 +1,9 @@
-package cc.sukazyo.cono.morny.test.utils
+package cc.sukazyo.cono.morny.system.utils
 
+import cc.sukazyo.cono.morny.system.MornySystemTests
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.{EpochDays, EpochMillis, EpochSeconds}
-import cc.sukazyo.cono.morny.test.MornyTests
-import org.scalatest.prop.TableDrivenPropertyChecks
 
-class EpochDateTimeTest extends MornyTests with TableDrivenPropertyChecks {
+class TestEpochDateTime extends MornySystemTests {
 	
 	"while converting to EpochMillis :" - {
 		

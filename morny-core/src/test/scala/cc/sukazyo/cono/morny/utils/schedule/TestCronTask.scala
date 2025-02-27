@@ -1,8 +1,8 @@
-package cc.sukazyo.cono.morny.test.utils.schedule
+package cc.sukazyo.cono.morny.utils.schedule
 
-import cc.sukazyo.cono.morny.test.MornyTests
 import cc.sukazyo.cono.morny.util.schedule.{CronTask, Scheduler}
 import cc.sukazyo.cono.morny.util.CommonFormat.formatDate
+import cc.sukazyo.cono.morny.MornyCoreTests
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.cronutils.model.field.expression.FieldExpressionFactory as C
@@ -13,7 +13,7 @@ import java.lang.System.currentTimeMillis
 import java.time.{ZonedDateTime, ZoneOffset}
 import java.time.temporal.ChronoUnit
 
-class CronTaskTest extends MornyTests {
+class TestCronTask extends MornyCoreTests {
 	
 	"cron task works fine" taggedAs Slow in {
 		

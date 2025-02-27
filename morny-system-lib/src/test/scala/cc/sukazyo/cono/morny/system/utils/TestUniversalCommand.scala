@@ -1,14 +1,13 @@
-package cc.sukazyo.cono.morny.test.utils
+package cc.sukazyo.cono.morny.system.utils
 
-import cc.sukazyo.cono.morny.test.MornyTests
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks
+import UniversalCommand as Cmd
 
-class UniversalCommandTest extends MornyTests with Matchers with TableDrivenPropertyChecks {
+import cc.sukazyo.cono.morny.system.MornySystemTests
+import cc.sukazyo.cono.morny.system.utils.UniversalCommand.Lossy as Lmd
+
+class TestUniversalCommand extends MornySystemTests {
 	
 	"while formatting command from String :" - {
-		import cc.sukazyo.cono.morny.system.utils.UniversalCommand as Cmd
-		import cc.sukazyo.cono.morny.system.utils.UniversalCommand.Lossy as Lmd
 		def whileLossy (info: String): String = "in lossy mode " + info
 		def whileStrict (info: String): String = "in strict mode" + info
 		
@@ -25,6 +24,8 @@ class UniversalCommandTest extends MornyTests with Matchers with TableDrivenProp
 		"""texts and ascii-spaces in '' should grouped in one arg""" in:
 			Cmd("""tests 'data set'""") shouldEqual Array("tests", "data set")
 			Lmd("""tests 'data set'""") shouldEqual Array("tests", "data set")
+			Cmd("""'rich command' arg1 arg2""") shouldEqual Array("rich command", "arg1", "arg2")
+			Lmd("""'rich command' arg1 arg2""") shouldEqual Array("rich command", "arg1", "arg2")
 		"""texts and ascii-spaces in "" should grouped in one arg""" in :
 			Cmd("""tests "data  set"""") shouldEqual Array("tests", "data  set")
 			Lmd("""tests "data  set"""") shouldEqual Array("tests", "data  set")
@@ -112,7 +113,7 @@ class UniversalCommandTest extends MornyTests with Matchers with TableDrivenProp
 		forAll(example_special_character) { char =>
 			s"input with special character ($char) should keep origin like" in {
 				Cmd(s"$char dataset data[$char]contains parsed") shouldEqual
-						Array(char, "dataset", s"data[$char]contains", "parsed")
+					Array(char, "dataset", s"data[$char]contains", "parsed")
 				Lmd(s"$char dataset data[$char]contains parsed") shouldEqual
 					Array(char, "dataset", s"data[$char]contains", "parsed")
 			}

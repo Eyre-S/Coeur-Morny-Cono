@@ -9,6 +9,4 @@ abstract class MornyTests extends AnyFreeSpec with should.Matchers {
 	val pack: ResourcePackage = ResourcePackage.get("assets_morny_tests")
 	val assets: ResourceDirectory = pack.getDirectory("assets_morny_tests")
 	
-	val pending_val = "[not-implemented]"
-	
 }

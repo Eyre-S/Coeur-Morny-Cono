@@ -1,8 +1,8 @@
-package cc.sukazyo.cono.morny.test.utils.tgapi.formatting
+package cc.sukazyo.cono.morny.system.telegram_api.formatting
 
-import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.system.MornySystemTests
 
-class TelegramParseEscapeTest extends MornyTests {
+class TestTelegramParseEscape extends MornySystemTests {
 	
 	"while escape HTML document :" - {
 		
@@ -10,15 +10,15 @@ class TelegramParseEscapeTest extends MornyTests {
 		val any_other = "0ir0Q*%_\"ir[0\"#*I%T\"I{EtjpJGI{\")#W*IT}P%*IH#){#NIJB9-/q{$(Jg'9m]q|MH4j0hq}|+($NR{')}}"
 		
 		"& must be escaped" in:
-				h("a & b") shouldEqual "a &amp; b"
+			h("a & b") shouldEqual "a &amp; b"
 		"< and > must be escaped" in:
-				h("<data-error>") shouldEqual "&lt;data-error&gt;"
+			h("<data-error>") shouldEqual "&lt;data-error&gt;"
 		"& and < and > must all be escaped" in:
-				h("<some-a> && <some-b>") shouldEqual "&lt;some-a&gt; &amp;&amp; &lt;some-b&gt;"
+			h("<some-a> && <some-b>") shouldEqual "&lt;some-a&gt; &amp;&amp; &lt;some-b&gt;"
 		"space and count should be kept" in:
-				h("\t<<<<  \n") shouldEqual "\t&lt;&lt;&lt;&lt;  \n"
+			h("\t<<<<  \n") shouldEqual "\t&lt;&lt;&lt;&lt;  \n"
 		"any others should kept origin like" in:
-				h(any_other) shouldEqual any_other
+			h(any_other) shouldEqual any_other
 		
 	}
 	
