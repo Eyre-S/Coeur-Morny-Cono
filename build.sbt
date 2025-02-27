@@ -1,3 +1,5 @@
+import MornyConfiguration.ProjectMetadata
+
 aether.AetherKeys.aetherOldVersionMethod := true
 
 ThisBuild / organization := MornyProject.group
@@ -59,14 +61,35 @@ ThisBuild / publishTo := MornyProject.publishTo
 ThisBuild / credentials ++= MornyProject.publishCredentials
 
 
+def projectMetadata (meta: ProjectMetadata): Seq[Def.Setting[?]] = {
+	
+	var settings: Seq[Def.Setting[?]] = Seq(
+		
+		name := meta.name,
+		moduleName := meta.id,
+		Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest,
+			"-h", s"target/test-reports/${meta.id}",
+		),
+		
+		libraryDependencies ++= meta.dependencies,
+		
+	)
+	
+	meta match {
+		case runnable: MornyConfiguration.Runnable =>
+			settings = settings ++ Seq(
+				mainClass := Some(runnable.main_class)
+			)
+		case _ =>
+	}
+	
+	settings
+}
+
+
 lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
 		.settings(
-			
-			name := MornyProject.morny_system_lib.name,
-			moduleName := MornyProject.morny_system_lib.id,
-			
-			libraryDependencies ++= MornyProject.morny_system_lib.dependencies,
-			
+			projectMetadata(MornyProject.morny_system_lib)
 		)
 
 lazy val morny_core = (project in file(MornyProject.morny_core.id))
@@ -74,10 +97,7 @@ lazy val morny_core = (project in file(MornyProject.morny_core.id))
 		.dependsOn(morny_system_lib)
 		.settings(
 			
-			name := MornyProject.morny_core.name,
-			moduleName := MornyProject.morny_core.id,
-			
-			libraryDependencies ++= MornyProject.morny_core.dependencies,
+			projectMetadata(MornyProject.morny_core),
 			
 			buildInfoPackage := MornyProject.morny_coeur.root_package,
 			buildInfoObject := "BuildConfig",
@@ -102,12 +122,7 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 		.dependsOn(morny_system_lib)
 		.settings(
 			
-			name := MornyProject.morny_coeur.name,
-			moduleName := MornyProject.morny_coeur.id,
-			
-			Compile / mainClass := Some(MornyProject.morny_coeur.main_class),
-			
-			libraryDependencies ++= MornyProject.morny_coeur.dependencies,
+			projectMetadata(MornyProject.morny_coeur),
 			
 //			buildInfoPackage := MornyProject.morny_coeur.root_package,
 //			buildInfoObject := "BuildConfig",
@@ -153,7 +168,7 @@ lazy val dockerImageTag: SettingKey[String] = settingKey[String]("Docker image t
 lazy val dockerBuild: TaskKey[Unit] = taskKey("Build using system docker with current version as the container tag")
 
 lazy val root = (project in file ("."))
-		.aggregate(morny_system_lib, morny_coeur)
+		.aggregate(morny_system_lib, morny_core, morny_coeur)
 		.settings(
 			
 			name := "Coeur Morny Cono",
@@ -187,5 +202,3 @@ lazy val root = (project in file ("."))
 			}
 			
 		)
-
-
