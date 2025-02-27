@@ -3,6 +3,7 @@ run-name: "Build projects to ensure compiling is successful"
 on: [workflow_call]
 jobs:
   compile:
+    name: "Compile Project"
     runs-on: ubuntu-latest
     steps:
       - name: "Check if there's already have cache"
