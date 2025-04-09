@@ -11,10 +11,10 @@ class MornyEventListeners (using manager: EventListenerManager) (using coeur: Mo
 		// KUOHUANHUAN_NEED_SLEEP
 		OnOnAlias(),
 		OnUniMeowTrigger(using coeur.commands),
+		OnQuestionMarkReply(),
 		$OnUserRandom.RandomSelect,
 		//noinspection NonAsciiCharacters
 		$OnUserRandom.尊嘟假嘟,
-		OnQuestionMarkReply(),
 		OnUserSlashAction(),
 		OnCallMe(),
 		OnCallMsgSend(),

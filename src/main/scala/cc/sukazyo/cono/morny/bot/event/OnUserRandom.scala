@@ -29,7 +29,8 @@ class OnUserRandom (using coeur: MornyCoeur) {
 					if rand_half then _con1 else _con2
 				case USER_IF_QUERY(_con) =>
 					// for capability with [[OnQuestionMarkReply]]
-					if OnQuestionMarkReply.isAllMessageMark(using _con) then return;
+					//   fixme: not tested yet
+					if event.defined[OnQuestionMarkReply.Marked.type] then return;
 					(if rand_half then "不" else "") + _con
 				case _ => null
 			

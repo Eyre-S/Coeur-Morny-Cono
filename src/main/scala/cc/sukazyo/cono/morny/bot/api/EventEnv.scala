@@ -51,6 +51,20 @@ class EventEnv (
 			case None => ConsumeResult(false)
 	}
 	
+	// fixme: defined() series is not tested yet
+	
+	def defined [T: ClassTag]: Boolean = {
+		variables get classTag[T].runtimeClass match
+			case Some(_) => true
+			case None => false
+	}
+	
+	def defined [T] (t: Class[T]): Boolean = {
+		variables get t match
+			case Some(_) => true
+			case None => false
+	}
+	
 	def consume [T: ClassTag] (consumer: T => Unit): ConsumeResult =
 		variables get classTag[T].runtimeClass match
 			case Some(i) => consumer(i.asInstanceOf[T]); ConsumeResult(true)

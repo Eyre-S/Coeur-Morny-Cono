@@ -16,12 +16,7 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		import event.update
 		
 		// FIXME: not tested yet, due to cannot connect to test bot
-		if boundary[Boolean] {
-			event.consume[MornyOnUpdateTimestampOffsetLock.ExpiredEvent.type] { _ =>
-				boundary.break(true)
-			}
-			false
-		} then {
+		if event.defined[MornyOnUpdateTimestampOffsetLock.ExpiredEvent.type] then {
 			logger.debug("OnQuestionMarkReply: expired event, skipped")
 			return
 		} else {
@@ -32,8 +27,12 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		
 		import cc.sukazyo.cono.morny.util.UseMath.over
 		import cc.sukazyo.cono.morny.util.UseRandom.chance_is
-		if (1 over 8) chance_is false then return;
 		if !isAllMessageMark(using update.message.text) then return;
+		// provide a mark to notify the following event
+		//   that the current event is all made of question marks
+		event.provide(OnQuestionMarkReply.Marked)
+		
+		if (1 over 8) chance_is false then return;
 		
 		if (update.message.hasProtectedContent) {
 			// Copy the message
@@ -76,5 +75,7 @@ object OnQuestionMarkReply {
 			true
 		}
 	}
+	
+	object Marked
 	
 }
