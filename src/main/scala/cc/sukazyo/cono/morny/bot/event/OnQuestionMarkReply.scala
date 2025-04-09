@@ -4,6 +4,7 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.event.OnQuestionMarkReply.isAllMessageMark
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.Log.logger
 import com.pengrad.telegrambot.request.{ForwardMessage, SendMessage}
 
 import scala.language.postfixOps
@@ -13,6 +14,19 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onMessage (using event: EventEnv): Unit = {
 		import event.update
+		
+		// FIXME: not tested yet, due to cannot connect to test bot
+		if boundary[Boolean] {
+			event.consume[MornyOnUpdateTimestampOffsetLock.ExpiredEvent.type] { _ =>
+				boundary.break(true)
+			}
+			false
+		} then {
+			logger.debug("OnQuestionMarkReply: expired event, skipped")
+			return
+		} else {
+			logger.debug("OnQuestionMarkReply: event continue")
+		}
 		
 		if update.message.text eq null then return
 		

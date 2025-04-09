@@ -5,6 +5,7 @@ import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.Chat
 
+// fixme: not tested yet
 class OnOnAlias (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onMessage (using event: EventEnv): Unit = {
