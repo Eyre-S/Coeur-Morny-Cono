@@ -23,7 +23,7 @@ class MornyCommands (using coeur: MornyCoeur) {
 				stash += (alias.name -> i)
 		stash
 	
-	private val $MornyHellos = MornyHellos()
+	private[bot] val $MornyHellos = MornyHellos()
 	private val $IP186Query = IP186Query()
 	private val $MornyInformation = MornyInformation()
 	private val $MornyInformationOlds = MornyInformationOlds(using $MornyInformation)

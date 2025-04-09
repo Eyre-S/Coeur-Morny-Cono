@@ -9,6 +9,7 @@ class MornyEventListeners (using manager: EventListenerManager) (using coeur: Mo
 	manager.register(
 		// ACTIVITY_RECORDER
 		// KUOHUANHUAN_NEED_SLEEP
+		OnOnAlias(),
 		OnUniMeowTrigger(using coeur.commands),
 		$OnUserRandom.RandomSelect,
 		//noinspection NonAsciiCharacters
