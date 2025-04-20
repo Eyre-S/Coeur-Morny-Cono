@@ -51,8 +51,6 @@ class EventEnv (
 			case None => ConsumeResult(false)
 	}
 	
-	// fixme: defined() series is not tested yet
-	
 	def defined [T: ClassTag]: Boolean = {
 		variables get classTag[T].runtimeClass match
 			case Some(_) => true

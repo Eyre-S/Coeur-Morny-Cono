@@ -7,9 +7,10 @@ import cc.sukazyo.cono.morny.bot.event.MornyOnUpdateTimestampOffsetLock.ExpiredE
 class MornyOnUpdateTimestampOffsetLock (using coeur: MornyCoeur) extends EventListener {
 	
 	private def checkOutdated (timestamp: Int)(using event: EventEnv): Unit =
-		event.provide(ExpiredEvent)
-		if coeur.config.eventIgnoreOutdated && (timestamp < (coeur.coeurStartTimestamp/1000)) then
-			event.setEventCanceled
+		if  timestamp < (coeur.coeurStartTimestamp/1000) then
+			event.provide(ExpiredEvent)
+			if coeur.config.eventIgnoreOutdated then
+				event.setEventCanceled
 	
 	override def onMessage (using event: EventEnv): Unit = checkOutdated(event.update.message.date)
 	override def onEditedMessage (using event: EventEnv): Unit = checkOutdated(event.update.editedMessage.date)

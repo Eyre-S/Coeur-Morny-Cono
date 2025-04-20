@@ -15,7 +15,6 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 	override def onMessage (using event: EventEnv): Unit = {
 		import event.update
 		
-		// FIXME: not tested yet, due to cannot connect to test bot
 		if event.defined[MornyOnUpdateTimestampOffsetLock.ExpiredEvent.type] then {
 			logger.debug("OnQuestionMarkReply: expired event, skipped")
 			return
