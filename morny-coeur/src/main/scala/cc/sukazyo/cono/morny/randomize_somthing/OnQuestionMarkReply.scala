@@ -20,7 +20,9 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		
 		import cc.sukazyo.cono.morny.util.UseMath.over
 		import cc.sukazyo.cono.morny.util.UseRandom.chance_is
-		if (1 over 8) chance_is false then return;
+
+		import scala.language.implicitConversions
+		if 7 over 8 chance_is true then return;
 		if !isAllMessageMark(using update.message.text) then return;
 		
 		SendMessage(

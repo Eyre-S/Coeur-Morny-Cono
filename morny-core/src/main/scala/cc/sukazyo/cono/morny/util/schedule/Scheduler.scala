@@ -121,7 +121,7 @@ class Scheduler (isDaemon: Boolean = false) {
 										case next: EpochMillis =>
 											routine.currentScheduledTimeMillis = Some(next)
 											schedule(routine)
-										case _ =>
+										case null =>
 								case _ =>
 						}
 						

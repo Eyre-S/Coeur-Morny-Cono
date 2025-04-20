@@ -9,6 +9,8 @@ import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.TelegramBot
 
+import scala.language.implicitConversions
+
 //noinspection NonAsciiCharacters
 class 私わね (using coeur: MornyCoeur) extends ISimpleCommand {
 	private given TelegramBot = coeur.account

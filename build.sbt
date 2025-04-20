@@ -7,7 +7,7 @@ ThisBuild / organizationName := MornyProject.group_name
 
 ThisBuild / version := MornyProject.version
 
-ThisBuild / scalaVersion := "3.4.1"
+ThisBuild / scalaVersion := "3.6.4"
 
 ThisBuild / resolvers ++= Seq(
 		"-ws-releases" at "https://mvn.sukazyo.cc/releases",
@@ -34,7 +34,8 @@ artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
 
 ThisBuild / scalacOptions ++= Seq(
 	"-language:postfixOps",
-	"-encoding", MornyProject.source_encoding
+	"-encoding", MornyProject.source_encoding,
+	"-feature"
 )
 ThisBuild / javacOptions ++= Seq(
 	"-encoding", MornyProject.source_encoding,

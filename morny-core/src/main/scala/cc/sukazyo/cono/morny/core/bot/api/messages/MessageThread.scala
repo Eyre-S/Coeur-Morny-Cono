@@ -44,6 +44,7 @@ object MessageThread {
 	(using _cxt: MessagingContext.WithUserAndMessage)
 	(_callback: Callback)
 	: MessageThread[Unit] = new MessageThread[Unit] {
+		import scala.language.implicitConversions
 		override val starterContext: MessagingContext.WithUserAndMessage = _cxt
 		override val passingData: Unit = ()
 		override val callback: CallbackParameterized[Unit] = _callback
