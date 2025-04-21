@@ -1,4 +1,7 @@
 import sbt.*
+import MornyConfiguration.Dependencies.defineModules
+
+import scala.language.implicitConversions
 
 //noinspection TypeAnnotation
 object MornyConfiguration {
@@ -32,6 +35,77 @@ object MornyConfiguration {
 		val main_class: String
 	}
 	
+	object Dependencies {
+		
+		trait ModuleDefinition {
+			def compile: Seq[ModuleID]
+		}
+		class ModuleUnit (val mod: ModuleID) extends ModuleDefinition {
+			override def compile: Seq[ModuleID] = Seq(mod)
+		}
+		class ModuleGroup (val mods: Seq[ModuleDefinition]) extends ModuleDefinition {
+			override def compile: Seq[ModuleID] = mods.flatMap(_.compile)
+		}
+		implicit def moduleToModuleUnit (mod: ModuleID): ModuleDefinition = {
+			new ModuleUnit(mod)
+		}
+		def defineModules (mods: ModuleDefinition*): ModuleDefinition = {
+			new ModuleGroup(mods)
+		}
+		
+		val base = defineModules(
+			
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.3" % Compile,
+			
+			"cc.sukazyo" % "messiva" % "0.2.0",
+			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
+			
+			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
+			
+		)
+		
+		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.1")
+		
+		val http4s = defineModules(
+			"org.http4s" %% "http4s-dsl" % "0.23.30",
+			"org.http4s" %% "http4s-circe" % "0.23.30",
+			"org.http4s" %% "http4s-netty-server" % "0.5.23"
+		)
+		
+		val sttp = defineModules(
+			"com.softwaremill.sttp.client3" %% "core" % "3.11.0",
+			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.11.0",
+			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime
+		)
+		
+		val circe = defineModules(
+			"io.circe" %% "circe-core" % "0.14.13",
+			"io.circe" %% "circe-generic" % "0.14.13",
+			"io.circe" %% "circe-parser" % "0.14.13"
+		)
+		
+		val gson = defineModules("com.google.code.gson" % "gson" % "2.13.0")
+		
+		val jsoup = defineModules("org.jsoup" % "jsoup" % "1.19.1")
+		
+		val cron_utils = defineModules(
+			"com.cronutils" % "cron-utils" % "9.2.1",
+			// for disable slf4j
+			// due to the slf4j api have been used in the following libraries:
+			//  - cron-utils
+			"org.slf4j" % "slf4j-nop" % "2.0.17" % Runtime
+		)
+		
+		val test_cases = defineModules(
+			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
+			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
+			// for test report
+			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
+			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
+		)
+		
+	}
+	
 	object Morny_System_Library extends ProjectMetadata {
 		
 		override val name = "Morny System Library"
@@ -40,30 +114,17 @@ object MornyConfiguration {
 		override val group = GROUP
 		override val root_package = s"${this.group}.cono.morny.system"
 		
-		override val dependencies = Seq(
+		override val dependencies = defineModules(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
+			Dependencies.base,
 			
-			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
-			
-			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
-			
-			"com.softwaremill.sttp.client3" %% "core" % "3.10.3",
-			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.10.3",
-			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
-			
-			"org.jsoup" % "jsoup" % "1.18.3",
+			Dependencies.sttp,
+			Dependencies.jsoup,
 			
 			"cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT" % Test changing(),
+			Dependencies.test_cases
 			
-			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
-			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
-			// for test report
-			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
-			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
-			
-		)
+		).compile
 		
 	}
 	
@@ -75,32 +136,19 @@ object MornyConfiguration {
 		override val group = GROUP
 		override val root_package = s"$GROUP.cono.morny.core"
 		
-		override val dependencies = Seq(
+		override val dependencies = defineModules(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
+			Dependencies.base,
+			Dependencies.res,
 			
-			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "resource-tools" % "0.3.1",
-			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
+			Dependencies.http4s,
 			
-			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
-			"org.http4s" %% "http4s-dsl" % "0.23.30",
-			"org.http4s" %% "http4s-circe" % "0.23.30",
-			"org.http4s" %% "http4s-netty-server" % "0.5.22",
+			Dependencies.circe,
+			Dependencies.cron_utils,
 			
-			"io.circe" %% "circe-core" % "0.14.10",
-			"io.circe" %% "circe-generic" % "0.14.10",
-			"io.circe" %% "circe-parser" % "0.14.10",
+			Dependencies.test_cases
 			
-			"com.cronutils" % "cron-utils" % "9.2.1",
-			
-			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
-			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
-			// for test report
-			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
-			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
-			
-		)
+		).compile
 		
 	}
 	
@@ -113,43 +161,21 @@ object MornyConfiguration {
 		override val root_package = s"$GROUP.cono.morny"
 		override val main_class = s"${this.root_package}.core.ServerMain"
 		
-		override val dependencies = Seq(
+		override val dependencies = defineModules(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.1" % Compile,
+			Dependencies.base,
+			Dependencies.res,
+			Dependencies.http4s,
 			
-			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "resource-tools" % "0.3.1",
-			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
+			Dependencies.sttp,
+			Dependencies.gson,
+			Dependencies.circe,
+			Dependencies.jsoup,
+			Dependencies.cron_utils,
 			
-			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
-			"org.http4s" %% "http4s-dsl" % "0.23.30",
-			"org.http4s" %% "http4s-circe" % "0.23.30",
-			"org.http4s" %% "http4s-netty-server" % "0.5.22",
+			Dependencies.test_cases
 			
-			"com.softwaremill.sttp.client3" %% "core" % "3.10.3",
-			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.10.3",
-			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime,
-			
-			"com.google.code.gson" % "gson" % "2.12.1",
-			"io.circe" %% "circe-core" % "0.14.10",
-			"io.circe" %% "circe-generic" % "0.14.10",
-			"io.circe" %% "circe-parser" % "0.14.10",
-			"org.jsoup" % "jsoup" % "1.18.3",
-			
-			"com.cronutils" % "cron-utils" % "9.2.1",
-			
-			// for disable slf4j
-			// due to the slf4j api have been used in the following libraries:
-			//  - cron-utils
-			"org.slf4j" % "slf4j-nop" % "2.0.16" % Runtime,
-			
-			"org.scalatest" %% "scalatest" % "3.2.19" % Test,
-			"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
-			// for test report
-			"com.vladsch.flexmark" % "flexmark" % "0.64.8" % Test,
-			"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test
-			
-		)
+		).compile
 		
 	}
 	
