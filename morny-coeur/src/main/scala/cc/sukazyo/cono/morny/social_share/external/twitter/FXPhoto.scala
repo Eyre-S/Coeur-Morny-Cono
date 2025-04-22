@@ -6,11 +6,15 @@ package cc.sukazyo.cono.morny.social_share.external.twitter
   * @param url URL of the photo
   * @param width Width of the photo, in pixels
   * @param height Height of the photo, in pixels
+  * @param altText Alternative text of the photo, or also known as photo description.
+  *
+  *                It seems that this is not provided by Fix-Twitter API after 2025-04.
   */
 case class FXPhoto (
 	`type`: "photo",
 	url: String,
 	width: Int,
 	height: Int,
-	altText: String // todo
+	// todo: Find a tweet to test if this can still work
+	altText: Option[String]
 )
