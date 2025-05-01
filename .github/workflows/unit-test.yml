@@ -1,0 +1,66 @@
+name: "Unit Test"
+run-name: "Test projects using Unit Test framework to ensure code quality and API stability"
+on: [workflow_call]
+jobs:
+  build-tests:
+    name: "Build project tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup cached built project"
+        uses: actions/cache/restore@v4
+        with:
+          path: "./"
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          fail-on-cache-miss: 'true'
+      - name: "Setup Java 21"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+      #      - if: steps.check-cache.outputs.cache-hit != 'true'
+      #        name: "Setup Gradle"
+      #        uses: gradle/actions/setup-gradle@v4
+      - name: "Compile unit tests"
+        run: ./gradlew testClasses --no-daemon
+      - name: "Cache compiled unit tests"
+        uses: actions/cache/save@v4
+        with:
+          path: "./"
+          key: ${{ runner.os }}-build-${{ github.sha }}-withTests
+  unit-tests-run:
+    name: "Run unit tests"
+    needs: [build-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup cached built project"
+        uses: actions/cache/restore@v4
+        with:
+          path: "./"
+          key: ${{ runner.os }}-build-${{ github.sha }}-withTests
+          fail-on-cache-miss: 'true'
+      - name: "Setup Java 21"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+      #      - if: steps.check-cache.outputs.cache-hit != 'true'
+      #        name: "Setup Gradle"
+      #        uses: gradle/actions/setup-gradle@v4
+      - name: "Run unit tests"
+        continue-on-error: true
+        run: ./gradlew test --no-daemon
+      - name: "Upload test reports as artifact"
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: 'unit-test-report'
+          path: ./build/test-results/test/*
+      - name: "Publish test report to summary"
+        uses: phoenix-actions/test-reporting@v15
+        with:
+          output-to: 'step-summary'
+          name: 'Unit Tests Report'
+          path: ./build/test-results/test/*.xml
+          reporter: 'java-junit'

@@ -1,0 +1,14 @@
+name: "Project Test"
+on: [push]
+jobs:
+  check-build:
+    name: "Do project compile"
+    uses: ./.github/workflows/build.yml
+  check-unit-tests:
+    name: "Do unit tests"
+    needs: [check-build]
+    uses: ./.github/workflows/unit-test.yml
+  check-assembly-run:
+    name: "Generate and test run assembly"
+    needs: [check-build]
+    uses: ./.github/workflows/assembly-run.yml
