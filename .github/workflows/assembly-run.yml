@@ -4,7 +4,7 @@ on: [workflow_call]
 jobs:
   generate-assembly:
     name: "Build assembly jar"
-    uses: ./.github/workflows/assembly-generate.yml
+    uses: ./.github/workflows/assembly-build.yml
   run-assembly:
     name: "Test run assembly jar"
     needs: [generate-assembly]

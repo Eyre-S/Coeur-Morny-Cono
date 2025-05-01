@@ -1,4 +1,4 @@
-name: Project Test
+name: "Project Test"
 on: [push]
 jobs:
   check-build:
