@@ -21,7 +21,7 @@ jobs:
       #        name: "Setup Gradle"
       #        uses: gradle/actions/setup-gradle@v4
       - name: "Generate assembly jar"
-        run: ./gradlew shadowJar
+        run: ./gradlew shadowJar --no-daemon
       - name: "Publish assembly jar"
         uses: actions/upload-artifact@v4
         with:

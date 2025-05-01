@@ -27,7 +27,7 @@ jobs:
 #        uses: gradle/actions/setup-gradle@v4
       - if: steps.check-cache.outputs.cache-hit != 'true'
         name: "Compile Project"
-        run: ./gradlew classes --noDaemon
+        run: ./gradlew classes --no-daemon
       - if: steps.check-cache.outputs.cache-hit != 'true'
         name: "Cache the built project"
         uses: actions/cache/save@v4

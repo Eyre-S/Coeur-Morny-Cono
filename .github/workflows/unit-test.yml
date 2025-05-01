@@ -22,7 +22,7 @@ jobs:
       #        name: "Setup Gradle"
       #        uses: gradle/actions/setup-gradle@v4
       - name: "Compile unit tests"
-        run: ./gradlew testClasses
+        run: ./gradlew testClasses --no-daemon
       - name: "Cache compiled unit tests"
         uses: actions/cache/save@v4
         with:
@@ -50,7 +50,7 @@ jobs:
       #        uses: gradle/actions/setup-gradle@v4
       - name: "Run unit tests"
         continue-on-error: true
-        run: ./gradlew test
+        run: ./gradlew test --no-daemon
       - name: "Upload test reports as artifact"
         uses: actions/upload-artifact@v4
         continue-on-error: true
