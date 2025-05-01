@@ -7,7 +7,10 @@ import cc.sukazyo.cono.morny.util.EpochDateTime.EpochSeconds
   *
   * @param id Status (Tweet) ID
   * @param url Link to original Tweet
-  * @param text Text of Tweet
+  * @param text Text of Tweet. May not contains some extra information like URLs.
+  * @param raw_text Raw text of Tweet, contains a full article text and facets (rich information).
+  *                 Comparing with the `text` field, this contains all information that you want
+  *                 to know, like even the media is included.
   * @param created_at Date/Time in UTC when the Tweet was created
   * @param created_timestamp Date/Time in UTC when the Tweet was created
   * @param color Dominant color pulled from either Tweet media or from the author's profile picture.
@@ -39,6 +42,7 @@ case class FXTweet (
 	id: String,
 	url: String,
 	text: String,
+	raw_text: FXRawText,
 	created_at: String,
 	created_timestamp: EpochSeconds,
 	is_note_tweet: Boolean, // todo
@@ -50,7 +54,7 @@ case class FXTweet (
 //	twitter_card: "tweet"|"summary"|"summary_large_image"|"player",
 	twitter_card: Option[String],
 	author: FXAuthor,
-	source: String,
+	source: Option[String],
 	
 	///====================
 	/// Interaction counts

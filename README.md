@@ -18,7 +18,7 @@
 [badge_release_img]: https://img.shields.io/github/v/release/Eyre-S/Coeur-Morny-Cono?display_name=release&label=latest&color=#00fa9a
 [badge_release_target]: https://mvn.sukazyo.cc/#/releases/cc/sukazyo/morny-coeur
 [//]: # (on branch master)
-[badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/test.yml?branch=master&label=Tests
+[badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/work_test.yml?branch=master&label=Tests
 [//]: # (on branch 2.0.0)
 [//]: # ([badge_tests_img]: https://img.shields.io/github/actions/workflow/status/Eyre-S/Coeur-Morny-Cono/test.yml?branch=2.0.0&label=Tests%20on%202.0.0)
 [badge_snapshot_img]: https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvn.sukazyo.cc%2Fsnapshots%2Fcc%2Fsukazyo%2Fmorny-coeur%2Fmaven-metadata.xml&label=snapshots&color=%231e90ff
