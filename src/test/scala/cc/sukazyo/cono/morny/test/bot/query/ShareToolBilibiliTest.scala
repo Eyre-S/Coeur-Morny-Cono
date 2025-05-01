@@ -45,7 +45,7 @@ class ShareToolBilibiliTest extends MornyTests {
 				rx_title.get(rx).asInstanceOf[String]
 			})
 			for (shou <- shouldContains)
-				titles should contain(s"[bilibili] Share video / BV${shou.bv}")
+				titles should contain(s"[Bilibili] Video BV${shou.bv}")
 		}
 		
 		"that contains a video id/url should contains it in result" in {

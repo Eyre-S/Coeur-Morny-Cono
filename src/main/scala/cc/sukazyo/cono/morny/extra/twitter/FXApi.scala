@@ -49,6 +49,8 @@ object FXApi {
 		implicit val decoder_FXPoolChoice: Decoder[FXPoolChoice] = deriveDecoder
 		implicit val decoder_FXPool: Decoder[FXPool] = deriveDecoder
 		implicit val decoder_FXTranslate: Decoder[FXTranslate] = deriveDecoder
+		implicit val decoder_FXFacet: Decoder[FXFacet] = deriveDecoder
+		implicit val decoder_FXRawText: Decoder[FXRawText] = deriveDecoder
 		implicit val decoder_FXTweet_media: Decoder[FXTweet.mediaType] = deriveDecoder
 		implicit val decoder_FXTweet: Decoder[FXTweet] = deriveDecoder
 		implicit val decoder_FXApi: Decoder[FXApi] = deriveDecoder
