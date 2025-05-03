@@ -92,16 +92,25 @@ object OnGetSocial {
 	}
 	
 	private def tryFetchSocialOfBilibili (video: BiliVideoId)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) = {
-		
-		val video_info = XWebAPI.get_view(video)
-		coeur.account exec new SendPhoto(
-			replyChat,
-			video_info.data.pic
-		).replyToMessageId(replyToMessage)
-			.caption(
-				SocialBilibiliParser.printsBilibiliVideoCaption(video, video_info.data)
-			).parseMode(ParseMode.HTML)
-		
+		import io.circe.{DecodingFailure, ParsingFailure}
+		import sttp.client3.SttpClientException
+		try {
+			val video_info = XWebAPI.get_view(video)
+			coeur.account exec new SendPhoto(
+				replyChat,
+				video_info.data.pic
+			).replyToMessageId(replyToMessage)
+				.caption(
+					SocialBilibiliParser.printsBilibiliVideoCaption(video, video_info.data)
+				).parseMode(ParseMode.HTML)
+		} catch case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
+			coeur.account exec SendSticker(
+				replyChat,
+				TelegramStickers.ID_NETWORK_ERR
+			).replyToMessageId(replyToMessage)
+			logger error
+				"Error on requesting Bilibili API\n" + exceptionLog(e)
+			coeur.daemons.reporter.exception(e, "Error on requesting Bilibili API")
 	}
 	
 	private def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur) =
