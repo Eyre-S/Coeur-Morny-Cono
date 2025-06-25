@@ -26,15 +26,21 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	private class EventRunner (using update: Update) extends Thread {
 		
 		this setName s"upd-${update.updateId()}-nn"
-		private var currentSubevent: String = "<not-running-yet>"
-		private var currentListener: String = "<not-running-yet>"
+		private var _currSubevent: String = "<not-running-yet>"
+		private var _currListener: String = "<not-running-yet>"
+		
+		/** Current processing subevent */
+		def currentSubevent: String = _currSubevent
+		/** Current running listener */
+		def currentListener: String = _currListener
+		
 		private def setRunnerStatus (subevent: String): Unit = {
-			currentSubevent = subevent
+			_currSubevent = subevent
 			this setName s"upd-${update.updateId()}-$subevent"
 		}
 		
 		private def setRunningListener (listener: EventListener): Unit =
-			currentListener = listener.getClass.getName
+			_currListener = listener.getClass.getName
 		
 		override def run (): Unit = {
 			
@@ -87,23 +93,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 				if update.chatMember ne null then i.onChatMemberUpdated
 				setRunnerStatus("chat-join-request")
 				if update.chatJoinRequest ne null then i.onChatJoinRequest
-			} catch case e => {
-				val errorMessage = StringBuilder()
-				errorMessage ++= "Event throws unexpected exception!\n"
-				errorMessage ++= s"current event_listener = $currentListener\n"
-				errorMessage ++= s"current subevent = $currentSubevent\n"
-				errorMessage ++= s"error message :"
-				errorMessage ++= (exceptionLog(e) indent 4)
-				e match
-					case actionFailed: EventRuntimeException.ActionFailed =>
-						errorMessage ++= "\ntg-api action: response track: "
-						errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
-							actionFailed.response
-						) indent 4) ++= "\n"
-					case _ =>
-				logger error errorMessage.toString
-				coeur.daemons.reporter.exception(e, "on event running")
-			}
+			} catch case e => EventExceptionReporter.onException(e, this)
 		}
 		
 	}
@@ -125,6 +115,30 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		for (update <- updates.asScala)
 			EventRunner(using update).start()
 		UpdatesListener.CONFIRMED_UPDATES_ALL
+	}
+	
+	private object EventExceptionReporter {
+		
+		def onException (ex: Throwable, runner: EventRunner)(using env: EventEnv): Unit = {
+			val errorMessage = StringBuilder()
+			errorMessage ++= "Event throws unexpected exception!\n"
+			errorMessage ++= s"current event_listener = ${runner.currentListener}\n"
+			errorMessage ++= s"current subevent = ${runner.currentSubevent}\n"
+			errorMessage ++= s"error message :"
+			errorMessage ++= (exceptionLog(ex) indent 4)
+			ex match
+				case actionFailed: EventRuntimeException.ActionFailed =>
+					errorMessage ++= "\ntg-api action: response track: "
+					errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
+						actionFailed.response
+					) indent 4) ++= "\n"
+				case _ =>
+			logger error errorMessage.toString
+			coeur.daemons.reporter.exception(EventRuntimeException.EventListenerFailed(ex)(
+				runner.currentListener, runner.currentSubevent, env
+			))
+		}
+		
 	}
 	
 }
