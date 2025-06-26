@@ -3,7 +3,7 @@ plugins {
 	id 'java-library'
 	id 'application'
 	id 'maven-publish'
-	id "io.github.ysohda.scalatest" version "0.32.1"
+	id 'com.github.maiflai.scalatest' version "0.33"
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'com.github.gmazzo.buildconfig' version '4.1.2'
 	id 'org.ajoberstar.grgit' version '5.2.0'
