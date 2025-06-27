@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: 'liberica'
           cache: gradle
 #      - if: steps.check-cache.outputs.cache-hit != 'true'
 #        name: "Setup Gradle"
