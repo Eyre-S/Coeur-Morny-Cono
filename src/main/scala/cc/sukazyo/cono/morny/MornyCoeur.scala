@@ -5,7 +5,7 @@ import cc.sukazyo.cono.morny.daemon.MornyDaemons
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.MornyCoeur.THREAD_SERVER_EXIT
 import cc.sukazyo.cono.morny.bot.api.EventListenerManager
-import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
+import cc.sukazyo.cono.morny.bot.event.{MornyEventListeners, MornyInjectEventContext, MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.bot.query.MornyQueries
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
@@ -74,6 +74,7 @@ class MornyCoeur (using val config: MornyConfig) {
 	val daemons: MornyDaemons = MornyDaemons()
 	//noinspection ScalaWeakerAccess
 	val eventManager: EventListenerManager = EventListenerManager()
+	eventManager register MornyInjectEventContext()
 	eventManager register MornyOnUpdateTimestampOffsetLock()
 	val commands: MornyCommands = MornyCommands()
 	//noinspection ScalaWeakerAccess

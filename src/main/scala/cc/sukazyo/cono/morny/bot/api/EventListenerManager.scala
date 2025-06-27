@@ -65,6 +65,8 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		private def runEventListener (i: EventListener)(using EventEnv): Unit = {
 			try {
+				setRunnerStatus(s"_universal")
+				i.on
 				setRunnerStatus("message")
 				if update.message ne null then i.onMessage
 				setRunnerStatus("edited-message")

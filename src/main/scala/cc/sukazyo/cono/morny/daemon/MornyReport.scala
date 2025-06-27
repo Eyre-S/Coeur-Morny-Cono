@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.bot.event.EventContext
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
@@ -13,6 +14,7 @@ import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.CronTask
 import cc.sukazyo.cono.morny.util.UseException
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.Cron
 import com.cronutils.model.definition.CronDefinitionBuilder
@@ -79,9 +81,15 @@ class MornyReport (using coeur: MornyCoeur) {
 					buffer += // language=html
 						s"""User Executing Command:
 						   | - <i>command</i>: <code>${command.command}</code>
-						   | - <i>args</i>: <code>${command.args.mkString("[", ", ", "]")}</code>
-						   |""".stripMargin
+						   | - <i>args</i>: <code>${command.args.length}</code> args""".stripMargin
 				})
+				eventErr.context.consume[EventContext] { context =>
+					buffer += // language=html
+						s"""Context of this event:
+						   | - <i>trigger timestamp</i>: ${context.timestamp.map(x => s"<code>$x</code>").getOrElse("<i>null</i>")}
+						   | - <i>triggerer user</i>: ${context.invoker.map(_.fullnameRefHTML).getOrElse("<i>null</i>")}
+						   | - <i>in chat: ${context.chat.map(_.safe_linkHTML).getOrElse("<i>null</i>")}</i>""".stripMargin
+				}
 				buffer.toList
 			}
 			case _ => Nil
