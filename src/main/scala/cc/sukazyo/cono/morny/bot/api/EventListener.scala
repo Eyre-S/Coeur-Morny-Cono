@@ -28,6 +28,16 @@ trait EventListener () {
 	  */
 	def atEventPost (using EventEnv): Unit = {}
 	
+	/** No matter which subevent type, this will always run.
+	  *
+	  * It behaves as a subevent so that it runs just as a normal listener function, the only difference is it does not
+	  * filter the subevent type.
+	  * 
+	  * Useful if you just want to write some listener that the Telegram event type does not matter, only the event
+	  * context etc. is matters.
+	  */
+	def on (using EventEnv): Unit = {}
+	
 	def onMessage (using EventEnv): Unit = {}
 	def onEditedMessage (using EventEnv): Unit = {}
 	def onChannelPost (using EventEnv): Unit = {}

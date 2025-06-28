@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.bot.event.EventContext
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
@@ -11,6 +12,9 @@ import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtm
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.CronTask
+import cc.sukazyo.cono.morny.util.UseException
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramFormatter
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.Cron
 import com.cronutils.model.definition.CronDefinitionBuilder
@@ -22,6 +26,7 @@ import com.pengrad.telegrambot.response.BaseResponse
 import com.pengrad.telegrambot.TelegramException
 
 import java.time.ZoneId
+import scala.collection.mutable.ListBuffer
 
 class MornyReport (using coeur: MornyCoeur) {
 	
@@ -51,24 +56,63 @@ class MornyReport (using coeur: MornyCoeur) {
 	}
 	
 	def exception (e: Throwable, description: String|Null = null): Unit = {
-		def _tgErrFormat: String = e match
-			case api: EventRuntimeException.ActionFailed =>
+		
+		val causeStack = UseException.getCauseStack(e)
+		
+		val formattedErrors = causeStack.flatMap {
+			case api: EventRuntimeException.ActionFailed => List(
 				// language=html
-				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
-						.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))
-			case tgErr: TelegramException if tgErr.response != null =>
+				"Telegram API Returns:\n<pre><code class='language-json'>%s</code></pre>"
+					.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))
+			)
+			case tgErr: TelegramException if tgErr.response != null => List(
 				// language=html
-				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
+				"Telegram API Returns:\n<pre><code class='language-json'>%s</code></pre>"
 					.formatted(GsonBuilder().setPrettyPrinting().create.toJson(tgErr.response))
-			case _ => ""
+			)
+			case eventErr: EventRuntimeException.EventListenerFailed => {
+				val buffer = ListBuffer[String]()
+				// language=html
+				buffer +=
+					s"""Event Context:
+					   | - <i>current listener</i>: <code>${eventErr.currentListener}</code>
+					   | - <i>current subevent</i>: <code>${eventErr.currentSubevent}</code>""".stripMargin
+				eventErr.context.consume[InputCommand](command => {
+					buffer += // language=html
+						s"""User Executing Command:
+						   | - <i>command</i>: <code>${command.command}</code>
+						   | - <i>args</i>: <code>${command.args.length}</code> args""".stripMargin
+				})
+				eventErr.context.consume[EventContext] { context =>
+					buffer += // language=html
+						s"""Context of this event:
+						   | - <i>trigger timestamp</i>: ${context.timestamp.map(x => s"<code>$x</code>").getOrElse("<i>null</i>")}
+						   | - <i>triggerer user</i>: ${context.invoker.map(_.fullnameRefHTML).getOrElse("<i>null</i>")}
+						   | - <i>in chat: ${context.chat.map(_.safe_linkHTML).getOrElse("<i>null</i>")}</i>""".stripMargin
+				}
+				buffer.toList
+			}
+			case _ => Nil
+		}
+		
+		val textBlocks = List(
+			
+			// language=html
+			List(s"""<b>▌Coeur Unexpected Exception </b>
+			   |${if description ne null then h(description)+"\n" else e.getMessage}""".stripMargin),
+			
+			formattedErrors,
+			
+			// language=html
+			List(s"<pre><code class=\"language-log\">${h(exceptionLog(e))}</code></pre>")
+			
+		).flatten
+		
 		executeReport(SendMessage(
 			coeur.config.reportToChat,
-			// language=html
-			s"""<b>▌Coeur Unexpected Exception </b>
-			   |${if description ne null then h(description)+"\n" else ""}
-			   |<pre><code class="language-log">${h(exceptionLog(e))}</code></pre>$_tgErrFormat"""
-			.stripMargin
+			textBlocks.mkString("\n\n"),
 		).parseMode(ParseMode HTML))
+		
 	}
 	
 	def unauthenticatedAction (action: String, user: User): Unit = {

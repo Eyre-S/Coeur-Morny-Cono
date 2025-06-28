@@ -94,6 +94,68 @@ class BilibiliFormsTest extends MornyTests with TableDrivenPropertyChecks {
 		
 	}
 	
+	"while searching bilibili video id from texts, " - {
+		
+		"a bare URL/id should be searched" in {
+			BiliVideoId.searchIn("https://b23.tv/av688730800")
+				.shouldEqual(List(BiliVideoId.fromAv(688730800L)))
+			BiliVideoId.searchIn("https://www.bilibili.com/video/bv1T24y197V2")
+				.shouldEqual(List(BiliVideoId.fromBv("1T24y197V2")))
+			BiliVideoId.searchIn("av87529274")
+				.shouldEqual(List(BiliVideoId.fromAv(87529274L)))
+		}
+		
+		"multiple video url/id should be searched to a list that contains all valid video id" in {
+			BiliVideoId.searchIn(
+				"""av18756293
+				  |https://b23.tv/BV1Q541167Qg
+				  |https://www.bilibili.com/s/video/AV455017605""".stripMargin) shouldEqual List(
+				BiliVideoId.fromAv(18756293L),
+				BiliVideoId.fromBv("1Q541167Qg"),
+				BiliVideoId.fromAv(455017605L)
+			)
+		}
+		
+		"the video text/url surrounded by other text with spaces should be searched" in {
+			BiliVideoId.searchIn("The video: av123456 is a video.")
+				.shouldEqual(List(BiliVideoId.fromAv(123456L)))
+		}
+		
+		"the video text/url surrounded by punctuation and brackets should be searched" in {
+			BiliVideoId.searchIn("an interesting video can be found [here](https://b23.tv/av3339987).")
+				.shouldEqual(List(BiliVideoId.fromAv(3339987)))
+			BiliVideoId.searchIn("something like BV1Q541167Qg, is odd")
+				.shouldEqual(List(BiliVideoId.fromBv("1Q541167Qg")))
+			BiliVideoId.searchIn("tag a video #{av875543} is just like this")
+				.shouldEqual(List(BiliVideoId.fromAv(875543)))
+		}
+		
+		"the video text/url surrounded by CJK characters should be searched" in {
+			BiliVideoId.searchIn("视频号av114514只是一个虚构的存在")
+				.shouldEqual(List(BiliVideoId.fromAv(114514)))
+			BiliVideoId.searchIn("ビデオ番号：av114514は単なる架空の存在です")
+				.shouldEqual(List(BiliVideoId.fromAv(114514)))
+		}
+		
+		"the av/bv like text inside random texts should not be searched" in {
+			BiliVideoId.searchIn("3zATg9BeCUPAV1pQy8ToXOq+RSYen6winZ2OO93eyHv")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("dph009ayh2w098yha9yh09dyha09av1")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("av18214670816042164014")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("av1821dwayhd80eawd")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("dph0xhoHOAh2wBBV1Q541167QgihOHhoXHOAa")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("BV1Q541167QgHOXhapoiwhrdpiAHPDXCiahpc")
+				.shouldBe(empty)
+			BiliVideoId.searchIn("dapihwdfpiHpi;dcahnPI:HDCBNpiwHPIDABV1Q541167Qg")
+				.shouldBe(empty)
+		}
+		
+	}
+	
 	"b23.tv share url" - {
 		
 		"should be get" - {

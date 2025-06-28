@@ -24,71 +24,78 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		this.listeners ++= listeners
 	
 	private class EventRunner (using update: Update) extends Thread {
+		
 		this setName s"upd-${update.updateId()}-nn"
-		private def updateThreadName (t: String): Unit =
-			this setName s"upd-${update.updateId()}-$t"
+		private var _currSubevent: String = "<not-running-yet>"
+		private var _currListener: String = "<not-running-yet>"
+		
+		/** Current processing subevent */
+		def currentSubevent: String = _currSubevent
+		/** Current running listener */
+		def currentListener: String = _currListener
+		
+		private def setRunnerStatus (subevent: String): Unit = {
+			_currSubevent = subevent
+			this setName s"upd-${update.updateId()}-$subevent"
+		}
+		
+		private def setRunningListener (listener: EventListener): Unit =
+			_currListener = listener.getClass.getName
 		
 		override def run (): Unit = {
 			
 			given env: EventEnv = EventEnv(update)
 			
-			for (i <- listeners)
+			for (i <- listeners) {
+				setRunningListener(i)
 				if (i.executeFilter)
 					runEventListener(i)
-			for (i <- listeners)
+			}
+			for (i <- listeners) {
+				setRunningListener(i)
 				runEventPost(i)
+			}
 			
 		}
 		
 		private def runEventPost (i: EventListener)(using EventEnv): Unit = {
-			updateThreadName("#post")
+			setRunnerStatus("#post")
 			i.atEventPost
 		}
 		
 		private def runEventListener (i: EventListener)(using EventEnv): Unit = {
 			try {
-				updateThreadName("message")
+				setRunnerStatus(s"_universal")
+				i.on
+				setRunnerStatus("message")
 				if update.message ne null then i.onMessage
-				updateThreadName("edited-message")
+				setRunnerStatus("edited-message")
 				if update.editedMessage ne null then i.onEditedMessage
-				updateThreadName("channel-post")
+				setRunnerStatus("channel-post")
 				if update.channelPost ne null then i.onChannelPost
-				updateThreadName("edited-channel-post")
+				setRunnerStatus("edited-channel-post")
 				if update.editedChannelPost ne null then i.onEditedChannelPost
-				updateThreadName("inline-query")
+				setRunnerStatus("inline-query")
 				if update.inlineQuery ne null then i.onInlineQuery
-				updateThreadName("chosen-inline-result")
+				setRunnerStatus("chosen-inline-result")
 				if update.chosenInlineResult ne null then i.onChosenInlineResult
-				updateThreadName("callback-query")
+				setRunnerStatus("callback-query")
 				if update.callbackQuery ne null then i.onCallbackQuery
-				updateThreadName("shipping-query")
+				setRunnerStatus("shipping-query")
 				if update.shippingQuery ne null then i.onShippingQuery
-				updateThreadName("pre-checkout-query")
+				setRunnerStatus("pre-checkout-query")
 				if update.preCheckoutQuery ne null then i.onPreCheckoutQuery
-				updateThreadName("poll")
+				setRunnerStatus("poll")
 				if update.poll ne null then i.onPoll
-				updateThreadName("poll-answer")
+				setRunnerStatus("poll-answer")
 				if update.pollAnswer ne null then i.onPollAnswer
-				updateThreadName("my-chat-member")
+				setRunnerStatus("my-chat-member")
 				if update.myChatMember ne null then i.onMyChatMemberUpdated
-				updateThreadName("chat-member")
+				setRunnerStatus("chat-member")
 				if update.chatMember ne null then i.onChatMemberUpdated
-				updateThreadName("chat-join-request")
+				setRunnerStatus("chat-join-request")
 				if update.chatJoinRequest ne null then i.onChatJoinRequest
-			} catch case e => {
-				val errorMessage = StringBuilder()
-				errorMessage ++= "Event throws unexpected exception:\n"
-				errorMessage ++= (exceptionLog(e) indent 4)
-				e match
-					case actionFailed: EventRuntimeException.ActionFailed =>
-						errorMessage ++= "\ntg-api action: response track: "
-						errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
-							actionFailed.response
-						) indent 4) ++= "\n"
-					case _ =>
-				logger error errorMessage.toString
-				coeur.daemons.reporter.exception(e, "on event running")
-			}
+			} catch case e => EventExceptionReporter.onException(e, this)
 		}
 		
 	}
@@ -110,6 +117,30 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		for (update <- updates.asScala)
 			EventRunner(using update).start()
 		UpdatesListener.CONFIRMED_UPDATES_ALL
+	}
+	
+	private object EventExceptionReporter {
+		
+		def onException (ex: Throwable, runner: EventRunner)(using env: EventEnv): Unit = {
+			val errorMessage = StringBuilder()
+			errorMessage ++= "Event throws unexpected exception!\n"
+			errorMessage ++= s"current event_listener = ${runner.currentListener}\n"
+			errorMessage ++= s"current subevent = ${runner.currentSubevent}\n"
+			errorMessage ++= s"error message :"
+			errorMessage ++= (exceptionLog(ex) indent 4)
+			ex match
+				case actionFailed: EventRuntimeException.ActionFailed =>
+					errorMessage ++= "\ntg-api action: response track: "
+					errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
+						actionFailed.response
+					) indent 4) ++= "\n"
+				case _ =>
+			logger error errorMessage.toString
+			coeur.daemons.reporter.exception(EventRuntimeException.EventListenerFailed(ex)(
+				runner.currentListener, runner.currentSubevent, env
+			))
+		}
+		
 	}
 	
 }

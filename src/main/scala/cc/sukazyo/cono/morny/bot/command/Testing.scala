@@ -19,8 +19,10 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 		coeur.account exec new SendMessage(
 			event.message.chat.id,
 			// language=html
-			"<b>Just</b> a TEST command."
+			"<b>Just</b> a TEST command that will throws an error."
 		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
+		
+		throw RuntimeException("Just an example error.")
 		
 	}
 	

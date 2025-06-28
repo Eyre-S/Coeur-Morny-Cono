@@ -16,7 +16,7 @@ case class XWebView (
 	pubdate: EpochSeconds,
 	ctime: EpochSeconds,
 	desc: String,
-	desc_v2: List[Ignore],
+	desc_v2: Option[List[Ignore]],
 	state: Int,
 	duration: Int,
 	forward: Option[Ignore],

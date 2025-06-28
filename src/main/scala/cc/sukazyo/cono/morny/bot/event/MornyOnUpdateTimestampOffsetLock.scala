@@ -6,16 +6,18 @@ import cc.sukazyo.cono.morny.bot.event.MornyOnUpdateTimestampOffsetLock.ExpiredE
 
 class MornyOnUpdateTimestampOffsetLock (using coeur: MornyCoeur) extends EventListener {
 	
-	private def checkOutdated (timestamp: Int)(using event: EventEnv): Unit =
-		if  timestamp < (coeur.coeurStartTimestamp/1000) then
-			event.provide(ExpiredEvent)
-			if coeur.config.eventIgnoreOutdated then
-				event.setEventCanceled
-	
-	override def onMessage (using event: EventEnv): Unit = checkOutdated(event.update.message.date)
-	override def onEditedMessage (using event: EventEnv): Unit = checkOutdated(event.update.editedMessage.date)
-	override def onChannelPost (using event: EventEnv): Unit = checkOutdated(event.update.channelPost.date)
-	override def onEditedChannelPost (using event: EventEnv): Unit = checkOutdated(event.update.editedChannelPost.date)
+	override def on (using event: EventEnv): Unit = {
+		event.consume[EventContext] { context =>
+			context.timestamp match
+				case Some(timestamp) =>
+					if timestamp < (coeur.coeurStartTimestamp / 1000) then {
+						event.provide(ExpiredEvent)
+						if coeur.config.eventIgnoreOutdated then
+							event.setEventCanceled
+					}
+				case _ =>
+		}
+	}
 	
 }
 
