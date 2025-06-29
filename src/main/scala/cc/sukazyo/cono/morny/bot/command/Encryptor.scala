@@ -19,6 +19,8 @@ import java.net.{URLDecoder, URLEncoder}
 import java.nio.charset.{Charset, IllegalCharsetNameException, UnsupportedCharsetException}
 import java.util.Base64
 import scala.language.postfixOps
+import scala.util.boundary
+import scala.util.boundary.break
 
 /** Provides Telegram Command __`/encrypt`__. */
 class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
@@ -28,7 +30,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	override val paramRule: String = "[algorithm|(l)] [(uppercase)]"
 	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
 	
-	override def execute (using command: InputCommand, event: Update): Unit = {
+	override def execute (using command: InputCommand, event: Update): Unit = boundary {
 		
 		val args = command.args
 		
@@ -64,6 +66,23 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			else false
 		}
 		
+		lazy val mod_charset: Charset =
+			params.find(_.text.startsWith("-e")) match
+				case Some(param) =>
+					param.used()
+					val charsetName = param.text.drop("-e".length)
+					try Charset.forName(charsetName)
+					catch case _: (IllegalCharsetNameException | UnsupportedCharsetException) =>
+						coeur.account exec SendMessage(
+							event.message.chat.id,
+							// language=html
+							s"<b>Unsupported Charset:</b> <code>${h(charsetName)}</code>".stripMargin
+						).replyToMessageId(event.message.messageId)
+						break()
+				case None => CommonEncrypt.ENCRYPT_STANDARD_CHARSET
+//		lazy val mod_enc_charset = modCharsetFind("-ee")
+//		lazy val mod_dec_charset = modCharsetFind("-ed")
+		
 		// BLOCK: get input
 		// for now, only support getting data from replied message, and
 		// this message CAN ONLY have texts or an universal file: if the
@@ -78,7 +97,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			val asByteArray: Array[Byte] = data
 		/** inner class: the [[XEncryptable]] implementation of [[String]] data */
 		case class XText (data: String) extends XEncryptable:
-			 val asByteArray: Array[Byte] = data getBytes CommonEncrypt.ENCRYPT_STANDARD_CHARSET
+			val str: String = data
+			val asByteArray: Array[Byte] = data.getBytes(mod_charset)
 		val input: XEncryptable =
 			val _r = event.message.replyToMessage
 			if ((_r ne null) && (_r.document ne null)) {
@@ -134,26 +154,14 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		case class EXText (text: String) extends EXTextLike
 		/** inner class: [[EXTextLike]] implementation of a special type: hash value */
 		case class EXHash (text: String) extends EXTextLike
-		/** @param typ Should be a sticker id */
-		case class EXError (typ: String, description: Option[String])
 		/** generate encrypt result by making normal encrypt: output type == input type */
 		def genResult_encrypt (
 			source: XEncryptable, processor: Array[Byte]=>Array[Byte], filenameProcessor: String=>String
-		)(using userParams: List[EXParam]): EXFile|EXText|EXError = {
+		): EXFile|EXText = {
 			source match
 				case x_file: XFile => EXFile(processor(x_file asByteArray), filenameProcessor(x_file.name))
 				case x: XText =>
-					val charset =
-						userParams.find(_.text startsWith "-ee") match
-							case Some(encParam) =>
-								val encoding = encParam.text.substring("-ee".length)
-								try {
-									encParam.used()
-									Charset.forName(encoding)
-								} catch case e: (IllegalCharsetNameException | UnsupportedCharsetException) =>
-									return EXError(TelegramStickers.ID_404, Some("Unsupported Encoding: " + encoding))
-							case None => CommonEncrypt.ENCRYPT_STANDARD_CHARSET
-					EXText(String(processor(x asByteArray), charset))
+					EXText(String(processor(x asByteArray), mod_charset))
 		}
 		/** generate encrypt result by making hash: output type == hash value */
 		def genResult_hash (source: XEncryptable, processor: Array[Byte]=>Array[Byte]): EXHash =
@@ -165,8 +173,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
-		val result: EXHash|EXFile|EXText|EXError = args(0) match
-			case "base64" | "b64" | "base64url" | "base64u" | "b64u" =>
+		val result: EXHash|EXFile|EXText = args(0) match
+			case "base64" | "base" | "baseu" | "b64" | "base64url" | "base64u" | "b64u" =>
 				val _tool_b64 =
 					if args(0) contains "u" then Base64.getUrlEncoder
 					else Base64.getEncoder
@@ -175,7 +183,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					_tool_b64.encode,
 					n => n+".b64.txt"
 				)
-			case "base64decode" | "base64d" | "b64d" | "base64url-decode" | "base64ud" | "b64ud" =>
+			case "base64decode"  | "based" | "baseud" | "base64d" | "b64d" | "base64url-decode" | "base64ud" | "b64ud" =>
 				val _tool_b64d =
 					if args(0) contains "u" then Base64.getUrlDecoder
 					else Base64.getDecoder
@@ -189,13 +197,13 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			case "urlencoder" | "urlencode" | "urlenc" | "url" =>
 				input match
 					case x: XText =>
-						EXText(URLEncoder.encode(x.data, ENCRYPT_STANDARD_CHARSET))
+						EXText(URLEncoder.encode(x.data, mod_charset))
 					case _: XFile => echo_unsupported; return;
 			case "urldecoder" | "urldecode" | "urldec" | "urld" =>
 				input match
 					case _: XFile => echo_unsupported; return;
 					case x: XText =>
-						try { EXText(URLDecoder.decode(x.data, ENCRYPT_STANDARD_CHARSET)) }
+						try { EXText(URLDecoder.decode(x.data, mod_charset)) }
 						catch case _: IllegalArgumentException =>
 								echo_unsupported
 								return
@@ -231,16 +239,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					// language=html
 					s"<pre><code>${h(_text.text)}</code></pre>"
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-			case _err: EXError =>
-				coeur.account exec SendSticker(
-					event.message.chat.id, _err.typ
-				).replyToMessageId(event.message.messageId)
-				_err.description.map { errMessage =>
-					// todo: maybe better formatted
-					coeur.account exec SendMessage(
-						event.message.chat.id, errMessage
-					).replyToMessageId(event.message.messageId)
-				}
+		
 	}
 	
 	/** echo help to a specific message in a specific chat.
@@ -255,38 +254,39 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  *
 	  * when output to telegram just like:
 	  * <blockquote>
-	  * 	'''__base64__''', b64<br>
-	  * 	'''__base64url__''', base64u, b64u<br>
-	  * 	'''__base64decode__''', base64d, b64d<br>
-	  * 	'''__base64url-decode__''', base64ud, b64ud<br>
-	  *     '''urlencode''', urlencode, urlenc, url<br>
-	  *     '''__urldecoder__''', urldecode, urldec, urld<br>
-	  * 	'''__sha1__'''<br>
-	  * 	'''__sha256__'''<br>
-	  * 	'''__sha512__'''<br>
-	  * 	'''__md5__'''<br>
+	  * 	'''base64''', base, b64<br>
+	  * 	'''base64u''', baseu, base64u, b64u<br>
+	  * 	'''base64decode''', based, base64d, b64d<br>
+	  * 	'''base64url-decode''', baseud, base64ud, b64ud<br>
+	  *     '''urlencoder''', urlencode, urlenc, url<br>
+	  *     '''urldecoder''', urldecode, urldec, urld<br>
+	  * 	'''sha1'''<br>
+	  * 	'''sha256'''<br>
+	  * 	'''sha512'''<br>
+	  * 	'''md5'''<br>
 	  * 	---<br>
-	  * 	'''__uppercase__''', upper, u ''(sha1/sha256/sha512/md5 only)''
-	  * 	'''__-ee{charset_name}__''' ''(base64 encode/decode only)''
-	  * 	'''__-ed{charset_name}__''' ''(base64 encode/decode only)''
+	  * 	'''uppercase''', upper, u ''(sha1/sha256/sha512/md5 only)''
+	  * 	'''-e__{charset_name}__''' ''(base64/url encode/decode only)''
 	  * </blockquote>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
 		coeur.account exec SendMessage(
 			chat,
-			s"""<b><u>base64</u></b>, b64
-			   |<b><u>base64url</u></b>, base64u, b64u
-			   |<b><u>base64decode</u></b>, base64d, b64d
-			   |<b><u>base64url-decode</u></b>, base64ud, b64ud
-			   |<b><u>urlencoder</u></b>, urlencode, urlenc, url
-			   |<b><u>urldecoder</u></b>, urldecode, urldec, urld
-			   |<b><u>sha1</u></b>
-			   |<b><u>sha256</u></b>
-			   |<b><u>sha512</u></b>
-			   |<b><u>md5</u></b>
+			// language=html
+			s"""<b>base64</b>, base, b64
+			   |<b>base64url</b>, baseu, base64u, b64u
+			   |<b>base64decode</b>, based, base64d, b64d
+			   |<b>base64url-decode</b>, baseud, base64ud, b64ud
+			   |<b>urlencoder</b>, urlencode, urlenc, url
+			   |<b>urldecoder</b>, urldecode, urldec, urld
+			   |<b>sha1</b>
+			   |<b>sha256</b>
+			   |<b>sha512</b>
+			   |<b>md5</b>
 			   |---
 			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>
-			   |<b><i>-ee<u>&lt;charset_name&gt;</u></i></b> <i>(base64 encode/decode only)</i>"""
+			   |<b><i>-e<u>&lt;charset_name&gt;</u></i></b> <i>(base64 encode/decode only)</i>
+			   |<b><i>file</i></b>, f <i>(base64 encode/decode only)</i>"""
 			.stripMargin
 		).replyToMessageId(replyTo).parseMode(ParseMode HTML)
 	
