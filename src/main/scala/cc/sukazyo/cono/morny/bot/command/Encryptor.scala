@@ -9,12 +9,14 @@ import cc.sukazyo.cono.morny.util.CommonEncrypt
 import cc.sukazyo.cono.morny.util.CommonEncrypt.*
 import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
+import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 import com.pengrad.telegrambot.model.{PhotoSize, Update}
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{GetFile, SendDocument, SendMessage, SendSticker}
 
 import java.io.IOException
 import java.net.{URLDecoder, URLEncoder}
+import java.nio.charset.{Charset, IllegalCharsetNameException, UnsupportedCharsetException}
 import java.util.Base64
 import scala.language.postfixOps
 
@@ -35,27 +37,32 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			echoHelp(event.message.chat.id, event.message.messageId)
 			return
 		
-		// for mod-params:
-		// mod-params is the args belongs to the encrypt algorithm.
-		// due to the algorithm is defined in the 1st (array(0)) arg,
-		// so the mod-params is which defined since the 2nd arg. also
-		// due to there's only one mod-param yet (it is uppercase),
-        // so the algorithm will be and must be in the 2nd arg.
-		/** inner function: is input `arg` means mod-param ''uppercase'' */
 		def _is_mod_u(arg: String): Boolean =
 			if (arg equalsIgnoreCase "uppercase") return true
 			if (arg equalsIgnoreCase "u") return true
 			if (arg equalsIgnoreCase "upper") return true
 			false
-		val mod_uppercase = if (args.length > 1) {
-			if (args.length < 3 && _is_mod_u(args(1))) true
-			else
-				coeur.account exec SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_404
-				).replyToMessageId(event.message.messageId)
-				return
-		} else false
+		
+		/** The param entity of command.
+		  *
+		  * Each entity has its text value, and a state about if it has used.
+		  */
+		case class EXParam (text: String) {
+			var _isUsed = false
+			def used (): Unit = _isUsed = true
+			def isUsed: Boolean = _isUsed
+		}
+		/** List of [[EXParam]]. contains all params after the encryption algorithm. */
+		implicit val params: List[EXParam] =
+			args.toList.drop(1).map(EXParam(_))
+		
+		// test if uppercase param is set, also set the uppercase params used.
+		lazy val mod_uppercase = params.exists { param =>
+			if _is_mod_u(param.text) then
+				param.used()
+				true
+			else false
+		}
 		
 		// BLOCK: get input
 		// for now, only support getting data from replied message, and
@@ -127,11 +134,26 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		case class EXText (text: String) extends EXTextLike
 		/** inner class: [[EXTextLike]] implementation of a special type: hash value */
 		case class EXHash (text: String) extends EXTextLike
+		/** @param typ Should be a sticker id */
+		case class EXError (typ: String, description: Option[String])
 		/** generate encrypt result by making normal encrypt: output type == input type */
-		def genResult_encrypt (source: XEncryptable, processor: Array[Byte]=>Array[Byte], filenameProcessor: String=>String): EXFile|EXText = {
+		def genResult_encrypt (
+			source: XEncryptable, processor: Array[Byte]=>Array[Byte], filenameProcessor: String=>String
+		)(using userParams: List[EXParam]): EXFile|EXText|EXError = {
 			source match
 				case x_file: XFile => EXFile(processor(x_file asByteArray), filenameProcessor(x_file.name))
-				case x: XText => EXText(String(processor(x asByteArray), CommonEncrypt.ENCRYPT_STANDARD_CHARSET))
+				case x: XText =>
+					val charset =
+						userParams.find(_.text startsWith "-ee") match
+							case Some(encParam) =>
+								val encoding = encParam.text.substring("-ee".length)
+								try {
+									encParam.used()
+									Charset.forName(encoding)
+								} catch case e: (IllegalCharsetNameException | UnsupportedCharsetException) =>
+									return EXError(TelegramStickers.ID_404, Some("Unsupported Encoding: " + encoding))
+							case None => CommonEncrypt.ENCRYPT_STANDARD_CHARSET
+					EXText(String(processor(x asByteArray), charset))
 		}
 		/** generate encrypt result by making hash: output type == hash value */
 		def genResult_hash (source: XEncryptable, processor: Array[Byte]=>Array[Byte]): EXHash =
@@ -143,7 +165,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				event.message.chat.id,
 				TelegramStickers ID_404
 			).replyToMessageId(event.message.messageId)
-		val result: EXHash|EXFile|EXText = args(0) match
+		val result: EXHash|EXFile|EXText|EXError = args(0) match
 			case "base64" | "b64" | "base64url" | "base64u" | "b64u" =>
 				val _tool_b64 =
 					if args(0) contains "u" then Base64.getUrlEncoder
@@ -185,6 +207,16 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				echo_unsupported; return;
 		// END BLOCK: encrypt
 		
+		// warning if params not used:
+		if params.exists(_.isUsed == false) then
+			coeur.account exec SendMessage(
+				event.message.chat.id,
+				// language=html
+				s"""<b>Unknown Params:</b>
+				   |${params.filterNot(_.isUsed).map(x => s" - <code>${h(x.text)}</code>").mkString("\n")}""".stripMargin
+			).replyToMessageId(event.message.messageId).parseMode(ParseMode.HTML)
+			return
+		
 		// output
 		result match
 			case _file: EXFile =>
@@ -199,7 +231,16 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					// language=html
 					s"<pre><code>${h(_text.text)}</code></pre>"
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-		
+			case _err: EXError =>
+				coeur.account exec SendSticker(
+					event.message.chat.id, _err.typ
+				).replyToMessageId(event.message.messageId)
+				_err.description.map { errMessage =>
+					// todo: maybe better formatted
+					coeur.account exec SendMessage(
+						event.message.chat.id, errMessage
+					).replyToMessageId(event.message.messageId)
+				}
 	}
 	
 	/** echo help to a specific message in a specific chat.
@@ -226,6 +267,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * 	'''__md5__'''<br>
 	  * 	---<br>
 	  * 	'''__uppercase__''', upper, u ''(sha1/sha256/sha512/md5 only)''
+	  * 	'''__-ee{charset_name}__''' ''(base64 encode/decode only)''
+	  * 	'''__-ed{charset_name}__''' ''(base64 encode/decode only)''
 	  * </blockquote>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
@@ -242,7 +285,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |<b><u>sha512</u></b>
 			   |<b><u>md5</u></b>
 			   |---
-			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>"""
+			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>
+			   |<b><i>-ee<u>&lt;charset_name&gt;</u></i></b> <i>(base64 encode/decode only)</i>"""
 			.stripMargin
 		).replyToMessageId(replyTo).parseMode(ParseMode HTML)
 	
