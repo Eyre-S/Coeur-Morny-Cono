@@ -1,11 +1,13 @@
 package cc.sukazyo.cono.morny.reporter
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.command.MornyInformation
 import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
+@MornyModuleInject
 class Module extends MornyInternalModule {
 	
 	override val id: String = "morny.report"

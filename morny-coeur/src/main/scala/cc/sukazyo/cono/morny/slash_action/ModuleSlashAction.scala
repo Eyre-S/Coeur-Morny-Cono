@@ -1,8 +1,10 @@
 package cc.sukazyo.cono.morny.slash_action
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
+@MornyModuleInject
 class ModuleSlashAction extends MornyInternalModule {
 	
 	override val id: String = "morny.slash"

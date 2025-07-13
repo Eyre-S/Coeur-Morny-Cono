@@ -1,0 +1,47 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MornyTests #Library" type="ScalaTestRunConfiguration" factoryName="ScalaTest" singleton="false" show_console_on_std_err="false" show_console_on_std_out="false">
+    <module name="Coeur Morny Cono.Morny System Library.test" />
+    <option name="VMParameters" value="" />
+    <option name="allowRunningInParallel" value="true" />
+    <option name="alternativeJrePath" />
+    <option name="alternativeJrePathEnabled" value="false" />
+    <option name="classpathModifications">
+      <list />
+    </option>
+    <option name="envFilePaths">
+      <list />
+    </option>
+    <option name="envs">
+      <map />
+    </option>
+    <option name="passParentEnvs" value="true" />
+    <option name="programParameters" value="" />
+    <option name="projectPathOnTarget" />
+    <option name="selectedOptions">
+      <list />
+    </option>
+    <option name="testKind" value="All in package" />
+    <option name="workingDirectory" value="$ProjectFileDir$\run" />
+    <option name="classBuf">
+      <list>
+        <option value="cc.sukazyo.cono.morny.system.telegram_api.formatting.TestNamingUtils" />
+        <option value="cc.sukazyo.cono.morny.system.telegram_api.formatting.TestTelegramFormatter" />
+        <option value="cc.sukazyo.cono.morny.system.telegram_api.formatting.TestTelegramParseEscape" />
+        <option value="cc.sukazyo.cono.morny.system.telegram_api.formatting.TestTelegramUserInformation" />
+        <option value="cc.sukazyo.cono.morny.system.telegram_api.command.TestInputCommand" />
+        <option value="cc.sukazyo.cono.morny.system.utils.TestCommonEncrypt" />
+        <option value="cc.sukazyo.cono.morny.system.utils.TestEpochDateTime" />
+        <option value="cc.sukazyo.cono.morny.system.utils.TestConvertByteHex" />
+        <option value="cc.sukazyo.cono.morny.system.utils.TestUniversalCommand" />
+      </list>
+    </option>
+    <option name="searchTest" value="In single module" />
+    <option name="shortenClasspath" value="NONE" />
+    <option name="testPackagePath" value="cc.sukazyo.cono.morny" />
+    <option name="useUiWithSbt" value="true" />
+    <option name="workingDirectory" value="$ProjectFileDir$\run" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,9 +1,11 @@
 package cc.sukazyo.cono.morny.crons
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 import cc.sukazyo.cono.morny.crons.cmd.CommandCreate
 
+@MornyModuleInject
 class ModuleCRONs extends MornyInternalModule {
 	
 	override val id: String = "morny.cron"

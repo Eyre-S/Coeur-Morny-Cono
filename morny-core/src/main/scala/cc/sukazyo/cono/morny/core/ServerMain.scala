@@ -1,11 +1,10 @@
 package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.core.MornyConfig.{CheckFailure, PROP_TOKEN_KEY}
+import cc.sukazyo.cono.morny.core.MornyConfig.CheckFailure
 import cc.sukazyo.cono.morny.core.module.ModuleHelper
-import cc.sukazyo.cono.morny.core.module.ModuleLoader.MornyModuleInitializingException
+import cc.sukazyo.cono.morny.core.module.loader.AnnotatedModulesLoader
 import cc.sukazyo.cono.morny.util.CommonFormat
-import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 
 import java.time.ZoneOffset
 import java.util.TimeZone
@@ -172,11 +171,7 @@ object ServerMain {
 				s"""The Skip Login feature is not implemented yet!
 				   |""".stripMargin
 		
-		val loadedModules = ModuleHelper.loadCoeurModules(
-			(e: MornyModuleInitializingException) => {
-				logger.error(e.toLogString)
-			}
-		)
+		val loadedModules = AnnotatedModulesLoader.scanModules()
 		
 		if (mode_echoVersion) {
 			

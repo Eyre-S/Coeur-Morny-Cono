@@ -1,8 +1,10 @@
 package cc.sukazyo.cono.morny.randomize_somthing
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
+@MornyModuleInject
 class ModuleRandomize extends MornyInternalModule {
 	
 	override val id: String = "morny.rand"

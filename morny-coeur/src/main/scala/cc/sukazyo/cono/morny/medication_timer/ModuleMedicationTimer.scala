@@ -1,9 +1,11 @@
 package cc.sukazyo.cono.morny.medication_timer
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
+@MornyModuleInject
 class ModuleMedicationTimer extends MornyInternalModule {
 	
 	override val id: String = "morny.medication_timer"

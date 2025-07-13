@@ -1,10 +1,12 @@
 package cc.sukazyo.cono.morny.tele_utils
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 import cc.sukazyo.cono.morny.tele_utils.event_hack.{CommandEventHack, EventHacker, HackerEventHandler}
 import cc.sukazyo.cono.morny.tele_utils.user_info.{CommandGetUser, InlineMyInformation}
 
+@MornyModuleInject
 class ModuleTeleUtils extends MornyInternalModule {
 	
 	override val id: String = "morny.tele_utils"

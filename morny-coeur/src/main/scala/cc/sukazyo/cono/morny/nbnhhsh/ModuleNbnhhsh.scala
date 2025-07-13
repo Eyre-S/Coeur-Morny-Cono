@@ -1,8 +1,10 @@
 package cc.sukazyo.cono.morny.nbnhhsh
 
-import cc.sukazyo.cono.morny.core.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
+import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
+@MornyModuleInject
 class ModuleNbnhhsh extends MornyInternalModule {
 	
 	override val id: String = "morny.nbnhhsh"

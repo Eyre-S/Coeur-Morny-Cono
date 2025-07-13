@@ -64,12 +64,14 @@ object MornyConfiguration {
 			
 		)
 		
-		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.1")
+		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT" changing())
+		
+		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.180")
 		
 		val http4s = defineModules(
 			"org.http4s" %% "http4s-dsl" % "0.23.30",
 			"org.http4s" %% "http4s-circe" % "0.23.30",
-			"org.http4s" %% "http4s-netty-server" % "0.5.23"
+			"org.http4s" %% "http4s-netty-server" % "0.5.24"
 		)
 		
 		val sttp = defineModules(
@@ -79,12 +81,12 @@ object MornyConfiguration {
 		)
 		
 		val circe = defineModules(
-			"io.circe" %% "circe-core" % "0.14.13",
-			"io.circe" %% "circe-generic" % "0.14.13",
-			"io.circe" %% "circe-parser" % "0.14.13"
+			"io.circe" %% "circe-core" % "0.14.14",
+			"io.circe" %% "circe-generic" % "0.14.14",
+			"io.circe" %% "circe-parser" % "0.14.14"
 		)
 		
-		val gson = defineModules("com.google.code.gson" % "gson" % "2.13.0")
+		val gson = defineModules("com.google.code.gson" % "gson" % "2.13.1")
 		
 		val jsoup = defineModules("org.jsoup" % "jsoup" % "1.19.1")
 		
@@ -140,6 +142,7 @@ object MornyConfiguration {
 			
 			Dependencies.base,
 			Dependencies.res,
+			Dependencies.classes,
 			
 			Dependencies.http4s,
 			

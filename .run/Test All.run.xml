@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test All" type="CompoundRunConfigurationType">
+    <toRun name="MornyTests #Coeur" type="ScalaTestRunConfiguration" />
+    <toRun name="MornyTests #Core" type="ScalaTestRunConfiguration" />
+    <toRun name="MornyTests #Library" type="ScalaTestRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

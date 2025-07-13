@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="MornyTests #ALL" type="ScalaTestRunConfiguration" factoryName="ScalaTest" singleton="false" show_console_on_std_err="false" show_console_on_std_out="false">
-    <module name="Coeur Morny Cono.test" />
+  <configuration default="false" name="MornyTests #Coeur" type="ScalaTestRunConfiguration" factoryName="ScalaTest" singleton="false" show_console_on_std_err="false" show_console_on_std_out="false">
+    <module name="Coeur Morny Cono.Morny Coeur.test" />
     <option name="VMParameters" value="" />
     <option name="allowRunningInParallel" value="true" />
     <option name="alternativeJrePath" />
@@ -22,9 +22,19 @@
     </option>
     <option name="testKind" value="All in package" />
     <option name="workingDirectory" value="$ProjectFileDir$\run" />
+    <option name="classBuf">
+      <list>
+        <option value="cc.sukazyo.cono.morny.test.daemon.MedicationTimerTest" />
+        <option value="cc.sukazyo.cono.morny.test.bot.event.OnQuestionMarkReplyTest" />
+        <option value="cc.sukazyo.cono.morny.test.extra.BilibiliFormsTest" />
+        <option value="cc.sukazyo.cono.morny.test.extra.twitter.FXApiTest" />
+        <option value="cc.sukazyo.cono.morny.test.extra.twitter.PackageTest" />
+        <option value="cc.sukazyo.cono.morny.test.utils.BiliToolTest" />
+      </list>
+    </option>
     <option name="searchTest" value="In single module" />
     <option name="shortenClasspath" value="NONE" />
-    <option name="testPackagePath" value="cc.sukazyo.cono.morny.test" />
+    <option name="testPackagePath" value="cc.sukazyo.cono.morny" />
     <option name="useUiWithSbt" value="true" />
     <option name="workingDirectory" value="$ProjectFileDir$\run" />
     <method v="2">

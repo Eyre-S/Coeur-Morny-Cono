@@ -1,4 +1,4 @@
-package cc.sukazyo.cono.morny.core.internal
+package cc.sukazyo.cono.morny.core.module.internal
 
 import cc.sukazyo.cono.morny.core.{MornyModule, MornySystem}
 

@@ -35,7 +35,8 @@ artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
 ThisBuild / scalacOptions ++= Seq(
 	"-language:postfixOps",
 	"-encoding", MornyProject.source_encoding,
-	"-feature"
+	"-feature",
+	"-deprecation"
 )
 ThisBuild / javacOptions ++= Seq(
 	"-encoding", MornyProject.source_encoding,
