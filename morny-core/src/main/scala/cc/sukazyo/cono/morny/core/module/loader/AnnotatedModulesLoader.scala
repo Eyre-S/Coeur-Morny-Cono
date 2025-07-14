@@ -1,8 +1,7 @@
 package cc.sukazyo.cono.morny.core.module.loader
 
 import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.core.MornyModule
-import cc.sukazyo.cono.morny.core.module.MornyModuleInject
+import cc.sukazyo.cono.morny.core.module.{MornyModule, MornyModuleInject}
 import io.github.classgraph.{ClassGraph, ClassInfo}
 
 import scala.collection.mutable.ListBuffer

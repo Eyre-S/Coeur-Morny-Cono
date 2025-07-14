@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.encrypt_tool
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.module.MornyModuleInject
+import cc.sukazyo.cono.morny.reporter.ModuleMornyReporter
 
 @MornyModuleInject
 class ModuleEncryptor extends MornyInternalModule {
@@ -13,6 +14,8 @@ class ModuleEncryptor extends MornyInternalModule {
 		// language=markdown
 		"""Provides `/encrypt` command for enc/dec/hash things.
 		  |""".stripMargin
+	
+	override val depends: Seq[String] = ModuleMornyReporter.id :: Nil
 	
 	override def onInitializing (using MornyCoeur)(cxt: MornyCoeur.OnInitializingContext): Unit = {
 		import cxt.*

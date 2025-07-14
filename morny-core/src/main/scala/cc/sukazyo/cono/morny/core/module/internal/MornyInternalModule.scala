@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.core.module.internal
 
-import cc.sukazyo.cono.morny.core.{MornyModule, MornySystem}
+import cc.sukazyo.cono.morny.core.MornySystem
+import cc.sukazyo.cono.morny.core.module.MornyModule
 
 trait MornyInternalModule extends MornyModule {
 	

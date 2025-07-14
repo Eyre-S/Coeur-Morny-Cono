@@ -9,7 +9,7 @@ import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingMa
 import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
-import cc.sukazyo.cono.morny.core.module.ModuleHelper
+import cc.sukazyo.cono.morny.core.module.{ModuleHelper, MornyModule}
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.schedule.Scheduler
 import cc.sukazyo.cono.morny.util.time.WatchDog

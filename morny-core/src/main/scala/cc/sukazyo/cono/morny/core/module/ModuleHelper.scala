@@ -1,6 +1,5 @@
 package cc.sukazyo.cono.morny.core.module
 
-import cc.sukazyo.cono.morny.core.MornyModule
 import cc.sukazyo.cono.morny.util.dataview.Table
 
 object ModuleHelper {
@@ -11,5 +10,7 @@ object ModuleHelper {
 			modules.map(f => f.id :: f.name :: f.version :: Nil) *
 		)
 	}
+	
+	
 	
 }

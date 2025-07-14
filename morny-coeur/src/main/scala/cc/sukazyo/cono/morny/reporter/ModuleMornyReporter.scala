@@ -7,14 +7,22 @@ import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandE
 import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.module.MornyModuleInject
 
-@MornyModuleInject
-class Module extends MornyInternalModule {
+object ModuleMornyReporter {
 	
-	override val id: String = "morny.report"
-	override val name: String = "Morny/Coeur Reporter"
-	override val description: String | Null =
+	val id: String = "morny.report"
+	val name: String = "Morny/Coeur Reporter"
+	val description: String | Null =
 		"""Report crucial messages to a Telegram channel.
 		  |""".stripMargin
+	
+}
+
+@MornyModuleInject
+class ModuleMornyReporter extends MornyInternalModule {
+	
+	override val id: String = ModuleMornyReporter.id
+	override val name: String = ModuleMornyReporter.name
+	override val description: String | Null = ModuleMornyReporter.description
 	
 	description.take(description.indexOf("\n"))
 	

@@ -4,13 +4,11 @@ import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand, ITelegramCommand}
-import com.pengrad.telegrambot.model.{Message, Update}
+import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
 import com.pengrad.telegrambot.TelegramBot
 
-import javax.swing.text.html.HTML
-import scala.annotation.unused
 import scala.language.postfixOps
 
 //noinspection NonAsciiCharacters

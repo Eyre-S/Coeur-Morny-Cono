@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.core.module.loader
 
-import cc.sukazyo.cono.morny.core.MornyModule
+import cc.sukazyo.cono.morny.core.module.MornyModule
 
 object ModuleLoader {
 	
@@ -29,7 +29,7 @@ object ModuleLoader {
 	/** Trying to load a class that is not a Morny module (not implements [[MornyModule]]) */
 	class NotMornyModuleException (className: String) extends MornyModuleInitializingException (
 		className,
-		s"Class is not a MornyModule, due to it does not implements the cc.sukazyo.cono.morny.core.MornyModule trait."
+		s"Class is not a MornyModule, due to it does not implements the ${classOf[MornyModule].getName} trait."
 	)
 	
 	@throws[MornyModuleInitializingException]

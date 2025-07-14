@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.social_share
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.module.internal.MornyInternalModule
 import cc.sukazyo.cono.morny.core.module.MornyModuleInject
+import cc.sukazyo.cono.morny.reporter.ModuleMornyReporter
 
 @MornyModuleInject
 class ModuleSocialShare extends MornyInternalModule {
@@ -13,6 +14,8 @@ class ModuleSocialShare extends MornyInternalModule {
 		"""Provides a serial tools contains refactor share url, get content from
 		  |social media, and more.
 		  |""".stripMargin
+	
+	override val depends: Seq[String] = ModuleMornyReporter.id :: Nil
 	
 	override def onInitializing (using MornyCoeur)(cxt: MornyCoeur.OnInitializingContext): Unit = {
 		import cxt.*

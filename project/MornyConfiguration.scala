@@ -68,6 +68,8 @@ object MornyConfiguration {
 		
 		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.180")
 		
+		val graph = defineModules("org.scala-graph" %% "graph-core" % "2.0.3")
+		
 		val http4s = defineModules(
 			"org.http4s" %% "http4s-dsl" % "0.23.30",
 			"org.http4s" %% "http4s-circe" % "0.23.30",
@@ -143,6 +145,8 @@ object MornyConfiguration {
 			Dependencies.base,
 			Dependencies.res,
 			Dependencies.classes,
+			
+			Dependencies.graph,
 			
 			Dependencies.http4s,
 			
