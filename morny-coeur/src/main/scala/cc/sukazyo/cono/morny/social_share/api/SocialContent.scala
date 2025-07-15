@@ -5,7 +5,7 @@ import cc.sukazyo.cono.morny.social_share.api.SocialContent.{SocialMedia, Social
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.SocialMediaType.{Photo, Video}
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.NamingUtils.inlineQueryId
-import cc.sukazyo.cono.morny.system.telegram_api.inline_query.InlineQueryUnit
+import cc.sukazyo.cono.morny.system.telegram_api.inline_query.QueryResultUnit
 import com.pengrad.telegrambot.model.request.*
 import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
 import com.pengrad.telegrambot.TelegramBot
@@ -60,10 +60,10 @@ case class SocialContent (
 				.unsafeExecute
 	}
 	
-	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[InlineQueryUnit[?]] = {
+	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[QueryResultUnit[?]] = {
 		(
 			if (medias_mosaic nonEmpty) && (medias_mosaic.get.t == Photo) && medias_mosaic.get.isInstanceOf[SocialMediaWithUrl] then
-				InlineQueryUnit(InlineQueryResultPhoto(
+				QueryResultUnit(InlineQueryResultPhoto(
 					inlineQueryId(s"[$id_head/photo/mosaic]$id_param"),
 					medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url,
 					thumbnailOrElse(medias_mosaic.get.asInstanceOf[SocialMediaWithUrl].url)
@@ -72,18 +72,18 @@ case class SocialContent (
 				val media = medias.head
 				media match
 					case media_url: SocialMediaWithUrl =>
-						InlineQueryUnit(InlineQueryResultPhoto(
+						QueryResultUnit(InlineQueryResultPhoto(
 							inlineQueryId(s"[$id_head/photo/0]$id_param"),
 							media_url.url,
 							thumbnailOrElse(media_url.url)
 						).title(s"$name").caption(text_html).parseMode(ParseMode.HTML)) :: Nil
 					case _ =>
-						InlineQueryUnit(InlineQueryResultArticle(
+						QueryResultUnit(InlineQueryResultArticle(
 							inlineQueryId(s"[$id_head/text_only]$id_param"), s"$name (text only)",
 							InputTextMessageContent(text_withPicPlaceholder).parseMode(ParseMode.HTML)
 						)) :: Nil
 			else
-				InlineQueryUnit(InlineQueryResultArticle(
+				QueryResultUnit(InlineQueryResultArticle(
 					inlineQueryId(s"[$id_head/text]$id_param"), s"$name",
 					InputTextMessageContent(text_html).parseMode(ParseMode.HTML)
 				)) :: Nil

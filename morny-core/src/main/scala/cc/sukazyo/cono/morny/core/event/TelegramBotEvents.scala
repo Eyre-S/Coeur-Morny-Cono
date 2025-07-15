@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.core.event
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener as TelegramEventListener}
+import cc.sukazyo.cono.morny.system.telegram_api.inline_query.QueryListener
 import cc.sukazyo.std.event.RichEvent
 import cc.sukazyo.std.event.impl.NormalEventManager
 import com.pengrad.telegrambot.TelegramException
@@ -23,7 +24,14 @@ class TelegramBotEvents (using coeur: MornyCoeur) {
 	val OnGetUpdateFailed: NormalEventManager[TelegramException, Unit] =
 		NormalEventManager().initContextWith(initWithCoeur)
 	
+	// TODO: docs
+	/** @since 2.0.0-alpha21 */
 	val OnListenerOccursException: RichEvent[(Throwable, TelegramEventListener, EventEnv), Unit] =
+		NormalEventManager().initContextWith(initWithCoeur)
+	
+	// TODO: docs
+	/** @since 0.2.0-alpha22 */
+	val OnQueryListenerOccursException: RichEvent[(Throwable, QueryListener, EventEnv), Unit] =
 		NormalEventManager().initContextWith(initWithCoeur)
 	
 }
