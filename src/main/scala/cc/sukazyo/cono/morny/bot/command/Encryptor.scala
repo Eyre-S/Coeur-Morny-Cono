@@ -39,12 +39,6 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			echoHelp(event.message.chat.id, event.message.messageId)
 			return
 		
-		def _is_mod_u(arg: String): Boolean =
-			if (arg equalsIgnoreCase "uppercase") return true
-			if (arg equalsIgnoreCase "u") return true
-			if (arg equalsIgnoreCase "upper") return true
-			false
-		
 		/** The param entity of command.
 		  *
 		  * Each entity has its text value, and a state about if it has used.
@@ -58,13 +52,20 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		implicit val params: List[EXParam] =
 			args.toList.drop(1).map(EXParam(_))
 		
-		// test if uppercase param is set, also set the uppercase params used.
-		lazy val mod_uppercase = params.exists { param =>
-			if _is_mod_u(param.text) then
-				param.used()
-				true
-			else false
+		def paramTagExists (tags: List[String]): Boolean = {
+			params.exists { param =>
+				tags.exists { tag =>
+					if param.text equalsIgnoreCase tag then {
+						param.used()
+						true
+					} else false
+				}
+			}
 		}
+		
+		lazy val mod_uppercase = paramTagExists("uppercase" :: "upper" :: "u" :: Nil)
+		
+		lazy val mod_file: Boolean = paramTagExists("file" :: "f" :: Nil)
 		
 		lazy val mod_charset: Charset =
 			params.find(_.text.startsWith("-e")) match
@@ -187,8 +188,16 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				val _tool_b64d =
 					if args(0) contains "u" then Base64.getUrlDecoder
 					else Base64.getDecoder
+				val mappedInput:XEncryptable =
+					if mod_file then
+						input match {
+							case textInput: XText =>
+								XFile(textInput.asByteArray, "data.base64")
+							case _ => input
+						}
+					else input
 				try { genResult_encrypt(
-					input,
+					mappedInput,
 					_tool_b64d.decode,
 					CommonEncrypt.lint_base64FileName
 				) } catch case _: IllegalArgumentException =>
@@ -205,8 +214,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					case x: XText =>
 						try { EXText(URLDecoder.decode(x.data, mod_charset)) }
 						catch case _: IllegalArgumentException =>
-								echo_unsupported
-								return
+							echo_unsupported
+							return
 			case "md5" => genResult_hash(input, MD5)
 			case "sha1" => genResult_hash(input, SHA1)
 			case "sha256" => genResult_hash(input, SHA256)
@@ -267,6 +276,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * 	---<br>
 	  * 	'''uppercase''', upper, u ''(sha1/sha256/sha512/md5 only)''
 	  * 	'''-e__{charset_name}__''' ''(base64/url encode/decode only)''
+	  * 	'''file''', f ''(base64 decode only)''
 	  * </blockquote>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
@@ -285,8 +295,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |<b>md5</b>
 			   |---
 			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>
-			   |<b><i>-e<u>&lt;charset_name&gt;</u></i></b> <i>(base64 encode/decode only)</i>
-			   |<b><i>file</i></b>, f <i>(base64 encode/decode only)</i>"""
+			   |<b><i>-e<u>&lt;charset_name&gt;</u></i></b> <i>(base64/url encode/decode only)</i>
+			   |<b><i>file</i></b>, f <i>(base64 decode only)</i>"""
 			.stripMargin
 		).replyToMessageId(replyTo).parseMode(ParseMode HTML)
 	
