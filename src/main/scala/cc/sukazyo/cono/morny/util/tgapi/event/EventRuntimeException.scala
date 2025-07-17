@@ -28,6 +28,22 @@ object EventRuntimeException {
 		this.initCause(caused)
 	}
 	
+	/** When the exception is about an event. Mostly this is a listeners internal error.
+	  *
+	  * This includes the context of the event.
+	  *
+	  * The original [[Exception]] that occurred this exception is stored in [[getCause]]. The caused can also be
+	  * [[ActionFailed]] or [[ClientFailed]].
+	  *
+	  * @param ex              The original [[Exception]] that thrown by the listener. Will be stored in [[getCause]].
+	  * @param context         The context of the listener's processing event.
+	  */
+	class EventAboutFailed (ex: Throwable, message: String)(
+		val context: EventEnv
+	) extends EventRuntimeException(message) {
+		this.initCause(ex)
+	}
+	
 	/**
 	  * When the exception is thrown by an event listener.
 	  *
@@ -44,9 +60,7 @@ object EventRuntimeException {
 	  */
 	class EventListenerFailed (ex: Throwable)(
 		val currentListener: String, val currentSubevent: String,
-		val context: EventEnv
-	) extends EventRuntimeException(s"Event failed when listener $currentListener is processing $currentSubevent.") {
-		this.initCause(ex)
-	}
+		context: EventEnv
+	) extends EventAboutFailed(ex, s"Event failed when listener $currentListener is processing $currentSubevent.")(context)
 	
 }
