@@ -2,9 +2,23 @@ package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.bot.query
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.api.EventEnv
+import cc.sukazyo.cono.morny.bot.query.MornyQueries.QueryListenerExceptionListener
+import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.pengrad.telegrambot.model.Update
 
 import scala.collection.mutable.ListBuffer
+
+object MornyQueries {
+	
+	type QueryListenerExceptionListener = (ITelegramQuery, Throwable)=>Any
+	
+	class QueryListenerFailed (ex: Throwable, val queryListener: ITelegramQuery, event: EventEnv)
+	extends EventRuntimeException.EventAboutFailed(
+		ex, s"Unexcepted exception occurred on sub-query ${queryListener.getClass.getName}"
+	)(event)
+	
+}
 
 class MornyQueries (using MornyCoeur) {
 	
@@ -14,10 +28,9 @@ class MornyQueries (using MornyCoeur) {
 		ShareToolTwitter(),
 		ShareToolBilibili(),
 		ShareToolXhs(),
-		ShareToolSocialContent()
+		ShareToolSocialContent(),
+		GenError()
 	)
-	
-	type QueryListenerExceptionListener = (ITelegramQuery, Throwable)=>Any
 	
 	def query (onQueryListenerExceptions: QueryListenerExceptionListener)(event: Update): List[InlineQueryUnit[_]] = {
 		val results = ListBuffer[InlineQueryUnit[_]]()

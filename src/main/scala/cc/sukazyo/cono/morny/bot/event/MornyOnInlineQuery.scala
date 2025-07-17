@@ -5,6 +5,7 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.bot.query.{InlineQueryUnit, ITelegramQuery, MornyQueries}
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.bot.query.MornyQueries.QueryListenerFailed
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.{Gson, GsonBuilder}
 import com.pengrad.telegrambot.model.request.InlineQueryResult
@@ -30,7 +31,7 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 				) indent 4) ++= "\n"
 			case _ =>
 		logger error errorMessage.toString
-		coeur.daemons.reporter.exception(e)
+		coeur.daemons.reporter.exception(QueryListenerFailed(e, queryListener, event))
 	}
 	
 	override def onInlineQuery (using event: EventEnv): Unit = {

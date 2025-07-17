@@ -3,7 +3,8 @@ package cc.sukazyo.cono.morny.daemon
 import cc.sukazyo.cono.morny.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
 import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
-import cc.sukazyo.cono.morny.bot.event.EventContext
+import cc.sukazyo.cono.morny.bot.event.{EventContext, MornyOnInlineQuery}
+import cc.sukazyo.cono.morny.bot.query.MornyQueries
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.util.statistics.NumericStatistics
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
@@ -70,13 +71,21 @@ class MornyReport (using coeur: MornyCoeur) {
 				"Telegram API Returns:\n<pre><code class='language-json'>%s</code></pre>"
 					.formatted(GsonBuilder().setPrettyPrinting().create.toJson(tgErr.response))
 			)
-			case eventErr: EventRuntimeException.EventListenerFailed => {
+			case eventErr: EventRuntimeException.EventAboutFailed =>
 				val buffer = ListBuffer[String]()
 				// language=html
-				buffer +=
-					s"""Event Context:
-					   | - <i>current listener</i>: <code>${eventErr.currentListener}</code>
-					   | - <i>current subevent</i>: <code>${eventErr.currentSubevent}</code>""".stripMargin
+				eventErr match {
+					case evListenerErr: EventRuntimeException.EventListenerFailed =>
+						buffer +=
+							s"""Event Context:
+							   | - <i>current listener</i>: <code>${evListenerErr.currentListener}</code>
+							   | - <i>current subevent</i>: <code>${evListenerErr.currentSubevent}</code>""".stripMargin
+					case evQueryErr: MornyQueries.QueryListenerFailed =>
+						buffer +=
+							s"""Query Context:
+							   | - <i>running sub-query</i>: <code>${evQueryErr.queryListener.getClass.getName}</code>"""
+								.stripMargin
+				}
 				eventErr.context.consume[InputCommand](command => {
 					buffer += // language=html
 						s"""User Executing Command:
@@ -91,7 +100,6 @@ class MornyReport (using coeur: MornyCoeur) {
 						   | - <i>in chat: ${context.chat.map(_.safe_linkHTML).getOrElse("<i>null</i>")}</i>""".stripMargin
 				}
 				buffer.toList
-			}
 			case _ => Nil
 		}
 		
