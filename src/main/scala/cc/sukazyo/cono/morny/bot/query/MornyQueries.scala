@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.bot.query
 
 import cc.sukazyo.cono.morny.bot.query
-import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import com.pengrad.telegrambot.model.Update
 
@@ -18,11 +17,15 @@ class MornyQueries (using MornyCoeur) {
 		ShareToolSocialContent()
 	)
 	
-	def query (event: Update): List[InlineQueryUnit[_]] = {
+	type QueryListenerExceptionListener = (ITelegramQuery, Throwable)=>Any
+	
+	def query (onQueryListenerExceptions: QueryListenerExceptionListener)(event: Update): List[InlineQueryUnit[_]] = {
 		val results = ListBuffer[InlineQueryUnit[_]]()
 		for (instance <- queryInstances) {
-			val r = instance query event
-			if (r != null) results ++= r
+			try {
+				val r = instance query event
+				if (r != null) results ++= r
+			} catch case e => onQueryListenerExceptions(instance, e)
 		}
 		results.result()
 	}
