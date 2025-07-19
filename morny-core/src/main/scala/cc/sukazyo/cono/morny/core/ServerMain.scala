@@ -115,7 +115,10 @@ object ServerMain {
 		/// process startup params - like startup mode
 		///
 		
-		if (showHello) logger `info` MornyAbout.MORNY_PREVIEW_IMAGE_ASCII
+		if (showHello)
+			logger `info` MornyAbout.MORNY_PREVIEW_IMAGE_ASCII
+			import cc.sukazyo.std.random.{defaults, CollectionChooser_SeqExtension}
+			logger `info` s"==== ${MornyAbout.MORNY_SPLASHES.filter(_.nonEmpty).toList.chooseOne} ===="
 		if (mode_echoHello) return
 		
 		if (unknownArgs.nonEmpty) logger `warn`

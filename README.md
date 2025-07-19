@@ -45,7 +45,7 @@
 
 [scala]: https://www.scala-lang.org/
 [spotbugs]: https://spotbugs.github.io/
-[tg4j]: https://github.com/pengrad/java-telegram-bot-api
+[Java Telegram Bot API]: https://github.com/pengrad/java-telegram-bot-api
 [okhttp]: https://square.github.io/okhttp/
 [gson]: https://github.com/google/gson
 [scalatest]: https://scalatest.org/
@@ -57,10 +57,12 @@
 [cron-utils]: https://github.com/jmrozanec/cron-utils
 [http4s]: https://http4s.org/
 [da4a]: https://github.com/suk-ws/da4a
+[classgraph]: https://github.com/classgraph/classgraph
+[Graph for Scala]: https://www.scala-graph.org/
 
 [Scala 3][scala] | [SpotBugs Annotations][spotbugs] | [ScalaTest] \
-[messiva] | [resource-tools] | [da4a] \
-[Java Telegram Bot API][tg4j] | [http4s] \
-[okhttp] | [sttp] | [Gson] | [circe] | [jsoup] | [cron-utils]
+[messiva] | [resource-tools] | [da4a] | [ClassGraph] \
+[Java Telegram Bot API] | [http4s] \
+[Graph for Scala] | [okhttp] | [sttp] | [Gson] | [circe] | [jsoup] | [cron-utils]
 
 </div>

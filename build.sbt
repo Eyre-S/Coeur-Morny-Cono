@@ -126,22 +126,6 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 			
 			projectMetadata(MornyProject.morny_coeur),
 			
-//			buildInfoPackage := MornyProject.morny_coeur.root_package,
-//			buildInfoObject := "BuildConfig",
-//			buildInfoOptions += BuildInfoOption.Traits("cc.sukazyo.cono.morny.IBuildInfo"),
-//			buildInfoKeys ++= Seq(
-//				BuildInfoKey[String]("VERSION", MornyProject.version),
-//				BuildInfoKey[String]("VERSION_FULL", MornyProject.version_full),
-//				BuildInfoKey[String]("VERSION_BASE", MornyProject.version_base),
-//				BuildInfoKey[Option[String]]("VERSION_DELTA", MornyProject.version_delta),
-//				BuildInfoKey[String]("CODENAME", MornyProject.version_codename),
-//				BuildInfoKey.action[Long]("CODE_TIMESTAMP") { MornyProject.code_time },
-//				BuildInfoKey.action[String]("COMMIT") { MornyProject.git_commit },
-//				BuildInfoKey.action[Boolean]("CLEAN_BUILD") { MornyProject.git_is_clean },
-//				BuildInfoKey[String]("CODE_STORE", MornyProject.git_store),
-//				BuildInfoKey[String]("COMMIT_PATH", MornyProject.git_store_path),
-//			),
-			
 			assemblyMergeStrategy := {
 				case module if module endsWith "module-info.class" => MergeStrategy.concat
 				case module_kt if module_kt endsWith ".kotlin_module" => MergeStrategy.concat

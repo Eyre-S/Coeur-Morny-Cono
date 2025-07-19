@@ -6,10 +6,15 @@ import java.io.IOException
 
 object MornyAbout {
 	
-	val MORNY_PREVIEW_IMAGE_ASCII: String =
+	lazy val MORNY_PREVIEW_IMAGE_ASCII: String =
 		try { MornyAssets.assets.getFile("texts/server-hello.txt").readString }
 		catch case e: IOException =>
 			throw RuntimeException("Cannot read MORNY_PREVIEW_IMAGE_ASCII from assets pack", e)
+	
+	lazy val MORNY_SPLASHES: Array[String] =
+		try { MornyAssets.assets.getFile("/texts/splash.txt").readString.split('\n') }
+		catch case e: IOException =>
+			throw RuntimeException("Cannot read MORNY_SPLASHES from assets pack", e)
 	
 	val MORNY_SOURCECODE_LINK = "https://github.com/Eyre-S/Coeur-Morny-Cono"
 	val MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK = "https://storage.sukazyo.cc/Eyre_S/Coeur-Morny-Cono"

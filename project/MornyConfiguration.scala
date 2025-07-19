@@ -38,13 +38,20 @@ object MornyConfiguration {
 	object Dependencies {
 		
 		trait ModuleDefinition {
-			def compile: Seq[ModuleID]
+			def compile: Seq[ModuleID] = compile(false)
+			def compile (tag_test: Boolean): Seq[ModuleID]
+			def asTest: ModuleDefinition
 		}
-		class ModuleUnit (val mod: ModuleID) extends ModuleDefinition {
-			override def compile: Seq[ModuleID] = Seq(mod)
+		class ModuleUnit (val mod: ModuleID, val tag_test: Boolean = false) extends ModuleDefinition {
+			override def compile (tag_test: Boolean): Seq[ModuleID] =
+				if (tag_test || this.tag_test) Seq(mod % Test)
+				else Seq(mod)
+			override def asTest = new ModuleUnit(this.mod, true)
 		}
-		class ModuleGroup (val mods: Seq[ModuleDefinition]) extends ModuleDefinition {
-			override def compile: Seq[ModuleID] = mods.flatMap(_.compile)
+		class ModuleGroup (val mods: Seq[ModuleDefinition], val tag_test: Boolean = false) extends ModuleDefinition {
+			override def compile (tag_test: Boolean): Seq[ModuleID] =
+				mods.flatMap(_.compile(tag_test || this.tag_test))
+			override def asTest = new ModuleGroup(this.mods, this.tag_test)
 		}
 		implicit def moduleToModuleUnit (mod: ModuleID): ModuleDefinition = {
 			new ModuleUnit(mod)
@@ -58,15 +65,15 @@ object MornyConfiguration {
 			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.3" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT" changing(),
+			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			
 		)
 		
-		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT" changing())
+		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT")
 		
-		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.180")
+		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.181")
 		
 		val graph = defineModules("org.scala-graph" %% "graph-core" % "2.0.3")
 		
@@ -125,7 +132,7 @@ object MornyConfiguration {
 			Dependencies.sttp,
 			Dependencies.jsoup,
 			
-			"cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT" % Test changing(),
+			Dependencies.res.asTest,
 			Dependencies.test_cases
 			
 		).compile
