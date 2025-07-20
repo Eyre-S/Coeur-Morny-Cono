@@ -1,0 +1,16 @@
+	Morny Translations File
+
+%1.0
+&encoding=utf8
+&indent=1
+
+morny.information.about_links
+| <a href='{MORNY_SOURCECODE_LINK}'>source code</a> | <a href='{MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
+| <a href='{MORNY_ISSUE_TRACKER_LINK}'>回饋 / issue tracker</a>
+| <a href='{MORNY_USER_GUIDE_LINK}'>使用說明書 / user guide & docs</a>
+
+morny.command.info.message.about
+| <b>Morny Cono</b>
+| 來自安妮的侍從小鼠。
+| ————————————————
+| {morny.information.about_links}

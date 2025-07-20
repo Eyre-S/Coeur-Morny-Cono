@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
-import cc.sukazyo.cono.morny.core.assets.MornyAssets
+import cc.sukazyo.cono.morny.core.assets.{AssetPackLoader, MornyAssets}
 import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
@@ -131,7 +131,13 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	///>>> BLOCK START local storage / data configuration
 	
 	val assets: MornyAssets = MornyAssets()
-	val lang: MornyLangs = MornyLangs()
+	logger.info("Loading Morny's assets packs...")
+	AssetPackLoader.loadFromScans(assets)
+	logger.info("Loaded asset packs: \n" +
+		assets.assetPacks.map(x => s" - ${x.metadata.id}").mkString("\n")
+	)
+	
+	val lang: MornyLangs = MornyLangs(using assets)
 	
 	///>>> BLOCK END local storage / data configuration
 	

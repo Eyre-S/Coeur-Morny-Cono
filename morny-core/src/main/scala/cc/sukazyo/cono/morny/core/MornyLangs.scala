@@ -1,8 +1,7 @@
 package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
-import cc.sukazyo.cono.morny.core.MornyLangs.load
-import cc.sukazyo.cono.morny.data.MornyAssets
+import cc.sukazyo.cono.morny.core.assets.MornyAssets
 import cc.sukazyo.cono.morny.util.hytrans.*
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import cc.sukazyo.cono.morny.util.var_text.{Var, VarText}
@@ -14,16 +13,18 @@ import scala.util.boundary.break
 
 object MornyLangs {
 	
-	private def load(): Translations = {
+	private def load (using assets: MornyAssets): Translations = {
+		
+		val assetDirs = assets.assetDirs.map(_._2)
 		
 		val (lang_index, lang_trans) = {
 			
 			logger `info` s"Loading Morny's translation data."
 			
-			val (lang_dir, lang_index_content) = try {
+			val (lang_dir_s, lang_index_content) = try {
 				(
-					MornyAssets.assets.getDirectory("langs"),
-					MornyAssets.assets.getFile("langs/_index.hyl").readString
+					assetDirs.map(_.getDirectory("langs")).filter(_ != null),
+					assetDirs.map(_.getFile("langs/_index.hyl")).filter(_ != null).head.readString
 				)
 			} catch case e: IOException =>
 				throw Exception("Cannot read Morny's translations file.", e)
@@ -37,7 +38,10 @@ object MornyLangs {
 			
 			val language_translations = mutable.HashMap.empty[String, Definitions]
 			
-			for (file <- lang_dir.listFiles()) yield {
+			for (
+				lang_dir <- lang_dir_s;
+				file <- lang_dir.listFiles
+			) yield {
 				boundary {
 					val file_name = file.getPath.last
 					if !(file_name.endsWith(".hyt") || file_name.endsWith(".hytrans")) then break()
@@ -59,10 +63,14 @@ object MornyLangs {
 							   |due to failed, this ($file_name) has been ignored.""".stripMargin
 						break()
 					logger `info` s"read language file $file_name (normalized lang name is $normalized), with ${lang_def.size} entries."
-					if language_translations contains normalized then
-						// TODO: merge
-						logger `warn` s"  language $normalized seems already loaded one yet, this will override the old one!"
-					else language_translations += (normalized -> lang_def)
+					if language_translations contains normalized then {
+						val old = language_translations(normalized)
+						val merged = old `merge` lang_def
+						val override_count = old.size + lang_def.size - merged.size
+						language_translations += (normalized -> merged)
+						if override_count > 0 then
+							logger `warn` s"  $override_count entries override by new translations"
+					} else language_translations += (normalized -> lang_def)
 				}
 			}
 			
@@ -76,12 +84,13 @@ object MornyLangs {
 	
 }
 
-class MornyLangs {
+class MornyLangs (using assets: MornyAssets) {
 	
-	private var translations: Translations = load()
+	private var translations: Translations = this.load()
 	
-	def reload (): Unit =
-		translations = load()
+	def load(): Translations = MornyLangs.load(using assets)
+	def reload(): Unit =
+		translations = this.load()
 	
 	def getRaw: Translations = translations
 	

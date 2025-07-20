@@ -4,27 +4,6 @@
 &encoding=utf8
 &indent=1
 
-morny.information.about_links
-| <a href='{MORNY_SOURCECODE_LINK}'>source code</a> | <a href='{MORNY_SOURCECODE_SELF_HOSTED_MIRROR_LINK}'>backup</a>
-| <a href='{MORNY_ISSUE_TRACKER_LINK}'>反馈 / issue tracker</a>
-| <a href='{MORNY_USER_GUIDE_LINK}'>使用说明书 / user guide & docs</a>
-
-morny.command.info.message.about
-| <b>Morny Cono</b>
-| 来自安妮的侍从小鼠。
-| ————————————————
-| {morny.information.about_links}
-
-morny.command.info.sub_start.message
-| 欢迎使用 <b>Morny Cono</b>，<i>来自安妮的侍从小鼠</i>。
-| Morny 具有各种各样的功能。
-|
-| ————————————————
-| {morny.information.about_links}
-| ————————————————
-|
-| （你可以随时通过 /info 重新获得这些信息）
-
 morny.misc.command_test.message
 | <b>这只是一个 /test 测试命令。</b>测试 <i>id</i> 为 <code>2</code>。
 | 你可以回复一条消息来测试回复消息的功能。
