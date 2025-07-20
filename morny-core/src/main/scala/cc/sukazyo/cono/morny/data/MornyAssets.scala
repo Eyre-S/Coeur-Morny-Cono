@@ -9,6 +9,8 @@ object MornyAssets {
 	val assetsLocation: List[String] = "assets" :: "morny-coeur" :: Nil
 	
 	val pack: ResourcePackage = ResourcePackage.get(assetsLocation :+ "morny-coeur.identifier" *)
+	val corePack: ResourcePackage = ResourcePackage.get("assets/core/core_assets.identifier")
 	val assets: ResourceDirectory = pack.getDirectory(assetsLocation*)
+	val coreAssets: ResourceDirectory = corePack.getDirectory("assets/core")
 	
 }

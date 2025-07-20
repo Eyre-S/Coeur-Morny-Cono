@@ -71,7 +71,7 @@ object MornyConfiguration {
 			
 		)
 		
-		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.3.2-SNAPSHOT")
+		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.4.0-SNAPSHOT")
 		
 		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.181")
 		

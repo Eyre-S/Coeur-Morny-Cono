@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.core
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
+import cc.sukazyo.cono.morny.core.assets.MornyAssets
 import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
@@ -129,6 +130,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	///>>> BLOCK START local storage / data configuration
 	
+	val assets: MornyAssets = MornyAssets()
 	val lang: MornyLangs = MornyLangs()
 	
 	///>>> BLOCK END local storage / data configuration

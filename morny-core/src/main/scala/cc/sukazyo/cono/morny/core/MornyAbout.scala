@@ -7,12 +7,12 @@ import java.io.IOException
 object MornyAbout {
 	
 	lazy val MORNY_PREVIEW_IMAGE_ASCII: String =
-		try { MornyAssets.assets.getFile("texts/server-hello.txt").readString }
+		try { MornyAssets.coreAssets.getFile("texts/server-hello.txt").readString }
 		catch case e: IOException =>
 			throw RuntimeException("Cannot read MORNY_PREVIEW_IMAGE_ASCII from assets pack", e)
 	
 	lazy val MORNY_SPLASHES: Array[String] =
-		try { MornyAssets.assets.getFile("/texts/splash.txt").readString.split('\n') }
+		try { MornyAssets.coreAssets.getFile("/texts/splash.txt").readString.split('\n') }
 		catch case e: IOException =>
 			throw RuntimeException("Cannot read MORNY_SPLASHES from assets pack", e)
 	
