@@ -130,6 +130,7 @@ lazy val morny_coeur = (project in file(MornyProject.morny_coeur.id))
 				case module if module endsWith "module-info.class" => MergeStrategy.concat
 				case module_kt if module_kt endsWith ".kotlin_module" => MergeStrategy.concat
 				case version if (version startsWith "META-INF") && (version endsWith ".versions.properties") => MergeStrategy.concat
+				case "assets/morny-assets.jsonc" | "assets\\morny-assets.jsonc" => MergeStrategy.preferProject
 				case x =>
 					val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
 					oldStrategy(x)
