@@ -1,10 +1,11 @@
 plugins {
+	id 'java'
 	id 'scala'
 	id 'java-library'
 	id 'application'
 	id 'maven-publish'
 	id 'com.github.maiflai.scalatest' version "0.33"
-	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	id 'com.gradleup.shadow' version '8.3.9'
 	id 'com.github.gmazzo.buildconfig' version '4.1.2'
 	id 'org.ajoberstar.grgit' version '5.2.0'
 	id "me.champeau.jmh" version "0.7.2"
@@ -68,12 +69,12 @@ if (project.hasProperty("publishMvnRepoUrl")) {
 	publish_remote_password = publishMvnRepoPassword
 }
 
-group proj_group
-version proj_version_full
+group = proj_group
+version = proj_version_full
 
 repositories {
 	mavenCentral()
-	maven { name '-ws'; url 'https://mvn.sukazyo.cc/releases' }
+	maven { name = '-ws'; url = 'https://mvn.sukazyo.cc/releases' }
 }
 
 dependencies {
@@ -224,29 +225,24 @@ void listChanges (Status.Changes listing) {
 publishing {
 	repositories {
 		if (publish_local_url != null) maven {
-			name 'archives'
-			url publish_local_url
+			name = 'archives'
+			url = publish_local_url
 		}
 		if (publish_remote_url != null) maven {
-			name '-ws-'
-			url publish_remote_url
+			name = '-ws-'
+			url = publish_remote_url
 			credentials {
-				username publish_remote_username
-				password publish_remote_password
+				username = publish_remote_username
+				password = publish_remote_password
 			}
 		}
 	}
 	publications {
-		//noinspection GroovyAssignabilityCheck
-		main(MavenPublication) {
-			//noinspection GroovyAssignabilityCheck
-			from components.java
-			//noinspection GroovyAssignabilityCheck
+		create("main", MavenPublication) {
 			groupId = proj_group
-			//noinspection GroovyAssignabilityCheck
 			artifactId = proj_archive_name
-			//noinspection GroovyAssignabilityCheck
 			version = proj_version
+			from components.java
 		}
 	}
 }
