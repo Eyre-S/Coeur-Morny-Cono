@@ -61,6 +61,7 @@ class ShareToolBilibiliTest extends MornyTests {
 		
 		"that contains a b23 video share url should contains it in result" taggedAs (Slow, Network) in {
 			for (messageObject <- BilibiliAssets.message_with_urls.with_b23_url) {
+//				s"In Message:\n${messageObject.content.indent(2)}" taggedAs (Slow, Network) in {
 				withInfos(s"In Message:\n${messageObject.content.indent(2)}") {
 					queryResultShouldContains(
 						ShareToolBilibili().query(formatToQueryUpdate(messageObject.content)),

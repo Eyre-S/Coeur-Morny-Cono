@@ -1,3 +1,6 @@
+# 以下全部数据仅为从随机位置搜集的随机链接和文字组合，引用到的视频以及文本内容无任何偏好含义
+# All data below is a random combination of links and text collected from random locations, and the quoted videos and
+#  text content have no preference whatsoever
 without_b23_url:
   - content: |
       【兔子把化妆品涂在了脸上】 https://www.bilibili.com/video/BV1mB4y1o7dP/?share_source=copy_web&vd_source=653acafde45a589accad0a1287a9c7d8d
@@ -30,26 +33,16 @@ without_b23_url:
         bv: "1Pw4m1k7ot"
 with_b23_url:
   - content: |
-      【四十小时三转机全程廉航 纽约回国终极折磨之旅-哔哩哔哩】 https://b23.tv/H6TxLwN
+      【四十小时三转机全程廉航 纽约回国终极折磨之旅-哔哩哔哩】 https://b23.tv/DwatLtK
     with_links:
-      - raw: "https://b23.tv/H6TxLwN"
-        shareId: "H6TxLwN"
+      - raw: "https://b23.tv/DwatLtK"
+        shareId: "DwatLtK"
         bv: "1e4421Q7Hy"
-  - content: "【2只鸡蛋就能做舒芙蕾欧姆蛋，外加奶油培根白蘑菇-哔哩哔哩】 https://b23.tv/0kPCod3"
+  - content: "https://b23.tv/M5CJ4wT"
     with_links:
-      - raw: "https://b23.tv/0kPCod3"
-        shareId: "0kPCod3"
-        bv: "1sJ4m1j7Vw"
-  - content: "https://b23.tv/EbD4M1n"
-    with_links:
-      - raw: "https://b23.tv/EbD4M1n"
+      - raw: "https://b23.tv/M5CJ4wT"
         shareId: "EbD4M1n"
-        bv: "11KbRebEgp"
-  - content: "⚡班长又出新歌，唱到封号，老c都顶唔顺⚡ https://b23.tv/igpw6X4"
-    with_links:
-      - raw: "https://b23.tv/igpw6X4"
-        shareId: "igpw6X4"
-        bv: "1RT421k7T1"
+        bv: "13LERziE4F"
   - content: |
       b23.tv/BV1QT421D7Md
       绘画型高松灯（确信
