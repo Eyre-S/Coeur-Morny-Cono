@@ -48,7 +48,7 @@ class ShareToolBilibiliTest extends MornyTests {
 				titles should contain(s"[Bilibili] Video BV${shou.bv}")
 		}
 		
-		"that contains a video id/url should contains it in result" in {
+		"that contains a video id/url, it should has results" in {
 			for (messageObject <- BilibiliAssets.message_with_urls.without_b23_url) {
 				withInfos(s"In Message:\n${messageObject.content.indent(2)}") {
 					queryResultShouldContains(
@@ -59,7 +59,7 @@ class ShareToolBilibiliTest extends MornyTests {
 			}
 		}
 		
-		"that contains a b23 video share url should contains it in result" taggedAs (Slow, Network) in {
+		"that contains a b23 video share url, it should has results" taggedAs (Slow, Network) in {
 			for (messageObject <- BilibiliAssets.message_with_urls.with_b23_url) {
 //				s"In Message:\n${messageObject.content.indent(2)}" taggedAs (Slow, Network) in {
 				withInfos(s"In Message:\n${messageObject.content.indent(2)}") {
@@ -71,7 +71,7 @@ class ShareToolBilibiliTest extends MornyTests {
 			}
 		}
 		
-		"that have no bilibili video url should returns null" in {
+		"that have no bilibili video url, it should has no result" in {
 			for (message <- RandomMessages.text_message.normal_message) { withInfos ("In Message:\n" + message.indent(2)) {
 				ShareToolBilibili().query(formatToQueryUpdate(message)) shouldEqual List.empty
 			}}
