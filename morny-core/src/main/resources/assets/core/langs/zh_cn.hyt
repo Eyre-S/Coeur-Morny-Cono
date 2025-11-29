@@ -1,5 +1,23 @@
 	Morny Translations File
 
+	>> Core Bot APIs
+%1.0
+&encoding=utf8
+&indent=1
+
+core.api.bot.messages.threading_message.thread_expired
+| {duration_message} 内未收到回复。消息串已取消。
+
+core.api.bot.messages.threading_message.thread_override_by_new_message
+| 目前正有另一个消息串正在等待新的消息，由于新消息串的开启，旧的消息串已被自动取消。
+
+core.api.bot.messages.threading_message.manually_cancel.cancelled
+| 已取消.
+
+core.api.bot.messages.threading_message.manually_cancel.no_thread_to_cancel
+| 当前没有消息串可供取消.
+
+	>> Core Provided Features
 %1.0
 &encoding=utf8
 &indent=1

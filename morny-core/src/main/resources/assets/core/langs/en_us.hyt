@@ -1,5 +1,24 @@
 	Morny Translations File
 
+	>> Core Bot APIs
+%1.0
+&encoding=utf8
+&indent=1
+
+core.api.bot.messages.threading_message.thread_expired
+| No responding after {duration_message}, message thread have cancelled.
+
+core.api.bot.messages.threading_message.thread_override_by_new_message
+| There seems another message thread is waiting for future messages.
+| That thread has been canceled automatically.
+
+core.api.bot.messages.threading_message.manually_cancel.cancelled
+| Canceled.
+
+core.api.bot.messages.threading_message.manually_cancel.no_thread_to_cancel
+| No active message thread to cancel.
+
+	>> Core Provided Features
 %1.0
 &encoding=utf8
 &indent=1
