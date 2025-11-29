@@ -100,6 +100,11 @@ class TestUniversalCommand extends MornySystemTests {
 			Lmd("") shouldEqual Array.empty[String]
 		}
 		
+		"string with only spaces should return empty array" in {
+			Cmd("       ") shouldEqual Array.empty[String]
+			Lmd("       ") shouldEqual Array.empty[String]
+		}
+		
 		val example_special_character = Table(
 			"char",
 			"　",
