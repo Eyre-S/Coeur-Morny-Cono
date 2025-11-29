@@ -1,13 +1,14 @@
 import MornyConfiguration.ProjectMetadata
 
 aether.AetherKeys.aetherOldVersionMethod := true
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / organization := MornyProject.group
 ThisBuild / organizationName := MornyProject.group_name
 
 ThisBuild / version := MornyProject.version
 
-ThisBuild / scalaVersion := "3.6.4"
+ThisBuild / scalaVersion := "3.7.4"
 
 ThisBuild / resolvers ++= Seq(
 		"-ws-releases" at "https://mvn.sukazyo.cc/releases",
@@ -34,24 +35,30 @@ artifactName := {(sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
 
 ThisBuild / scalacOptions ++= Seq(
 	"-language:postfixOps",
+	"-language:implicitConversions",
+//	"-language:experimental.macros",
 	"-encoding", MornyProject.source_encoding,
+	"-java-output-version", "17",
 	"-feature",
-	"-deprecation"
+	"-unchecked",
+	"-deprecation",
+	"-Xfatal-warnings"
 )
 ThisBuild / javacOptions ++= Seq(
 	"-encoding", MornyProject.source_encoding,
-	"-source", "17",
-	"-target", "17"
+	"-source", "21",
+	"-target", "21"
 )
 ThisBuild / autoAPIMappings := true
 ThisBuild / apiMappings ++= {
 	def mappingsFor(organization: String, names: List[String], location: String, revision: String => String = identity): Seq[(File, URL)] =
-		for {
+		(for {
 			entry: Attributed[File] <- (Compile / fullClasspath).value
 			module: ModuleID <- entry.get(moduleID.key)
 			if module.organization == organization
 			if names.exists(module.name.startsWith)
-		} yield entry.data -> url(location.format(revision(module.revision)))
+		} yield entry.data -> url(location.format(revision(module.revision))))
+				.to[Seq]
 	val mappings: Seq[(File, URL)] = Seq(
 		mappingsFor("org.scala-lang", List("scala-library"), "https://scala-lang.org/api/%s/"),
 		mappingsFor("com.github.pengrad", "java-telegram-bot-api"::Nil, "https://jitpack.io/com/github/pengrad/java-telegram-bot-api/6.3.0/javadoc/"),
