@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.system.telegram_api.command
 
 import cc.sukazyo.cono.morny.system.utils.UniversalCommand
 
+@deprecated("Use modern TGInputCommand instead", "2.0.0-alpha22")
 class InputCommand private (
 		val target: String|Null,
 		val command: String,
@@ -17,6 +18,7 @@ class InputCommand private (
 	
 }
 
+@deprecated("Use modern TGInputCommand instead", "2.0.0-alpha22")
 object InputCommand {
 	
 	private final val TARGET_DEFAULT: String|Null = null

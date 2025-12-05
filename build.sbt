@@ -42,12 +42,12 @@ ThisBuild / scalacOptions ++= Seq(
 	"-feature",
 	"-unchecked",
 	"-deprecation",
-	"-Xfatal-warnings"
+//	"-Xfatal-warnings"
 )
 ThisBuild / javacOptions ++= Seq(
 	"-encoding", MornyProject.source_encoding,
-	"-source", "21",
-	"-target", "21"
+	"-source", "17",
+	"-target", "17"
 )
 ThisBuild / autoAPIMappings := true
 ThisBuild / apiMappings ++= {

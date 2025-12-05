@@ -1,12 +1,12 @@
 package cc.sukazyo.cono.morny.system.utils.command
 
-class InputCommand private (
-	val command: String,
-	val args: Array[String],
-	val argsRaw: String
-) {
+class InputCommand protected (
+	override val command: String,
+	override val args: Array[String],
+	override val argsRaw: String
+) extends IInputCommand {
 	
-	def nextLevel: Option[InputCommand] = InputCommand(args, argsRaw)
+	def subcommand: Option[InputCommand] = InputCommand(args, argsRaw)
 	
 }
 
