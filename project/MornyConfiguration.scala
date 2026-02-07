@@ -1,5 +1,5 @@
-import sbt.*
 import MornyConfiguration.Dependencies.defineModules
+import sbt.*
 
 import scala.language.implicitConversions
 
@@ -62,10 +62,10 @@ object MornyConfiguration {
 		
 		val base = defineModules(
 			
-			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.3" % Compile,
+			"com.github.spotbugs" % "spotbugs-annotations" % "4.9.8" % Compile,
 			
 			"cc.sukazyo" % "messiva" % "0.2.0",
-			"cc.sukazyo" % "da4a" % "0.2.0-SNAPSHOT",
+			"cc.sukazyo" % "da4a" % "0.3.0-SNAPSHOT",
 			
 			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
 			
@@ -73,14 +73,14 @@ object MornyConfiguration {
 		
 		val res = defineModules("cc.sukazyo" % "resource-tools" % "0.4.0-SNAPSHOT")
 		
-		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.181")
+		val classes = defineModules("io.github.classgraph" % "classgraph" % "4.8.184")
 		
 		val graph = defineModules("org.scala-graph" %% "graph-core" % "2.0.3")
 		
 		val http4s = defineModules(
-			"org.http4s" %% "http4s-dsl" % "0.23.30",
-			"org.http4s" %% "http4s-circe" % "0.23.30",
-			"org.http4s" %% "http4s-netty-server" % "0.5.24"
+			"org.http4s" %% "http4s-dsl" % "0.23.33",
+			"org.http4s" %% "http4s-circe" % "0.23.33",
+			"org.http4s" %% "http4s-netty-server" % "0.5.28"
 		)
 		
 		val sttp = defineModules(
@@ -90,14 +90,14 @@ object MornyConfiguration {
 		)
 		
 		val circe = defineModules(
-			"io.circe" %% "circe-core" % "0.14.14",
-			"io.circe" %% "circe-generic" % "0.14.14",
-			"io.circe" %% "circe-parser" % "0.14.14"
+			"io.circe" %% "circe-core" % "0.14.15",
+			"io.circe" %% "circe-generic" % "0.14.15",
+			"io.circe" %% "circe-parser" % "0.14.15"
 		)
 		
-		val gson = defineModules("com.google.code.gson" % "gson" % "2.13.1")
+		val gson = defineModules("com.google.code.gson" % "gson" % "2.13.2")
 		
-		val jsoup = defineModules("org.jsoup" % "jsoup" % "1.19.1")
+		val jsoup = defineModules("org.jsoup" % "jsoup" % "1.22.1")
 		
 		val cron_utils = defineModules(
 			"com.cronutils" % "cron-utils" % "9.2.1",
