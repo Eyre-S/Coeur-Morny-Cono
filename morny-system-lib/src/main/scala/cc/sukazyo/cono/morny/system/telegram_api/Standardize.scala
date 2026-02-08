@@ -4,10 +4,16 @@ object Standardize {
 	
 	type UserID = Long
 	type ChatID = Long
+	type MessageThreadID = Int
 	type MessageID = Int
+	type MessageGroupID = String
 	
-	val CHANNEL_SPEAKER_MAGIC_ID = 136817688
+	type ServerTime = Int
 	
-	val MASK_BOTAPI_FORMATTED_ID: Long = -1000000000000L
+	val CHANNEL_SPEAKER_MAGIC_ID: UserID = 136817688
+	
+	val MASK_BOTAPI_FORMATTED_ID: ChatID = -1000000000000L
+	
+	val NON_COMMITED_MESSAGE_ID: MessageID = 0
 	
 }

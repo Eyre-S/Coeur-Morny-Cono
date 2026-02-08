@@ -30,8 +30,7 @@ trait SendableMessage [REQ <: AbstractSendRequest[REQ]] extends Message {
 				request.messageThreadId(chatThread.threadId)
 			case _ =>
 		
-		if (this.replyParameters == request.replyParameters)
-			request.replyParameters(this.replyParameters)
+		this.replyParameters.map(request.replyParameters)
 		
 	}
 	
