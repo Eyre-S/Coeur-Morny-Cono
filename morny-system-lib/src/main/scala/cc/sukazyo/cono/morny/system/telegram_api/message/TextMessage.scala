@@ -1,12 +1,12 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
-import cc.sukazyo.cono.morny.system.telegram_api.text.Text
+import cc.sukazyo.cono.morny.system.telegram_api.text.MessageText
 import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
 
 trait TextMessage (
 	
-	val text: Text
+	val text: MessageText
 	
 ) extends Message with SendableMessage[SendMessage] {
 	
@@ -14,10 +14,11 @@ trait TextMessage (
 		val text = this.text.compile
 		val request = SendMessage(
 			this.chat.id,
-			text.text,
+			text.message,
 		)
 		if (text.entities.nonEmpty)
 			request.entities(text.entities*)
+		text.parseMode.map(request.parseMode)
 		request
 	}
 	
