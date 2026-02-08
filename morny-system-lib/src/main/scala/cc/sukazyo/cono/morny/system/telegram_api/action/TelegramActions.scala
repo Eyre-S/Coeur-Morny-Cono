@@ -1,43 +1,21 @@
 package cc.sukazyo.cono.morny.system.telegram_api.action
 
-import cc.sukazyo.cono.morny.system.telegram_api.account.BotAccount
-import cc.sukazyo.cono.morny.system.telegram_api.chat.ChatChannel
-import cc.sukazyo.cono.morny.system.telegram_api.message.{SendableMessage, TextMessage, UnsupportedForSendException}
-import cc.sukazyo.cono.morny.system.telegram_api.text.Text
-import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
+import cc.sukazyo.cono.morny.system.telegram_api.account.AbstractBotAccount
+import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
+import cc.sukazyo.cono.morny.system.telegram_api.message.{SendableMessage, UnsupportedForSendException}
+import com.pengrad.telegrambot.request.AbstractSendRequest
 import com.pengrad.telegrambot.response.SendResponse
 
 trait TelegramActions {
-	this: BotAccount =>
+	this: AbstractBotAccount =>
 	
 	@throws[ClientRequestException]
 	@throws[UnsupportedForSendException]
-	def sendMessage (message: SendableMessage, chat: ChatChannel): SendResponse =  {
-		
-		val sendRequestDecorator = (request: AbstractSendRequest[?]) => {
-			if (message.replyParameters != null)
-				request.replyParameters(message.replyParameters)
-		}
-		
-		message match {
-			
-			case textMessage: TextMessage =>
-				
-				val text: Text.CompiledText = textMessage.text.compile
-				val sendRequest = SendMessage(
-					chat.id,
-					text.text
-				).entities(text.entities*)
-				
-				sendRequestDecorator(sendRequest)
-				
-				this.exec(sendRequest)
-				
-			case _ =>
-				throw UnsupportedForSendException();
-			
-		}
-		
+	def sendMessage [REQ <: AbstractSendRequest[REQ]] (message: SendableMessage[REQ], chat: Chat): SendResponse =  {
+		val sendContext = SendMessageContext(this)
+		val sendRequest: AbstractSendRequest[REQ] = message.getSendRequest(sendContext)
+		message.decorateSendRequest(sendRequest, sendContext)
+		this.exec(sendRequest)
 	}
 	
 }

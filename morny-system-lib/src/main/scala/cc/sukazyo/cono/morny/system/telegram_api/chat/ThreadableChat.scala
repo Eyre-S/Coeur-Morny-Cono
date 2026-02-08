@@ -1,4 +1,5 @@
 package cc.sukazyo.cono.morny.system.telegram_api.chat
 
-trait ChannelChat extends Chat {
+trait ThreadableChat extends Chat {
+	def threadId: Int
 }

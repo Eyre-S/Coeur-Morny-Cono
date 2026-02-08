@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.system.telegram_api.account
 
 import com.pengrad.telegrambot.TelegramBot
 
-class StaticBotAccount (telegramBot: TelegramBot) extends BotAccount {
+class StaticBotAccount (telegramBot: TelegramBot) extends AbstractBotAccount {
 	
 	/** Get the [[TelegramBot]] instance associated to this account.
 	  *
