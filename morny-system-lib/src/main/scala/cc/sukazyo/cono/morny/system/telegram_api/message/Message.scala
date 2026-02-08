@@ -1,8 +1,10 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
+import com.pengrad.telegrambot.model.request.ReplyParameters
+
 trait Message (
 	
-	val effectID: Option[String],
+	val replyParameters: ReplyParameters,
 	
 	val replyMarkup: Null
 	

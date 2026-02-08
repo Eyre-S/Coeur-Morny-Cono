@@ -67,7 +67,7 @@ object MornyConfiguration {
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "da4a" % "0.3.0-SNAPSHOT",
 			
-			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
+			"com.github.pengrad" % "java-telegram-bot-api" % "9.3.0",
 			
 		)
 		
@@ -86,7 +86,7 @@ object MornyConfiguration {
 		val sttp = defineModules(
 			"com.softwaremill.sttp.client3" %% "core" % "3.11.0",
 			"com.softwaremill.sttp.client3" %% "okhttp-backend" % "3.11.0",
-			"com.squareup.okhttp3" % "okhttp" % "4.12.0" % Runtime
+			"com.squareup.okhttp3" % "okhttp" % "5.3.2" % Runtime
 		)
 		
 		val circe = defineModules(
