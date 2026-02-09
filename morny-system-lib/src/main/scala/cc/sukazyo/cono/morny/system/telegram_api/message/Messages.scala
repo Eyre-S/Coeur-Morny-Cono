@@ -25,16 +25,16 @@ object Messages {
 	def create (chatId: ChatID): BaseCreatingMessage =
 		create(Chat(chatId))
 	
-	def create (baseMessage: Message): BaseCreatingMessage =
+	def derive (baseMessage: Message): BaseCreatingMessage =
 		BaseCreatingMessage(baseMessage.chat, baseMessage.replyParameters)
 	
-	def create (baseMessage: NativeMessage): BaseCreatingMessage =
+	def derive (baseMessage: NativeMessage): BaseCreatingMessage =
 		BaseCreatingMessage(
 			Chat.from(baseMessage),
 			Some(ReplyParameters(baseMessage.messageId))
 		)
 	
-	def createNoReply (baseMessage: NativeMessage): BaseCreatingMessage =
+	def deriveNoReply (baseMessage: NativeMessage): BaseCreatingMessage =
 		BaseCreatingMessage(Chat.from(baseMessage), None)
 	
 }

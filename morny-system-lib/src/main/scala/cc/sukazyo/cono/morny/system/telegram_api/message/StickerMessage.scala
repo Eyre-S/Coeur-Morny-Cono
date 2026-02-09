@@ -2,45 +2,41 @@ package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
+import cc.sukazyo.cono.morny.system.telegram_api.objects.ClientMedia
 import com.pengrad.telegrambot.model.request.ReplyParameters
 import com.pengrad.telegrambot.request.{AbstractSendRequest, SendSticker}
 
-import java.io.File
-
 sealed trait StickerMessage
-	extends Message with SendableMessage[SendSticker]
+	extends Message with SendableMessage[SendSticker] {
+	
+	def sticker: ClientMedia
+	
+	override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendSticker] = {
+		sticker match {
+			case idBased: ClientMedia.IDBased =>
+				SendSticker(this.chat.id, idBased.fileId)
+			case fileBased: ClientMedia.FileBased =>
+				SendSticker(this.chat.id, fileBased.file)
+			case byteArrayBased: ClientMedia.ByteArrayBased =>
+				SendSticker(this.chat.id, byteArrayBased.byteArray)
+		}
+	}
+	
+}
 
 object StickerMessage {
 	
-	trait FileBase extends StickerMessage {
-		def file: File
-		override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendSticker] =
-			SendSticker(this.chat.id, file)
-	}
-	
-	trait IDBase extends StickerMessage {
-		def stickerId: String
-		override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendSticker] =
-			SendSticker(this.chat.id, stickerId)
-	}
-	
-	trait ByteArrayBase extends StickerMessage {
-		def byteArray: Array[Byte]
-		override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendSticker] =
-			SendSticker(this.chat.id, byteArray)
-	}
-	
-	class ClientIDBasedStickerMessage (
+	class ClientStickerMessage (
 		override val chat: Chat,
 		override val replyParameters: Option[ReplyParameters],
-		override val stickerId: String,
-	) extends IDBase
+		override val sticker: ClientMedia
+	) extends StickerMessage
 	
 	trait CreateOps {
 		this: Message =>
 		
-		def sticker (stickerId: String): ClientIDBasedStickerMessage =
-			ClientIDBasedStickerMessage(this.chat, this.replyParameters, stickerId)
+		def sticker (stickerId: String): ClientStickerMessage =
+			ClientStickerMessage(this.chat, this.replyParameters, ClientMedia(stickerId))
 		
 	}
 	
