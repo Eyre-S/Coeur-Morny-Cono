@@ -1,14 +1,14 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
-import cc.sukazyo.cono.morny.system.telegram_api.text.MessageText
+import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
+import cc.sukazyo.cono.morny.system.telegram_api.text.{MessageText, NativeText}
+import com.pengrad.telegrambot.model.request.{ParseMode, ReplyParameters}
 import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
 
-trait TextMessage (
+trait TextMessage extends Message with SendableMessage[SendMessage] {
 	
-	val text: MessageText
-	
-) extends Message with SendableMessage[SendMessage] {
+	def text: MessageText
 	
 	override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendMessage] = {
 		val text = this.text.compile
@@ -20,6 +20,30 @@ trait TextMessage (
 			request.entities(text.entities*)
 		text.parseMode.map(request.parseMode)
 		request
+	}
+	
+}
+
+object TextMessage {
+	
+	class TextMessageImpl (
+		
+		override val chat: Chat,
+		override val replyParameters: Option[ReplyParameters],
+		
+		override val text: MessageText
+	
+	) extends TextMessage
+	
+	trait CreateOps {
+		this: Message =>
+		
+		def apply (text: MessageText): TextMessage =
+			TextMessageImpl(this.chat, this.replyParameters, text)
+		
+		def apply (text: String): TextMessage =
+			this.apply(NativeText.plain(text))
+		
 	}
 	
 }

@@ -36,7 +36,12 @@ object StickerMessage {
 		override val stickerId: String,
 	) extends IDBase
 	
-	def create (base: BaseCreatingMessage)(stickerId: String): ClientIDBasedStickerMessage =
-		ClientIDBasedStickerMessage(base.chat, base.replyParameters, stickerId)
+	trait CreateOps {
+		this: Message =>
+		
+		def sticker (stickerId: String): ClientIDBasedStickerMessage =
+			ClientIDBasedStickerMessage(this.chat, this.replyParameters, stickerId)
+		
+	}
 	
 }

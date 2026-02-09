@@ -4,7 +4,7 @@ object Standardize {
 	
 	type UserID = Long
 	type ChatID = Long
-	type MessageThreadID = Int
+	type MessageThreadID = Long
 	type MessageID = Int
 	type MessageGroupID = String
 	

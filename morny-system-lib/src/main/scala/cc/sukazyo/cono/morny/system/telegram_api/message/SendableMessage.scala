@@ -1,8 +1,10 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
+import cc.sukazyo.cono.morny.system.telegram_api.account.BotAccount
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.ThreadableChat
 import com.pengrad.telegrambot.request.AbstractSendRequest
+import com.pengrad.telegrambot.response.SendResponse
 
 /** This message type is able to send via
   * [[cc.sukazyo.cono.morny.system.telegram_api.action.TelegramActions.sendMessage()]].
@@ -33,5 +35,8 @@ trait SendableMessage [REQ <: AbstractSendRequest[REQ]] extends Message {
 		this.replyParameters.map(request.replyParameters)
 		
 	}
+	
+	def send (account: BotAccount): SendResponse =
+		account.sendMessage(this)
 	
 }

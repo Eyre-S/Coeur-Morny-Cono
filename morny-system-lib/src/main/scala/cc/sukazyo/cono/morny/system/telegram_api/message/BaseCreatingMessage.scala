@@ -7,3 +7,5 @@ class BaseCreatingMessage (
 	override val chat: Chat,
 	override val replyParameters: Option[ReplyParameters]
 ) extends Message
+	with TextMessage.CreateOps
+	with StickerMessage.CreateOps
