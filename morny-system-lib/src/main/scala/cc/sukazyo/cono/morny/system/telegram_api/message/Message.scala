@@ -1,9 +1,9 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
+import cc.sukazyo.cono.morny.system.telegram_api.Natives.{NativeMultipartSendRequest, NativeSendRequest, NativeSimpleSendRequest}
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.{Chat, ThreadableChat}
 import com.pengrad.telegrambot.model.request.ReplyParameters
-import com.pengrad.telegrambot.request.AbstractSendRequest
 
 trait Message extends MaybeSendableMessage {
 	
@@ -14,14 +14,26 @@ trait Message extends MaybeSendableMessage {
 	//	def replyMarkup: Null
 	//	def inlineKeyboard: this.replyMarkup.type = replyMarkup
 	
-	override def decorateSendRequest[D_REQ <: AbstractSendRequest[D_REQ]] (request: AbstractSendRequest[D_REQ], sendContext: SendMessageContext): Unit = {
+	override def decorateSendRequest (request: NativeSendRequest[?, ?], sendContext: SendMessageContext): Unit = {
 		
-		this.chat match
-			case chatThread: ThreadableChat =>
-				request.messageThreadId(chatThread.threadId)
-			case _ =>
-		
-		this.replyParameters.map(request.replyParameters)
+		request match {
+			case simple: NativeSimpleSendRequest[_] =>
+				
+				this.chat match
+					case chatThread: ThreadableChat =>
+						simple.request.messageThreadId(chatThread.threadId)
+				
+				this.replyParameters.map(simple.request.replyParameters)
+				
+			case multipart: NativeMultipartSendRequest =>
+				
+				this.chat match
+					case chatThread: ThreadableChat =>
+						multipart.request.messageThreadId(chatThread.threadId)
+				
+				this.replyParameters.map(multipart.request.replyParameters)
+				
+		}
 		
 	}
 	

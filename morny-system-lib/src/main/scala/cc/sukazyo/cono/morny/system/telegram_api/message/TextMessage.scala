@@ -1,16 +1,18 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
+import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSimpleSendRequest
 import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
 import cc.sukazyo.cono.morny.system.telegram_api.text.{MessageText, NativeText}
-import com.pengrad.telegrambot.model.request.{ParseMode, ReplyParameters}
-import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
+import com.pengrad.telegrambot.model.request.ReplyParameters
+import com.pengrad.telegrambot.request.SendMessage
+import com.pengrad.telegrambot.response.SendResponse
 
-trait TextMessage extends Message with SendableMessage[SendMessage] {
+trait TextMessage extends Message with SendableMessage[NativeSimpleSendRequest[SendMessage], SendMessage, SendResponse] {
 	
 	def text: MessageText
 	
-	override def getSendRequest (sendContext: SendMessageContext): AbstractSendRequest[SendMessage] = {
+	override def getSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendMessage] = {
 		val text = this.text.compile
 		val request = SendMessage(
 			this.chat.id,
@@ -19,7 +21,7 @@ trait TextMessage extends Message with SendableMessage[SendMessage] {
 		if (text.entities.nonEmpty)
 			request.entities(text.entities*)
 		text.parseMode.map(request.parseMode)
-		request
+		NativeSimpleSendRequest(request)
 	}
 	
 }
