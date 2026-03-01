@@ -6,13 +6,13 @@ sealed trait ClientMediaData
 
 object ClientMediaData {
 	
-	class IDBased (val fileId: String) extends ClientMediaData
-	def apply (fileId: String): IDBased = new IDBased(fileId)
+	case class IDBased (fileId: String) extends ClientMediaData
+	def apply (fileId: String): IDBased = IDBased(fileId)
 	
-	class FileBased (val file: File) extends ClientMediaData
-	def apply (file: File): FileBased = new FileBased(file)
+	case class FileBased (file: File) extends ClientMediaData
+	def apply (file: File): FileBased = FileBased(file)
 	
-	class ByteArrayBased (val byteArray: Array[Byte]) extends ClientMediaData
-	def apply (byteArray: Array[Byte]): ByteArrayBased = new ByteArrayBased(byteArray)
+	case class ByteArrayBased (byteArray: Array[Byte]) extends ClientMediaData
+	def apply (byteArray: Array[Byte]): ByteArrayBased = ByteArrayBased(byteArray)
 	
 }
