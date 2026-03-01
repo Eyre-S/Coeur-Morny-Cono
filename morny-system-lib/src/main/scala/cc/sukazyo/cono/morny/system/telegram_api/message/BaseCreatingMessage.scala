@@ -9,7 +9,9 @@ class BaseCreatingMessage (
 	override val replyParameters: Option[ReplyParameters]
 ) extends Message
 	with TextMessage.CreateOps
-	with StickerMessage.CreateOps {
+	with StickerMessage.CreateOps
+	with PhotoMessage.CreateOps
+	with MediaGroupMessage.CreateOps {
 	
 	def replyTo (replyParameters: ReplyParameters): BaseCreatingMessage =
 		BaseCreatingMessage(chat, Some(replyParameters))

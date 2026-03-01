@@ -32,10 +32,22 @@ object MediaGroupMessage {
 		override def getSendRequest (sendContext: SendMessageContext): NativeMultipartSendRequest = {
 			val request = SendMediaGroup(
 				this.chat.id,
-				this.toInputMedias
+				this.toInputMedias*
 			)
 			NativeMultipartSendRequest(request)
 		}
+		
+	}
+	
+	trait CreateOps {
+		this: Message =>
+		
+		def media (media: AbstractClientMedia[?], medias: AbstractClientMedia[?]*): MediaGroupMessage =
+			new ClientImpl(
+				chat = this.chat,
+				replyParameters = this.replyParameters,
+				medias = media :: medias.toList
+			)
 		
 	}
 	

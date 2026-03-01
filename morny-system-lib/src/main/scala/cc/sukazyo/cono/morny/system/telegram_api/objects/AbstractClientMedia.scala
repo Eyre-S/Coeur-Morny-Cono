@@ -1,14 +1,10 @@
 package cc.sukazyo.cono.morny.system.telegram_api.objects
 
-import cc.sukazyo.cono.morny.system.telegram_api.text.MessageText
 import com.pengrad.telegrambot.model.request.InputMedia
 
-trait AbstractClientMedia [T <: InputMedia[T]] {
+trait AbstractClientMedia [T <: InputMedia[T]] extends AbstractCreatingMedia {
 	
 	def mediaType: String
-	def mediaData: ClientMediaData
-	
-	def caption: Option[MessageText]
 	
 	// todo: implement this
 	def toNative: InputMedia[T]

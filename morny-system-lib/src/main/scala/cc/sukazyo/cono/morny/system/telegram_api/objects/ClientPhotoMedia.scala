@@ -26,3 +26,15 @@ class ClientPhotoMedia (
 	}
 	
 }
+
+object ClientPhotoMedia {
+	
+	trait CreateOps {
+		this: AbstractCreatingMedia =>
+		
+		def photo: ClientPhotoMedia =
+			new ClientPhotoMedia(this.mediaData, this.caption)
+		
+	}
+	
+}

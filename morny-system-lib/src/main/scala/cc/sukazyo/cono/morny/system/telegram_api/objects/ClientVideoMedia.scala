@@ -35,3 +35,15 @@ class ClientVideoMedia (
 	}
 	
 }
+
+object ClientVideoMedia {
+	
+	trait CreateOps {
+		this: AbstractCreatingMedia =>
+		
+		def video: ClientVideoMedia =
+			new ClientVideoMedia(this.mediaData, this.caption, None, None, None, None, None, None, None)
+		
+	}
+	
+}

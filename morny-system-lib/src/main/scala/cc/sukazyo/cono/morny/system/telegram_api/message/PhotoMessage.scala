@@ -54,6 +54,9 @@ object PhotoMessage {
 			PhotoMessageImpl(this.chat, this.replyParameters, media)
 		}
 		
+		def media (media: ClientPhotoMedia): PhotoMessage =
+			this.photo(media)
+		
 		def photo (mediaId: String, caption: MessageText): PhotoMessage = {
 			this.photo(ClientPhotoMedia(ClientMediaData(mediaId), Some(caption)))
 		}
