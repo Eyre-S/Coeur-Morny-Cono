@@ -1,0 +1,42 @@
+name: Morny Coeur - Build
+on: workflow_call
+jobs:
+  compile:
+    name: "compile"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "check whether already run"
+        id: check-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-coeur-build-${{ github.sha }}
+          lookup-only: 'true'
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup project - with dependency built"
+        uses: actions/cache/restore@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-core-build-${{ github.sha }}
+          fail-on-cache-miss: 'true'
+#      - if: steps.check-cache.outputs.cache-hit != 'true'
+#        uses: actions/checkout@v4
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup java"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: sbt
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup sbt"
+        uses: sbt/setup-sbt@v1
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "SBT: compile morny_coeur"
+        run: sbt morny_coeur/compile
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "cache run"
+        uses: actions/cache/save@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-coeur-build-${{ github.sha }}
