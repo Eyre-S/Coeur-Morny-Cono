@@ -1,0 +1,38 @@
+name: Full Check
+on: push
+jobs:
+  
+  build-system-lib:
+    name: "Build System Library"
+    uses: ./.github/workflows/system-lib-build.yml
+  unit-test-system-lib:
+    name: "Unit-Test System Library"
+    needs: [build-system-lib]
+    uses: ./.github/workflows/system-lib-unit-test.yml
+    
+  build-core:
+    name: "Build Morny Core"
+    needs: [build-system-lib]
+    uses: ./.github/workflows/core-build.yml
+  unit-test-core:
+    name: "Unit-Test Core"
+    needs: [build-core]
+    uses: ./.github/workflows/core-unit-test.yml
+    
+  build-coeur:
+    needs: [build-core]
+    name: "Build Coeur"
+    uses: ./.github/workflows/coeur-build.yml
+  unit-test-coeur:
+    name: "Unit-Test Coeur"
+    needs: [build-coeur]
+    uses: ./.github/workflows/coeur-unit-test.yml
+    
+  build-assembly:
+    name: "Build Coeur assembly jar"
+    needs: [build-coeur]
+    uses: ./.github/workflows/assembly-build.yml
+  check-run-assembly:
+    name: "Test run assembly jar"
+    needs: [build-assembly]
+    uses: ./.github/workflows/assembly-check.yml

@@ -1,0 +1,75 @@
+name: Morny Core - Unit Tests
+on: workflow_call
+jobs:
+  compile-tests:
+    name: "compile test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "check whether already run"
+        id: check-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-core-build-test-${{ github.sha }}
+          lookup-only: 'true'
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup project - with built main"
+        uses: actions/cache/restore@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-core-build-${{ github.sha }}
+          fail-on-cache-miss: 'true'
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup java"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: sbt
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "setup sbt"
+        uses: sbt/setup-sbt@v1
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "SBT: compile test morny_core"
+        run: sbt 'morny_core / Test / compile'
+      - if: steps.check-cache.outputs.cache-hit != 'true'
+        name: "cache run"
+        uses: actions/cache/save@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-core-build-test-${{ github.sha }}
+  unit-test:
+    name: "run tests"
+    needs: [compile-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "setup project - with built"
+        uses: actions/cache/restore@v5
+        with:
+          path: "./"
+          key: ${{ runner.os }}-core-build-test-${{ github.sha }}
+          fail-on-cache-miss: 'true'
+      - name: "setup java"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: sbt
+      - name: "setup sbt"
+        uses: sbt/setup-sbt@v1
+      - name: "SBT: test morny_core"
+        continue-on-error: true
+        run: sbt 'morny_core / test'
+      - name: "upload report artifact"
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: 'Morny Core - Test Report'
+          path: ./morny-core/target/test-reports/*
+      - name: "publish report summary"
+        uses: phoenix-actions/test-reporting@v15
+        with:
+          output-to: 'step-summary'
+          name: 'Unit Tests Report - Morny Core'
+          path: ./morny-core/target/test-reports/*.xml
+          reporter: 'java-junit'

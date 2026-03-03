@@ -37,6 +37,7 @@ ThisBuild / scalacOptions ++= Seq(
 	"-language:postfixOps",
 	"-language:implicitConversions",
 //	"-language:experimental.macros",
+//	"-language:experimental.saferExceptions",
 	"-encoding", MornyProject.source_encoding,
 	"-java-output-version", "17",
 	"-feature",
@@ -98,7 +99,10 @@ def projectMetadata (meta: ProjectMetadata): Seq[Def.Setting[?]] = {
 
 lazy val morny_system_lib = (project in file (MornyProject.morny_system_lib.id))
 		.settings(
-			projectMetadata(MornyProject.morny_system_lib)
+			projectMetadata(MornyProject.morny_system_lib),
+			scalacOptions ++= Seq(
+//					"-language:experimental.saferExceptions"
+			)
 		)
 
 lazy val morny_core = (project in file(MornyProject.morny_core.id))

@@ -1,28 +1,29 @@
-name: assembly-run.yml
+name: assembly jar - Build
 on: [workflow_call]
 jobs:
   assembly:
-    name: "Build assembly jar"
+    name: "generate assembly jar"
     runs-on: ubuntu-latest
     steps:
-      - name: "Setup cached built project"
+      - name: "setup project - with built"
         uses: actions/cache/restore@v4
         with:
           path: "./"
-          key: ${{ runner.os }}-build-${{ github.sha }}
+          key: ${{ runner.os }}-coeur-build-${{ github.sha }}
           fail-on-cache-miss: 'true'
-      - name: "Setup Java 21"
+      - name: "setup java"
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: sbt
-      - name: "Setup sbt"
+      - name: "setup sbt"
         uses: sbt/setup-sbt@v1
-      - name: "Generate assembly jar"
+      - name: "SBT: build assembly jar"
         run: sbt assembly
-      - name: "Publish assembly jar"
-        uses: actions/upload-artifact@v4
+      - name: "upload assembly jar"
+        uses: actions/upload-artifact@v7
         with:
-          name: 'assembly'
+          archive: 'false'
+          name: 'assembly jars'
           path: ./morny-coeur/target/*-assembly-*.jar

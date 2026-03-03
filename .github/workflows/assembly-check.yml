@@ -1,25 +1,21 @@
-name: assembly-run.yml
+name: assembly jar - Check
 on: [workflow_call]
 jobs:
-  generate-assembly:
-    name: "Build assembly jar"
-    uses: ./.github/workflows/assembly-generate.yml
   run-assembly:
-    name: "Test run assembly jar"
-    needs: [generate-assembly]
+    name: "run"
     runs-on: ubuntu-latest
     steps:
-      - name: "Setup assembly jar from artifacts"
-        uses: actions/download-artifact@v4
+      - name: "setup assembly jar"
+        uses: actions/download-artifact@v8
         with:
-          name: 'assembly'
+          pattern: 'Morny Coeur-assembly-*.jar'
           path: ./assembles/
-      - name: "Setup Java 21"
+      - name: "setup java"
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: "Run assembly jar"
+      - name: "run assembly jar"
         id: assembly-run
         shell: bash
         run: |
