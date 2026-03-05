@@ -5,6 +5,17 @@ import cc.sukazyo.cono.morny.system.telegram_api.Standardize.{ChatID, MessageThr
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
 import com.pengrad.telegrambot.model.request.ReplyParameters
 
+/** Utils to create a message.
+  *
+  * It initializes the common message parameters, includes:
+  *
+  * - target [[Chat]] (with [[MessageThreadID]])
+  * - [[ReplyParameters]], maybe reply, or cross-chat reference.
+  *
+  * @see [[BaseCreatingMessage]] for more details about how to create a specific message type.
+  *
+  * @since 2.0.0-alpha22
+  */
 object Messages {
 	
 	def create (chat: Chat, replyParameters: ReplyParameters): BaseCreatingMessage =

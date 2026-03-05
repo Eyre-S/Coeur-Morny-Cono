@@ -15,7 +15,7 @@ sealed trait PhotoMessage
 	def media: ClientPhotoMedia
 	
 	@throws[UnsupportedForSendException]
-	override def getSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendPhoto] = {
+	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendPhoto] = {
 		
 		val request = media.mediaData match
 			case idBased: ClientMediaData.IDBased =>

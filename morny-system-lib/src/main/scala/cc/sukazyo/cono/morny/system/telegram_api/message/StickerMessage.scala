@@ -13,7 +13,7 @@ sealed trait StickerMessage
 	
 	def sticker: ClientMediaData
 	
-	override def getSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendSticker] = {
+	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendSticker] = {
 		NativeSimpleSendRequest(sticker match {
 			case idBased: ClientMediaData.IDBased =>
 				SendSticker(this.chat.id, idBased.fileId)

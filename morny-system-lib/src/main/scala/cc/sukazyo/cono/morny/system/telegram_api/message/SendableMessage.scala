@@ -2,12 +2,14 @@ package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSendRequest
 import cc.sukazyo.cono.morny.system.telegram_api.account.BotAccount
-import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
+import cc.sukazyo.cono.morny.system.telegram_api.action.{ClientRequestException, SendMessageContext}
 import com.pengrad.telegrambot.request.{AbstractSendRequest, BaseRequest}
 import com.pengrad.telegrambot.response.BaseResponse
 
 /** This message type is able to send via
   * [[cc.sukazyo.cono.morny.system.telegram_api.action.TelegramActions.sendMessage()]].
+  *
+  * @since 2.0.0-alpha22
   *
   * @todo I need to explicitly declare all type parameters in the implementations, like:
   *
@@ -28,21 +30,57 @@ import com.pengrad.telegrambot.response.BaseResponse
 trait SendableMessage [T <: NativeSendRequest[Req, Resp], Req <: BaseRequest[Req, Resp], Resp <: BaseResponse]
 	extends Message {
 	
-	/** Get an [[AbstractSendRequest]] that can send this message.
+	/** Get a [[NativeSendRequest]] that can send this message.
+	  *
+	  * ## Implementation note
+	  *
+	  * Do not override this method. Override [[generateBaseSendRequest]] and
+	  * [[decorateSendRequest]] instead.
+	  *
+	  * @since 2.0.0-alpha22
+	  *
+	  * @param sendContext Information that helps to build an [[AbstractSendRequest]].
+	  * @return A fully decorated [[AbstractSendRequest]] that can be sent to Telegram API.
+	  */
+	def getSendRequest (sendContext: SendMessageContext): T = {
+		val req = this.generateBaseSendRequest(sendContext)
+		this.decorateSendRequest(req, sendContext)
+		req
+	}
+	
+	/** Get a [[NativeSendRequest]] that can send this message.
+	  *
+	  * It may lack some necessary information, which will be filled by [[decorateSendRequest]].
 	  * 
 	  * ## Implementation note
-	  * 
-	  * When implementing this method, it does not need (and not recommended) to call
-	  * [[decorateSendRequest]] this method. The
-	  * [[cc.sukazyo.cono.morny.system.telegram_api.action.TelegramActions.sendMessage]] will
-	  * call it.
+	  *
+	  * Do not call [[decorateSendRequest]] in this method.
+	  *
+	  * @since 2.0.0-alpha22
 	  * 
 	  * @param sendContext Information that helps to build an [[AbstractSendRequest]].
-	  * @return
+	  * @return Basic [[NativeSendRequest]]. Much information may be missing, requires a
+	  *         [[decorateSendRequest decorate]] to complete.
 	  */
 	@throws[UnsupportedForSendException]
-	def getSendRequest (sendContext: SendMessageContext): T
+	def generateBaseSendRequest (sendContext: SendMessageContext): T
 	
+	/** Send via a Telegram [[BotAccount]].
+	  *
+	  * On success, it will return the response from Telegram API. The specific type of the
+	  * response is determined by the type of this message.
+	  *
+	  * @since 2.0.0-alpha22
+	  *
+	  * @return The response from Telegram API.
+	  * @throws ClientRequestException Request is sent but failed. Maybe a rejected by API, or
+	  *                                a network issue occurred.
+	  * @throws UnsupportedForSendException If the message cannot be sent. Maybe some parameters
+	  *                                     conflicts, or some necessary information is missing,
+	  *                                     or some parameters is not supported to send yet.
+	  */
+	@throws[ClientRequestException]
+	@throws[UnsupportedForSendException]
 	def send (account: BotAccount): Resp =
 		account.sendMessage(this)
 	

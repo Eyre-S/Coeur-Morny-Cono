@@ -12,7 +12,7 @@ trait TextMessage extends Message with SendableMessage[NativeSimpleSendRequest[S
 	
 	def text: MessageText
 	
-	override def getSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendMessage] = {
+	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendMessage] = {
 		val text = this.text.compile
 		val request = SendMessage(
 			this.chat.id,

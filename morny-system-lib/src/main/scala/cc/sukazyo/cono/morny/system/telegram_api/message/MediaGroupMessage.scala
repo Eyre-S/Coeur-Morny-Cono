@@ -15,6 +15,14 @@ trait MediaGroupMessage
 	
 	def toInputMedias: List[InputMedia[?]] =
 		medias.map(_.toNative)
+		
+	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeMultipartSendRequest = {
+		val request = SendMediaGroup(
+			this.chat.id,
+			this.toInputMedias*
+		)
+		NativeMultipartSendRequest(request)
+	}
 	
 }
 
@@ -28,14 +36,6 @@ object MediaGroupMessage {
 		override val medias: List[AbstractClientMedia[?]],
 		
 	) extends MediaGroupMessage {
-		
-		override def getSendRequest (sendContext: SendMessageContext): NativeMultipartSendRequest = {
-			val request = SendMediaGroup(
-				this.chat.id,
-				this.toInputMedias*
-			)
-			NativeMultipartSendRequest(request)
-		}
 		
 	}
 	
