@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSendRequest
-import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 
 trait MaybeSendableMessage {
 	
@@ -20,6 +19,6 @@ trait MaybeSendableMessage {
 	  *
 	  * @since 2.0.0-alpha22
 	  */
-	def decorateSendRequest (request: NativeSendRequest[?, ?], sendContext: SendMessageContext): Unit
+	def decorateSendRequest (request: NativeSendRequest[?, ?]): Unit
 	
 }

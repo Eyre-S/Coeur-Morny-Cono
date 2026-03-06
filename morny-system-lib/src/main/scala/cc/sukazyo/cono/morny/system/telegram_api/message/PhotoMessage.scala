@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSimpleSendRequest
-import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
 import cc.sukazyo.cono.morny.system.telegram_api.objects.{ClientMediaData, ClientPhotoMedia}
 import cc.sukazyo.cono.morny.system.telegram_api.text.{MessageText, NativeText}
@@ -15,7 +14,7 @@ sealed trait PhotoMessage
 	def media: ClientPhotoMedia
 	
 	@throws[UnsupportedForSendException]
-	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendPhoto] = {
+	override def generateBaseSendRequest: NativeSimpleSendRequest[SendPhoto] = {
 		
 		val request = media.mediaData match
 			case idBased: ClientMediaData.IDBased =>

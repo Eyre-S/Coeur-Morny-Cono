@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSimpleSendRequest
-import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
 import cc.sukazyo.cono.morny.system.telegram_api.text.{MessageText, NativeText}
 import com.pengrad.telegrambot.model.request.ReplyParameters
@@ -12,7 +11,7 @@ trait TextMessage extends Message with SendableMessage[NativeSimpleSendRequest[S
 	
 	def text: MessageText
 	
-	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendMessage] = {
+	override def generateBaseSendRequest: NativeSimpleSendRequest[SendMessage] = {
 		val text = this.text.compile
 		val request = SendMessage(
 			this.chat.id,

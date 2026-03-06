@@ -2,7 +2,7 @@ package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSendRequest
 import cc.sukazyo.cono.morny.system.telegram_api.account.BotAccount
-import cc.sukazyo.cono.morny.system.telegram_api.action.{ClientRequestException, SendMessageContext}
+import cc.sukazyo.cono.morny.system.telegram_api.action.ClientRequestException
 import com.pengrad.telegrambot.request.{AbstractSendRequest, BaseRequest}
 import com.pengrad.telegrambot.response.BaseResponse
 
@@ -39,12 +39,11 @@ trait SendableMessage [T <: NativeSendRequest[Req, Resp], Req <: BaseRequest[Req
 	  *
 	  * @since 2.0.0-alpha22
 	  *
-	  * @param sendContext Information that helps to build an [[AbstractSendRequest]].
 	  * @return A fully decorated [[AbstractSendRequest]] that can be sent to Telegram API.
 	  */
-	def getSendRequest (sendContext: SendMessageContext): T = {
-		val req = this.generateBaseSendRequest(sendContext)
-		this.decorateSendRequest(req, sendContext)
+	def getSendRequest: T = {
+		val req = this.generateBaseSendRequest
+		this.decorateSendRequest(req)
 		req
 	}
 	
@@ -57,13 +56,13 @@ trait SendableMessage [T <: NativeSendRequest[Req, Resp], Req <: BaseRequest[Req
 	  * Do not call [[decorateSendRequest]] in this method.
 	  *
 	  * @since 2.0.0-alpha22
-	  * 
+	  *
 	  * @param sendContext Information that helps to build an [[AbstractSendRequest]].
 	  * @return Basic [[NativeSendRequest]]. Much information may be missing, requires a
 	  *         [[decorateSendRequest decorate]] to complete.
 	  */
 	@throws[UnsupportedForSendException]
-	def generateBaseSendRequest (sendContext: SendMessageContext): T
+	def generateBaseSendRequest: T
 	
 	/** Send via a Telegram [[BotAccount]].
 	  *
@@ -81,7 +80,7 @@ trait SendableMessage [T <: NativeSendRequest[Req, Resp], Req <: BaseRequest[Req
 	  */
 	@throws[ClientRequestException]
 	@throws[UnsupportedForSendException]
-	def send (account: BotAccount): Resp =
+	def send (using account: BotAccount): Resp =
 		account.sendMessage(this)
 	
 }

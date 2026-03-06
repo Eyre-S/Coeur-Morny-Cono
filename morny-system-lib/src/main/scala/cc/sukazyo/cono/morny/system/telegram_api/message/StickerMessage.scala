@@ -1,7 +1,6 @@
 package cc.sukazyo.cono.morny.system.telegram_api.message
 
 import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeSimpleSendRequest
-import cc.sukazyo.cono.morny.system.telegram_api.action.SendMessageContext
 import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
 import cc.sukazyo.cono.morny.system.telegram_api.objects.ClientMediaData
 import com.pengrad.telegrambot.model.request.ReplyParameters
@@ -13,7 +12,7 @@ sealed trait StickerMessage
 	
 	def sticker: ClientMediaData
 	
-	override def generateBaseSendRequest (sendContext: SendMessageContext): NativeSimpleSendRequest[SendSticker] = {
+	override def generateBaseSendRequest: NativeSimpleSendRequest[SendSticker] = {
 		NativeSimpleSendRequest(sticker match {
 			case idBased: ClientMediaData.IDBased =>
 				SendSticker(this.chat.id, idBased.fileId)

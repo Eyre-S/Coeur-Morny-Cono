@@ -13,8 +13,7 @@ trait TelegramActions {
 	@throws[UnsupportedForSendException]
 	def sendMessage [Q <: NativeSendRequest[T, R], T <: BaseRequest[T, R], R <: BaseResponse]
 	(message: SendableMessage[Q, T, R]): R = {
-		val sendContext = SendMessageContext(this)
-		this.exec(message.getSendRequest(sendContext).request)
+		this.exec(message.getSendRequest.request)
 	}
 	
 }
