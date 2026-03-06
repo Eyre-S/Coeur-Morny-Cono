@@ -6,13 +6,13 @@ import com.pengrad.telegrambot.model.request.ParseMode
 class NativeText (
 	val message: String,
 	val parseMode: Option[ParseMode],
-	val entities: List[MessageEntity]
+	val entities: Seq[MessageEntity]
 ) extends MessageText {
 	
 	override def compile: CompiledText =
 		CompiledText(message, parseMode, entities)
 	
-	def withEntities (entities: List[MessageEntity]): NativeText = {
+	def withEntities (entities: MessageEntity*): NativeText = {
 		NativeText(message, parseMode, entities)
 	}
 	

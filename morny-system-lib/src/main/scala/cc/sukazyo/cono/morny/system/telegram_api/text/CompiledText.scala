@@ -6,5 +6,5 @@ import com.pengrad.telegrambot.model.request.ParseMode
 case class CompiledText (
 	message: String,
 	parseMode: Option[ParseMode],
-	entities: List[MessageEntity]
+	entities: Seq[MessageEntity]
 )
