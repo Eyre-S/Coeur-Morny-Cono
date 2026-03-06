@@ -1,23 +1,22 @@
 package cc.sukazyo.cono.morny.system.telegram_api.formatting
 
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.system.telegram_api.Standardize.MASK_BOTAPI_FORMATTED_ID
-import com.pengrad.telegrambot.model.{Chat, Message, User}
-import com.pengrad.telegrambot.model.Chat.Type
+import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
+import com.pengrad.telegrambot.model.{Chat, ChatFullInfo, Message, User}
 
 object TelegramFormatter {
 	
 	extension (chat: Chat) {
 		
 		def safe_name: String = chat.`type` match
-			case Type.Private => _connectName(chat.firstName, chat.lastName)
+			case Chat.Type.Private => _connectName(chat.firstName, chat.lastName)
 			case _ => chat.title
 		
 		def safe_linkHTML: String =
 			if (chat.username == null)
 				chat.`type` match
 					// language=html
-					case Type.Private => s"<a href='${_link_user(chat.id)}'>@[u:${chat.id}]</a>"
+					case Chat.Type.Private => s"<a href='${_link_user(chat.id)}'>@[u:${chat.id}]</a>"
 					// language=html
 					case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>@[c/${chat.id}]</a>"
 			else s"@${h(chat.username)}"
@@ -26,13 +25,63 @@ object TelegramFormatter {
 		def safe_firstnameRefHTML: String =
 			chat.`type` match
 				// language=html
-				case Type.Private => s"<a href='${_link_user(chat.id)}'>${h(chat.firstName)}</a>"
+				case Chat.Type.Private => s"<a href='${_link_user(chat.id)}'>${h(chat.firstName)}</a>"
 				// language=html
 				case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>${h(chat.title)}</a>"
 		
 		//noinspection ScalaWeakerAccess
 		def id_tdLib: Long =
 			if chat.id < 0 then (chat.id - MASK_BOTAPI_FORMATTED_ID)abs else chat.id
+		
+		def typeTag: String =
+			import ChatTypeTag.tag
+			chat.`type`.tag
+		
+	}
+	
+	/** Exactly the same thing with extension of chat (just above)
+	  *
+	  * This is RIDICULOUS!
+	  *
+	  * ChatFullInfo has all the members of Chat, but it does not extend it, makes either
+	  * transform one to another, or write code twice for both Chat & ChatFullInfo, for the
+	  * methods that can use Chat as input.
+	  *
+	  * Even more! Chat & ChatFullInfo both have `Type` member type. Which is a (or a twin?)
+	  * enum and contains EXACTLY THE SAME members. But they are DIFFERENT! Just because they
+	  * belong two ABSOLUTELY DIFFERENT chat types which could have been related by inheritance.
+	  *
+	  * I am so mad that I'm leaving the comments here.
+	  *
+	  * I have started an issue below, hope this problem can be solved in the future:
+	  * [pengrad/java-telegram-bot-api#433](https://github.com/pengrad/java-telegram-bot-api/issues/433)
+	  */
+	extension (chat: ChatFullInfo) {
+		
+		def safe_name: String = chat.`type` match
+			case ChatFullInfo.Type.Private => _connectName(chat.firstName, chat.lastName)
+			case _ => chat.title
+		
+		def safe_linkHTML: String =
+			if (chat.username == null)
+				chat.`type` match
+					// language=html
+					case ChatFullInfo.Type.Private => s"<a href='${_link_user(chat.id)}'>@[u:${chat.id}]</a>"
+					// language=html
+					case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>@[c/${chat.id}]</a>"
+			else s"@${h(chat.username)}"
+		
+		//noinspection ScalaWeakerAccess
+		def safe_firstnameRefHTML: String =
+			chat.`type` match
+				// language=html
+				case ChatFullInfo.Type.Private => s"<a href='${_link_user(chat.id)}'>${h(chat.firstName)}</a>"
+				// language=html
+				case _ => s"<a href='${_link_chat(chat.id_tdLib)}'>${h(chat.title)}</a>"
+		
+		//noinspection ScalaWeakerAccess
+		def id_tdLib: Long =
+			if chat.id < 0 then (chat.id - MASK_BOTAPI_FORMATTED_ID) abs else chat.id
 		
 		def typeTag: String =
 			import ChatTypeTag.tag
@@ -47,12 +96,20 @@ object TelegramFormatter {
 		inline val SUPERGROUP = "💬"
 		inline val CHANNEL = "📢"
 		
-		extension (t: Type) {
+		extension (t: Chat.Type) {
 			def tag: String = t match
-				case Type.Private => this.PRIVATE
-				case Type.group => this.GROUP
-				case Type.supergroup => this.SUPERGROUP
-				case Type.channel => this.CHANNEL
+				case Chat.Type.Private => this.PRIVATE
+				case Chat.Type.group => this.GROUP
+				case Chat.Type.supergroup => this.SUPERGROUP
+				case Chat.Type.channel => this.CHANNEL
+		}
+		
+		extension (t: ChatFullInfo.Type) {
+			def tag: String = t match
+				case ChatFullInfo.Type.Private => this.PRIVATE
+				case ChatFullInfo.Type.group => this.GROUP
+				case ChatFullInfo.Type.supergroup => this.SUPERGROUP
+				case ChatFullInfo.Type.channel => this.CHANNEL
 		}
 		
 	}
