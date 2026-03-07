@@ -17,21 +17,17 @@ trait Message extends MaybeSendableMessage {
 		
 		request match {
 			case simple: NativeSimpleSendRequest[_] =>
-				
 				this.chat match
+					case _ =>
 					case chatThread: ThreadableChat =>
 						simple.request.messageThreadId(chatThread.threadId)
-				
 				this.replyParameters.map(simple.request.replyParameters)
-				
 			case multipart: NativeMultipartSendRequest =>
-				
 				this.chat match
+					case _ =>
 					case chatThread: ThreadableChat =>
 						multipart.request.messageThreadId(chatThread.threadId)
-				
 				this.replyParameters.map(multipart.request.replyParameters)
-				
 		}
 		
 	}

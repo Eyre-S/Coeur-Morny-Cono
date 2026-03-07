@@ -44,8 +44,8 @@ class CommandCreate (using coeur: MornyCoeur) extends ISimpleCommand {
 				.parse(message.text())
 			catch case e: IllegalArgumentException =>
 				ErrorMessage(
-					ccMsg.sticker(TelegramStickers.ID_404).getSendRequest.request,
-					ccMsg(
+					ccMsg.noReply.sticker(TelegramStickers.ID_404).getSendRequest.request,
+					ccMsg.noReply(
 						
 						s"""Probably you've entered an invalid CRON expression:
 						   |

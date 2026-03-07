@@ -28,13 +28,16 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
+		var isOk: Boolean = false
 		command.args.headOption match
 			// due to the complex of stickers.XXX subcommands
 			//  matches all the commands that starts with "stickers"
 			case Some(s) if s.startsWith(Stickers.name) =>
 				Stickers.execute
+				isOk = true
 			case _ =>
 		
+		if isOk then return
 		this.emitCommands(using command.subcommand, event)
 		
 	}

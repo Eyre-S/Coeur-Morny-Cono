@@ -63,12 +63,6 @@ case class SocialContent (
 			}
 			ccMsg.media(clientMedias).send
 		}
-//			val mediaGroup = medias.map(f => f.genTelegramInputMedia)
-//			mediaGroup.head.caption(text_html)
-//			mediaGroup.head.parseMode(ParseMode.HTML)
-//			SendMediaGroup(replyChat, mediaGroup*)
-//				.replyToMessageId(replyToMessage)
-//				.unsafeExecute
 	}
 	
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[QueryResultUnit[?]] = {
