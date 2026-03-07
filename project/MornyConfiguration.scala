@@ -67,7 +67,7 @@ object MornyConfiguration {
 			"cc.sukazyo" % "messiva" % "0.2.0",
 			"cc.sukazyo" % "da4a" % "0.3.0-SNAPSHOT",
 			
-			"com.github.pengrad" % "java-telegram-bot-api" % "6.2.0",
+			"com.github.pengrad" % "java-telegram-bot-api" % "9.5.0",
 			
 		)
 		

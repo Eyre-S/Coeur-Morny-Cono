@@ -1,19 +1,17 @@
 package cc.sukazyo.cono.morny.slash_action
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import cc.sukazyo.cono.morny.system.utils.UniversalCommand
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	private val TG_FORMAT = "^\\w+(@\\w+)?$"r
 	
@@ -61,8 +59,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					origin
 				else update.message.replyToMessage
 			
-			SendMessage(
-				update.message.chat.id,
+			Messages.derive(update.message)(Texts.html(
 				"%s %s%s %s %s!".format(
 					origin.sender_firstnameRefHTML,
 					h(v_verb), if hasObject then "" else "了",
@@ -71,8 +68,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					else target.sender_firstnameRefHTML,
 					if hasObject then h(v_object+" ") else ""
 				)
-			).parseMode(ParseMode HTML).replyToMessageId(update.message.messageId)
-				.unsafeExecute
+			)).send
 			event.setEventOk
 			
 		}

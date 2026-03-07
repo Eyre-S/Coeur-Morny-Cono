@@ -3,16 +3,15 @@ package cc.sukazyo.cono.morny.crons.cmd
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.cronutils.descriptor.CronDescriptor
-import com.cronutils.model.{Cron, CronType}
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.cronutils.model.time.ExecutionTime
+import com.cronutils.model.{Cron, CronType}
 import com.cronutils.parser.CronParser
 import com.pengrad.telegrambot.model.{Message, Update}
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -26,11 +25,10 @@ class CommandCreate (using coeur: MornyCoeur) extends ISimpleCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		given context: MessagingContext.WithUserAndMessage = MessagingContext.extract(using event.message)
 		
-		SendMessage(
-			context.bind_chat.id,
-			"Type your CRON expression below:"
-		).replyToMessageId(context.bind_message.messageId)
-			.unsafeExecute
+		// TODO: update using new MessagingContext API
+		Messages.derive(context.bind_message)
+			("Type your CRON expression below:")
+			.send
 		
 		coeur.messageThreading.doAfter(execute1)
 		
@@ -38,23 +36,22 @@ class CommandCreate (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	def execute1 (message: Message, prev: MessagingContext.WithUserAndMessage): Unit = {
 		given context: MessagingContext.WithUserAndMessage = MessagingContext.extract(using message)
+		// TODO: update using new MessagingContext API
+		val ccMsg = Messages.derive(context.bind_message)
 		
 		val cron: Cron =
 			try CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX))
 				.parse(message.text())
 			catch case e: IllegalArgumentException =>
 				ErrorMessage(
-					SendSticker(
-						context.bind_chat.id,
-						TelegramStickers.ID_404
-					),
-					SendMessage(
-						context.bind_chat.id,
+					ccMsg.noReply.sticker(TelegramStickers.ID_404).getSendRequest.request,
+					ccMsg.noReply(
+						
 						s"""Probably you've entered an invalid CRON expression:
 						   |
 						   |${e.toLogString}
 						   |""".stripMargin
-					)
+					).getSendRequest.request
 				).submit
 				return
 		
@@ -63,8 +60,7 @@ class CommandCreate (using coeur: MornyCoeur) extends ISimpleCommand {
 		val cron_exec_time = ExecutionTime.forCron(cron)
 		val cron_next = cron_exec_time.nextExecution(current)
 		val cron_prev = cron_exec_time.lastExecution(current)
-		SendMessage(
-			context.bind_chat.id,
+		ccMsg(
 			s"""Set CRON task.
 			   |
 			   |Your cron settings is runs $cron_describe
@@ -72,8 +68,7 @@ class CommandCreate (using coeur: MornyCoeur) extends ISimpleCommand {
 			   |Next will run at: ${cron_next.map(_.format(DateTimeFormatter.ISO_DATE_TIME)).orElse("Will not run afterwards.")}
 			   |
 			   |""".stripMargin
-		).replyToMessageId(context.bind_message.messageId)
-			.unsafeExecute
+		).send
 		
 	}
 	

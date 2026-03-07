@@ -3,15 +3,16 @@ package cc.sukazyo.cono.morny.core.bot.internal
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.schedule.{DelayedTask, Scheduler}
-import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.{AbstractSendRequest, SendMessage}
+import com.pengrad.telegrambot.model.request.ReplyParameters
+import com.pengrad.telegrambot.request.AbstractSendRequest
 
 class ErrorMessageManager (using coeur: MornyCoeur) {
-	given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	private val expiresDuration: DurationMillis = 1000 * 60 * 60 * 5 // 5 hours
 	
@@ -48,14 +49,17 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 	  *                            This is part of the API limitation, but due to in normal cases,
 	  *                            the source error message must be in the same chat so it may
 	  *                            make sense.
-	  * @param isNewMessage Is this ErrorMessage is a new error message, otherwise it should be
-	  *                     an existed error message that just calling this method because of
-	  *                     need to be resent some messages.
+	  * @param isNewMessage        Is this ErrorMessage is a new error message, otherwise it should be
+	  *                            an existed error message that just calling this method because of
+	  *                            need to be resent some messages.
 	  *
-	  *                     If this is new, the message will be added to the stash, if not, it
-	  *                     should be comes from the stash and will not be added to the stash again.
+	  *                            If this is new, the message will be added to the stash, if not, it
+	  *                            should come from the stash and will not be added to the stash again.
 	  *
-	  *                     Default is false.
+	  *                            Default is false.
+	  *
+	  * @todo It may requires redesign, to compatible with new
+	  *       [[cc.sukazyo.cono.morny.system.telegram_api.message.Messages]] API.
 	  */
 	def sendErrorMessage (
 		message: ErrorMessage[?, ?],
@@ -69,7 +73,7 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 		injectedSendContext match
 			case None =>
 			case Some(cxt) =>
-				sendMessage.replyToMessageId(cxt.bind_message.messageId)
+				sendMessage.replyParameters(ReplyParameters(cxt.bind_message.messageId))
 		val response = sendMessage.unsafeExecute
 		if isNewMessage then
 			val key = MessagingContext.extract(using response.message).toChatMessageKey
@@ -99,11 +103,9 @@ class ErrorMessageManager (using coeur: MornyCoeur) {
 				case Some(msg) =>
 					sendErrorMessage(msg, ErrorMessage.Types.Complex, Some(cxt))
 				case None =>
-					SendMessage(
-						cxt.bind_chat.id,
-						"Not a error message."
-					).replyToMessageId(cxt.bind_message.messageId)
-						.unsafeExecute
+					Messages.derive(cxt.bind_message)
+						("Not a error message.")
+						.send
 	}
 	
 }

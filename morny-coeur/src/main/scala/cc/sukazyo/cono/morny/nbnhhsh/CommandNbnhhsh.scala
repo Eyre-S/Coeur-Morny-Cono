@@ -3,17 +3,15 @@ package cc.sukazyo.cono.morny.nbnhhsh
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
 import sttp.client3.{HttpError, SttpClientException}
 
 class CommandNbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	private val NBNHHSH_RESULT_HEAD_HTML =
 		// language=html
@@ -32,11 +30,7 @@ class CommandNbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 			else if (event.message.replyToMessage != null && event.message.replyToMessage.text != null)
 				event.message.replyToMessage.text
 			else
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_404
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
+				Messages.derive(event.message).sticker(TelegramStickers.ID_404).send
 				return;
 		
 		try {
@@ -67,19 +61,15 @@ class CommandNbnhhsh (using coeur: MornyCoeur) extends ITelegramCommand {
 				logger `trace` s"**done"
 			}
 			
-			SendMessage(
-				event.message.chat.id,
-				message toString
-			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			Messages.derive(event.message)(Texts.html(message.toString)).send
 			
 		} catch case e: (HttpError[_] | SttpClientException) => {
-			SendMessage(
-				event.message.chat.id,
+			// TODO: why no reply here?
+			Messages.deriveNoReply(event.message)(
 				s"""[Exception] in query:
 				   |${h(e.getMessage)}
 				   |""".stripMargin
-			).unsafeExecute
+			).send
 		}
 		
 	}

@@ -4,10 +4,10 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{InputCommand, ISimpleCommand, ITelegramCommand}
-import com.pengrad.telegrambot.model.{BotCommand, DeleteMyCommands, Update}
-import com.pengrad.telegrambot.request.{SendSticker, SetMyCommands}
-import com.pengrad.telegrambot.TelegramBot
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ISimpleCommand, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import com.pengrad.telegrambot.model.{BotCommand, Update}
+import com.pengrad.telegrambot.request.{DeleteMyCommands, SetMyCommands}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -17,16 +17,14 @@ object MornyCommandManager:
 	type CommandMap = mutable.SeqMap[String, ISimpleCommand]
 
 class MornyCommandManager (using coeur: MornyCoeur) extends SimpleCommandManager {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	protected override def nonCommandExecutable (using command: InputCommand, event: Update): Boolean = {
 		if command.target eq null then false
 		else
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_404
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			Messages.derive(event.message)
+				.sticker(TelegramStickers.ID_404)
+				.send
 			true
 	}
 	
@@ -58,7 +56,7 @@ class MornyCommandManager (using coeur: MornyCoeur) extends SimpleCommandManager
 			case telegramCommand: ITelegramCommand if name == command.name =>
 				list ++= formatTelegramCommandListLine(telegramCommand)
 			case _ =>
-		list toArray
+		list.toArray
 	
 	private def formatTelegramCommandListLine (command: ITelegramCommand): Array[BotCommand] =
 		def buildOne (name: String, paramRule: String, intro: String): BotCommand =
@@ -67,6 +65,6 @@ class MornyCommandManager (using coeur: MornyCoeur) extends SimpleCommandManager
 			buildOne(command.name, command.paramRule, command.description))
 		for (alias <- command.aliases)
 			if (alias.listed) list += buildOne(alias.name, "", "↑")
-		list toArray
+		list.toArray
 	
 }

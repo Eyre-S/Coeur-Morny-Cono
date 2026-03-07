@@ -4,17 +4,18 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.reporter.MornyReport
-import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.File.getContent
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.ListedAlias
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import cc.sukazyo.cono.morny.system.utils.CommonEncrypt
 import cc.sukazyo.cono.morny.system.utils.CommonEncrypt.*
 import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
+import com.pengrad.telegrambot.model.request.ReplyParameters
 import com.pengrad.telegrambot.model.{PhotoSize, Update}
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{GetFile, SendDocument, SendMessage, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.request.{GetFile, SendDocument}
 
 import java.io.IOException
 import java.net.{URLDecoder, URLEncoder}
@@ -22,7 +23,7 @@ import java.util.Base64
 
 /** Provides Telegram Command __`/encrypt`__. */
 class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override val name: String = "encrypt"
 	override val aliases: List[ICommandAlias] = ListedAlias("enc") :: Nil
@@ -30,7 +31,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
-		
+		val ccMsg = Messages.derive(event.message)
 		val args = command.args
 		
 		// show a simple help page
@@ -53,11 +54,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		val mod_uppercase = if (args.length > 1) {
 			if (args.length < 3 && _is_mod_u(args(1))) true
 			else
-				SendSticker(
-					event.message.chat.id,
-					TelegramStickers ID_404
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
+				ccMsg.sticker(TelegramStickers.ID_404).send
 				return
 		} else false
 		
@@ -116,11 +113,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			} else if ((_r ne null) && (_r.text ne null)) {
 				XText(_r.text)
 			} else {
-				SendMessage(
-					event.message.chat.id,
-					"<i><u>null</u></i>"
-				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-					.unsafeExecute
+				ccMsg(Texts.html("<i><u>null</u></i>")).send
 				return
 			}
 		// END BLOCK: get input
@@ -146,11 +139,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			EXHash(if mod_uppercase then hashed toUpperCase else hashed)
 		//noinspection UnitMethodIsParameterless
 		def echo_unsupported: Unit =
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_404
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			ccMsg.sticker(TelegramStickers.ID_404).send
 		val result: EXHash|EXFile|EXText = args(0) match
 			case "base64" | "b64" | "base64url" | "base64u" | "b64u" =>
 				val _tool_b64 =
@@ -196,19 +185,18 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		// output
 		result match
 			case _file: EXFile =>
+				// TODO: use new send message API
 				SendDocument(
 					event.message.chat.id,
 					_file.result
-				).fileName(_file.resultName).replyToMessageId(event.message.messageId)
+				).fileName(_file.resultName).replyParameters(ReplyParameters(event.message.messageId))
 					.unsafeExecute
 			case _text: EXTextLike =>
 				import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-				SendMessage(
-					event.message.chat.id,
+				ccMsg(Texts.html(
 					// language=html
 					s"<pre><code>${h(_text.text)}</code></pre>"
-				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-					.unsafeExecute
+				)).send
 		
 	}
 	
@@ -239,8 +227,9 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * </blockquote>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
-		SendMessage(
-			chat,
+		// TODO: MessageThread support
+		Messages.create(chat).replyTo(replyTo)(Texts.html(
+			// language=html
 			s"""<b><u>base64</u></b>, b64
 			   |<b><u>base64url</u></b>, base64u, b64u
 			   |<b><u>base64decode</u></b>, base64d, b64d
@@ -254,7 +243,6 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |---
 			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>"""
 			.stripMargin
-		).replyToMessageId(replyTo).parseMode(ParseMode HTML)
-			.unsafeExecute
+		)).send
 	
 }

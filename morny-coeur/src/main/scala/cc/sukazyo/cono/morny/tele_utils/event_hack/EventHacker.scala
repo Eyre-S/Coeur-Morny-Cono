@@ -2,17 +2,15 @@ package cc.sukazyo.cono.morny.tele_utils.event_hack
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
 
 import scala.collection.mutable
 
 class EventHacker (using coeur: MornyCoeur) {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	private case class Hacker (from_chat: Long, from_message: Long):
 		override def toString: String = s"$from_chat/$from_message"
@@ -41,12 +39,11 @@ class EventHacker (using coeur: MornyCoeur) {
 			else return false
 		logger `debug` s"hacked event by $x"
 		import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-		SendMessage(
-			x.from_chat,
+		// TODO: add MessageThread support
+		Messages.create(x.from_chat).replyTo(x.from_message.toInt)(Texts.html(
 			// language=html
 			s"<pre><code class='language-json'>${h(GsonBuilder().setPrettyPrinting().create.toJson(update))}</code></pre>"
-		).parseMode(ParseMode HTML).replyToMessageId(x.from_message toInt)
-			.unsafeExecute
+		)).send
 		true
 	}
 	

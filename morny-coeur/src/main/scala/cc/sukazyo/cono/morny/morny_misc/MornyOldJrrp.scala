@@ -1,16 +1,14 @@
 package cc.sukazyo.cono.morny.morny_misc
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
 
 class MornyOldJrrp (using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override val name: String = "jrrp"
 	override val aliases: List[ICommandAlias] = Nil
@@ -27,12 +25,10 @@ class MornyOldJrrp (using coeur: MornyCoeur) extends ITelegramCommand {
 			case _ => "..."
 		
 		import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-		SendMessage(
-			event.message.chat.id,
+		Messages.derive(event.message)(Texts.html(
 			// language=html
 			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code> ${h(ending)}"
-		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
-			.unsafeExecute
+		)).send
 		
 	}
 	
