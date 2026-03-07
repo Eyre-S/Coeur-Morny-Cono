@@ -2,16 +2,14 @@ package cc.sukazyo.cono.morny.tele_utils.event_hack
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.SendSticker
-import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override val name: String = "event_hack"
 	override val aliases: List[ICommandAlias] = Nil
@@ -20,22 +18,16 @@ class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) exte
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		import hacker.{registerHack, HackType}
+		import hacker.{HackType, registerHack}
+		val ccMsg = Messages.derive(event.message)
 		
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_WAITING
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			ccMsg.sticker(TelegramStickers.ID_WAITING).send
+		
 		def done_forbiddenForAny =
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_403
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			ccMsg.sticker(TelegramStickers.ID_403).send
 		
 		def doRegister (t: HackType): Unit =
 			registerHack(
@@ -47,14 +39,14 @@ class CommandEventHack (using hacker: EventHacker)(using coeur: MornyCoeur) exte
 		x_mode match
 			case "any" =>
 				if (coeur.trusted isTrust event.message.from)
-					doRegister(HackType ANY)
+					doRegister(HackType.ANY)
 					done_ok
 				else done_forbiddenForAny
 			case "group" =>
-				doRegister(HackType GROUP)
+				doRegister(HackType.GROUP)
 				done_ok
 			case _ =>
-				doRegister(HackType USER)
+				doRegister(HackType.USER)
 				done_ok
 		
 	}

@@ -3,14 +3,12 @@ package cc.sukazyo.cono.morny.social_share.command
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.social_share.event.OnGetSocial
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.SendSticker
-import com.pengrad.telegrambot.TelegramBot
 
 class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override val name: String = "get"
 	override val aliases: List[ICommandAlias] = Nil
@@ -19,12 +17,11 @@ class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		def do404 (): Unit =
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers.ID_404
-			).replyToMessageId(event.message.messageId())
-				.unsafeExecute
+		def do404 (): Unit = {
+			Messages.derive(event.message)
+				.sticker(TelegramStickers.ID_404)
+				.send
+		}
 		
 		val content =
 			if command.args.length > 0 then

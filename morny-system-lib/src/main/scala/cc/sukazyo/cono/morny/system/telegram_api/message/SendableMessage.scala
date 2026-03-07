@@ -57,7 +57,6 @@ trait SendableMessage [T <: NativeSendRequest[Req, Resp], Req <: BaseRequest[Req
 	  *
 	  * @since 2.0.0-alpha22
 	  *
-	  * @param sendContext Information that helps to build an [[AbstractSendRequest]].
 	  * @return Basic [[NativeSendRequest]]. Much information may be missing, requires a
 	  *         [[decorateSendRequest decorate]] to complete.
 	  */

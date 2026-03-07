@@ -1,17 +1,15 @@
 package cc.sukazyo.cono.morny.ip186
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 class BotCommand (using coeur: MornyCoeur) {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	private enum Subs (val cmd: String):
 		case IP extends Subs("ip")
@@ -31,25 +29,18 @@ class BotCommand (using coeur: MornyCoeur) {
 		override def execute (using command: InputCommand, event: Update): Unit = query
 	
 	private def query (using event: Update, command: InputCommand): Unit = {
+		val ccMsg = Messages.derive(event.message)
 		
 		val target: String|Null =
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
 			else if (command.args.length > 1)
-				SendMessage(
-					event.message.chat.id,
-					"[Unavailable] Too much arguments."
-				).replyToMessageId(event.message.messageId)
-					.unsafeExecute
+				ccMsg("[Unavailable] Too much arguments.").send
 				return
 			else command.args(0)
 		
 		if (target eq null)
-			SendMessage(
-				event.message.chat.id,
-				"[Unavailable] No ip defined."
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			ccMsg("[Unavailable] No ip defined.").send
 			return;
 		
 		
@@ -61,22 +52,18 @@ class BotCommand (using coeur: MornyCoeur) {
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
 				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			SendMessage(
-				event.message.chat.id,
+			ccMsg(Texts.html(
 				s"""${h(response.url)}
 				   |<code>${h(response.body)}</code>"""
 				.stripMargin
-			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			)).send
 			
 		} catch case e: Exception =>
-			SendMessage(
-				event.message().chat().id(),
+			ccMsg(Texts.html(
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""
 				.stripMargin
-			).parseMode(ParseMode.HTML).replyToMessageId(event.message().messageId())
-				.unsafeExecute
+			)).send
 		
 	}
 	

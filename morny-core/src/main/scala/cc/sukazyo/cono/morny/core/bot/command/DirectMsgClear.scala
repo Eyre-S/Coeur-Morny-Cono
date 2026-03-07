@@ -4,15 +4,15 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import com.pengrad.telegrambot.model.{Chat, Update}
-import com.pengrad.telegrambot.request.{DeleteMessage, GetChatMember, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.request.{DeleteMessage, GetChatMember}
 
 import scala.language.postfixOps
 
 class DirectMsgClear (using coeur: MornyCoeur) extends ISimpleCommand {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override val name: String = "r"
 	override val aliases: List[ICommandAlias] = Nil
@@ -51,10 +51,11 @@ class DirectMsgClear (using coeur: MornyCoeur) extends ISimpleCommand {
 				DeleteMessage(event.message.chat.id, event.message.messageId).unsafeExecute
 			}
 		
-		} else SendSticker(
-			event.message.chat.id,
-			TelegramStickers ID_403
-		).replyToMessageId(event.message.messageId).unsafeExecute
+		} else {
+			Messages.derive(event.message)
+				.sticker(TelegramStickers.ID_403)
+				.send
+		}
 		
 	}
 	

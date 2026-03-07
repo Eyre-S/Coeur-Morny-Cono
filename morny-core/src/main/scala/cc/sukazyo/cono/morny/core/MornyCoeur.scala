@@ -11,6 +11,7 @@ import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandE
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.core.module.{ModuleHelper, MornyModule}
+import cc.sukazyo.cono.morny.system.telegram_api.account.{BotAccount, StaticBotAccount}
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
@@ -180,6 +181,19 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	/** [[account]]'s telegram user id */
 	val userid: Long = __loginResult.userid
 	
+	/** The Telegram [[BotAccount]] that this coeur instance uses.
+	  *
+	  * Contains native [[TelegramBot account]], with additional methods.
+	  *
+	  * Provided under [[dsl]]'s given scope.
+	  *
+	  * @todo the name is temporary and will be renamed in the future. It is currently named
+	  *       like this to avoid name conflict with [[account]].
+	  *
+	  * @since 2.0.0-alpha22
+	  */
+	val __todo_context_BotAccount: BotAccount = StaticBotAccount(account)
+	
 	/** Morny's task [[Scheduler]] */
 	val tasks: Scheduler = Scheduler()
 	/** current Morny's [[MornyTrusted]] instance */
@@ -287,7 +301,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val http: HttpServer = _httpServerContext.start
 	_httpServerContext = null
 	logger `info` "start telegram event listening"
-	import com.pengrad.telegrambot.TelegramException
 	account.setUpdatesListener(eventManager, eventManager.ExceptionHandler)
 	
 	// Coeur Starting Post Event
@@ -341,6 +354,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	object dsl extends BotExtension {
 		given account: TelegramBot = MornyCoeur.this.account
 		given translations: MornyLangs = MornyCoeur.this.lang
+		given BotAccount = MornyCoeur.this.__todo_context_BotAccount
 	}
 	
 	def saveDataAll(): Unit = {

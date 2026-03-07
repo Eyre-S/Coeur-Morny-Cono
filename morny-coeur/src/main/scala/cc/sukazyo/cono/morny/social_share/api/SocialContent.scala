@@ -1,14 +1,15 @@
 package cc.sukazyo.cono.morny.social_share.api
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.social_share.api.SocialContent.{SocialMedia, SocialMediaType, SocialMediaWithUrl}
 import cc.sukazyo.cono.morny.social_share.api.SocialContent.SocialMediaType.{Photo, Video}
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
+import cc.sukazyo.cono.morny.social_share.api.SocialContent.{SocialMedia, SocialMediaWithUrl}
 import cc.sukazyo.cono.morny.system.telegram_api.formatting.NamingUtils.inlineQueryId
 import cc.sukazyo.cono.morny.system.telegram_api.inline_query.QueryResultUnit
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.objects.ClientMediaData.{ByteArrayBased, IDBased}
+import cc.sukazyo.cono.morny.system.telegram_api.objects.{AbstractClientMedia, ClientMediaData, Medias}
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.model.request.*
-import com.pengrad.telegrambot.request.{SendMediaGroup, SendMessage}
-import com.pengrad.telegrambot.TelegramBot
 
 /** Model of social networks' status. for example twitter tweet or
   * weibo status.
@@ -45,19 +46,29 @@ case class SocialContent (
 			case _ => orElse
 	
 	def outputToTelegram (using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit = {
-		given TelegramBot = coeur.account
-		if medias isEmpty then
-			SendMessage(replyChat, text_html)
-				.parseMode(ParseMode.HTML)
-				.replyToMessageId(replyToMessage)
-				.unsafeExecute
-		else
-			val mediaGroup = medias.map(f => f.genTelegramInputMedia)
-			mediaGroup.head.caption(text_html)
-			mediaGroup.head.parseMode(ParseMode.HTML)
-			SendMediaGroup(replyChat, mediaGroup*)
-				.replyToMessageId(replyToMessage)
-				.unsafeExecute
+		import coeur.dsl.given
+		// TODO: MessageThread support
+		val ccMsg = Messages.create(replyChat).replyTo(replyToMessage)
+		if medias isEmpty then {
+			ccMsg(Texts.html(text_html)).send
+		} else {
+			val clientMedias: List[AbstractClientMedia[?]] = medias.zipWithIndex.map { (it, i) =>
+				val base = Medias.of(it.toMediaData)
+				val base2 = if i == 0
+					then base.caption(Texts.html(text_html))
+					else base
+				it.t match
+					case Photo => base2.photo
+					case Video => base2.video
+			}
+			ccMsg.media(clientMedias).send
+		}
+//			val mediaGroup = medias.map(f => f.genTelegramInputMedia)
+//			mediaGroup.head.caption(text_html)
+//			mediaGroup.head.parseMode(ParseMode.HTML)
+//			SendMediaGroup(replyChat, mediaGroup*)
+//				.replyToMessageId(replyToMessage)
+//				.unsafeExecute
 	}
 	
 	def genInlineQueryResults (using id_head: String, id_param: Any, name: String): List[QueryResultUnit[?]] = {
@@ -98,19 +109,15 @@ object SocialContent {
 		case Photo
 		case Video
 	sealed trait SocialMedia(val t: SocialMediaType) {
-		def genTelegramInputMedia: InputMedia[?]
+		def toMediaData: ClientMediaData
 	}
 	case class SocialMediaWithUrl (url: String)(t: SocialMediaType) extends SocialMedia(t) {
-		override def genTelegramInputMedia: InputMedia[?] =
-			t match
-				case Photo => InputMediaPhoto(url)
-				case Video => InputMediaVideo(url)
+		override def toMediaData: ClientMediaData =
+			IDBased(url)
 	}
 	case class SocialMediaWithBytesData (data: Array[Byte])(t: SocialMediaType) extends SocialMedia(t) {
-		override def genTelegramInputMedia: InputMedia[?] =
-			t match
-				case Photo => InputMediaPhoto(data)
-				case Video => InputMediaVideo(data)
+		override def toMediaData: ClientMediaData =
+			ByteArrayBased(data)
 	}
 	
 }

@@ -8,13 +8,11 @@ import cc.sukazyo.cono.morny.social_share.api.{SocialTwitterParser, SocialWeiboP
 import cc.sukazyo.cono.morny.social_share.event.OnGetSocial.tryFetchSocial
 import cc.sukazyo.cono.morny.social_share.external.{twitter, weibo}
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Message.textWithUrls
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.pengrad.telegrambot.model.Chat
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
 
 class OnGetSocial (using coeur: MornyCoeur) extends EventListener {
 	
@@ -76,43 +74,39 @@ object OnGetSocial {
 	
 	def tryFetchSocialOfTweet (url: twitter.TweetUrlInformation)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit =
 		import cc.sukazyo.cono.morny.social_share.external.twitter.FXApi
+		import coeur.dsl.given
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.SttpClientException
 		try {
 			val api = FXApi.Fetch.status(Some(url.screenName), url.statusId)
 			SocialTwitterParser.parseFXTweet(api).outputToTelegram
 		} catch case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
-			SendSticker(
-				replyChat,
-				TelegramStickers.ID_NETWORK_ERR
-			).replyToMessageId(replyToMessage).unsafeExecute(using coeur.account)
+			// TODO: MessageThread support
+			Messages.create(replyChat).replyTo(replyToMessage)
+				.sticker(TelegramStickers.ID_NETWORK_ERR)
+				.send
 			logger `error`
 				"Error on requesting FixTweet API\n" + e.toLogString
 			coeur.externalContext.consume[MornyReport](_.exception(e, "Error on requesting FixTweet API"))
 	
 	def tryFetchSocialOfWeibo (url: weibo.StatusUrlInfo)(using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit =
 		import cc.sukazyo.cono.morny.social_share.external.weibo.MApi
+		import coeur.dsl.given
 		import io.circe.{DecodingFailure, ParsingFailure}
 		import sttp.client3.{HttpError, SttpClientException}
-		given TelegramBot = coeur.account
+		val ccMsg = Messages.create(replyChat).replyTo(replyToMessage)
 		try {
 			val api = MApi.Fetch.statuses_show(url.id)
 			SocialWeiboParser.parseMStatus(api).outputToTelegram
 		} catch
 			case e: HttpError[?] =>
-				SendMessage(
-					replyChat,
+				ccMsg(Texts.html(
 					// language=html
 					s"""Weibo Request Error <code>${e.statusCode}</code>
 					   |<pre><code>${e.body}</code></pre>""".stripMargin
-				).replyToMessageId(replyToMessage).parseMode(ParseMode.HTML)
-					.unsafeExecute
+				)).send
 			case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
-				SendSticker(
-					replyChat,
-					TelegramStickers.ID_NETWORK_ERR
-				).replyToMessageId(replyToMessage)
-					.unsafeExecute
+				ccMsg.sticker(TelegramStickers.ID_NETWORK_ERR).send
 				logger `error`
 					"Error on requesting Weibo m.API\n" + e.toLogString
 				coeur.externalContext.consume[MornyReport](_.exception(e, "Error on requesting Weibo m.API"))
