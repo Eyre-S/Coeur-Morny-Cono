@@ -1,19 +1,19 @@
 package cc.sukazyo.cono.morny.core.http.api
 
 import cats.effect.IO
+import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramImages
 import cc.sukazyo.cono.morny.util.StringEnsure.firstLine
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
-import org.http4s.{Header, MediaType, Response}
 import org.http4s.dsl.io.*
 import org.http4s.headers.`Content-Type`
+import org.http4s.{MediaType, Response}
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-object HttpStatus extends HttpStatus
-
-trait HttpStatus {
+trait HttpStatus (using coeur: MornyCoeur) {
+	import coeur.dsl.given
 	
 	private type ResponseT = Response[IO]
 	private type ResponseIO = IO[ResponseT]

@@ -3,7 +3,7 @@ package cc.sukazyo.cono.morny.data
 import cc.sukazyo.restools.{ResourceDirectory, ResourcePackage}
 
 @deprecated("use modern API: cc.sukazyo.cono.morny.core.assets.MornyAssets", "2.0.0-alpha22")
-object MornyAssets {
+object DeprecatedMornyAssets {
 	
 	class AssetsException (caused: Throwable) extends Exception("Cannot read assets file.", caused)
 	
