@@ -3,8 +3,8 @@ package cc.sukazyo.cono.morny.core
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur.*
 import cc.sukazyo.cono.morny.core.assets.{AssetPackLoader, MornyAssets}
-import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.ThreadingManager
+import cc.sukazyo.cono.morny.core.bot.api.{BotExtension, EventListenerManager, MornyCommandManager, MornyQueryManager}
 import cc.sukazyo.cono.morny.core.bot.event.{MornyOnInlineQuery, MornyOnTelegramCommand, MornyOnUpdateTimestampOffsetLock}
 import cc.sukazyo.cono.morny.core.bot.internal.{ErrorMessageManager, ThreadingManagerImpl}
 import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandEvents}
@@ -12,10 +12,10 @@ import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.core.module.{ModuleHelper, MornyModule}
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
-import cc.sukazyo.cono.morny.util.schedule.Scheduler
-import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
+import cc.sukazyo.cono.morny.util.schedule.Scheduler
+import cc.sukazyo.cono.morny.util.time.WatchDog
 import cc.sukazyo.std.contexts.GivenContext
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.GetMe
@@ -386,6 +386,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	object dsl extends BotExtension {
 		given account: TelegramBot = MornyCoeur.this.account
 		given translations: MornyLangs = MornyCoeur.this.lang
+		given assets: MornyAssets = MornyCoeur.this.assets
 	}
 	
 	def saveDataAll(): Unit = {

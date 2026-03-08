@@ -3,8 +3,8 @@ package cc.sukazyo.cono.morny.core.assets
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.core.assets.MornyAssets.{AssetPackConflictException, AssetPackLoadException, METADATA_FILE, NotAssetPackException}
-import cc.sukazyo.restools.{ResourceDirectory, ResourceFile}
 import cc.sukazyo.restools.utils.PathsHelper
+import cc.sukazyo.restools.{ResourceDirectory, ResourceFile}
 import io.circe.{DecodingFailure, ParsingFailure}
 
 import java.io.IOException
@@ -33,6 +33,23 @@ object MornyAssets {
 	
 }
 
+/** Assets (resource files) manager for Morny.
+  *
+  * Assets are organized in packs. Packs can contain one or more namespace, and real assets are
+  * stored in these namespaces.
+  *
+  * ## Assets pack file structure
+  *
+  * ```
+  * (assets-root)
+  * - morny-assets.jsonc : Morny Assets Pack metadata description file
+  * - <namespace-id>
+  *   - <assets-files...>
+  * - <namespace-id>
+  *   - <assets-files...>
+  * - ...
+  * ```
+  */
 class MornyAssets {
 	
 	class AssetGroup (val name: String, val dir: ResourceDirectory)
@@ -58,6 +75,21 @@ class MornyAssets {
 		this
 	}
 	
+	/** Register an assets pack to Morny Assets manager.
+	  *
+	  * @param resourceDirectory The assets root directory. This directory must directly
+	  *                          contain the [[METADATA_FILE]]. For dirs from classpath, it
+	  *                          should be `/assets` dir under specification (when root is
+	  *                          classpath root).
+	  * @throws NotAssetPackException if the [[METADATA_FILE]] is not found in this directory.
+	  * @throws AssetPackLoadException if this [[ResourceDirectory]] cannot be read, or the
+	  *                                metadata file cannot be read or parsed.
+	  
+	  * @throws AssetPackConflictException if the [[AssetPackMetadata.id]] is already
+	  *                                    registered by another asset pack.
+	  
+	  * @return This [[MornyAssets]] instance, for chaining.
+	  */
 	@throws[NotAssetPackException]
 	@throws[AssetPackLoadException]
 	@throws[AssetPackConflictException]
@@ -93,7 +125,9 @@ class MornyAssets {
 	def assetDirs: List[(String, ResourceDirectory)] =
 		packs.flatMap(_._2.groups).map(i => (i.name, i.dir)).toList
 	
+	@deprecated("not ready for use")
 	def getFile (path: String): ResourceFile = this.getFile(PathsHelper.parseString(path)*)
+	@deprecated("not ready for use")
 	def getFile (path: String*): ResourceFile = boundary[ResourceFile] {
 		for (dir <- assetDirs) {
 			val file = dir._2.getFile(path*)
@@ -102,11 +136,33 @@ class MornyAssets {
 		throw IllegalArgumentException(s"Asset file ${PathsHelper.compile(path.toArray)} cannot be found!")
 	}
 	
-	def getFileInGroup (group: String, path: String): ResourceFile =
-		this.getFileInGroup(group, PathsHelper.parseString(path)*)
-	def getFileInGroup (group: String, path: String*): ResourceFile = boundary[ResourceFile] {
+	/** Get a file in a specific namespace.
+	  *
+	  * @param namespace Target namespace.
+	  * @param path Target file path. The string formatted path will be parsed by
+	  *             [[PathsHelper.parseString]], and the result will be used as path segments.
+	  *
+	  * @throws IllegalArgumentException if the file cannot be found.
+	  *
+	  * @return A [[ResourceFile]].
+	  */
+	@throws[IllegalArgumentException]
+	def get (namespace: String, path: String): ResourceFile =
+		this.get(namespace, PathsHelper.parseString(path)*)
+	/** Get a file in a specific namespace.
+	  *
+	  * @param namespace                 Target namespace.
+	  * @param path                      Target file path. The string formatted path will be parsed by
+	  *                                  [[PathsHelper.parseString]], and the result will be used as path segments.
+	  *
+	  * @throws IllegalArgumentException if the file cannot be found.
+	  *
+	  * @return A [[ResourceFile]].
+	  */
+	@throws[IllegalArgumentException]
+	def get (namespace: String, path: String*): ResourceFile = boundary[ResourceFile] {
 		for (dir <- assetDirs) {
-			if (dir._1 == group)
+			if (dir._1 == namespace)
 				val file = dir._2.getFile(path*)
 				if file != null then break(file)
 		}
