@@ -166,7 +166,7 @@ class MornyAssets {
 				val file = dir._2.getFile(path*)
 				if file != null then break(file)
 		}
-		throw IllegalArgumentException(s"Asset file ${PathsHelper.compile(path.toArray)} cannot be found!")
+		throw IllegalArgumentException(s"Asset file \"${PathsHelper.compile(path.toArray)}\" cannot be found!")
 	}
 	
 }

@@ -119,6 +119,10 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	given MornyCoeur = this
 	
+	private var _lifecycle: MornyLifecycleStatus =
+		MornyLifecycleStatus.Starting(Thread.currentThread())
+	val watchDog: WatchDog = MornyWatchDog()
+	
 	val telegramBotEvents = new TelegramBotEvents()
 	val telegramCoreCommandEvents = new TelegramCoreCommandEvents()
 	
@@ -145,6 +149,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	logger `info` "Coeur starting..."
 	private var initializeContext = GivenContext()
+	initializeContext / this << watchDog
 	
 	import cc.sukazyo.cono.morny.util.StringEnsure.deSensitive
 	logger `info` s"args key:\n  ${config.telegramBotKey.deSensitive(4)}"
@@ -252,15 +257,6 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		_httpServerContext,
 		initializeContext)))
 	
-	val watchDog: WatchDog = WatchDog("watch-dog", 1000, 1500, { (consumed, _) =>
-		import cc.sukazyo.cono.morny.util.CommonFormat.formatDuration as f
-		logger `warn`
-			s"""Can't keep up! is the server overloaded or host machine fall asleep?
-			   |  current tick takes ${f(consumed)} to complete.""".stripMargin
-		tasks.notifyIt()
-	})
-	initializeContext / this << watchDog
-	
 	// Coeur Initializing Post Event
 	tryCallModulesEvent("onInitializingPost", _.onInitializingPost(OnInitializingPostContext(
 		externalContext,
@@ -344,6 +340,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		commands.automaticTGListUpdate()
 	
 	initializeContext = null
+	_lifecycle = MornyLifecycleStatus.Running()
 	logger `info` "Coeur start complete."
 	
 	///<<< BLOCK END instance configure & startup stage 2
@@ -389,6 +386,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 		given assets: MornyAssets = MornyCoeur.this.assets
 	}
 	
+	def lifecycle: MornyLifecycleStatus = _lifecycle
+	
 	def saveDataAll(): Unit = {
 		tryCallModulesEvent("onRoutineSaveData", _.onRoutineSavingData)
 		logger `notice` "done all save action."
@@ -429,6 +428,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	def exit (status: Int, reason: AnyRef): Unit =
 		whileExit_reason = Some(reason)
+		_lifecycle = MornyLifecycleStatus.Stopping()
 		System `exit` status
 	
 	private case class LoginResult(account: TelegramBot, username: String, userid: Long)

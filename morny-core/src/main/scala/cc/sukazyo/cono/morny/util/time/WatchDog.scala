@@ -15,11 +15,13 @@ trait WatchDog (val isDaemonIt: Boolean = true) extends Thread {
 	this.start()
 	
 	override def run(): Unit = {
+		this.onStart()
 		while (!this.isInterrupted) {
 			val currentMillis = System.currentTimeMillis()
 			previousTickTimeMillis match
 				case Some(_previousMillis) =>
 					val consumedMillis = currentMillis - _previousMillis
+					this.tick(consumedMillis)
 					if consumedMillis > overloadMillis then
 						this.overloaded(consumedMillis, consumedMillis - _previousMillis)
 					previousTickTimeMillis = Some(currentMillis)
@@ -29,9 +31,15 @@ trait WatchDog (val isDaemonIt: Boolean = true) extends Thread {
 			catch case _: InterruptedException =>
 				this.interrupt()
 		}
+		this.onEnd()
 	}
 	
-	def overloaded(consumed: DurationMillis, delayed: DurationMillis): Unit
+	protected def onStart (): Unit = ()
+	protected def onEnd (): Unit = ()
+	
+	protected def tick (consumed: DurationMillis): Unit = ()
+	
+	protected def overloaded (consumed: DurationMillis, delayed: DurationMillis): Unit
 	
 }
 
