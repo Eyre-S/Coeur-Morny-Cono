@@ -121,6 +121,8 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	private var _lifecycle: MornyLifecycleStatus =
 		MornyLifecycleStatus.Starting(Thread.currentThread())
+	
+	/** This Morny's [[MornyWatchDog WatchDog]] */
 	val watchDog: WatchDog = MornyWatchDog()
 	
 	val telegramBotEvents = new TelegramBotEvents()
@@ -134,6 +136,31 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	
 	///>>> BLOCK START local storage / data configuration
 	
+	/** Morny's assets subsystem (assets manager).
+	  *
+	  * To get files, and also dependencies of many subsystem/modules that requires
+	  * assets/reources files (like [[lang i18n subsystem]]).
+	  *
+	  * <details><summary>How this is initialized</summary>
+	  *
+	  * ## How this is initialized
+	  *
+	  * Morny's core, [[MornyCoeur]], will initialize this manager, and auto-find & load assets
+	  * packs using [[AssetPackLoader]].
+	  *
+	  * This stage comes very early in the lifecycle, even before
+	  * [[MornyModule.onInitializingPre init-pre]] stage. It is initialized right after login,
+	  * and the [[lang i18n subsystem]] is followed.
+	  *
+	  * </details>
+	  *
+	  * ## Subsystem lifecycle control / Customize
+	  *
+	  * Since morny core is not ready for multi-instances, assets subsystem is not able to
+	  * control/customize the initializations.
+	  *
+	  * @see [[MornyAssets!]] : For more introduction for Morny's assets subsystem.
+	  */
 	val assets: MornyAssets = MornyAssets()
 	logger.info("Loading Morny's assets packs...")
 	AssetPackLoader.loadFromScans(assets)

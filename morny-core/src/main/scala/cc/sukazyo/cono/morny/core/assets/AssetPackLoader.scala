@@ -8,6 +8,8 @@ import io.github.classgraph.ClassGraph
 import java.net.URI
 import scala.collection.mutable.ListBuffer
 
+/** Utils for load assets packs.
+  */
 object AssetPackLoader {
 	
 	class ClasspathScanException (val classpath: URI, cause: Throwable)

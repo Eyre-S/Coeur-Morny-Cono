@@ -4,6 +4,12 @@ import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.DurationMillis
 import cc.sukazyo.cono.morny.util.time.WatchDog
 
+/** Morny's main WatchDog.
+  *
+  * It will monitor Morny's healthy during startup stage.
+  *
+  * The parameters are following parent [[WatchDog]].
+  */
 class MornyWatchDog (using coeur: MornyCoeur) extends WatchDog {
 	
 	override def onStart (): Unit = {
