@@ -2,7 +2,12 @@ package cc.sukazyo.cono.morny.core.assets
 
 import scala.util.Using
 
-/** An image.
+/** An image in an assets group.
+  *
+  * Image is located at <code>&lt;assets-root&gt;/_[[group]]_/images/_[[filepath]]_</code>. The [[filepath]] must
+  * contains file extension.
+  *
+  * Usually is defined by [[AssetsImageSpec]].
   */
 case class AssetImage (group: String, filepath: List[String]) {
 	
