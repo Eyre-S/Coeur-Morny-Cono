@@ -8,6 +8,7 @@
     <option name="classpathModifications">
       <list />
     </option>
+    <option name="defaultTargetName" />
     <option name="envFilePaths">
       <list />
     </option>
@@ -26,10 +27,12 @@
       <list>
         <option value="cc.sukazyo.cono.morny.utils.TestCommonFormat" />
         <option value="cc.sukazyo.cono.morny.utils.schedule.TestCronTask" />
-        <option value="cc.sukazyo.cono.morny.utils.schedule.TestTaskBasics" />
         <option value="cc.sukazyo.cono.morny.utils.schedule.TestIntervalTask" />
+        <option value="cc.sukazyo.cono.morny.utils.schedule.TestTaskBasics" />
         <option value="cc.sukazyo.cono.morny.utils.schedule.TestTaskScheduler" />
         <option value="cc.sukazyo.cono.morny.utils.var_text.TestVarText" />
+        <option value="cc.sukazyo.cono.morny.core.assets.TestAssetImages" />
+        <option value="cc.sukazyo.cono.morny.core.assets.TestAssetsPackLoads" />
       </list>
     </option>
     <option name="searchTest" value="In single module" />
