@@ -1,46 +1,18 @@
 package cc.sukazyo.cono.morny.data
 
-import cc.sukazyo.cono.morny.data.MornyAssets.AssetsException
+import cc.sukazyo.cono.morny.core.assets.{AssetImage, AssetsImageSpec}
 
-import java.io.IOException
 import scala.language.postfixOps
-import scala.util.Using
 
-object TelegramImages {
+object TelegramImages extends AssetsImageSpec {
 	
-	class AssetsFileImage (assetsPath: List[String]) {
-		
-		private var cache: Option[Array[Byte]] = None
-		
-		@throws[AssetsException]
-		def get:Array[Byte] =
-			if cache isEmpty then read()
-			cache.get
-		
-		@throws[AssetsException]
-		private def read (): Unit = {
-			Using (MornyAssets.assets.getFile(assetsPath*).read()) { stream =>
-				try { this.cache = Some(stream.readAllBytes()) }
-				catch case e: IOException => {
-					throw AssetsException(e)
-				}
-			}
-		}
-		
-	}
+	override protected def assetsNamespace: String = "core"
 	
-	object AssetsFileImage {
-		def byId (id: String): AssetsFileImage =
-			byId(id, "png")
-		def byId (id: String, ty: String): AssetsFileImage =
-			AssetsFileImage("images" :: s"$id.$ty" :: Nil);
-	}
-	
-	val IMG_ABOUT: AssetsFileImage = AssetsFileImage.byId("featured-image@0.5x", "jpg")
-	val IMG_400: AssetsFileImage = AssetsFileImage.byId("http-sekai-400")
-	val IMG_404: AssetsFileImage = AssetsFileImage.byId("http-sekai-404")
-	val IMG_500: AssetsFileImage = AssetsFileImage.byId("http-sekai-500")
-	val IMG_501: AssetsFileImage = AssetsFileImage.byId("http-sekai-501")
-	val IMG_523: AssetsFileImage = AssetsFileImage.byId("http-sekai-523")
+	val IMG_ABOUT: AssetImage = image("featured-image@0.5x", "jpg")
+	val IMG_400: AssetImage = png("http-sekai-400")
+	val IMG_404: AssetImage = png("http-sekai-404")
+	val IMG_500: AssetImage = png("http-sekai-500")
+	val IMG_501: AssetImage = png("http-sekai-501")
+	val IMG_523: AssetImage = png("http-sekai-523")
 	
 }

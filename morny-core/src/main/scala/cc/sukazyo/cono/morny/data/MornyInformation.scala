@@ -1,5 +1,6 @@
 package cc.sukazyo.cono.morny.data
 
+import cc.sukazyo.cono.morny.core.assets.MornyAssets
 import cc.sukazyo.cono.morny.core.{MornyAbout, MornySystem}
 import cc.sukazyo.cono.morny.util.var_text.Var
 
@@ -37,7 +38,7 @@ object MornyInformation {
 		catch case _: UnknownHostException => None
 	}
 	
-	def getAboutPic: Array[Byte] = TelegramImages.IMG_ABOUT.get
+	def getAboutPic (using MornyAssets): Array[Byte] = TelegramImages.IMG_ABOUT.get
 	
 	def getMornyAboutLinksVars: List[Var] =
 		List(
