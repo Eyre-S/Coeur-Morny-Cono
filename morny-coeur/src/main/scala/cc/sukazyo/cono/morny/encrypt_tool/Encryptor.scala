@@ -191,6 +191,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 					_file.result
 				).fileName(_file.resultName).replyParameters(ReplyParameters(event.message.messageId))
 					.unsafeExecute
+				
 			case _text: EXTextLike =>
 				import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
 				ccMsg(Texts.html(
@@ -202,7 +203,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	/** echo help to a specific message in a specific chat.
 	  *
-	  * === the help message ===
+	  * ## the help message
+	  * 
 	  * The first paragraph lists available encrypt algorithms and its alias,
 	  * each line have one algorithm where the first name highlighted is the
 	  * main name and following is aliases separated with `,`.
@@ -211,20 +213,19 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * italic text following describes its usage environment.
 	  *
 	  * when output to telegram just like:
-	  * <blockquote>
-	  * 	'''__base64__''', b64<br>
-	  * 	'''__base64url__''', base64u, b64u<br>
-	  * 	'''__base64decode__''', base64d, b64d<br>
-	  * 	'''__base64url-decode__''', base64ud, b64ud<br>
-	  *     '''urlencode''', urlencode, urlenc, url<br>
-	  *     '''__urldecoder__''', urldecode, urldec, urld<br>
-	  * 	'''__sha1__'''<br>
-	  * 	'''__sha256__'''<br>
-	  * 	'''__sha512__'''<br>
-	  * 	'''__md5__'''<br>
-	  * 	---<br>
-	  * 	'''__uppercase__''', upper, u ''(sha1/sha256/sha512/md5 only)''
-	  * </blockquote>
+	  * 
+	  * > **<u>base64</u>**, b64  
+	  * > **<u>base64url</u>**, base64u, b64u  
+	  * > **<u>base64decode</u>**, base64d, b64d  
+	  * > **<u>base64url-decode</u>**, base64ud, b64ud  
+	  * > **<u>urlencoder</u>**, urlencode, urlenc, url  
+	  * > **<u>urldecoder</u>**, urldecode, urldec, urld  
+	  * > **<u>sha1</u>**  
+	  * > **<u>sha256</u>**  
+	  * > **<u>sha512</u>**  
+	  * > **<u>md5</u>**  
+	  * > ---  
+	  * > **uppercase**, upper, u *(sha1/sha256/sha512/md5 only)*
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
 		// TODO: MessageThread support
