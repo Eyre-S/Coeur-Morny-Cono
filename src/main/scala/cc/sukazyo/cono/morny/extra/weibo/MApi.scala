@@ -36,6 +36,7 @@ object MApi {
 		private val httpClient = OkHttpSyncBackend()
 		private val basicRequest = mornyBasicRequest
 			.header(HeaderNames.Referer, uri_base.toString)
+			.header(SttpPublic.Headers.XRequestWith.BROWSER_XML)
 		
 		@throws[HttpError[_]|SttpClientException|ParsingFailure|DecodingFailure]
 		def statuses_show (id: String): MApi[MStatus] =

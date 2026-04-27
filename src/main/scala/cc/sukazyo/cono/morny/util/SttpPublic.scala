@@ -20,7 +20,14 @@ object SttpPublic {
 			
 		}
 		
+		object XRequestWith {
+			
+			val BROWSER_XML = Header(HeaderNames.XRequestedWith, "XMLHttpRequest")
+			
+		}
+		
 	}
+	
 	
 	val mornyBasicRequest: RequestT[client3.Empty, Either[String, String], Any] =
 		basicRequest
