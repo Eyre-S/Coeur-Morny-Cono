@@ -1,6 +1,7 @@
 package cc.sukazyo.cono.morny.test.utils.tgapi.formatting
 
 import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.test_tags.API
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.tagobjects.{Network, Slow}
 
@@ -16,7 +17,7 @@ class TelegramUserInformationTest extends MornyTests with TableDrivenPropertyChe
 		
 		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramUserInformation.*
 		
-		s"datacenter should be $cdn" taggedAs (Slow, Network) in:
+		s"datacenter should be $cdn" taggedAs (Slow, Network, API) in:
 			getDataCenterFromUser(username) shouldEqual cdn
 		
 		"formatted data should as expected" in:

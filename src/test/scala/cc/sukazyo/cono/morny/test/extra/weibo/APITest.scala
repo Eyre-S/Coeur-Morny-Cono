@@ -2,6 +2,7 @@ package cc.sukazyo.cono.morny.test.extra.weibo
 
 import cc.sukazyo.cono.morny.extra.weibo.{MApi, MStatus, parseWeiboStatusUrl}
 import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.test_tags.API
 import org.scalatest.tagobjects.{Network, Slow}
 
 import java.io.ByteArrayInputStream
@@ -17,7 +18,7 @@ class APITest extends MornyTests {
 			
 			"use stateuses_show " - {
 				
-				"with a valid status ID should return a MStatus API result" taggedAs(Slow, Network) in {
+				"with a valid status ID should return a MStatus API result" taggedAs(Slow, Network, API) in {
 					val result = MApi.Fetch.statuses_show(parseWeiboStatusUrl(validURL).get.id)
 					result.ok shouldBe 1
 					result.data shouldBe a[MStatus]
@@ -29,14 +30,14 @@ class APITest extends MornyTests {
 				
 				lazy val fetchedStatus: MStatus = MApi.Fetch.statuses_show(parseWeiboStatusUrl(validURL).get.id).data
 				
-				"should contains pics" taggedAs (Network, Slow) in {
+				"should contains pics" taggedAs (Network, Slow, API) in {
 					fetchedStatus.pics shouldBe defined
 					fetchedStatus.pics.get should not be empty
 				}
 				
 				"the pics" - {
 					
-					"should be able to fetched from its URL" taggedAs(Slow, Network) in {
+					"should be able to fetched from its URL" taggedAs(Slow, Network, API) in {
 						val pic = fetchedStatus.pics.get(0)
 						val imageBytes = MApi.Fetch.pic(pic.url)
 						val image = ImageIO.read(ByteArrayInputStream(imageBytes))

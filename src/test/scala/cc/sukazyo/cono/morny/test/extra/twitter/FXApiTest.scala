@@ -3,6 +3,7 @@ package cc.sukazyo.cono.morny.test.extra.twitter
 import cc.sukazyo.cono.morny.extra.twitter.FXApi
 import cc.sukazyo.cono.morny.extra.twitter.FXApi.Fetch
 import cc.sukazyo.cono.morny.test.MornyTests
+import cc.sukazyo.cono.morny.test_tags.API
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.tagobjects.{Network, Slow}
 
@@ -11,7 +12,7 @@ class FXApiTest extends MornyTests with TableDrivenPropertyChecks {
 	
 	"while fetch status (tweet) :"  - {
 		
-		"non exists tweet id should return 404" taggedAs (Slow, Network) in {
+		"non exists tweet id should return 404" taggedAs (Slow, Network, API) in {
 			val api = Fetch.status(Some("some_non_exists"), "-1")
 			api.code shouldEqual 404
 			api.message shouldEqual "NOT_FOUND"
@@ -21,7 +22,7 @@ class FXApiTest extends MornyTests with TableDrivenPropertyChecks {
 		/** It should return 401, but in practice it seems will only
 		  * return 404.
 		  */
-		"private tweet should return 410 or 404" taggedAs (Slow, Network) in {
+		"private tweet should return 410 or 404" taggedAs (Slow, Network, API) in {
 			val api = Fetch.status(Some("_takiChan"), "1586671758999924736")
 			api.code should (equal (404) or equal (401))
 			api.code match
@@ -108,7 +109,7 @@ class FXApiTest extends MornyTests with TableDrivenPropertyChecks {
 			}),
 		)
 		forAll(examples) { (data, assertion) =>
-			s"tweet $data should be fetched successful" taggedAs (Slow, Network) in {
+			s"tweet $data should be fetched successful" taggedAs (Slow, Network, API) in {
 				assertion(Fetch.status(data._1, data._2))
 			}
 		}
