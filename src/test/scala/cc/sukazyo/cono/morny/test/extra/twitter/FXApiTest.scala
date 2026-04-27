@@ -13,7 +13,7 @@ class FXApiTest extends MornyTests with TableDrivenPropertyChecks {
 	"while fetch status (tweet) :"  - {
 		
 		"non exists tweet id should return 404" taggedAs (Slow, Network, API) in {
-			val api = Fetch.status(Some("some_non_exists"), "-1")
+			val api = Fetch.status(Some("some_non_exists"), "12094670913650163450981630984")
 			api.code shouldEqual 404
 			api.message shouldEqual "NOT_FOUND"
 			api.tweet shouldBe empty

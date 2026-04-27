@@ -15,14 +15,14 @@ case class FXAuthor (
 	avatar_url: Option[String],
 	avatar_color: Option[String],
 	banner_url: Option[String],
-	description: String, // todo
-	location: String, // todo
+	description: Option[String], // todo
+	location: Option[String], // todo
 	website: Option[FXAuthor.websiteType], // todo
-	followers: Int, // todo
-	following: Int, // todo
-	joined: String, // todo
-	likes: Int, // todo
-	tweets: Int // todo
+	followers: Option[Int], // todo
+	following: Option[Int], // todo
+	joined: Option[String], // todo
+	likes: Option[Int], // todo
+	tweets: Option[Int] // todo
 )
 
 object FXAuthor {
