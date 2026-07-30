@@ -9,6 +9,10 @@ class BaseCreatingMedia (
 	with ClientPhotoMedia.CreateOps
 	with ClientVideoMedia.CreateOps {
 	
+	/** Append a caption to this media.
+	  * 
+	  * @return A new creating-media with the caption appended.
+	  */
 	def caption (text: MessageText): BaseCreatingMedia =
 		new BaseCreatingMedia(
 			mediaData = this.mediaData,

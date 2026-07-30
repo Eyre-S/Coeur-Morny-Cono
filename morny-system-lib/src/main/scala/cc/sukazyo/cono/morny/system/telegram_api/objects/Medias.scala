@@ -4,6 +4,8 @@ import cc.sukazyo.cono.morny.system.telegram_api.objects.ClientMediaData.{ByteAr
 
 import java.io.File
 
+/** Helpers to create a [[AbstractClientMedia media-to-send]].
+  */
 object Medias {
 	
 	def of (fileId: String): BaseCreatingMedia =

@@ -5,9 +5,11 @@ import com.pengrad.telegrambot.model.request.InputMediaVideo
 
 class ClientVideoMedia (
 	
+	// common properties
 	override val mediaData: ClientMediaData,
 	override val caption: Option[MessageText] = None,
 	
+	// owned properties
 	val thumbnail: Option[ClientMediaData],
 	val cover: Option[ClientMediaData],
 	
