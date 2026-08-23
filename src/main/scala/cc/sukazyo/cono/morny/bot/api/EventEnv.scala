@@ -7,9 +7,20 @@ import com.pengrad.telegrambot.model.Update
 import scala.collection.mutable
 import scala.reflect.{classTag, ClassTag}
 
+/** Context of [[EventListener]]'s event
+  * 
+  * @param update Update that this event contains.
+  *               
+  *               Typically, one update becomes one event, but for message-group that have
+  *               multiple attachments, there may be multiple [[com.pengrad.telegrambot.model.Message]]
+  *               objects, so that will have multiple update objects. The full list of updates
+  *               will be at [[updates]]
+  */
 class EventEnv (
 	
-	val update: Update
+	val update: Update,
+	
+	val updates: List[Update]
 	
 ) {
 	

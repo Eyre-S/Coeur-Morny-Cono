@@ -1,5 +1,7 @@
 package cc.sukazyo.cono.morny.bot.api
 
+import com.pengrad.telegrambot.model.Update
+
 trait EventListener () {
 	
 	/** Determine if this event listener should be processed.

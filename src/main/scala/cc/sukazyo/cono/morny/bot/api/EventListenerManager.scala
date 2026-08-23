@@ -2,12 +2,14 @@ package cc.sukazyo.cono.morny.bot.api
 
 import cc.sukazyo.cono.morny.{Log, MornyCoeur}
 import cc.sukazyo.cono.morny.Log.{exceptionLog, logger}
+import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Update.tryGetGroupId
 import cc.sukazyo.cono.morny.util.tgapi.event.EventRuntimeException
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.UpdatesListener
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 
 /** Contains a [[mutable.Queue]] of [[EventListener]], and delivery telegram [[Update]].
@@ -23,9 +25,14 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	def register (listeners: EventListener*): Unit =
 		this.listeners ++= listeners
 	
-	private class EventRunner (using update: Update) extends Thread {
+	private class EventRunner (using updates: List[Update]) extends Thread {
 		
-		this setName s"upd-${update.updateId()}-nn"
+		private val head = updates.head
+		private val updId = s"upd-${head.updateId()}" + (
+			if updates.length == 1 then ""
+			else s"+${updates.length-1}")
+		
+		this setName s"$updId-nn"
 		private var _currSubevent: String = "<not-running-yet>"
 		private var _currListener: String = "<not-running-yet>"
 		
@@ -36,7 +43,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		private def setRunnerStatus (subevent: String): Unit = {
 			_currSubevent = subevent
-			this setName s"upd-${update.updateId()}-$subevent"
+			this setName s"$updId-$subevent"
 		}
 		
 		private def setRunningListener (listener: EventListener): Unit =
@@ -44,7 +51,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		override def run (): Unit = {
 			
-			given env: EventEnv = EventEnv(update)
+			given env: EventEnv = EventEnv(head, updates)
 			
 			for (i <- listeners) {
 				setRunningListener(i)
@@ -65,36 +72,36 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		private def runEventListener (i: EventListener)(using EventEnv): Unit = {
 			try {
-				setRunnerStatus(s"_universal")
+				setRunnerStatus(s"-universal")
 				i.on
 				setRunnerStatus("message")
-				if update.message ne null then i.onMessage
+				if head.message ne null then i.onMessage
 				setRunnerStatus("edited-message")
-				if update.editedMessage ne null then i.onEditedMessage
+				if head.editedMessage ne null then i.onEditedMessage
 				setRunnerStatus("channel-post")
-				if update.channelPost ne null then i.onChannelPost
+				if head.channelPost ne null then i.onChannelPost
 				setRunnerStatus("edited-channel-post")
-				if update.editedChannelPost ne null then i.onEditedChannelPost
+				if head.editedChannelPost ne null then i.onEditedChannelPost
 				setRunnerStatus("inline-query")
-				if update.inlineQuery ne null then i.onInlineQuery
+				if head.inlineQuery ne null then i.onInlineQuery
 				setRunnerStatus("chosen-inline-result")
-				if update.chosenInlineResult ne null then i.onChosenInlineResult
+				if head.chosenInlineResult ne null then i.onChosenInlineResult
 				setRunnerStatus("callback-query")
-				if update.callbackQuery ne null then i.onCallbackQuery
+				if head.callbackQuery ne null then i.onCallbackQuery
 				setRunnerStatus("shipping-query")
-				if update.shippingQuery ne null then i.onShippingQuery
+				if head.shippingQuery ne null then i.onShippingQuery
 				setRunnerStatus("pre-checkout-query")
-				if update.preCheckoutQuery ne null then i.onPreCheckoutQuery
+				if head.preCheckoutQuery ne null then i.onPreCheckoutQuery
 				setRunnerStatus("poll")
-				if update.poll ne null then i.onPoll
+				if head.poll ne null then i.onPoll
 				setRunnerStatus("poll-answer")
-				if update.pollAnswer ne null then i.onPollAnswer
+				if head.pollAnswer ne null then i.onPollAnswer
 				setRunnerStatus("my-chat-member")
-				if update.myChatMember ne null then i.onMyChatMemberUpdated
+				if head.myChatMember ne null then i.onMyChatMemberUpdated
 				setRunnerStatus("chat-member")
-				if update.chatMember ne null then i.onChatMemberUpdated
+				if head.chatMember ne null then i.onChatMemberUpdated
 				setRunnerStatus("chat-join-request")
-				if update.chatJoinRequest ne null then i.onChatJoinRequest
+				if head.chatJoinRequest ne null then i.onChatJoinRequest
 			} catch case e => EventExceptionReporter.onException(e, this)
 		}
 		
@@ -103,19 +110,38 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 	
 	import java.util
 	import scala.jdk.CollectionConverters.*
-	/** Delivery the telegram [[Update]]s.
+	/** Delivery the telegram [[Update]]s to [[EventListener]]s that [[register]]ed.
 	  *
-	  * The implementation of [[UpdatesListener]].
-	  *
-	  * For each [[Update]], create an [[EventRunner]] for it, and
-	  * start the it.
+	  * For normal updates, one update will deliver to one runner thread. For updates
+	  * that belongs to one message group (media group), those who have the same group
+	  * id will be packed to one list and deliver to one runner thread, so that
+	  * [[EventListener]]s can receive a pack of updates that have full group messages.
 	  *
 	  * @return [[UpdatesListener.CONFIRMED_UPDATES_ALL]], for all Updates
 	  *         should be processed in [[EventRunner]] created for it.
 	  */
 	override def process (updates: util.List[Update]): Int = {
-		for (update <- updates.asScala)
-			EventRunner(using update).start()
+		
+		var i = 0
+		while (i < updates.size) {
+			
+			val it = updates.get(i)
+			val groupId = it.tryGetGroupId
+			val cache: List[Update] = if (groupId.nonEmpty) {
+				
+				val buffer: ListBuffer[Update] = ListBuffer(it)
+				while (i+1 < updates.size() && updates.get(i+1).tryGetGroupId == groupId) {
+					i += 1
+					buffer += updates.get(i)
+				}
+				buffer.toList
+				
+			} else List(it)
+			EventRunner(using cache).start()
+			
+			i += 1
+		}
+		
 		UpdatesListener.CONFIRMED_UPDATES_ALL
 	}
 	

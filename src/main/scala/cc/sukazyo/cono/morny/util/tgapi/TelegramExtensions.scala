@@ -74,6 +74,15 @@ object TelegramExtensions {
 		
 	}}
 	
+	object Update { extension (self: Update) {
+		
+		def tryGetGroupId: Option[String] =
+			if self.message != null then
+				Option(self.message.mediaGroupId)
+			else None
+		
+	}}
+	
 	class LimboUser (id: Long) extends User(id)
 	class LimboChat (val _id: Long) extends Chat() {
 		override val id: java.lang.Long = _id
