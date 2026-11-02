@@ -16,7 +16,7 @@ class Testing (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		coeur.account exec new SendMessage(
+		coeur.account `exec` new SendMessage(
 			event.message.chat.id,
 			// language=html
 			"<b>Just</b> a TEST command that will throws an error."

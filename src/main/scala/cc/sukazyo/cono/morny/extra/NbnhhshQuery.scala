@@ -20,7 +20,7 @@ object NbnhhshQuery {
 	
 	private val httpClient = OkHttpSyncBackend()
 	
-	@throws[HttpError[_]|SttpClientException]
+	@throws[HttpError[?]|SttpClientException]
 	def sendGuess (text: String): GuessResult = {
 		case class GuessRequest (text: String)
 		val http = mornyBasicRequest

@@ -13,7 +13,7 @@ class ShareToolBilibili extends ITelegramQuery {
 	private val SHARE_FORMAT_HTML = "<a href='%s'>%s</a>"
 	private def formatShareHTML (url: String, name: String): String = SHARE_FORMAT_HTML.format(url, name)
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if (event.inlineQuery.query == null) return null
 		if (event.inlineQuery.query isBlank) return null

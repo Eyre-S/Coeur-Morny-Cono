@@ -25,7 +25,7 @@ class MornyOldJrrp (using coeur: MornyCoeur) extends ITelegramCommand {
 			case _ => "..."
 		
 		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			event.message.chat.id,
 			// language=html
 			f"${user.fullnameRefHTML} 在(utc的)今天的运气指数是———— <code>$jrrp%.2f%%</code> ${h(ending)}"

@@ -9,8 +9,8 @@ trait WatchDog (val isDaemonIt: Boolean = true) extends Thread {
 	val overloadMillis: DurationMillis = tickSpeedMillis + (tickSpeedMillis/2)
 	private var previousTickTimeMillis: Option[EpochMillis] = None
 	
-	this setName threadName
-	this setDaemon isDaemonIt
+	this `setName` threadName
+	this `setDaemon` isDaemonIt
 	
 	this.start()
 	

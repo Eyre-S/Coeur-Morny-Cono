@@ -48,7 +48,7 @@ case class SocialContent (
 	
 	def outputToTelegram (using replyChat: Long, replyToMessage: Int)(using coeur: MornyCoeur): Unit = {
 		if medias isEmpty then
-			coeur.account exec
+			coeur.account `exec`
 				SendMessage(replyChat, text_html)
 					.parseMode(ParseMode.HTML)
 					.replyToMessageId(replyToMessage)
@@ -56,8 +56,8 @@ case class SocialContent (
 			val mediaGroup = medias.map(f => f.genTelegramInputMedia)
 			mediaGroup.head.caption(text_html)
 			mediaGroup.head.parseMode(ParseMode.HTML)
-			coeur.account exec
-				SendMediaGroup(replyChat, mediaGroup: _*)
+			coeur.account `exec`
+				SendMediaGroup(replyChat, mediaGroup*)
 					.replyToMessageId(replyToMessage)
 	}
 	
@@ -155,13 +155,13 @@ object SocialContent {
 		def genTelegramInputMedia: InputMedia[?]
 	}
 	case class SocialMediaWithUrl (url: String)(t: SocialMediaType, sourceUrl: String) extends SocialMedia(t, sourceUrl) {
-		override def genTelegramInputMedia: InputMedia[_] =
+		override def genTelegramInputMedia: InputMedia[?] =
 			t match
 				case Photo => InputMediaPhoto(url)
 				case Video => InputMediaVideo(url)
 	}
 	case class SocialMediaWithBytesData (data: Array[Byte])(t: SocialMediaType, sourceUrl: String) extends SocialMedia(t, sourceUrl) {
-		override def genTelegramInputMedia: InputMedia[_] =
+		override def genTelegramInputMedia: InputMedia[?] =
 			t match
 				case Photo => InputMediaPhoto(data)
 				case Video => InputMediaVideo(data)

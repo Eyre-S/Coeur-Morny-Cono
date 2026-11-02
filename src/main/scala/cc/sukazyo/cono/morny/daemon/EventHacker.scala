@@ -28,18 +28,18 @@ class EventHacker (using coeur: MornyCoeur) {
 			case HackType.GROUP => s"{{$from_chat}}"
 			case HackType.ANY => "[[]]"
 		hackers += (record -> Hacker(from_chat, from_message))
-		logger debug s"add hacker track $record"
+		logger `debug` s"add hacker track $record"
 	
 	def trigger (chat: Long, fromUser: Long)(using update: Update): Boolean = {
-		logger debug s"got event signed {{$chat}}(($fromUser))"
+		logger `debug` s"got event signed {{$chat}}(($fromUser))"
 		val x: Hacker =
 			if hackers contains s"(($fromUser))" then (hackers remove s"(($fromUser))") get
 			else if hackers contains s"{{$chat}}" then (hackers remove s"{{$chat}}") get
 			else if hackers contains "[[]]" then (hackers remove "[[]]") get
 			else return false
-		logger debug s"hacked event by $x"
+		logger `debug` s"hacked event by $x"
 		import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			x.from_chat,
 			// language=html
 			s"<pre><code class='language-json'>${h(GsonBuilder().setPrettyPrinting().create.toJson(update))}</code></pre>"

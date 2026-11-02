@@ -22,26 +22,26 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 		errorMessage ++= "Event throws unexpected exception!\n"
 		errorMessage ++= s"current query listener = ${queryListener.getClass.getName}\n"
 		errorMessage ++= s"error message :"
-		errorMessage ++= (exceptionLog(e) indent 4)
+		errorMessage ++= (exceptionLog(e) `indent` 4)
 		e match
 			case actionFailed: EventRuntimeException.ActionFailed =>
 				errorMessage ++= "\ntg-api action: response track: "
 				errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
 					actionFailed.response
-				) indent 4) ++= "\n"
+				) `indent` 4) ++= "\n"
 			case _ =>
-		logger error errorMessage.toString
+		logger `error` errorMessage.toString
 		coeur.daemons.reporter.exception(QueryListenerFailed(e, queryListener, event))
 	}
 	
 	override def onInlineQuery (using event: EventEnv): Unit = {
 		import event.update
 		
-		val results: List[InlineQueryUnit[_]] = queryManager.query(onQueryingException(event))(update)
+		val results: List[InlineQueryUnit[?]] = queryManager.query(onQueryingException(event))(update)
 		
 		var cacheTime = Int.MaxValue
 		var isPersonal = InlineQueryUnit.defaults.IS_PERSONAL
-		val resultAnswers = ListBuffer[InlineQueryResult[_]]()
+		val resultAnswers = ListBuffer[InlineQueryResult[?]]()
 		for (r <- results) {
 			if (cacheTime > r.cacheTime) cacheTime = r.cacheTime
 			if (r isPersonal) isPersonal = true
@@ -52,9 +52,9 @@ class MornyOnInlineQuery (using queryManager: MornyQueries) (using coeur: MornyC
 		
 		if (results isEmpty) return;
 		
-		logger trace "Query answers:\n" + resultAnswers.map("  " + Gson().toJson(_)).mkString("\n")
-		coeur.account exec AnswerInlineQuery(
-			update.inlineQuery.id, resultAnswers toArray:_*
+		logger `trace` "Query answers:\n" + resultAnswers.map("  " + Gson().toJson(_)).mkString("\n")
+		coeur.account `exec` AnswerInlineQuery(
+			update.inlineQuery.id, resultAnswers.toArray*
 		).cacheTime(cacheTime).isPersonal(isPersonal)
 		
 		event.setEventOk

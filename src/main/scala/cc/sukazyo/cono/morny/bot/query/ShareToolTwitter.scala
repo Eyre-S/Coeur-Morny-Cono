@@ -14,7 +14,7 @@ class ShareToolTwitter extends ITelegramQuery {
 	private val TITLE_FX = "[Twitter/X][Fix-Tweet]"
 	private val ID_PREFIX_FX = "[morny/share/twitter/fx_url]"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if (event.inlineQuery.query == null) return null
 		

@@ -22,7 +22,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 		val text = update.message.text
 		if text == null then return;
 		
-		if (text startsWith "/") {
+		if (text `startsWith` "/") {
 			
 			// there has to be some special conditions for DP7
 			// due to I have left DP7, I closed those special
@@ -33,7 +33,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 			// these message, here to remember the old DP7.
 			
 			val actions = UniversalCommand.Lossy(text)
-			actions(0) = actions(0) substring 1
+			actions(0) = actions(0) `substring` 1
 			
 			actions(0)
 			
@@ -42,7 +42,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 				case TG_FORMAT(_) =>
 					return;
 				// ignore Path link
-				case x if x contains "/" => return;
+				case x if x `contains` "/" => return;
 				case _ =>
 			
 			val isHardParse = actions(0) isBlank
@@ -60,7 +60,7 @@ class OnUserSlashAction (using coeur: MornyCoeur) extends EventListener {
 					origin
 				else update.message.replyToMessage
 			
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				update.message.chat.id,
 				"%s %s%s %s %s!".format(
 					origin.sender_firstnameRefHTML,

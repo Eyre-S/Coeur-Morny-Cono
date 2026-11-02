@@ -17,7 +17,7 @@ class GetSocial (using coeur: MornyCoeur) extends ITelegramCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
 		def do404 (): Unit =
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				event.message.chat.id,
 				TelegramStickers.ID_404
 			).replyToMessageId(event.message.messageId())

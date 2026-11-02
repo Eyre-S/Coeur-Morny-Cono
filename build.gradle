@@ -114,7 +114,7 @@ java {
 }
 
 scala {
-	scalaVersion = "3.3.1"
+	scalaVersion = "3.10.0"
 }
 
 sourceSets {

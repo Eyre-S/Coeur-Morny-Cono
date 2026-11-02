@@ -11,7 +11,7 @@ import com.pengrad.telegrambot.model.request.{InlineQueryResultPhoto, ParseMode}
 
 class ShareToolSocialContent extends ITelegramQuery {
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		val query = event.inlineQuery.query
 		if query == null then return null
@@ -20,7 +20,7 @@ class ShareToolSocialContent extends ITelegramQuery {
 		
 	}
 	
-	private def bilibiliVideos (query: String): List[InlineQueryUnit[_]] = {
+	private def bilibiliVideos (query: String): List[InlineQueryUnit[?]] = {
 		
 		val results: List[(String, BiliVideoId)] =
 			BiliVideoId.searchIn(query).map(x => (x.toString, x)) ++
@@ -43,7 +43,7 @@ class ShareToolSocialContent extends ITelegramQuery {
 		
 	}
 	
-	private def twitterTweets (query: String): List[InlineQueryUnit[_]] = {
+	private def twitterTweets (query: String): List[InlineQueryUnit[?]] = {
 		twitter.guessTweetUrl(query).flatMap { tweet =>
 			SocialTwitterParser.parseFXTweet(FXApi.Fetch.status(Some(tweet.statusPath), tweet.statusId))
 				.genInlineQueryResults(using
@@ -53,7 +53,7 @@ class ShareToolSocialContent extends ITelegramQuery {
 		}
 	}
 	
-	private def weiboStatus (query: String): List[InlineQueryUnit[_]] = {
+	private def weiboStatus (query: String): List[InlineQueryUnit[?]] = {
 		weibo.guessWeiboStatusUrl(query).flatMap { (url, status) =>
 			SocialWeiboParser.parseMStatus(MApi.Fetch.statuses_show(status.id))(url)
 				.genInlineQueryResults(using

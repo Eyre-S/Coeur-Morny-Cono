@@ -15,7 +15,7 @@ object Log {
 			MornyFormatterConsole()
 		)
 	)
-	logger minLevel LogLevels.INFO
+	logger `minLevel` LogLevels.INFO
 	
 	def debug: Boolean = logger.levelSetting.minLevel.level <= LogLevels.DEBUG.level
 	
@@ -25,7 +25,7 @@ object Log {
 	
 	def exceptionLog (e: Throwable): String =
 		val stackTrace = StringWriter()
-		e printStackTrace PrintWriter(stackTrace)
+		e `printStackTrace` PrintWriter(stackTrace)
 		stackTrace toString
 	
 }

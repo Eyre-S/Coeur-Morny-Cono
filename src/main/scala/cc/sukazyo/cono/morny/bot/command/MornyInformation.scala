@@ -41,7 +41,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		val action: String = command.args(0)
 		
 		action match {
-			case s if s startsWith Subs.STICKERS => echoStickers
+			case s if s `startsWith` Subs.STICKERS => echoStickers
 			case Subs.RUNTIME => echoRuntime
 			case Subs.VERSION | Subs.VERSION_2 => echoVersion
 			case Subs.TASKS => echoTasksStatus
@@ -52,7 +52,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echoInfo (chatId: Long, replyTo: Int): Unit = {
-		coeur.account exec new SendPhoto(
+		coeur.account `exec` new SendPhoto(
 			chatId,
 			getAboutPic
 		).caption(
@@ -71,8 +71,8 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 				else if (command.args.length == 2) command.args(1)
 				else null
 			} else if (command.args.length == 1) {
-				if ((command.args(0) startsWith s"${Subs.STICKERS}.") || (command.args(0) startsWith s"${Subs.STICKERS}#")) {
-					command.args(0) substring Subs.STICKERS.length+1
+				if ((command.args(0) `startsWith` s"${Subs.STICKERS}.") || (command.args(0) `startsWith` s"${Subs.STICKERS}#")) {
+					command.args(0) `substring` Subs.STICKERS.length+1
 				} else null
 			} else null
 		if (mid == null) echo404
@@ -85,7 +85,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 			echoSticker(_key, _file_id)
 		else {
 			try {
-				val sticker = TelegramStickers getById mid
+				val sticker = TelegramStickers `getById` mid
 				echoSticker(sticker.getKey, sticker.getValue)
 			} catch case _: NoSuchFieldException => {
 				echo404
@@ -97,15 +97,15 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 		val send_mid = SendMessage(send_chat, mid)
 		val send_sticker = SendSticker(send_chat, file_id)
 		if (send_replyTo != -1) send_mid.replyToMessageId(send_replyTo)
-		val result_send_mid = coeur.account exec send_mid
+		val result_send_mid = coeur.account `exec` send_mid
 		send_sticker.replyToMessageId(result_send_mid.message.messageId)
-		coeur.account exec send_sticker
+		coeur.account `exec` send_sticker
 	}
 	
 	private[command] def echoVersion (using event: Update): Unit = {
 		val versionDeltaHTML = if (MornySystem.isUseDelta) s"-δ<code>${h(MornySystem.VERSION_DELTA)}</code>" else ""
 		val versionGitHTML = if (MornySystem.isGitBuild) s"git $getVersionGitTagHTML" else ""
-		coeur.account exec new SendMessage(
+		coeur.account `exec` new SendMessage(
 			event.message.chat.id,
 			// language=html
 			s"""version:
@@ -122,7 +122,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	private[command] def echoRuntime (using event: Update): Unit = {
 		def sysprop (p: String): String = System.getProperty(p)
-		coeur.account exec new SendMessage(
+		coeur.account `exec` new SendMessage(
 			event.message.chat.id,
 			/* language=html */
 			s"""system:
@@ -150,7 +150,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	private def echoTasksStatus (using update: Update): Unit = {
 //		if !coeur.trusted.isTrusted(update.message.from.id) then return;
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			update.message.chat.id,
 			// language=html
 			s"""<b>Coeur Task Scheduler:</b>
@@ -162,7 +162,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echoEventStatistics (using update: Update): Unit = {
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			update.message.chat.id,
 			// language=html
 			s"""<b>Event Statistics :</b>
@@ -172,7 +172,7 @@ class MornyInformation (using coeur: MornyCoeur) extends ITelegramCommand {
 	}
 	
 	private def echo404 (using event: Update): Unit =
-		coeur.account exec new SendSticker(
+		coeur.account `exec` new SendSticker(
 			event.message.chat.id,
 			TelegramStickers ID_404
 		).replyToMessageId(event.message.messageId)

@@ -22,7 +22,7 @@ object EpochDateTime {
 		def apply (time: String, zone: String): EpochMillis = {
 			val formatter = DateTimeFormatter.ISO_DATE_TIME
 			val innerTime = LocalDateTime.parse(time, formatter)
-			val instant = innerTime.toInstant(ZoneOffset of zone)
+			val instant = innerTime.toInstant(ZoneOffset `of` zone)
 			instant.toEpochMilli
 		}
 		def apply (time_zone: (String, String)): EpochMillis =

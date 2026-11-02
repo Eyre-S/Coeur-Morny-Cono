@@ -8,7 +8,7 @@ class ShareToolXhs extends ITelegramQuery {
 	private val TITLE = "[Xiaohongshu] Note"
 	private val ID = "[morny/share/xhs/link]"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		import event.inlineQuery
 		
 		if inlineQuery.query == null then return null

@@ -59,8 +59,8 @@ object TelegramParseEscape {
 							else
 								result += TextNode(elem.text)
 						case "img" =>
-							if elem.attributes hasKey "alt" then
-								result += TextNode(s"[${elem attr "alt"}]")
+							if elem.attributes `hasKey` "alt" then
+								result += TextNode(s"[${elem `attr` "alt"}]")
 						case _ =>
 							for (i <- cleanupHtml(elem.childNodes.asScala.toSeq)) result += i
 		}

@@ -9,14 +9,14 @@ class Eggs extends ITelegramQuery {
 	
 	private val ID_PREFIX = "[morny/info/me]"
 	
-	private def setSticker (stickerId: String): List[InlineQueryUnit[_]] = {
+	private def setSticker (stickerId: String): List[InlineQueryUnit[?]] = {
 		InlineQueryUnit(InlineQueryResultCachedSticker(
 			inlineQueryId(ID_PREFIX, stickerId),
 			stickerId
 		)) :: Nil
 	}
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		val query = event.inlineQuery.query
 		
 		query match {

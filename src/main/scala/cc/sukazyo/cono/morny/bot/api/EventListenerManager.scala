@@ -32,7 +32,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 			if updates.length == 1 then ""
 			else s"+${updates.length-1}")
 		
-		this setName s"$updId-nn"
+		this `setName` s"$updId-nn"
 		private var _currSubevent: String = "<not-running-yet>"
 		private var _currListener: String = "<not-running-yet>"
 		
@@ -43,7 +43,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 		
 		private def setRunnerStatus (subevent: String): Unit = {
 			_currSubevent = subevent
-			this setName s"$updId-$subevent"
+			this `setName` s"$updId-$subevent"
 		}
 		
 		private def setRunningListener (listener: EventListener): Unit =
@@ -153,15 +153,15 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 			errorMessage ++= s"current event_listener = ${runner.currentListener}\n"
 			errorMessage ++= s"current subevent = ${runner.currentSubevent}\n"
 			errorMessage ++= s"error message :"
-			errorMessage ++= (exceptionLog(ex) indent 4)
+			errorMessage ++= (exceptionLog(ex) `indent` 4)
 			ex match
 				case actionFailed: EventRuntimeException.ActionFailed =>
 					errorMessage ++= "\ntg-api action: response track: "
 					errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
 						actionFailed.response
-					) indent 4) ++= "\n"
+					) `indent` 4) ++= "\n"
 				case _ =>
-			logger error errorMessage.toString
+			logger `error` errorMessage.toString
 			coeur.daemons.reporter.exception(EventRuntimeException.EventListenerFailed(ex)(
 				runner.currentListener, runner.currentSubevent, env
 			))

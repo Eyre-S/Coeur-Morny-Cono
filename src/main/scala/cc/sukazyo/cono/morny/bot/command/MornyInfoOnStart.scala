@@ -18,7 +18,7 @@ class MornyInfoOnStart (using coeur: MornyCoeur) extends ISimpleCommand {
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		if command.args.nonEmpty then return
 		
-		coeur.account exec new SendPhoto(
+		coeur.account `exec` new SendPhoto(
 			event.message.chat.id,
 			getAboutPic
 		).caption(

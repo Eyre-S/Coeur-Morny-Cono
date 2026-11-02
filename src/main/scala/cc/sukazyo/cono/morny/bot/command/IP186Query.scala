@@ -31,7 +31,7 @@ class IP186Query (using coeur: MornyCoeur) {
 	
 	private def query (using event: Update, command: InputCommand): Unit = {
 		
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			event.message.chat.id,
 			"🥺 This feature has been deprecated, due to the upstream service (https://ip.186526.xyz) has been gone for a long time."
 		).replyToMessageId(event.message.messageId)
@@ -42,7 +42,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			if (command.args isEmpty)
 				if event.message.replyToMessage eq null then null else event.message.replyToMessage.text
 			else if (command.args.length > 1)
-				coeur.account exec SendMessage(
+				coeur.account `exec` SendMessage(
 					event.message.chat.id,
 					"[Unavailable] Too much arguments."
 				).replyToMessageId(event.message.messageId)
@@ -50,7 +50,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			else command.args(0)
 		
 		if (target eq null)
-			coeur.account exec new SendMessage(
+			coeur.account `exec` new SendMessage(
 				event.message.chat.id,
 				"[Unavailable] No ip defined."
 			).replyToMessageId(event.message.messageId)
@@ -65,7 +65,7 @@ class IP186Query (using coeur: MornyCoeur) {
 				case Subs.WHOIS.cmd => IP186QueryHandler.query_whoisPretty(target)
 				case _ => throw IllegalArgumentException(s"Unknown 186-IP query method ${command.command}")
 			
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				event.message.chat.id,
 				s"""${h(response.url)}
 				   |<code>${h(response.body)}</code>"""
@@ -73,7 +73,7 @@ class IP186Query (using coeur: MornyCoeur) {
 			).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 			
 		} catch case e: Exception =>
-			coeur.account exec new SendMessage(
+			coeur.account `exec` new SendMessage(
 				event.message().chat().id(),
 				s"""[Exception] in query:
 				   |<code>${h(e.getMessage)}</code>"""

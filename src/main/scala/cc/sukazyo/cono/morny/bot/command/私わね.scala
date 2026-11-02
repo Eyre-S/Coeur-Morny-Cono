@@ -16,9 +16,9 @@ class 私わね (using coeur: MornyCoeur) extends ISimpleCommand {
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
-		if ((1 over 521) chance_is true) {
+		if ((1 `over` 521) `chance_is` true) {
 			val text = "/打假"
-			coeur.account exec new SendMessage(
+			coeur.account `exec` new SendMessage(
 				event.message.chat.id,
 				text
 			).replyToMessageId(event.message.messageId)

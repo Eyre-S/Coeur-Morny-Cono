@@ -96,7 +96,7 @@ object OnGetSocial {
 		import sttp.client3.SttpClientException
 		try {
 			val video_info = XWebAPI.get_view(video)
-			coeur.account exec new SendPhoto(
+			coeur.account `exec` new SendPhoto(
 				replyChat,
 				video_info.data.pic
 			).replyToMessageId(replyToMessage)
@@ -104,11 +104,11 @@ object OnGetSocial {
 					SocialBilibiliParser.printsBilibiliVideoCaption(video, video_info.data)
 				).parseMode(ParseMode.HTML)
 		} catch case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				replyChat,
 				TelegramStickers.ID_NETWORK_ERR
 			).replyToMessageId(replyToMessage)
-			logger error
+			logger `error`
 				"Error on requesting Bilibili API\n" + exceptionLog(e)
 			coeur.daemons.reporter.exception(e, "Error on requesting Bilibili API")
 	}
@@ -121,11 +121,11 @@ object OnGetSocial {
 			val api = FXApi.Fetch.status(Some(url.screenName), url.statusId)
 			SocialTwitterParser.parseFXTweet(api).outputToTelegram
 		} catch case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				replyChat,
 				TelegramStickers.ID_NETWORK_ERR
 			).replyToMessageId(replyToMessage)
-			logger error
+			logger `error`
 				"Error on requesting FixTweet API\n" + exceptionLog(e)
 			coeur.daemons.reporter.exception(e, "Error on requesting FixTweet API")
 	
@@ -138,18 +138,18 @@ object OnGetSocial {
 			SocialWeiboParser.parseMStatus(api)(rawUrl).outputToTelegram
 		} catch
 			case e: HttpError[?] =>
-				coeur.account exec SendMessage(
+				coeur.account `exec` SendMessage(
 					replyChat,
 					// language=html
 					s"""Weibo Request Error <code>${e.statusCode}</code>
 					   |<pre><code>${e.body}</code></pre>""".stripMargin
 				).replyToMessageId(replyToMessage).parseMode(ParseMode.HTML)
 			case e: (SttpClientException | ParsingFailure | DecodingFailure) =>
-				coeur.account exec SendSticker(
+				coeur.account `exec` SendSticker(
 					replyChat,
 					TelegramStickers.ID_NETWORK_ERR
 				).replyToMessageId(replyToMessage)
-				logger error
+				logger `error`
 					"Error on requesting Weibo m.API\n" + exceptionLog(e)
 				coeur.daemons.reporter.exception(e, "Error on requesting Weibo m.API")
 	

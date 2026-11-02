@@ -139,12 +139,12 @@ object BiliTool {
 		if (av > X_AV_MAX) throw IllegalAVFormatException.thusTooLarge(av)
 		if (av < 1) throw IllegalAVFormatException.thusTooSmall(av)
 		var _av = (X_AV_MAX | av) ^ V_CONV_XOR
-		val bv = Array(BV_TEMPLATE:_*)
+		val bv = Array(BV_TEMPLATE*)
 		for (i <- BV_TEMPLATE_FILTER.indices) {
 			bv(BV_TEMPLATE_FILTER(i)) = BB58_TABLE((_av % BB58_BASE).toInt)
 			_av /= BB58_BASE
 		}
-		String copyValueOf bv
+		String `copyValueOf` bv
 	}
 	
 }

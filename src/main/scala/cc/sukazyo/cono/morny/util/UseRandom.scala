@@ -11,11 +11,11 @@ object UseRandom {
 	
 	class ChancePossibility[T <: Any] (val one: T) (using possibility: Double) {
 		def nor[U] (another: U): T|U =
-			if Random.nextDouble < possibility then one else another
+			if Random.nextDouble() < possibility then one else another
 	}
 	
 	given Conversion[ChancePossibility[Boolean], Boolean] with
-		def apply(in: ChancePossibility[Boolean]): Boolean = in nor !in.one
+		def apply(in: ChancePossibility[Boolean]): Boolean = in `nor` !in.one
 	
 	extension (num: Double) {
 		
@@ -24,7 +24,7 @@ object UseRandom {
 		
 	}
 	
-	def rand_half: Boolean = Random.nextBoolean
+	def rand_half: Boolean = Random.nextBoolean()
 	
 	def rand_id: String =
 		import ConvertByteHex.toHex

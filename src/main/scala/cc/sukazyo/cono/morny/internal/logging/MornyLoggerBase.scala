@@ -8,7 +8,7 @@ class MornyLoggerBase extends Logger with IMornyLogLevelImpl {
 	
 	def this (appends: IAppender*) =
 		this()
-		this.appends.addAll(java.util.List.of(appends:_*))
+		this.appends.addAll(java.util.List.of(appends*))
 	
 	override def notice (message: String): Unit =
 		pushToAllAppender(Log(1, new Message(message), MornyLogLevels.NOTICE))

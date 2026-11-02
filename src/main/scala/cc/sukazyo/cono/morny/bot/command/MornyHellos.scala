@@ -19,7 +19,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 		override val description: String = "检查是否在线"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_ONLINE_STATUS_RETURN
 			).replyToMessageId(event.message.messageId)
@@ -34,7 +34,7 @@ class MornyHellos (using coeur: MornyCoeur) {
 		override val description: String = "打招呼"
 		
 		override def execute (using command: InputCommand, event: Update): Unit =
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_HELLO
 			).replyToMessageId(event.message.messageId)

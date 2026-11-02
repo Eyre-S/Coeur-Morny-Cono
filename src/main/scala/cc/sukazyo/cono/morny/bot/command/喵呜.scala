@@ -49,7 +49,7 @@ class 喵呜 (using coeur: MornyCoeur) {
 		override val paramRule: String = ""
 		override val description: String = "抽取一个神秘盒子"
 		override def execute (using command: InputCommand, event: Update): Unit = {
-			coeur.account exec new SendSticker(
+			coeur.account `exec` new SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_PROGYNOVA
 			).replyToMessageId(event.message.messageId)
@@ -59,7 +59,7 @@ class 喵呜 (using coeur: MornyCoeur) {
 	private def replyingSet (whileRec: String, whileNew: String)(using event: Update): Unit = {
 		val isNew = event.message.replyToMessage == null
 		val target = if (isNew) event.message else event.message.replyToMessage
-		coeur.account exec new SendMessage(
+		coeur.account `exec` new SendMessage(
 			event.message.chat.id,
 			if (isNew) whileNew else whileRec
 		).replyToMessageId(target.messageId).parseMode(ParseMode HTML)

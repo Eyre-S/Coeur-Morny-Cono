@@ -22,12 +22,12 @@ class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 		val x_mode = if (command.args nonEmpty) command.args(0) else ""
 		
 		def done_ok =
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_WAITING
 			).replyToMessageId(event.message.messageId)
 		def done_forbiddenForAny =
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				event.message.chat.id,
 				TelegramStickers ID_403
 			).replyToMessageId(event.message.messageId)
@@ -41,7 +41,7 @@ class EventHack (using coeur: MornyCoeur) extends ITelegramCommand {
 			)
 		x_mode match
 			case "any" =>
-				if (coeur.trusted isTrusted event.message.from.id)
+				if (coeur.trusted `isTrusted` event.message.from.id)
 					doRegister(HackType ANY)
 					done_ok
 				else done_forbiddenForAny

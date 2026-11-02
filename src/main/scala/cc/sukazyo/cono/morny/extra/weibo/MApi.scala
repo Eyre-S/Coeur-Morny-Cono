@@ -38,7 +38,7 @@ object MApi {
 			.header(HeaderNames.Referer, uri_base.toString)
 			.header(SttpPublic.Headers.XRequestWith.BROWSER_XML)
 		
-		@throws[HttpError[_]|SttpClientException|ParsingFailure|DecodingFailure]
+		@throws[HttpError[?]|SttpClientException|ParsingFailure|DecodingFailure]
 		def statuses_show (id: String): MApi[MStatus] =
 			import MApi.CirceADTs.given
 			import sttp.client3.asString
@@ -51,7 +51,7 @@ object MApi {
 				.as[MApi[MStatus]]
 				.toTry.get
 		
-		@throws[HttpError[_] | SttpClientException | ParsingFailure | DecodingFailure]
+		@throws[HttpError[?] | SttpClientException | ParsingFailure | DecodingFailure]
 		def pic (picUrl: String): Array[Byte] =
 			import sttp.client3.*
 			import sttp.model.{MediaType, Uri}

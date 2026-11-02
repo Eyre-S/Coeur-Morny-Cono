@@ -12,7 +12,7 @@ class MyInformation extends ITelegramQuery {
 	private val ID_PREFIX = "[morny/info/me]"
 	private val TITLE = "My Account Information"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if !((event.inlineQuery.query eq null) || (event.inlineQuery.query isEmpty)) then return null
 		
@@ -20,7 +20,7 @@ class MyInformation extends ITelegramQuery {
 			InlineQueryUnit(InlineQueryResultArticle(
 				inlineQueryId(ID_PREFIX), TITLE,
 				new InputTextMessageContent(
-					TelegramUserInformation getFormattedInformation event.inlineQuery.from
+					TelegramUserInformation `getFormattedInformation` event.inlineQuery.from
 				).parseMode(ParseMode HTML)
 			)).isPersonal(true).cacheTime(10)
 		)

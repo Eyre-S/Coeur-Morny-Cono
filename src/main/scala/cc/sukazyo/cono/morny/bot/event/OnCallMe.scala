@@ -30,18 +30,18 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 					requestItem(update.message.from, "<b>Hana Paresu</b>")
 				case "dinner" | "lunch" | "breakfast" | "meal" | "eating" | "安妮今天吃什么" =>
 					requestLastDinner(update.message)
-				case cc if cc startsWith "cc::" =>
+				case cc if cc `startsWith` "cc::" =>
 					requestCustom(update.message)
 				case _ =>
 					return;
 		
 		if success then
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				update.message.chat.id,
 				TelegramStickers ID_SENT
 			).replyToMessageId(update.message.messageId)
 		else
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				update.message.chat.id,
 				TelegramStickers ID_501
 			).replyToMessageId(update.message.messageId)
@@ -51,7 +51,7 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 	}
 	
 	private def requestItem (user: User, itemHTML: String, extra: String|Null = null): Boolean =
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			me,
 			s"""request $itemHTML
 			   |from ${user.fullnameRefHTML}${if extra == null then "" else "\n"+extra}"""
@@ -63,11 +63,11 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 		if coeur.config.dinnerChatId == -1 then return false
 		var isAllowed = false
 		var lastDinnerData: Message|Null = null
-		if (coeur.trusted isTrusted_dinnerReader req.from.id) {
+		if (coeur.trusted `isTrusted_dinnerReader` req.from.id) {
 			// todo: have issues
 			//  i dont want to test it anymore... it might be deprecated soon
-			lastDinnerData = (coeur.account exec GetChat(coeur.config.dinnerChatId)).chat.pinnedMessage
-			val sendResp = coeur.account exec ForwardMessage(
+			lastDinnerData = (coeur.account `exec` GetChat(coeur.config.dinnerChatId)).chat.pinnedMessage
+			val sendResp = coeur.account `exec` ForwardMessage(
 				req.from.id,
 				lastDinnerData.forwardFromChat.id,
 				lastDinnerData.forwardFromMessageId
@@ -75,8 +75,8 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 			import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
 			import cc.sukazyo.cono.morny.util.EpochDateTime.EpochMillis
 			import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-			def lastDinner_dateMillis: EpochMillis = EpochMillis fromEpochSeconds lastDinnerData.forwardDate
-			coeur.account exec SendMessage(
+			def lastDinner_dateMillis: EpochMillis = EpochMillis `fromEpochSeconds` lastDinnerData.forwardDate
+			coeur.account `exec` SendMessage(
 				req.from.id,
 				"<i>on</i> <code>%s [UTC+8]</code>\n- <code>%s</code> <i>before</i>".formatted(
 					h(formatDate(lastDinner_dateMillis, 8)),
@@ -85,7 +85,7 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 			).parseMode(ParseMode HTML).replyToMessageId(sendResp.message.messageId)
 			isAllowed = true
 		} else {
-			coeur.account exec SendSticker(
+			coeur.account `exec` SendSticker(
 				req.from.id,
 				TelegramStickers ID_403
 			).replyToMessageId(req.messageId)
@@ -100,7 +100,7 @@ class OnCallMe (using coeur: MornyCoeur) extends EventListener {
 	
 	private def requestCustom (message: Message): Boolean =
 		requestItem(message.from, "<u>[???]</u>")
-		coeur.account exec ForwardMessage(me, message.chat.id, message.messageId)
+		coeur.account `exec` ForwardMessage(me, message.chat.id, message.messageId)
 		true
 	
 }

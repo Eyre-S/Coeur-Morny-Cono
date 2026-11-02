@@ -40,7 +40,7 @@ object MornySystem {
 			case _: (IOException|URISyntaxException) =>
 				"<non-jar-runtime>"
 			case n: NoSuchAlgorithmException =>
-				logger error exceptionLog(n)
+				logger `error` exceptionLog(n)
 //				MornyReport.exception(n, "<coeur-md5/calculation-error>") // todo: will not implemented
 				"<calculation-error>"
 	}

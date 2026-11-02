@@ -15,7 +15,7 @@ object TelegramExtensions {
 		@throws[EventRuntimeException]
 		def exec [T <: BaseRequest[T, R], R <: BaseResponse] (request: T, onError_message: String = ""): R = {
 			try {
-				val response = bot execute request
+				val response = bot `execute` request
 				if response isOk then return response
 				throw EventRuntimeException.ActionFailed(
 					if onError_message isEmpty then response.errorCode toString else onError_message,
@@ -58,7 +58,7 @@ object TelegramExtensions {
 				def apply (chatMember: ChatMember): UserPermissionLevel = apply(chatMember.status)
 			
 			import Bot.*
-			val chatMember: ChatMember = (bot exec GetChatMember(chat.id, user.id)).chatMember
+			val chatMember: ChatMember = (bot `exec` GetChatMember(chat.id, user.id)).chatMember
 			if chatMember eq null then false
 			else UserPermissionLevel(chatMember) >= UserPermissionLevel(permission)
 			

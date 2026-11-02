@@ -33,11 +33,11 @@ class MornyQueries (using MornyCoeur) {
 		GenError(),
 	)
 	
-	def query (onQueryListenerExceptions: QueryListenerExceptionListener)(event: Update): List[InlineQueryUnit[_]] = {
-		val results = ListBuffer[InlineQueryUnit[_]]()
+	def query (onQueryListenerExceptions: QueryListenerExceptionListener)(event: Update): List[InlineQueryUnit[?]] = {
+		val results = ListBuffer[InlineQueryUnit[?]]()
 		for (instance <- queryInstances) {
 			try {
-				val r = instance query event
+				val r = instance `query` event
 				if (r != null) results ++= r
 			} catch case e => onQueryListenerExceptions(instance, e)
 		}

@@ -31,7 +31,7 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		//   that the current event is all made of question marks
 		event.provide(OnQuestionMarkReply.Marked)
 		
-		if (1 over 8) chance_is false then return;
+		if (1 `over` 8) `chance_is` false then return;
 		
 		if (update.message.hasProtectedContent) {
 			// Copy the message
@@ -43,13 +43,13 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 			// we can only send the message again.
 			// TODO: change to CopyMessage when the API is updated.
 			// This is the old behavior with changes that removes the reply to the original message.
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				update.message.chat.id, update.message.text
 			)
 		} else {
 			// forward the message
 			//  if the message triggers question mark repeat
-			coeur.account exec ForwardMessage(
+			coeur.account `exec` ForwardMessage(
 				update.message.chat.id,
 				update.message.chat.id, update.message.messageId
 			)
@@ -70,7 +70,7 @@ object OnQuestionMarkReply {
 		boundary[Boolean] {
 			for (c <- text)
 				if !(QUESTION_MARKS contains c) then
-					boundary break false
+					boundary `break` false
 			true
 		}
 	}

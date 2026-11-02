@@ -22,7 +22,7 @@ class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 		val args = command.args
 		
 		if (args.length > 1)
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				event.message.chat.id,
 				"[Unavailable] Too much arguments."
 			).replyToMessageId(event.message.messageId)
@@ -32,7 +32,7 @@ class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 			if (args nonEmpty) {
 				try args(0) toLong
 				catch case e: NumberFormatException =>
-					coeur.account exec SendMessage(
+					coeur.account `exec` SendMessage(
 						event.message.chat.id,
 						s"[Unavailable] ${e.getMessage}"
 					).replyToMessageId(event.message.messageId)
@@ -40,10 +40,10 @@ class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 			} else if (event.message.replyToMessage eq null) event.message.from.id
 			else event.message.replyToMessage.from.id
 		
-		val response = coeur.account execute GetChatMember(event.message.chat.id, userId)
+		val response = coeur.account `execute` GetChatMember(event.message.chat.id, userId)
 		
 		if (response.chatMember eq null)
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				event.message.chat.id,
 				"[Unavailable] user not found."
 			).replyToMessageId(event.message.messageId)
@@ -52,15 +52,15 @@ class GetUsernameAndId (using coeur: MornyCoeur) extends ITelegramCommand {
 		val user = response.chatMember.user
 		
 		if (user.id == Standardize.CHANNEL_SPEAKER_MAGIC_ID)
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				event.message.chat.id,
 				"<code>$__channel_identify</code>"
 			).replyToMessageId(event.message.messageId)
 			return;
 		
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			event.message.chat.id,
-			TelegramUserInformation getFormattedInformation user
+			TelegramUserInformation `getFormattedInformation` user
 		).replyToMessageId(event.message.messageId()).parseMode(ParseMode HTML)
 		
 	}

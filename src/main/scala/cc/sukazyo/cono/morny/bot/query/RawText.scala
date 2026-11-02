@@ -10,7 +10,7 @@ class RawText extends ITelegramQuery {
 	private val ID_PREFIX = "[morny/r/text]"
 	private val TITLE = "Raw Text"
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if (event.inlineQuery.query == null || (event.inlineQuery.query isBlank)) return null
 		

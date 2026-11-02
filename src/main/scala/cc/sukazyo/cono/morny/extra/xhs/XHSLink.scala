@@ -85,7 +85,7 @@ object XHSLink {
 		@throws[IllegalArgumentException]
 		@throws[IllegalStateException]
 		def getXhsLink (using
-			http_client: sttp.client3.SttpBackend[sttp.client3.Identity, _] = http_client,
+			http_client: sttp.client3.SttpBackend[sttp.client3.Identity, ?] = http_client,
 			basic_request:  RequestT[sttp.client3.Empty, Either[String, String], Any] = mornyBasicRequest
 		): XHSLink = {
 			

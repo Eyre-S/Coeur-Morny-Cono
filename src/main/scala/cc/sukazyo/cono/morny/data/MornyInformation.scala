@@ -11,7 +11,7 @@ object MornyInformation {
 	def getVersionGitTagHTML: String = {
 		if (!MornySystem.isGitBuild) return ""
 		val g = StringBuilder()
-		val cm = BuildConfig.COMMIT substring(0, 8)
+		val cm = BuildConfig.COMMIT `substring`(0, 8)
 		val cp = MornySystem.currentCodePath
 		if (cp == null) g ++= s"<code>$cm</code>"
 		else g ++= s"<a href='$cp'>$cm</a>"

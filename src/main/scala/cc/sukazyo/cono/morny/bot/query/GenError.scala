@@ -4,7 +4,7 @@ import com.pengrad.telegrambot.model.Update
 
 class GenError extends ITelegramQuery {
 	
-	override def query (event: Update): List[InlineQueryUnit[_]] | Null = {
+	override def query (event: Update): List[InlineQueryUnit[?]] | Null = {
 		
 		if event.inlineQuery.query != "!!!gen-err" then return null
 		

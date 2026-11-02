@@ -27,7 +27,7 @@ class 创 (using coeur: MornyCoeur) {
 					return;
 			
 			val chuangText = 创.chuangText(text)
-			coeur.account exec SendMessage(
+			coeur.account `exec` SendMessage(
 				event.message.chat.id,
 				chuangText
 			).entities(

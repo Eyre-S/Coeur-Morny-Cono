@@ -16,10 +16,10 @@ class OnSomeJava (using coeur: MornyCoeur) extends EventListener {
 		
 		import cc.sukazyo.cono.morny.util.UseMath.over
 		import cc.sukazyo.cono.morny.util.UseRandom.chance_is
-		if (1 over 5) chance_is false then return;
+		if (1 `over` 5) `chance_is` false then return;
 		if !update.message.text.toLowerCase.contains("java") then return;
 		
-		coeur.account exec SendMessage(
+		coeur.account `exec` SendMessage(
 			update.message.chat.id,
 			"☕"
 		).replyToMessageId(update.message.messageId)

@@ -13,7 +13,7 @@ class OnOnAlias (using coeur: MornyCoeur) extends EventListener {
 		if (event.update.message.chat.`type` != Chat.Type.Private) return;
 		if !(List("o", "/o") contains event.update.message.text) then return;
 		
-		coeur.commands.$MornyHellos.On.execute(using InputCommand(""), event.update)
+		coeur.commands._MornyHellos.On.execute(using InputCommand(""), event.update)
 		
 	}
 	

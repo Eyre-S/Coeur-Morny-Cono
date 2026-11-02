@@ -11,23 +11,23 @@ class MornyDaemons (using val coeur: MornyCoeur) {
 	
 	def start (): Unit = {
 		
-		logger notice "ALL Morny Daemons starting..."
+		logger `notice` "ALL Morny Daemons starting..."
 		
 		medicationTimer.start()
 		reporter.start()
 		
-		logger notice "Morny Daemons started."
+		logger `notice` "Morny Daemons started."
 		
 	}
 	
 	def stop (): Unit = {
 		
-		logger notice "stopping All Morny Daemons..."
+		logger `notice` "stopping All Morny Daemons..."
 		
 		medicationTimer.stop()
 		reporter.stop()
 		
-		logger notice "stopped ALL Morny Daemons."
+		logger `notice` "stopped ALL Morny Daemons."
 	}
 	
 }

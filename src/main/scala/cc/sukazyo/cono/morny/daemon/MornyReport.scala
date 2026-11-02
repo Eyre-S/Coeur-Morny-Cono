@@ -35,25 +35,25 @@ class MornyReport (using coeur: MornyCoeur) {
 	
 	private val enabled = coeur.config.reportToChat != -1
 	if !enabled then
-		logger info "Morny Report is disabled : report chat is set to -1"
+		logger `info` "Morny Report is disabled : report chat is set to -1"
 	
 	private def executeReport[T <: BaseRequest[T, R], R<: BaseResponse] (report: T): Unit = {
 		if !enabled then return
 		try {
-			coeur.account exec report
+			coeur.account `exec` report
 		} catch case e: EventRuntimeException => {
 			import EventRuntimeException.*
 			e match
 				case e: ActionFailed =>
-					logger warn
+					logger `warn`
 						s"""cannot execute report to telegram:
-						   |${exceptionLog(e) indent 4}
+						   |${exceptionLog(e) `indent` 4}
 						   |  tg-api response:
-						   |${(e.response toString) indent 4}""".stripMargin
+						   |${(e.response toString) `indent` 4}""".stripMargin
 				case e: ClientFailed =>
-					logger error
+					logger `error`
 						s"""failed when report to telegram:
-						   |${exceptionLog(e.getCause) indent 4}
+						   |${exceptionLog(e.getCause) `indent` 4}
 						   |""".stripMargin
 		}
 	}
@@ -171,7 +171,7 @@ class MornyReport (using coeur: MornyCoeur) {
 				case e: (IllegalAccessException|IllegalArgumentException|NullPointerException) =>
 					// language=html
 					echo ++= s": <i>${h("<read-error>")}</i>"
-					logger error
+					logger `error`
 							s"""error while reading config field ${field.getName}
 							   |${exceptionLog(e)}""".stripMargin
 					exception(e, s"error while reading config field ${field.getName}")
@@ -244,9 +244,9 @@ class MornyReport (using coeur: MornyCoeur) {
 			   |   - <i>from</i> <code>${event_from_group.count}</code> <i>$SUPERGROUP groups/supergroups</i>
 			   |   - <i>from</i> <code>${event_from_private.count}</code> <i>$PRIVATE private chats</i>
 			   |   - <i>from</i> <code>${event_from_user_action.count}</code> <i>😼 user actions</i>
-			   | - <i>event ignored</i>: (<code>${eventTotal p ignored}%</code>) <code>$ignored</code>
-			   | - <i>event canceled</i>: (<code>${eventTotal p canceled}%</code>) <code>$canceled</code>
-			   | - <i>event processed</i>: (<code>${eventTotal p processed}%</code>) <code>$processed</code>
+			   | - <i>event ignored</i>: (<code>${eventTotal `p` ignored}%</code>) <code>$ignored</code>
+			   | - <i>event canceled</i>: (<code>${eventTotal `p` canceled}%</code>) <code>$canceled</code>
+			   | - <i>event processed</i>: (<code>${eventTotal `p` processed}%</code>) <code>$processed</code>
 			   | - <i>processed time usage</i>:
 			   |${runningTimeStatisticsHTML.indent(3)}""".stripMargin
 		
@@ -276,15 +276,15 @@ class MornyReport (using coeur: MornyCoeur) {
 				event.state match
 					case State.OK(from) =>
 						val timeUsed = EventTimeUsed(System.currentTimeMillis - event.timeStartup)
-						event provide timeUsed
-						logger debug
+						event `provide` timeUsed
+						logger `debug`
 							s"""event done with OK
 							   |  with time consumed ${timeUsed.it}ms
 							   |  by $from""".stripMargin
 						runningTime ++ timeUsed.it
 					case State.CANCELED(from) =>
 						eventCanceled += 1
-						logger debug
+						logger `debug`
 							s"""event done with CANCELED"
 							   |  by $from""".stripMargin
 					case null =>

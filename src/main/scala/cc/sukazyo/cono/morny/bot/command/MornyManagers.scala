@@ -37,27 +37,27 @@ class MornyManagers (using coeur: MornyCoeur) {
 		override def execute (using command: InputCommand, event: Update): Unit = {
 			
 			if !isMornyTargeted(event, command) then
-				logger debug "seems command does not targeted to morny, skipped"
+				logger `debug` "seems command does not targeted to morny, skipped"
 				return
 			
 			val user = event.message.from
 			
-			if (coeur.trusted isTrusted user.id) {
+			if (coeur.trusted `isTrusted` user.id) {
 				
-				coeur.account exec SendSticker(
+				coeur.account `exec` SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_EXIT
 				).replyToMessageId(event.message.messageId)
-				logger attention s"Morny exited by user ${user toLogTag}"
+				logger `attention` s"Morny exited by user ${user toLogTag}"
 				coeur.exit(0, user)
 				
 			} else {
 				
-				coeur.account exec SendSticker(
+				coeur.account `exec` SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger attention s"403 exit caught from user ${user toLogTag}"
+				logger `attention` s"403 exit caught from user ${user toLogTag}"
 				coeur.daemons.reporter.unauthenticatedAction("/exit", user)
 				
 			}
@@ -76,27 +76,27 @@ class MornyManagers (using coeur: MornyCoeur) {
 		override def execute (using command: InputCommand, event: Update): Unit = {
 			
 			if !isMornyTargeted(event, command) then
-				logger debug "seems command does not targeted to morny, skipped"
+				logger `debug` "seems command does not targeted to morny, skipped"
 				return
 			
 			val user = event.message.from
 			
-			if (coeur.trusted isTrusted user.id) {
+			if (coeur.trusted `isTrusted` user.id) {
 				
-				logger attention s"call save from command by ${user toLogTag}"
+				logger `attention` s"call save from command by ${user toLogTag}"
 				coeur.saveDataAll()
-				coeur.account exec SendSticker(
+				coeur.account `exec` SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_SAVED
 				).replyToMessageId(event.message.messageId)
 				
 			} else {
 				
-				coeur.account exec SendSticker(
+				coeur.account `exec` SendSticker(
 					event.message.chat.id,
 					TelegramStickers ID_403
 				).replyToMessageId(event.message.messageId)
-				logger attention s"403 save caught from user ${user toLogTag}"
+				logger `attention` s"403 save caught from user ${user toLogTag}"
 				coeur.daemons.reporter.unauthenticatedAction("/save", user)
 				
 			}
