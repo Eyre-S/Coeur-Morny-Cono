@@ -1,15 +1,16 @@
 package cc.sukazyo.cono.morny.uni_meow
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand}
-import com.pengrad.telegrambot.model.{MessageEntity, Update}
-import com.pengrad.telegrambot.request.SendMessage
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.model.{MessageEntity, Update}
 
 //noinspection NonAsciiCharacters
 class 创 (using coeur: MornyCoeur) {
 	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	object Chuang extends ISimpleCommand {
 		
@@ -28,13 +29,10 @@ class 创 (using coeur: MornyCoeur) {
 					return;
 			
 			val chuangText = 创.chuangText(text)
-			SendMessage(
-				event.message.chat.id,
-				chuangText
-			).entities(
-				MessageEntity(MessageEntity.Type.pre, 0, chuangText.length)
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			Messages.derive(event.message)(
+					Texts.plain(chuangText)
+						.withEntities(MessageEntity(MessageEntity.Type.pre, 0, chuangText.length))
+				).send
 			
 		}
 		
@@ -71,7 +69,7 @@ object 创 {
 		c         ++= raw" +-+-" ++= raw"-/-\-${"-" * _ext}"      ++= raw"-++/-\+ _/ \ " += '\n'
 		c         ++= raw"     " ++= raw" \_/ ${" " * _ext}"      ++= raw"   \-/       " += '\n'
 		
-		c toString
+		c.toString
 		
 	}
 	

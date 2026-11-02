@@ -1,6 +1,6 @@
 package cc.sukazyo.cono.morny.system.telegram_api
 
-import cc.sukazyo.cono.morny.system.telegram_api.event.EventRuntimeException
+import cc.sukazyo.cono.morny.system.telegram_api.action.ClientRequestException
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochSeconds
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.{Chat as TChat, ChatMember as TChatMember, File as TFile, Message as TMessage, MessageEntity as TMessageEntity, Update as TUpdate, User as TUser}
@@ -14,42 +14,43 @@ object TelegramExtensions {
 	
 	object Bot { extension (bot: TelegramBot) {
 		
-		/** Try sync execute a [[BaseRequest request]], and throws [[EventRuntimeException]]
+		/** Try sync execute a [[BaseRequest request]], and throws [[ClientRequestException]]
 		  * when it fails.
 		  *
 		  * It will use [[Telegram.execute]] to execute the request, and check if the response is failed.
 		  *
 		  * If the request returned a [[BaseResponse response]], the [[BaseResponse.isOk]] will be checked.
-		  * if it is false, the method will ended with a [[EventRuntimeException.ActionFailed]], which
+		  * if it is false, the method will ended with a [[ClientRequestException.ActionFailed]], which
 		  * message is param [[onError_message]](or [[BaseResponse.errorCode]] if it is empty).
 		  *
 		  * If the request failed in the client (that means [[TelegramBot.execute]] call failed with Exceptions),
-		  * this method will ended with a [[EventRuntimeException.ClientFailed]].
+		  * this method will ended with a [[ClientRequestException.ClientFailed]].
 		  *
 		  * @param request The request needed to be run.
 		  * @param onError_message The exception message that will be thrown when the [[request]]'s
 		  *                        [[BaseResponse response]] is not ok([[BaseResponse.isOk isOk()]] == false)
 		  * @tparam T Type of the request
 		  * @tparam R Type of the response that request should returns.
-		  * @throws EventRuntimeException Whenever the request's response is not ok, or the request does not
+		  *
+		  * @throws ClientRequestException Whenever the request's response is not ok, or the request does not
 		  *                               return a response. See above for more info.
 		  * @return The succeed response (which is returned by [[TelegramBot.execute]]) as is.
 		  *
 		  * @since 1.0.0
 		  */
-		@throws[EventRuntimeException]
+		@throws[ClientRequestException]
 		def exec [T <: BaseRequest[T, R], R <: BaseResponse] (request: BaseRequest[T, R], onError_message: String = ""): R = {
 			try {
 				val response = bot `execute` request
 				if response isOk then return response
-				throw EventRuntimeException.ActionFailed(
+				throw ClientRequestException.ActionFailed(
 					if onError_message isEmpty then response.errorCode toString else onError_message,
 					response
 				)
 			} catch
-				case e: EventRuntimeException.ActionFailed => throw e
+				case e: ClientRequestException.ActionFailed => throw e
 				case e: RuntimeException =>
-					throw EventRuntimeException.ClientFailed(e)
+					throw ClientRequestException.ClientFailed(e)
 		}
 		
 	}}
@@ -351,13 +352,14 @@ object TelegramExtensions {
 	
 	object Requests { extension [T<:BaseRequest[T,R], R<:BaseResponse] (self: BaseRequest[T,R]) {
 		/** Run this request with the given bot. Returns [[BaseResponse response]] if succeed, or throws
-		  * [[EventRuntimeException]] if run failed.
+		  * [[ClientRequestException]] if run failed.
 		  * 
 		  * This method is an alias for [[Bot.exec]]
-		  * 
+		  *
+		  *
 		  * @since 2.0.0
 		  */
-		@throws[EventRuntimeException]
+		@throws[ClientRequestException]
 		def unsafeExecute (using bot: TelegramBot): R =
 			import Bot.exec
 			bot.exec(self)

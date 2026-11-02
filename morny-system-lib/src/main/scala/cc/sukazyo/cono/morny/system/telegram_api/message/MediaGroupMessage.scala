@@ -1,0 +1,64 @@
+package cc.sukazyo.cono.morny.system.telegram_api.message
+
+import cc.sukazyo.cono.morny.system.telegram_api.Natives.NativeMultipartSendRequest
+import cc.sukazyo.cono.morny.system.telegram_api.chat.Chat
+import cc.sukazyo.cono.morny.system.telegram_api.objects.AbstractClientMedia
+import com.pengrad.telegrambot.model.request.{InputMedia, ReplyParameters}
+import com.pengrad.telegrambot.request.SendMediaGroup
+import com.pengrad.telegrambot.response.MessagesResponse
+
+trait MediaGroupMessage
+	extends MediaMessage [NativeMultipartSendRequest, SendMediaGroup, MessagesResponse] {
+	
+	def medias: List[AbstractClientMedia[?]]
+	
+	def toInputMedias: List[InputMedia[?]] =
+		medias.map(_.toNative)
+		
+	override def generateBaseSendRequest: NativeMultipartSendRequest = {
+		val request = SendMediaGroup(
+			this.chat.id,
+			this.toInputMedias*
+		)
+		NativeMultipartSendRequest(request)
+	}
+	
+}
+
+object MediaGroupMessage {
+	
+	class ClientImpl (
+		
+		override val chat: Chat,
+		override val replyParameters: Option[ReplyParameters],
+		
+		override val medias: List[AbstractClientMedia[?]],
+		
+	) extends MediaGroupMessage {
+		
+	}
+	
+	trait CreateOps {
+		this: Message =>
+		
+		def media (media: AbstractClientMedia[?], medias: AbstractClientMedia[?]*): MediaGroupMessage =
+			new ClientImpl(
+				chat = this.chat,
+				replyParameters = this.replyParameters,
+				medias = media :: medias.toList
+			)
+		
+		@throws[IllegalArgumentException]("if the media list is empty")
+		def media (medias: List[AbstractClientMedia[?]]): MediaGroupMessage = {
+			if medias.isEmpty then
+				throw IllegalArgumentException("Media list cannot be empty for media group message.")
+			new ClientImpl(
+				chat = this.chat,
+				replyParameters = this.replyParameters,
+				medias = medias
+			)
+		}
+		
+	}
+	
+}

@@ -1,29 +1,30 @@
 package cc.sukazyo.cono.morny.reporter
 
-import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.core.Log.logger
+import cc.sukazyo.cono.morny.core.{MornyCoeur, MornyConfig}
 import cc.sukazyo.cono.morny.data.MornyInformation.getVersionAllFullTagHTML
 import cc.sukazyo.cono.morny.reporter.telegram_bot.{BotErrorsReport, CoreCommandsReports}
-import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener, EventRuntimeException}
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Update.{sourceChat, sourceUser}
+import cc.sukazyo.cono.morny.system.telegram_api.action.ClientRequestException
+import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
+import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
 import cc.sukazyo.cono.morny.system.utils.CommonEncrypt.hashId
 import cc.sukazyo.cono.morny.system.utils.ConvertByteHex.toHex
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.DurationMillis
+import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import cc.sukazyo.cono.morny.util.schedule.CronTask
 import cc.sukazyo.cono.morny.util.statistics.{NumericStatistics, UniqueCounter}
-import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.cronutils.builder.CronBuilder
 import com.cronutils.model.Cron
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.google.gson.GsonBuilder
-import com.pengrad.telegrambot.model.{Chat, User}
+import com.pengrad.telegrambot.TelegramException
 import com.pengrad.telegrambot.model.request.ParseMode
+import com.pengrad.telegrambot.model.{Chat, User}
 import com.pengrad.telegrambot.request.{BaseRequest, SendMessage}
 import com.pengrad.telegrambot.response.BaseResponse
-import com.pengrad.telegrambot.TelegramException
 
 import java.time.ZoneId
 
@@ -39,8 +40,8 @@ class MornyReport (using val coeur: MornyCoeur) {
 		if !enabled then return
 		try {
 			report.unsafeExecute(using coeur.account)
-		} catch case e: EventRuntimeException => {
-			import EventRuntimeException.*
+		} catch case e: ClientRequestException => {
+			import ClientRequestException.*
 			e match
 				case e: ActionFailed =>
 					logger `warn`
@@ -58,7 +59,7 @@ class MornyReport (using val coeur: MornyCoeur) {
 	
 	def exception (e: Throwable, description: String|Null = null): Unit = {
 		def _tgErrFormat: String = e match
-			case api: EventRuntimeException.ActionFailed =>
+			case api: ClientRequestException.ActionFailed =>
 				// language=html
 				"\n\ntg-api error:\n<pre><code class='language-json'>%s</code></pre>"
 						.formatted(GsonBuilder().setPrettyPrinting().create.toJson(api.response))

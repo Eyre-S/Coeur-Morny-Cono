@@ -2,16 +2,14 @@ package cc.sukazyo.cono.morny.randomize_somthing
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.randomize_somthing.OnQuestionMarkReply.isAllMessageMark
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 
 import scala.util.boundary
 import scala.util.boundary.break
 
 class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	override def onMessage (using event: EventEnv): Unit = {
 		import event.update
@@ -25,10 +23,10 @@ class OnQuestionMarkReply (using coeur: MornyCoeur) extends EventListener {
 		if 7 over 8 chance_is true then return;
 		if !isAllMessageMark(using update.message.text) then return;
 		
-		SendMessage(
-			update.message.chat.id, update.message.text
-		).replyToMessageId(update.message.messageId)
-			.unsafeExecute
+		// TODO: copy message is able to use
+		Messages.derive(update.message)
+			(update.message.text)
+			.send
 		event.setEventOk
 		
 	}

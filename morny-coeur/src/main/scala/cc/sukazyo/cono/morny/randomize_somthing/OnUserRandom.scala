@@ -1,15 +1,13 @@
 package cc.sukazyo.cono.morny.randomize_somthing
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
-import com.pengrad.telegrambot.request.SendMessage
-import com.pengrad.telegrambot.TelegramBot
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 
 import scala.language.postfixOps
 
 class OnUserRandom (using coeur: MornyCoeur) {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	object RandomSelect extends EventListener {
 		
@@ -35,11 +33,9 @@ class OnUserRandom (using coeur: MornyCoeur) {
 			
 			if result == null then return;
 			
-			SendMessage(
-				update.message.chat.id,
-				result
-			).replyToMessageId(update.message.messageId)
-				.unsafeExecute
+			Messages.derive(update.message)
+				(result)
+				.send
 			event.setEventOk
 			
 		}
@@ -64,11 +60,9 @@ class OnUserRandom (using coeur: MornyCoeur) {
 					result = if rand_half then "尊嘟" else "假嘟"
 			if result == null then return
 			
-			SendMessage(
-				update.message.chat.id,
-				result
-			).replyToMessageId(update.message.messageId)
-				.unsafeExecute
+			Messages.derive(update.message)
+				(result)
+				.send
 			event.setEventOk
 			
 		}

@@ -2,18 +2,16 @@ package cc.sukazyo.cono.morny.uni_meow
 
 import cc.sukazyo.cono.morny.core.MornyCoeur
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{SendMessage, SendSticker}
-import com.pengrad.telegrambot.TelegramBot
 
 import scala.language.postfixOps
 
 //noinspection NonAsciiCharacters
 class 喵呜 (using coeur: MornyCoeur) {
-	private given TelegramBot = coeur.account
+	import coeur.dsl.given
 	
 	object 抱抱 extends ISimpleCommand {
 		override val name: String = "抱抱"
@@ -49,22 +47,18 @@ class 喵呜 (using coeur: MornyCoeur) {
 		override val paramRule: String = ""
 		override val description: String = "抽取一个神秘盒子"
 		override def execute (using command: InputCommand, event: Update): Unit = {
-			SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_PROGYNOVA
-			).replyToMessageId(event.message.messageId)
-				.unsafeExecute
+			Messages.derive(event.message)
+				.sticker(TelegramStickers.ID_PROGYNOVA)
+				.send
 		}
 	}
 	
 	private def replyingSet (whileRec: String, whileNew: String)(using event: Update): Unit = {
 		val isNew = event.message.replyToMessage == null
 		val target = if (isNew) event.message else event.message.replyToMessage
-		SendMessage(
-			event.message.chat.id,
-			if (isNew) whileNew else whileRec
-		).replyToMessageId(target.messageId).parseMode(ParseMode HTML)
-			.unsafeExecute
+		Messages.derive(event.message).replyTo(target.messageId)(
+			Texts.html(if (isNew) whileNew else whileRec)
+		).send
 	}
 	
 }

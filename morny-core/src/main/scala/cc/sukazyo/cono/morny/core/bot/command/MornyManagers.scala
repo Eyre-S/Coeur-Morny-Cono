@@ -2,27 +2,26 @@ package cc.sukazyo.cono.morny.core.bot.command
 
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.MornyCoeur
-import cc.sukazyo.cono.morny.core.bot.api.messages
 import cc.sukazyo.cono.morny.core.bot.api.messages.MessagingContext
 import cc.sukazyo.cono.morny.core.event.TelegramCoreCommandEvents
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.HiddenAlias
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand, ITelegramCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.HiddenAlias
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramFormatter.*
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.request.{EditMessageText, SendMessage, SendSticker}
+import com.pengrad.telegrambot.request.EditMessageText
 
 class MornyManagers (using coeur: MornyCoeur) {
 	import coeur.dsl.{*, given}
 	
 	private def verifyTrusted (command: ISimpleCommand)(using cxt: MessagingContext.WithUserAndMessage): Boolean = {
 		if !(coeur.trusted isTrust cxt.bind_user) then
-			SendSticker(
-				cxt.bind_chat.id,
-				TelegramStickers ID_403
-			).replyToMessageId(cxt.bind_message.messageId)
-				.unsafeExecute
+			// TODO: may update with new MessagingContext API
+			Messages.derive(cxt.bind_message)
+				.sticker(TelegramStickers.ID_403)
+				.send
 			logger `attention` s"403 ${command.name} caught from user ${cxt.bind_user toLogTag}"
 			TelegramCoreCommandEvents.inCoeur.OnUnauthorizedManageCommandCall.emit((cxt, command))
 			false
@@ -41,11 +40,9 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			if !verifyTrusted(this) then return
 			
-			val statusMessage = SendMessage(
-				cxt.bind_chat.id,
-				"[ .... ] Coeur reload."
-			).replyToMessageId(cxt.bind_message.messageId)
-				.unsafeExecute
+			val statusMessage = Messages.derive(cxt.bind_message)
+				("[ .... ] Coeur reload.")
+				.send
 			
 			coeur.reload()
 			
@@ -71,11 +68,10 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			if !verifyTrusted(this) then return
 			
-			SendSticker(
-				cxt.bind_chat.id,
-				TelegramStickers ID_EXIT
-			).replyToMessageId(cxt.bind_message.messageId)
-				.unsafeExecute
+			// TODO: may update with new MessagingContext API
+			Messages.derive(cxt.bind_message)
+				.sticker(TelegramStickers.ID_EXIT)
+				.send
 			logger `attention` s"Morny exited by user ${cxt.bind_user toLogTag}"
 			coeur.exit(0, cxt.bind_user)
 			
@@ -97,11 +93,10 @@ class MornyManagers (using coeur: MornyCoeur) {
 			
 			logger `attention` s"call save from command by ${cxt.bind_user toLogTag}"
 			coeur.saveDataAll()
-			SendSticker(
-				cxt.bind_chat.id,
-				TelegramStickers ID_SAVED
-			).replyToMessageId(cxt.bind_message.messageId)
-				.unsafeExecute
+			// TODO: maybe update with new MessagingContext API
+			Messages.derive(cxt.bind_message)
+				.sticker(TelegramStickers.ID_SAVED)
+				.send
 			
 		}
 		

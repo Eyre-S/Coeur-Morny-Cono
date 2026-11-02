@@ -1,6 +1,5 @@
 package cc.sukazyo.cono.morny.system.telegram_api.command
 
-import cc.sukazyo.cono.morny.system.telegram_api.command.InputCommand
 import com.pengrad.telegrambot.model.Update
 
 /** A simple command.

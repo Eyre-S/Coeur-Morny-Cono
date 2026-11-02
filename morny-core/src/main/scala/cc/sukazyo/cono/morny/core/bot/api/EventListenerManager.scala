@@ -1,13 +1,14 @@
 package cc.sukazyo.cono.morny.core.bot.api
 
-import cc.sukazyo.cono.morny.core.{Log, MornyCoeur}
 import cc.sukazyo.cono.morny.core.Log.logger
 import cc.sukazyo.cono.morny.core.event.TelegramBotEvents
-import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener, EventRuntimeException}
+import cc.sukazyo.cono.morny.core.{Log, MornyCoeur}
+import cc.sukazyo.cono.morny.system.telegram_api.action.ClientRequestException
+import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
 import com.google.gson.GsonBuilder
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.UpdatesListener
+import com.pengrad.telegrambot.{TelegramException, UpdatesListener}
 
 import scala.collection.mutable
 
@@ -18,6 +19,55 @@ import scala.collection.mutable
   * @param coeur the [[MornyCoeur]] context.
   */
 class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
+	
+	object ExceptionHandler extends com.pengrad.telegrambot.ExceptionHandler {
+		override def onException (e: TelegramException): Unit = {
+			
+			// This function intended to catch exceptions on update
+			//   fetching controlled by Telegram API Client. So that
+			//   it won't be directly printed to STDOUT without Morny's
+			//   logger. And it can be reported when needed.
+			// TelegramException can either contain a caused that infers
+			//   a lower level client exception (network err or others);
+			//   nor contains a response that means API request failed.
+			
+			if (e.response != null) {
+				import com.google.gson.GsonBuilder
+				logger `error`
+					s"""Failed get updates: ${e.getMessage}
+					   |  server responses:
+					   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response).indent(4)}
+					   |""".stripMargin
+			}
+			
+			if (e.getCause != null) {
+				import java.net.{SocketException, SocketTimeoutException}
+				import javax.net.ssl.SSLHandshakeException
+				val caused = e.getCause
+				caused match
+					case e_timeout: (SSLHandshakeException|SocketException|SocketTimeoutException) =>
+						import cc.sukazyo.messiva.log.Message
+
+						import scala.collection.mutable
+						val log = mutable.ArrayBuffer(s"Failed get updates: Network Error")
+						var current: Throwable = e_timeout
+						log += s"  due to: ${current.getClass.getSimpleName}: ${current.getMessage}"
+						while (current.getCause != null) {
+							current = current.getCause
+							log += s"  caused by: ${current.getClass.getSimpleName}: ${current.getMessage}"
+						}
+						logger `error` Message(log mkString "\n")
+					case e_other =>
+						logger `error`
+							s"""Failed get updates:
+							   |${e_other.toLogString `indent` 3}""".stripMargin
+				
+				TelegramBotEvents.inCoeur.OnGetUpdateFailed.emit(e)
+				
+			}
+			
+		}
+	}
 	
 	private val listeners = mutable.Queue.empty[EventListener]
 	
@@ -85,7 +135,7 @@ class EventListenerManager (using coeur: MornyCoeur) extends UpdatesListener {
 				errorMessage ++= "Event throws unexpected exception:\n"
 				errorMessage ++= (e.toLogString `indent` 4)
 				e match
-					case actionFailed: EventRuntimeException.ActionFailed =>
+					case actionFailed: ClientRequestException.ActionFailed =>
 						errorMessage ++= "\ntg-api action: response track: "
 						errorMessage ++= (GsonBuilder().setPrettyPrinting().create().toJson(
 							actionFailed.response

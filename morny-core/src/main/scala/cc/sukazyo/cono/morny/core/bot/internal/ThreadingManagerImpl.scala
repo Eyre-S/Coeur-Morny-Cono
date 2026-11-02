@@ -1,16 +1,20 @@
 package cc.sukazyo.cono.morny.core.bot.internal
 
-import cc.sukazyo.cono.morny.core.bot.api.messages.{MessageThread, MessagingContext, ThreadingManager}
 import cc.sukazyo.cono.morny.core.bot.api.messages.MessageThread.{Callback, CallbackParameterized, ThreadKey}
+import cc.sukazyo.cono.morny.core.bot.api.messages.{MessageThread, MessagingContext, ThreadingManager}
 import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.account.{BotAccount, StaticBotAccount}
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, InputCommand}
 import cc.sukazyo.cono.morny.system.telegram_api.event.{EventEnv, EventListener}
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
 import cc.sukazyo.cono.morny.util.schedule.{DelayedTask, Scheduler, Task}
-import com.pengrad.telegrambot.model.{Message, Update}
 import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.model.{Message, Update}
 import com.pengrad.telegrambot.request.SendMessage
 
 class ThreadingManagerImpl (using bot: TelegramBot) extends ThreadingManager {
+	// TODO: maybe a refactor?
+	given BotAccount = StaticBotAccount(bot)
 	
 	private val threadMap = collection.mutable.Map[ThreadKey, InternalMessageThread[?]]()
 	private val threadMapCleaner = Scheduler(isDaemon = true)
@@ -91,14 +95,13 @@ class ThreadingManagerImpl (using bot: TelegramBot) extends ThreadingManager {
 	  *             sent to this context.
 	  */
 	override def ensureCleanState (using _cxt: MessagingContext.WithUserAndMessage): Unit =
-		if cancelThread(ThreadKey fromContext _cxt) then
-			SendMessage(
-				_cxt.bind_chat.id,
+		if cancelThread(ThreadKey fromContext _cxt) then {
+			Messages.derive(_cxt.bind_message)(
 				"""There seems another message thread is waiting for future messages.
 				  |That thread has been canceled automatically.
 				  |""".stripMargin
-			).replyToMessageId(_cxt.bind_message.messageId)
-				.unsafeExecute
+			).send
+		}
 	
 	override def cancelThread (threadKey: ThreadKey): Boolean =
 		threadMap.get(threadKey)
@@ -119,16 +122,10 @@ class ThreadingManagerImpl (using bot: TelegramBot) extends ThreadingManager {
 		override val aliases: List[ICommandAlias] = Nil
 		
 		override def execute (using command: InputCommand, event: Update): Unit = {
+			val ccMsg = Messages.derive(event.message)
 			if cancelThread(ThreadKey fromMessage event.message) then
-				SendMessage(
-					event.message.chat.id,
-					"Canceled."
-				).replyToMessageId(event.message.messageId).unsafeExecute
-			else
-				SendMessage(
-					event.message.chat.id,
-					"No active message thread to cancel."
-				).replyToMessageId(event.message.messageId).unsafeExecute
+				ccMsg("Canceled.").send
+			else ccMsg("No active message thread to cancel.").send
 		}
 		
 	}

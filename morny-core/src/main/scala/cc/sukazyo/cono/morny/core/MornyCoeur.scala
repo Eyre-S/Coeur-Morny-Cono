@@ -11,6 +11,7 @@ import cc.sukazyo.cono.morny.core.event.{TelegramBotEvents, TelegramCoreCommandE
 import cc.sukazyo.cono.morny.core.http.api.{HttpServer, MornyHttpServerContext}
 import cc.sukazyo.cono.morny.core.http.internal.MornyHttpServerContextImpl
 import cc.sukazyo.cono.morny.core.module.{ModuleHelper, MornyModule}
+import cc.sukazyo.cono.morny.system.telegram_api.account.{BotAccount, StaticBotAccount}
 import cc.sukazyo.cono.morny.system.utils.EpochDateTime.EpochMillis
 import cc.sukazyo.cono.morny.util.UseString.MString
 import cc.sukazyo.cono.morny.util.UseThrowable.toLogString
@@ -212,6 +213,19 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	/** [[account]]'s telegram user id */
 	val userid: Long = __loginResult.userid
 	
+	/** The Telegram [[BotAccount]] that this coeur instance uses.
+	  *
+	  * Contains native [[TelegramBot account]], with additional methods.
+	  *
+	  * Provided under [[dsl]]'s given scope.
+	  *
+	  * @todo the name is temporary and will be renamed in the future. It is currently named
+	  *       like this to avoid name conflict with [[account]].
+	  *
+	  * @since 2.0.0-alpha22
+	  */
+	val __todo_context_BotAccount: BotAccount = StaticBotAccount(account)
+	
 	/** Morny's task [[Scheduler]] */
 	val tasks: Scheduler = Scheduler()
 	/** current Morny's [[MornyTrusted]] instance */
@@ -310,53 +324,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	val http: HttpServer = _httpServerContext.start
 	_httpServerContext = null
 	logger `info` "start telegram event listening"
-	import com.pengrad.telegrambot.TelegramException
-	account.setUpdatesListener(eventManager, (e: TelegramException) => {
-		
-		// This function intended to catch exceptions on update
-		//   fetching controlled by Telegram API Client. So that
-		//   it won't be directly printed to STDOUT without Morny's
-		//   logger. And it can be reported when needed.
-		// TelegramException can either contains a caused that infers
-		//   a lower level client exception (network err or others);
-		//   nor contains a response that means API request failed.
-		
-		if (e.response != null) {
-			import com.google.gson.GsonBuilder
-			logger `error`
-				s"""Failed get updates: ${e.getMessage}
-				   |  server responses:
-				   |${GsonBuilder().setPrettyPrinting().create.toJson(e.response).indent(4)}
-				   |""".stripMargin
-		}
-		
-		if (e.getCause != null) {
-			import java.net.{SocketException, SocketTimeoutException}
-			import javax.net.ssl.SSLHandshakeException
-			val caused = e.getCause
-			caused match
-				case e_timeout: (SSLHandshakeException|SocketException|SocketTimeoutException) =>
-					import cc.sukazyo.messiva.log.Message
-
-					import scala.collection.mutable
-					val log = mutable.ArrayBuffer(s"Failed get updates: Network Error")
-					var current: Throwable = e_timeout
-					log += s"  due to: ${current.getClass.getSimpleName}: ${current.getMessage}"
-					while (current.getCause != null) {
-						current = current.getCause
-						log += s"  caused by: ${current.getClass.getSimpleName}: ${current.getMessage}"
-					}
-					logger `error` Message(log mkString "\n")
-				case e_other =>
-					logger `error`
-						s"""Failed get updates:
-						   |${e_other.toLogString `indent` 3}""".stripMargin
-			
-			TelegramBotEvents.inCoeur.OnGetUpdateFailed.emit(e)
-			
-		}
-		
-	})
+	account.setUpdatesListener(eventManager, eventManager.ExceptionHandler)
 	
 	// Coeur Starting Post Event
 	tryCallModulesEvent("onStartingPost", _.onStartingPost(OnStartingPostContext(
@@ -409,6 +377,7 @@ class MornyCoeur (modules: List[MornyModule])(using val config: MornyConfig)(tes
 	  */
 	object dsl extends BotExtension {
 		given account: TelegramBot = MornyCoeur.this.account
+		given BotAccount = MornyCoeur.this.__todo_context_BotAccount
 		given translations: MornyLangs = MornyCoeur.this.lang
 		given assets: MornyAssets = MornyCoeur.this.assets
 	}

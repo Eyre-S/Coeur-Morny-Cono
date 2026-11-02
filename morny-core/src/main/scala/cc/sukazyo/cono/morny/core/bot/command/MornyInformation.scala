@@ -1,22 +1,19 @@
 package cc.sukazyo.cono.morny.core.bot.command
 
-import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
-import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
 import cc.sukazyo.cono.morny.core.bot.api.SimpleCommandManager
+import cc.sukazyo.cono.morny.core.bot.api.messages.{ErrorMessage, MessagingContext}
+import cc.sukazyo.cono.morny.core.{MornyCoeur, MornySystem}
 import cc.sukazyo.cono.morny.data.MornyInformation.*
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
-import cc.sukazyo.cono.morny.system.telegram_api.TelegramExtensions.Requests.unsafeExecute
-import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, InputCommand, ISimpleCommand, ITelegramCommand}
 import cc.sukazyo.cono.morny.system.telegram_api.command.ICommandAlias.HiddenAlias
+import cc.sukazyo.cono.morny.system.telegram_api.command.{ICommandAlias, ISimpleCommand, ITelegramCommand, InputCommand}
+import cc.sukazyo.cono.morny.system.telegram_api.formatting.TelegramParseEscape.escapeHtml as h
+import cc.sukazyo.cono.morny.system.telegram_api.message.Messages
+import cc.sukazyo.cono.morny.system.telegram_api.objects.Medias
+import cc.sukazyo.cono.morny.system.telegram_api.text.Texts
 import cc.sukazyo.cono.morny.util.CommonFormat.{formatDate, formatDuration}
-import cc.sukazyo.cono.morny.util.var_text
 import cc.sukazyo.cono.morny.util.var_text.VarText
 import com.pengrad.telegrambot.model.Update
-import com.pengrad.telegrambot.model.request.ParseMode
-import com.pengrad.telegrambot.request.{SendMessage, SendPhoto, SendSticker}
-
-import java.lang.System
 
 class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager with ITelegramCommand  {
 	import coeur.dsl.{*, given}
@@ -31,13 +28,16 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 	
 	override def execute (using command: InputCommand, event: Update): Unit = {
 		
+		var isOk: Boolean = false
 		command.args.headOption match
 			// due to the complex of stickers.XXX subcommands
 			//  matches all the commands that starts with "stickers"
 			case Some(s) if s.startsWith(Stickers.name) =>
 				Stickers.execute
+				isOk = true
 			case _ =>
 		
+		if isOk then return
 		this.emitCommands(using command.subcommand, event)
 		
 	}
@@ -67,16 +67,17 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 						coeur.errorMessageManager.sendErrorMessage(errMessage, ErrorMessage.Types.Complex, Some(cxt))
 		
 		// if theres no any associated information on the context
-		SendPhoto(
-			cxt.bind_chat.id,
-			getAboutPic
-		).caption(
-			translations.trans(
-				"morny.command.info.message.about",
-				translations.transAsVar("morny.information.about_links", getMornyAboutLinksVars*)(using cxt.bind_message.from.prefer_language)
-			)(using cxt.bind_message.from.prefer_language)
-		).parseMode(ParseMode HTML).replyToMessageId(cxt.bind_message.messageId)
-			.unsafeExecute
+		// TODO: can update with new MessagingContext API
+		Messages.derive(cxt.bind_message)
+			.photo(
+				Medias.of(getAboutPic)
+					.caption(Texts.html(
+						translations.trans(
+							"morny.command.info.message.about",
+							translations.transAsVar("morny.information.about_links", getMornyAboutLinksVars*)(using cxt.bind_message.from.prefer_language)
+						)(using cxt.bind_message.from.prefer_language)
+					)).photo
+			).send
 		
 	}
 	
@@ -131,12 +132,17 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 		
 		/** Send the specific sticker to telegram. */
 		private def sent (mid: String, file_id: String)(using send_chat: Long, send_replyTo: Int): Unit = {
-			val send_mid = SendMessage(send_chat, mid)
-			val send_sticker = SendSticker(send_chat, file_id)
-			if (send_replyTo != -1) send_mid.replyToMessageId(send_replyTo)
-			val result_send_mid = send_mid.unsafeExecute
-			send_sticker.replyToMessageId(result_send_mid.message.messageId)
-			send_sticker.unsafeExecute
+			// build&send message with mid
+			val ccMsg = Messages.create(send_chat)
+			val ccMsgMid =
+				if send_replyTo != -1 then ccMsg.replyTo(send_replyTo)
+				else ccMsg
+			val srvMsgMid = ccMsgMid(mid).send
+			// build message with sticker and send
+			// TODO: maybe upgrade method `replyTo`
+			ccMsg.replyTo(srvMsgMid.message.messageId)
+				.sticker(file_id)
+				.send
 		}
 		
 	}
@@ -154,8 +160,7 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 	private[command] def echoVersion (using event: Update): Unit = {
 		val versionDeltaHTML = MornySystem.VERSION_DELTA match {case Some(d) => s"-δ<code>${h(d)}</code>" case None => ""}
 		val versionGitHTML = if (MornySystem.GIT_COMMIT nonEmpty) s"git $getVersionGitTagHTML" else ""
-		SendMessage(
-			event.message.chat.id,
+		Messages.derive(event.message)(Texts.html(
 			VarText(
 				// language=html
 				"""version:
@@ -176,8 +181,7 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 				"time_millis" -> MornySystem.CODE_TIMESTAMP,
 				"time_utc" -> h(formatDate(MornySystem.CODE_TIMESTAMP, 0)),
 			)
-		).replyToMessageId(event.message.messageId).parseMode(ParseMode HTML)
-			.unsafeExecute
+		)).send
 	}
 	
 	private case object _Runtime extends ISimpleCommand:
@@ -187,8 +191,7 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 			echoRuntime
 	private[command] def echoRuntime (using event: Update): Unit = {
 		def sysprop (p: String): String = System.getProperty(p)
-		SendMessage(
-			event.message.chat.id,
+		Messages.derive(event.message)(Texts.html(
 			VarText(
 				/* language=html */
 				"""system:
@@ -231,8 +234,7 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 				"startup_time_utc" -> h(formatDate(coeur.coeurStartTimestamp, 0)),
 				"startup_time_millis" -> coeur.coeurStartTimestamp
 			)
-		).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-			.unsafeExecute
+		)).send
 	}
 	
 	private case object TasksStatus extends ISimpleCommand:
@@ -242,8 +244,7 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 			echoTasksStatus
 	private def echoTasksStatus (using update: Update): Unit = {
 //		if !coeur.trusted.isTrusted(update.message.from.id) then return;
-		SendMessage(
-			update.message.chat.id,
+		Messages.derive(update.message)(Texts.html(
 			VarText(
 				// language=html
 				"""<b>Coeur Task Scheduler:</b>
@@ -256,16 +257,13 @@ class MornyInformation (using coeur: MornyCoeur) extends SimpleCommandManager wi
 				"coeur.tasks.state" -> coeur.tasks.state,
 				"coeur.tasks.runnerState" -> coeur.tasks.runnerState
 			)
-		).parseMode(ParseMode.HTML).replyToMessageId(update.message.messageId)
-			.unsafeExecute
+		)).send
 	}
 	
 	private def echo404 (using event: Update): Unit =
-		SendSticker(
-			event.message.chat.id,
-			TelegramStickers ID_404
-		).replyToMessageId(event.message.messageId)
-			.unsafeExecute
+		Messages.derive(event.message)
+			.sticker(TelegramStickers.ID_404)
+			.send
 	
 }
 
