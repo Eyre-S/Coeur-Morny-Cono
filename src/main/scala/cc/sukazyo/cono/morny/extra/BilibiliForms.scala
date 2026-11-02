@@ -7,7 +7,6 @@ import sttp.client3.{HttpError, SttpClientException}
 import sttp.client3.okhttp.OkHttpSyncBackend
 import sttp.model.Uri
 
-import scala.runtime.stdLibPatches.Predef.assert as fromBv
 import scala.util.matching.Regex
 
 object BilibiliForms {

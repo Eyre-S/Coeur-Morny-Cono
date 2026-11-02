@@ -53,11 +53,8 @@ final String proj_version_full = proj_version + (proj_git ?
 final String proj_version_codename = CODENAME
 final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
 
-final JavaVersion proj_java = JavaVersion.VERSION_17
+final JavaVersion proj_java = JavaVersion.VERSION_21
 final Charset proj_file_encoding = StandardCharsets.UTF_8
-final proj_scala_api = 3
-//final proj_scala_lib = proj_scala_api+'.4.0-RC1-bin-20230901-89e8dba-NIGHTLY'
-final proj_scala_lib = proj_scala_api + '.3.1'
 String publish_local_url = null
 String publish_remote_url = null
 String publish_remote_username = null
@@ -79,43 +76,45 @@ repositories {
 
 dependencies {
 	
-	api group: 'org.scala-lang', name: 'scala3-library_3', version: proj_scala_lib
-	final scala = (String name) -> "${name}_$proj_scala_api"
-	compileOnlyApi group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: lib_spotbugs_v
+	compileOnlyApi "com.github.spotbugs:spotbugs-annotations:4.10.5"
 	
-	implementation group: 'cc.sukazyo', name: 'messiva', version: lib_messiva_v
-	implementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
+	implementation "cc.sukazyo:messiva:0.2.0"
+	implementation "cc.sukazyo:resource-tools:0.3.1"
 	
-	implementation group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: lib_javatelegramapi_v
-	implementation group: 'com.softwaremill.sttp.client3', name: scala('core'), version: lib_sttp_v
-	implementation group: 'com.softwaremill.sttp.client3', name: scala('okhttp-backend'), version: lib_sttp_v
-	runtimeOnly group: 'com.squareup.okhttp3', name: 'okhttp', version: lib_okhttp_v
-	runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: lib_okio_v
-	implementation group: 'com.google.code.gson', name: 'gson', version: lib_gson_v
-	implementation group: 'io.circe', name: scala('circe-core'), version: lib_circe_v
-	implementation group: 'io.circe', name: scala('circe-generic'), version: lib_circe_v
-	implementation group: 'io.circe', name: scala('circe-parser'), version: lib_circe_v
-	implementation group: 'io.circe', name: scala('circe-yaml-v12'), version: '0.16.0'
-	implementation group: 'org.jsoup', name: 'jsoup', version: lib_jsoup_v
-	implementation group: 'com.cronutils', name: 'cron-utils', version: lib_cron_utils_v
+	implementation "com.github.pengrad:java-telegram-bot-api:6.9.1"
+	implementation "com.softwaremill.sttp.client3:core_3:3.11.0"
+	implementation "com.softwaremill.sttp.client3:okhttp-backend_3:3.11.0"
+	runtimeOnly "com.squareup.okhttp3:okhttp:4.12.0"
+	runtimeOnly "com.squareup.okio:okio-jvm:3.18.2"
+	implementation "com.google.code.gson:gson:2.15.0"
+	implementation "io.circe:circe-core_3:0.14.17"
+	implementation "io.circe:circe-generic_3:0.14.17"
+	implementation "io.circe:circe-parser_3:0.14.17"
+	implementation "io.circe:circe-yaml-v12_3:0.16.0"
+	implementation 'org.jsoup:jsoup:1.23.2'
+	implementation "com.cronutils:cron-utils:9.2.1"
 	
 	// used for disable slf4j
 	// due to the slf4j api have been used in the following libraries:
 	//  - cron-utils
-	runtimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: lib_slf4j_v
-	testRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: lib_slf4j_v
+	runtimeOnly "org.slf4j:slf4j-nop:2.0.20"
+	testRuntimeOnly "org.slf4j:slf4j-nop:2.0.20"
 	
-	testImplementation group: 'cc.sukazyo', name: 'resource-tools', version: lib_resourcetools_v
-	testImplementation group: 'org.scalatest', name: scala('scalatest'), version: lib_scalatest_v
-	testImplementation group: 'org.scalatest', name: scala('scalatest-freespec'), version: lib_scalatest_v
-	testRuntimeOnly group: 'org.scala-lang.modules', name: scala('scala-xml'), version: lib_scalamodule_xml_v
+	testImplementation "cc.sukazyo:resource-tools:0.3.1"
+	testImplementation "org.scalatest:scalatest_3:3.2.17"
+	testImplementation "org.scalatest:scalatest-freespec_3:3.2.17"
+	testRuntimeOnly "org.scala-lang.modules:scala-xml_3:2.2.0"
 	// for generating HTML report: required by gradle-scalatest plugin
-	testRuntimeOnly group: 'com.vladsch.flexmark', name: 'flexmark-all', version: '0.64.8'
+	testRuntimeOnly "com.vladsch.flexmark:flexmark-all:0.64.8"
 	
 }
 
 java {
 	withSourcesJar()
+}
+
+scala {
+	scalaVersion = "3.3.1"
 }
 
 sourceSets {
@@ -133,24 +132,18 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	
-	sourceCompatibility proj_java.getMajorVersion()
-	targetCompatibility proj_java.getMajorVersion()
-	
+	options.release = proj_java.ordinal()
 	options.encoding = proj_file_encoding.name()
-	
 }
 
 tasks.withType(ScalaCompile).configureEach {
 	
-	sourceCompatibility proj_java.getMajorVersion()
-	targetCompatibility proj_java.getMajorVersion()
+	scalaCompileOptions.encoding = proj_file_encoding.name()
+	options.encoding = proj_file_encoding.name()
+	scalaCompileOptions.additionalParameters.add "-Xunchecked-java-output-version:${proj_java.ordinal()}".toString()
 	
 	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
 	scalaCompileOptions.additionalParameters.addAll ("-Xmax-inlines", "256")
-	
-	scalaCompileOptions.encoding = proj_file_encoding.name()
-	options.encoding = proj_file_encoding.name()
 	
 }
 
