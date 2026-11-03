@@ -59,14 +59,15 @@ class ShareToolBilibiliTest extends MornyTests {
 			}
 		}
 		
-		"that contains a b23 video share url, it should has results" taggedAs (Slow, Network) in {
+		"that contains a b23 video share url, it should has results" - {
 			for (messageObject <- BilibiliAssets.message_with_urls.with_b23_url) {
-//				s"In Message:\n${messageObject.content.indent(2)}" taggedAs (Slow, Network) in {
-				withInfos(s"In Message:\n${messageObject.content.indent(2)}") {
-					queryResultShouldContains(
-						ShareToolBilibili().query(formatToQueryUpdate(messageObject.content)),
-						messageObject.with_links
-					)
+				s"In Message:\n${messageObject.content.indent(2)}" taggedAs (Slow, Network) in {
+					withInfos(s"In Message:\n${messageObject.content.indent(2)}") {
+						queryResultShouldContains(
+							ShareToolBilibili().query(formatToQueryUpdate(messageObject.content)),
+							messageObject.with_links
+						)
+					}
 				}
 			}
 		}

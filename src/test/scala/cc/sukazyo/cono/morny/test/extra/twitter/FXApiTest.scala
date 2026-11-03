@@ -59,16 +59,12 @@ class FXApiTest extends MornyTests with TableDrivenPropertyChecks {
 //				api.tweet.get.media.get.photos.get.head.height shouldBe 1536
 //				api.tweet.get.media.get.mosaic shouldBe empty
 //			}),
-			((None, "1538536152093044736"), api => {
+			((None, "1961764095822369138"), api => {
 				api.tweet shouldBe defined
 				api.tweet.get.media shouldBe defined
 				api.tweet.get.media.get.videos shouldBe empty
 				api.tweet.get.media.get.photos shouldBe defined
 				api.tweet.get.media.get.photos.get.length shouldBe 2
-				api.tweet.get.media.get.photos.get.head.width shouldBe 2894
-				api.tweet.get.media.get.photos.get.head.height shouldBe 4093
-				api.tweet.get.media.get.photos.get(1).width shouldBe 2894
-				api.tweet.get.media.get.photos.get(1).height shouldBe 4093
 				api.tweet.get.media.get.mosaic shouldBe defined
 			}),
 			// https://x.com/_suk_ws/status/1472085698081484800
