@@ -100,22 +100,28 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		case class XText (data: String) extends XEncryptable:
 			val str: String = data
 			val asByteArray: Array[Byte] = data.getBytes(mod_charset)
-		val input: XEncryptable =
-			val _r = event.message.replyToMessage
-			if ((_r ne null) && (_r.document ne null)) {
+		
+		val input: XEncryptable = {
+			
+			val dataFromParam = command.data
+			val dataFromReply = event.message.replyToMessage
+			
+			if (!dataFromParam.isBlank) {
+				XText(dataFromParam)
+			} else if ((dataFromReply ne null) && (dataFromReply.document ne null)) {
 				try {XFile(
-					coeur.account `getFileContent` (coeur.account `exec` GetFile(_r.document.fileId)).file,
-					_r.document.fileName
+						coeur.account `getFileContent` (coeur.account `exec` GetFile(dataFromReply.document.fileId)).file,
+						dataFromReply.document.fileName
 				)} catch case e: IOException =>
 					logger `warn` s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
 					coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
 					return
-			} else if ((_r ne null) && (_r.photo ne null)) {
+			} else if ((dataFromReply ne null) && (dataFromReply.photo ne null)) {
 				try {
 					var _photo_origin: PhotoSize = null
 					var _photo_size: Long = 0
-					for (size <- _r.photo)
-						val _size = (size.width longValue)*size.height
+					for (size <- dataFromReply.photo)
+						val _size = (size.width longValue) * size.height
 						if (_photo_size < _size)
 							_photo_origin = size
 							_photo_size = _size
@@ -135,8 +141,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 						logger `warn` s"FileProcess error: PhotoSize:\n\t${e.getMessage}"
 						coeur.daemons.reporter.exception(e, "FileProcess error: PhotoSize")
 						return
-			} else if ((_r ne null) && (_r.text ne null)) {
-				XText(_r.text)
+			} else if ((dataFromReply ne null) && (dataFromReply.text ne null)) {
+				XText(dataFromReply.text)
 			} else {
 				coeur.account `exec` SendMessage(
 					event.message.chat.id,
@@ -144,6 +150,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
 				return
 			}
+			
+		}
 		// END BLOCK: get input
 		
 		// BLOCK: encrypt
