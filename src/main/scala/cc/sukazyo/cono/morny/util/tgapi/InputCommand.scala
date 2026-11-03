@@ -3,9 +3,10 @@ package cc.sukazyo.cono.morny.util.tgapi
 import cc.sukazyo.cono.morny.util.UniversalCommand
 
 class InputCommand private (
-		val target: String|Null,
-		val command: String,
-		val args: Array[String]
+	val target: String|Null,
+	val command: String,
+	val args: Array[String],
+	val data: String
 ) {
 	
 	override def toString: String =
@@ -15,18 +16,23 @@ class InputCommand private (
 
 object InputCommand {
 	
-	def apply (input: Array[String]): InputCommand = {
+	def apply (input: Array[String], data: String): InputCommand = {
 		val _ex = if input.nonEmpty then input(0) `split` ("@", 2) else Array.empty[String]
 		val _args = input drop 1
 		new InputCommand(
 			if _ex.length > 1 then _ex(1) else null,
 			if _ex.nonEmpty then _ex(0) else "",
-			_args
+			_args,
+			data
 		)
 	}
 	
 	//noinspection NoTailRecursionAnnotation
-	def apply (input: String): InputCommand =
-		InputCommand(UniversalCommand.Lossy(input))
+	def apply (input: String): InputCommand = {
+		val i = input.split("\n", 2)
+		val commandLine = i.head
+		val data = if (i.size > 1) i(1) else ""
+		InputCommand(UniversalCommand.Lossy(commandLine), data)
+	}
 	
 }
