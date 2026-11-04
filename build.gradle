@@ -54,6 +54,7 @@ final String proj_version_codename = CODENAME
 final long proj_code_time = proj_clean ? grgit.head().dateTime.toInstant().toEpochMilli() : System.currentTimeMillis()
 
 final JavaVersion proj_java = JavaVersion.VERSION_21
+final int proj_java_release = Integer.parseInt(proj_java.majorVersion)
 final Charset proj_file_encoding = StandardCharsets.UTF_8
 String publish_local_url = null
 String publish_remote_url = null
@@ -132,15 +133,21 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	options.release = proj_java.ordinal()
+	options.release = proj_java_release
+	sourceCompatibility = proj_java
+	targetCompatibility = proj_java
 	options.encoding = proj_file_encoding.name()
 }
 
 tasks.withType(ScalaCompile).configureEach {
 	
+	options.release = proj_java_release
+	sourceCompatibility = proj_java
+	targetCompatibility = proj_java
+	scalaCompileOptions.additionalParameters.add "-Xunchecked-java-output-version:${proj_java_release}".toString()
+	
 	scalaCompileOptions.encoding = proj_file_encoding.name()
 	options.encoding = proj_file_encoding.name()
-	scalaCompileOptions.additionalParameters.add "-Xunchecked-java-output-version:${proj_java.ordinal()}".toString()
 	
 	scalaCompileOptions.additionalParameters.add "-language:postfixOps"
 	scalaCompileOptions.additionalParameters.addAll ("-Xmax-inlines", "256")

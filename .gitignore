@@ -1,19 +1,17 @@
+# all default-ignore files
+# except...
+.*
+!.gitignore
+!.dockerignore
+!.editorconfig
+!.gitattributes
+!.github/
 
-# IDE
-.idea/
-.vscode/
-.gradle/
-.settings/
-
-#build
+# build
 /build/
 /bin/
 /out/
 target/
-.metals/
-.bsp/
-.bloop/
-.project
 lcoal.properties
 
 # debug dir
