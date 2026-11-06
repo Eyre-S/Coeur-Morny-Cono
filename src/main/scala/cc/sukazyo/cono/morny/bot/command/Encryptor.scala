@@ -2,16 +2,18 @@ package cc.sukazyo.cono.morny.bot.command
 
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
+import cc.sukazyo.cono.morny.bot.command.Encryptor.*
 import cc.sukazyo.cono.morny.bot.command.ICommandAlias.ListedAlias
 import cc.sukazyo.cono.morny.data.TelegramStickers
-import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.CommonEncrypt
 import cc.sukazyo.cono.morny.util.CommonEncrypt.*
 import cc.sukazyo.cono.morny.util.ConvertByteHex.toHex
+import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import cc.sukazyo.cono.morny.util.tgapi.TelegramExtensions.Bot.exec
 import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
-import com.pengrad.telegrambot.model.{PhotoSize, Update}
+import cc.sukazyo.messiva.logger.Logger
 import com.pengrad.telegrambot.model.request.ParseMode
+import com.pengrad.telegrambot.model.{Message, PhotoSize, Update}
 import com.pengrad.telegrambot.request.{GetFile, SendDocument, SendMessage, SendSticker}
 
 import java.io.IOException
@@ -22,15 +24,144 @@ import scala.language.postfixOps
 import scala.util.boundary
 import scala.util.boundary.break
 
+object Encryptor {
+	
+	sealed trait Encryptable {
+		@throws[IOException]
+		def binary: Bin
+	}
+	
+	object Encryptable {
+		
+		def fromPhotos (photos: Array[PhotoSize])(using MornyCoeur): Either[PhotoSizeException, InputTFile] = {
+			var _photo_origin: PhotoSize = null
+			var _photo_size: Long = 0
+			for (size <- photos)
+				val _size = (size.width longValue) * size.height
+				if (_photo_size < _size)
+					_photo_origin = size
+					_photo_size = _size
+			if (_photo_origin eq null) return Left(PhotoSizeException("no photo from api."))
+			import cc.sukazyo.cono.morny.util.UseRandom.rand_id
+			Right(InputTFile(_photo_origin.fileId, s"photo$rand_id.png"))
+		}
+		
+		def fromAttachments
+		(onPhotoSizeException: PhotoSizeException => Unit)
+		(message: Message, withTextBody: Boolean = false)
+		(using Charset, Logger, MornyCoeur): Option[Encryptable] = {
+			if message eq null then return None
+			if (message.document ne null) {
+				return Some(InputTFile(message.document.fileId, message.document.fileName))
+			} else if (message.photo ne null) {
+				Encryptable.fromPhotos(message.photo) match {
+					case Right(right) => return Some(right)
+					case Left(err) => onPhotoSizeException(err)
+				}
+			} else if (withTextBody && message.text != null) {
+				return Some(InputText(message.text))
+			}
+			None
+		}
+		
+	}
+	
+	case class InputText (str: String)(using charset: Charset) extends Encryptable {
+		override def binary: Bin = str.getBytes(charset)
+	}
+	
+	sealed trait EncryptableFile extends Encryptable {
+		def filename: String
+	}
+	
+	case class InputFile (override val binary: Bin, override val filename: String) extends EncryptableFile
+	
+	case class InputTFile (fileId: String, override val filename: String)(using coeur: MornyCoeur)
+	extends EncryptableFile {
+		@throws[IOException]
+		override def binary: Bin = coeur.account.getFileContent(
+			(coeur.account `exec` GetFile(fileId)).file
+		)
+	}
+	
+	class PhotoSizeException (message: String) extends Exception(s"FileProcess error: PhotoSize:\n\t$message") {
+		def log ()(using logger: Logger, coeur: MornyCoeur): Unit = {
+			logger.warn(this.getMessage)
+			coeur.daemons.reporter.exception(this, "FileProcess error: PhotoSize")
+		}
+	}
+	
+	case class OutputFile (file: Bin, filename: String)
+	
+	trait OutputTextLike {
+		def text: String
+	}
+	
+	case class OutputText (text: String) extends OutputTextLike
+	
+	case class OutputHash (text: String) extends OutputTextLike
+	
+	@throws[IOException]
+	def doEncrypt (
+		source: Encryptable,
+		processor: Bin => Bin,
+		filenameProcessor: String => String
+	)(using charset: Charset): OutputTextLike | OutputFile = {
+		source match {
+			case inputFile: EncryptableFile =>
+				OutputFile(processor(inputFile.binary), filenameProcessor(inputFile.filename))
+			case inputText: InputText =>
+				OutputText(String(processor(inputText.binary), charset))
+		}
+	}
+	
+	@throws[IOException]
+	def doHash (uppercase: Boolean)(source: Encryptable, processor: Bin => Bin): OutputHash = {
+		val hashed = processor(source.binary).toHex
+		OutputHash(if uppercase then hashed.toUpperCase else hashed)
+	}
+	
+}
+
 /** Provides Telegram Command __`/encrypt`__. */
 class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	override val name: String = "encrypt"
 	override val aliases: Array[ICommandAlias] | Null = Array(ListedAlias("enc"))
 	override val paramRule: String = "[algorithm|(l)] [(uppercase)]"
-	override val description: String = "通过指定算法加密回复的内容 (目前只支持文本)"
+	override val description: String = "通过指定加密/解密/哈希算法处理信息"
+	
+	private def echoNoContent ()(using message: Message): Unit = {
+		coeur.account `exec` SendMessage(
+			message.chat.id,
+			"<i><u>null</u></i>"
+		).parseMode(ParseMode HTML).replyToMessageId(message.messageId)
+	}
+	
+	private def echoConflict ()(using message: Message): Unit = {
+		coeur.account `exec` SendSticker(
+			message.chat.id,
+			TelegramStickers.ID_CONFLICT
+		).replyToMessageId(message.messageId)
+	}
+	
+	private def echoUnsupported ()(using message: Message): Unit = {
+		coeur.account `exec` SendSticker(
+			message.chat.id,
+			TelegramStickers.ID_404
+		).replyToMessageId(message.messageId)
+	}
+	
+	private def echoInternalError ()(using message: Message): Unit = {
+		coeur.account `exec` SendSticker(
+			message.chat.id,
+			TelegramStickers.ID_OVERHEAT
+		).replyToMessageId(message.messageId)
+	}
 	
 	override def execute (using command: InputCommand, event: Update): Unit = boundary {
+		given Logger = logger
+		given Message = event.message
 		
 		val args = command.args
 		
@@ -67,7 +198,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		
 		lazy val mod_file: Boolean = paramTagExists("file" :: "f" :: Nil)
 		
-		lazy val mod_charset: Charset =
+		given mod_charset: Charset =
 			params.find(_.text.startsWith("-e")) match
 				case Some(param) =>
 					param.used()
@@ -85,109 +216,48 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 //		lazy val mod_dec_charset = modCharsetFind("-ed")
 		
 		// BLOCK: get input
-		// for now, only support getting data from replied message, and
-		// this message CAN ONLY have texts or an universal file: if the
-		// universal files are not only one, only the first one can be get.
-		// - do NOT SUPPORT telegram inline image/video/autio yet
-		// - do NOT SUPPORT multi-file yet
-		// todo: support inline image/video/audio file and multi-files.
-		/** inner trait: the encryptable data abstract */
-		trait XEncryptable { /** standards data to [[Array]]`[`[[Byte]]`]` for processing */ val asByteArray: Array[Byte] }
-		/** inner class: the [[XEncryptable]] implementation of binary([[Array]]`[`[[Byte]]`]`) data (file or something) */
-		case class XFile (data: Array[Byte], name: String) extends XEncryptable:
-			val asByteArray: Array[Byte] = data
-		/** inner class: the [[XEncryptable]] implementation of [[String]] data */
-		case class XText (data: String) extends XEncryptable:
-			val str: String = data
-			val asByteArray: Array[Byte] = data.getBytes(mod_charset)
-		
-		val input: XEncryptable = {
+		/** User input data that will be encrypted.
+		  *
+		  * Will be loaded from (sorted by priority):
+		  *  1. texts that following the command. (the second & later lines of command message)
+		  *  2. attachments of command message.
+		  *  3. attachments of replied message.
+		  *  4. message full texts of replied message. (rich styles will not be formatted)
+		  *
+		  * Note that *source 1* and *source 2* is conflict, if both exists, an error will be occurred.
+		  */
+		val input: Encryptable = {
+			val myFromAttachments = Encryptable.fromAttachments(onPhotoSizeException = { err =>
+				err.log()
+			})
+			// message body data
+			val dataFromParam =
+				val data = command.data
+				if (!data.isBlank) Some(InputText(data))
+				else None
+			// message attachments
+			val dataFromAttachments = myFromAttachments(event.message, false)
+			// replied message attachments || text body
+			lazy val dataFromReplies = myFromAttachments(event.message.replyToMessage, true)
 			
-			val dataFromParam = command.data
-			val dataFromReply = event.message.replyToMessage
-			
-			if (!dataFromParam.isBlank) {
-				XText(dataFromParam)
-			} else if ((dataFromReply ne null) && (dataFromReply.document ne null)) {
-				try {XFile(
-						coeur.account `getFileContent` (coeur.account `exec` GetFile(dataFromReply.document.fileId)).file,
-						dataFromReply.document.fileName
-				)} catch case e: IOException =>
-					logger `warn` s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-					coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
-					return
-			} else if ((dataFromReply ne null) && (dataFromReply.photo ne null)) {
-				try {
-					var _photo_origin: PhotoSize = null
-					var _photo_size: Long = 0
-					for (size <- dataFromReply.photo)
-						val _size = (size.width longValue) * size.height
-						if (_photo_size < _size)
-							_photo_origin = size
-							_photo_size = _size
-					if (_photo_origin eq null) throw IllegalArgumentException("no photo from api.")
-					import cc.sukazyo.cono.morny.util.UseRandom.rand_id
-					XFile(
-						coeur.account `getFileContent` (coeur.account `exec` GetFile(_photo_origin.fileId)).file,
-						s"photo$rand_id.png"
-					)
-				} catch
-					case e: IOException =>
-						//noinspection DuplicatedCode
-						logger `warn` s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
-						coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
-						return
-					case e: IllegalArgumentException =>
-						logger `warn` s"FileProcess error: PhotoSize:\n\t${e.getMessage}"
-						coeur.daemons.reporter.exception(e, "FileProcess error: PhotoSize")
-						return
-			} else if ((dataFromReply ne null) && (dataFromReply.text ne null)) {
-				XText(dataFromReply.text)
-			} else {
-				coeur.account `exec` SendMessage(
-					event.message.chat.id,
-					"<i><u>null</u></i>"
-				).parseMode(ParseMode HTML).replyToMessageId(event.message.messageId)
-				return
-			}
-			
+			if (dataFromParam.isDefined && dataFromAttachments.isDefined)
+				echoConflict(); return
+			else if (dataFromParam.isDefined) dataFromParam.get
+			else if (dataFromAttachments.isDefined) dataFromAttachments.get
+			else if (dataFromReplies.isDefined) dataFromReplies.get
+			else { echoNoContent(); return }
 		}
 		// END BLOCK: get input
 		
 		// BLOCK: encrypt
-		/** inner class: encrypt result implementation of text-like (can be described as [[String]]). */
-		trait EXTextLike { val text: String }
-		/** inner class: encrypt result implementation of a file */
-		case class EXFile (result: Array[Byte], resultName: String)
-		/** inner class: [[EXTextLike]] implementation of just normal text */
-		case class EXText (text: String) extends EXTextLike
-		/** inner class: [[EXTextLike]] implementation of a special type: hash value */
-		case class EXHash (text: String) extends EXTextLike
-		/** generate encrypt result by making normal encrypt: output type == input type */
-		def genResult_encrypt (
-			source: XEncryptable, processor: Array[Byte]=>Array[Byte], filenameProcessor: String=>String
-		): EXFile|EXText = {
-			source match
-				case x_file: XFile => EXFile(processor(x_file asByteArray), filenameProcessor(x_file.name))
-				case x: XText =>
-					EXText(String(processor(x asByteArray), mod_charset))
-		}
-		/** generate encrypt result by making hash: output type == hash value */
-		def genResult_hash (source: XEncryptable, processor: Array[Byte]=>Array[Byte]): EXHash =
-			val hashed = processor(source asByteArray) toHex;
-			EXHash(if mod_uppercase then hashed toUpperCase else hashed)
 		//noinspection UnitMethodIsParameterless
-		def echo_unsupported: Unit =
-			coeur.account `exec` SendSticker(
-				event.message.chat.id,
-				TelegramStickers ID_404
-			).replyToMessageId(event.message.messageId)
-		val result: EXHash|EXFile|EXText = args(0) match
+		def myDoHash = doHash(mod_uppercase)
+		val result: OutputTextLike|OutputFile = try args(0) match
 			case "base64" | "base" | "baseu" | "b64" | "base64url" | "base64u" | "b64u" =>
 				val _tool_b64 =
 					if args(0) `contains` "u" then Base64.getUrlEncoder
 					else Base64.getEncoder
-				genResult_encrypt(
+				doEncrypt(
 					input,
 					_tool_b64.encode,
 					n => n+".b64.txt"
@@ -196,40 +266,46 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 				val _tool_b64d =
 					if args(0) `contains` "u" then Base64.getUrlDecoder
 					else Base64.getDecoder
-				val mappedInput:XEncryptable =
+				val mappedInput:Encryptable =
 					if mod_file then
 						input match {
-							case textInput: XText =>
-								XFile(textInput.asByteArray, "data.base64")
+							case textInput: InputText =>
+								InputFile(textInput.binary, "data.base64")
 							case _ => input
 						}
 					else input
-				try { genResult_encrypt(
+				try { doEncrypt(
 					mappedInput,
 					_tool_b64d.decode,
 					CommonEncrypt.lint_base64FileName
 				) } catch case _: IllegalArgumentException =>
-					echo_unsupported
-					return
+					echoUnsupported(); return
 			case "urlencoder" | "urlencode" | "urlenc" | "url" =>
 				input match
-					case x: XText =>
-						EXText(URLEncoder.encode(x.data, mod_charset))
-					case _: XFile => echo_unsupported; return;
+					case x: InputText =>
+						OutputText(URLEncoder.encode(x.str, mod_charset))
+					case _: EncryptableFile =>
+						echoUnsupported(); return;
 			case "urldecoder" | "urldecode" | "urldec" | "urld" =>
 				input match
-					case _: XFile => echo_unsupported; return;
-					case x: XText =>
-						try { EXText(URLDecoder.decode(x.data, mod_charset)) }
+					case _: EncryptableFile =>
+						echoUnsupported(); return;
+					case x: InputText =>
+						try { OutputText(URLDecoder.decode(x.str, mod_charset)) }
 						catch case _: IllegalArgumentException =>
-							echo_unsupported
-							return
-			case "md5" => genResult_hash(input, MD5)
-			case "sha1" => genResult_hash(input, SHA1)
-			case "sha256" => genResult_hash(input, SHA256)
-			case "sha512" => genResult_hash(input, SHA512)
+							echoUnsupported(); return
+			case "md5" => myDoHash(input, MD5)
+			case "sha1" => myDoHash(input, SHA1)
+			case "sha256" => myDoHash(input, SHA256)
+			case "sha512" => myDoHash(input, SHA512)
 			case _ =>
-				echo_unsupported; return;
+				echoUnsupported(); return;
+		catch
+			case e: IOException =>
+				this.echoInternalError()
+				logger `warn` s"NetworkRequest error: TelegramFileAPI:\n\t${e.getMessage}"
+				coeur.daemons.reporter.exception(e, "NetworkRequest error: TelegramFileAPI")
+				return
 		// END BLOCK: encrypt
 		
 		// warning if params not used:
@@ -244,12 +320,12 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		
 		// output
 		result match
-			case _file: EXFile =>
+			case _file: OutputFile =>
 				coeur.account `exec` SendDocument(
 					event.message.chat.id,
-					_file.result
-				).fileName(_file.resultName).replyToMessageId(event.message.messageId)
-			case _text: EXTextLike =>
+					_file.file
+				).fileName(_file.filename).replyToMessageId(event.message.messageId)
+			case _text: OutputTextLike =>
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 				coeur.account `exec` SendMessage(
 					event.message.chat.id,
@@ -291,7 +367,11 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		coeur.account `exec` SendMessage(
 			chat,
 			// language=html
-			s"""<b>base64</b>, base, b64
+			s"""Put text content below command line,
+			   |or attach files,
+			   |or reply to a text/file message.
+			   |--- Algorithms ---
+			   |<b>base64</b>, base, b64
 			   |<b>base64url</b>, baseu, base64u, b64u
 			   |<b>base64decode</b>, based, base64d, b64d
 			   |<b>base64url-decode</b>, baseud, base64ud, b64ud
@@ -301,7 +381,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |<b>sha256</b>
 			   |<b>sha512</b>
 			   |<b>md5</b>
-			   |---
+			   |--- Arguments ---
 			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>
 			   |<b><i>-e<u>&lt;charset_name&gt;</u></i></b> <i>(base64/url encode/decode only)</i>
 			   |<b><i>file</i></b>, f <i>(base64 decode only)</i>"""
