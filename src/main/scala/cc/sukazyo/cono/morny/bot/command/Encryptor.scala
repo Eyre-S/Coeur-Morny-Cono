@@ -121,6 +121,9 @@ object Encryptor {
 		OutputHash(if uppercase then hashed.toUpperCase else hashed)
 	}
 	
+	class NoParamValueException (key: String)
+		extends Exception (s"No value defined for param key $key")
+	
 }
 
 /** Provides Telegram Command __`/encrypt`__. */
@@ -194,10 +197,34 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			}
 		}
 		
+		def paramGetValue (tags: List[String]): Option[String] = boundary {
+			val iterator = params.iterator
+			while (iterator.hasNext) {
+				val it = iterator.next()
+				if (tags.exists(_.equalsIgnoreCase(it.text))) {
+					it.used()
+					iterator.nextOption() match {
+						case Some(next) =>
+							next.used()
+							break(Some(next.text))
+						case None => throw new NoParamValueException(it.text)
+					}
+				}
+			}
+			None
+		}
+		
+		/** mod arg: If exists, encrypted results that ignore-cases (like hashes) will force use UPPERCASE. */
 		lazy val mod_uppercase = paramTagExists("uppercase" :: "upper" :: "u" :: Nil)
 		
+		/** mod arg: If exists, encrypted results will always output as attached file. */
 		lazy val mod_file: Boolean = paramTagExists("file" :: "f" :: Nil)
 		
+		/** value arg: override file name when output as a file. */
+		@throws[IllegalArgumentException]
+		lazy val param_filename: Option[String] = paramGetValue("name" :: Nil)
+		
+		/** env arg: force different charset to use. */
 		given mod_charset: Charset =
 			params.find(_.text.startsWith("-e")) match
 				case Some(param) =>
@@ -242,10 +269,14 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			
 			if (dataFromParam.isDefined && dataFromAttachments.isDefined)
 				echoConflict(); return
-			else if (dataFromParam.isDefined) dataFromParam.get
-			else if (dataFromAttachments.isDefined) dataFromAttachments.get
-			else if (dataFromReplies.isDefined) dataFromReplies.get
-			else { echoNoContent(); return }
+			dataFromParam
+			.orElse(dataFromAttachments)
+			.orElse(dataFromReplies) match {
+				case Some(value) => value
+				case None =>
+					echoNoContent()
+					return
+			}
 		}
 		// END BLOCK: get input
 		
@@ -309,23 +340,35 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 		// END BLOCK: encrypt
 		
 		// warning if params not used:
-		if params.exists(_.isUsed == false) then
-			coeur.account `exec` SendMessage(
-				event.message.chat.id,
-				// language=html
-				s"""<b>Unknown Params:</b>
-				   |${params.filterNot(_.isUsed).map(x => s" - <code>${h(x.text)}</code>").mkString("\n")}""".stripMargin
-			).replyToMessageId(event.message.messageId).parseMode(ParseMode.HTML)
-			return
+		def lastCheckUnusedParams (): Boolean = {
+			if params.exists(_.isUsed == false) then {
+				coeur.account `exec` SendMessage(
+					event.message.chat.id,
+					// language=html
+					s"""<b>Unknown Params:</b>
+					   |${params.filterNot(_.isUsed).map(x => s" - <code>${h(x.text)}</code>").mkString("\n")}""".stripMargin
+				).replyToMessageId(event.message.messageId).parseMode(ParseMode.HTML)
+				true
+			} else false
+		}
 		
 		// output
 		result match
 			case _file: OutputFile =>
-				coeur.account `exec` SendDocument(
-					event.message.chat.id,
-					_file.file
-				).fileName(_file.filename).replyToMessageId(event.message.messageId)
+				try
+					val filename = param_filename.getOrElse(_file.filename)
+					if lastCheckUnusedParams() then return
+					coeur.account `exec` SendDocument(
+						event.message.chat.id,
+						_file.file
+					).fileName(
+						filename
+					).replyToMessageId(event.message.messageId)
+				catch
+					case e: NoParamValueException =>
+						echoUnsupported()
 			case _text: OutputTextLike =>
+				if lastCheckUnusedParams() then return
 				import cc.sukazyo.cono.morny.util.tgapi.formatting.TelegramParseEscape.escapeHtml as h
 				coeur.account `exec` SendMessage(
 					event.message.chat.id,
@@ -337,7 +380,7 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	
 	/** echo help to a specific message in a specific chat.
 	  *
-	  * === the help message ===
+	  * ## the help message
 	  * The first paragraph lists available encrypt algorithms and its alias,
 	  * each line have one algorithm where the first name highlighted is the
 	  * main name and following is aliases separated with `,`.
@@ -346,30 +389,39 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 	  * italic text following describes its usage environment.
 	  *
 	  * when output to telegram just like:
-	  * <blockquote>
-	  * 	'''base64''', base, b64<br>
-	  * 	'''base64u''', baseu, base64u, b64u<br>
-	  * 	'''base64decode''', based, base64d, b64d<br>
-	  * 	'''base64url-decode''', baseud, base64ud, b64ud<br>
-	  *     '''urlencoder''', urlencode, urlenc, url<br>
-	  *     '''urldecoder''', urldecode, urldec, urld<br>
-	  * 	'''sha1'''<br>
-	  * 	'''sha256'''<br>
-	  * 	'''sha512'''<br>
-	  * 	'''md5'''<br>
-	  * 	---<br>
-	  * 	'''uppercase''', upper, u ''(sha1/sha256/sha512/md5 only)''
-	  * 	'''-e__{charset_name}__''' ''(base64/url encode/decode only)''
-	  * 	'''file''', f ''(base64 decode only)''
-	  * </blockquote>
+	  *
+	  * > > <b>/enc &lt;algorithm&gt;</b> *<u>[arguments...]</u>*<br>
+	  * > > **<u>&lt;data&gt;</u>**
+	  * >
+	  * > > 📎 <b>/enc &lt;algorithm&gt;</b> *<u>[arguments...]</u>*
+	  * >
+	  * > > ↪️ <b>/enc &lt;algorithm&gt;</b> *<u>[arguments...]</u>*
+	  * >
+	  * > --- Algorithms ---<br>
+	  * > **base64**, base, b64<br>
+	  * > **base64u**, baseu, base64u, b64u<br>
+	  * > **base64decode**, based, base64d, b64d<br>
+	  * > **base64url-decode**, baseud, base64ud, b64ud<br>
+	  * > **urlencoder**, urlencode, urlenc, url<br>
+	  * > **urldecoder**, urldecode, urldec, urld<br>
+	  * > **sha1**<br>
+	  * > **sha256**<br>
+	  * > **sha512**<br>
+	  * > **md5**<br>
+	  * > --- Arguments ---<br>
+	  * > ***uppercase***, upper, u *(sha1/sha256/sha512/md5 only)*<br>
+	  * > ***-e<u>&lt;charset_name&gt;</u>*** *(base64/url encode/decode only)*<br>
+	  * > ***file***, f *(base64 decode only)*<br>
+	  * > ***name <u>&lt;filename&gt;</u>*** *(only when out a file)*<br>
 	  */
 	private def echoHelp(chat: Long, replyTo: Int): Unit =
 		coeur.account `exec` SendMessage(
 			chat,
 			// language=html
-			s"""Put text content below command line,
-			   |or attach files,
-			   |or reply to a text/file message.
+			s"""<blockquote><b>/enc <u>&lt;algorithm&gt;</u></b> <u><i>[arguments...]</i></u>
+			   |<b><u>&lt;data&gt;</u></b></blockquote>
+			   |<blockquote>📎 <b>/enc <u>&lt;algorithm&gt;</u></b> <u><i>[arguments...]</i></u></blockquote>
+			   |<blockquote>↪️ <b>/enc <u>&lt;algorithm&gt;</u></b> <u><i>[arguments...]</i></u></blockquote>
 			   |--- Algorithms ---
 			   |<b>base64</b>, base, b64
 			   |<b>base64url</b>, baseu, base64u, b64u
@@ -384,7 +436,8 @@ class Encryptor (using coeur: MornyCoeur) extends ITelegramCommand {
 			   |--- Arguments ---
 			   |<b><i>uppercase</i></b>, upper, u <i>(sha1/sha256/sha512/md5 only)</i>
 			   |<b><i>-e<u>&lt;charset_name&gt;</u></i></b> <i>(base64/url encode/decode only)</i>
-			   |<b><i>file</i></b>, f <i>(base64 decode only)</i>"""
+			   |<b><i>file</i></b>, f <i>(base64 decode only)</i>
+			   |<b><i>name <u>&lt;filename&gt;</u></i></b> <i>(only when out a file)</i>"""
 			.stripMargin
 		).replyToMessageId(replyTo).parseMode(ParseMode HTML)
 	
