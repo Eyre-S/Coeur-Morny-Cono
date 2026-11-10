@@ -4,22 +4,49 @@ import cc.sukazyo.cono.morny.bot.api.{EventEnv, EventListener}
 import cc.sukazyo.cono.morny.Log.logger
 import cc.sukazyo.cono.morny.MornyCoeur
 import cc.sukazyo.cono.morny.bot.command.MornyCommands
+import cc.sukazyo.cono.morny.bot.event.MornyOnTelegramCommand.isCommandMessage
 import cc.sukazyo.cono.morny.util.tgapi.InputCommand
 import com.pengrad.telegrambot.model.{Message, Update}
+
+object MornyOnTelegramCommand {
+	
+	/** Whether input should be accepted as a command.
+	  *
+	  * A text should:
+	  *
+	  * - starts with `/`
+	  * - have no leading spaces after `/`
+	  *
+	  * to be treated as a command.
+	  *
+	  * @param input A maybe-command text input. Multiline is supported. [[null]] not supported!
+	  * @return [[true]] if this input is command-ish, [[false]] otherwise.
+	  */
+	def isCommandMessage (input: String): Boolean = {
+		if !input.startsWith("/") then false
+		else if input.startsWith("/ ") then false
+		else true
+	}
+	
+}
 
 class MornyOnTelegramCommand (using commandManager: MornyCommands) (using coeur: MornyCoeur) extends EventListener {
 	
 	override def onMessage (using event: EventEnv): Unit = {
 		given update: Update = event.update
 		
-		def _isCommandMessage(message: Message): Boolean =
-			if message.text eq null then false
-			else if !(message.text `startsWith` "/") then false
-			else if message.text `startsWith` "/ " then false
-			else true
+		val inputText: String =
+			Option(update.message.text)
+			.orElse(Option(update.message.caption)) match {
+				case Some(text) => text
+				case None =>
+					logger.debug("no any input text, skipped")
+					return
+			}
 		
-		if !_isCommandMessage(update.message) then return
-		val inputCommand = InputCommand(update.message.text drop 1)
+		if !isCommandMessage(inputText) then return
+		
+		val inputCommand = InputCommand(inputText.drop(1))
 		event `provide` inputCommand
 		logger `trace` ":provided InputCommand for event"
 		
